@@ -22,7 +22,7 @@ in the terminal and check that it recognizes the command and returns the expecte
 
 
 Installing RNAStructViz:
-Download the repository from https://github.com/gtfold/RNAStructViz 
+Download the repository from https://github.com/gtfold/RNAStructViz (by clicking the "ZIP" button).
 After unpacking the archive, navigate to the RNAStructViz-master directory in a terminal window. 
 Run the following:
   ./configure
