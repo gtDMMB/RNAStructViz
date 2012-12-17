@@ -313,7 +313,8 @@ void DiagramWindow::DrawKey3()
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn+3);
     yPosn += 10;
 
-    fl_color(FL_YELLOW);
+    //fl_color(FL_YELLOW);
+	fl_color(fl_rgb_color(255,127,0));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_line_style(FL_DOT);
@@ -410,7 +411,8 @@ void DiagramWindow::Draw3(RNAStructure** structures, const int resolution)
                 }
                 else
                 {
-                    fl_color(FL_YELLOW);
+                    //fl_color(FL_YELLOW);
+			fl_color(fl_rgb_color(255,127,0));
 				    DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase, 
 				    	angleDelta, radius);
                     
