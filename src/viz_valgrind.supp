@@ -1,0 +1,1028 @@
+{
+   <libGL1>
+   Memcheck:Leak
+   fun:malloc
+   fun:XInitExtension
+   fun:XextAddDisplay
+   obj:/usr/lib64/nvidia/libGL.so.256.35
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:_dl_lookup_symbol_x
+}
+
+{
+   <libGL2>
+   Memcheck:Leak
+   fun:malloc
+   fun:XInitExtension
+   fun:XextAddDisplay
+   obj:/usr/lib64/nvidia/libGL.so.256.35
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+}
+
+{
+   <Xft1>
+   Memcheck:Leak
+   fun:malloc
+   fun:XInitExtension
+   fun:XRenderFindDisplay
+   fun:XRenderQueryExtension
+   obj:/usr/lib64/libXft.so.2.1.2
+   fun:XftDefaultHasRender
+   fun:XftDefaultSubstitute
+   fun:XftFontMatch
+   fun:XftFontOpen
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN11Fl_FontSizeC1EPKc
+   fun:_Z7fl_fontii
+}
+
+{
+   <Xsomething1>
+   Memcheck:Leak
+   fun:malloc
+   fun:XInitExtension
+   fun:XFixesFindDisplay
+   fun:XFixesSetCursorName
+   fun:XcursorImagesLoadCursor
+   fun:XcursorTryShapeCursor
+   fun:XCreateGlyphCursor
+   fun:XCreateFontCursor
+   fun:_ZN9Fl_Window6cursorE9Fl_Cursor8Fl_ColorS1_
+   fun:_ZN15Fl_File_Chooser4showEv
+   fun:_ZN10MainWindow16OpenFileCallbackEP9Fl_WidgetPv
+   fun:_ZN9Fl_Button6handleEi
+}
+
+{
+   <Xsomething2>
+   Memcheck:Leak
+   fun:malloc
+   fun:XInitExtension
+   fun:XkbUseExtension
+   fun:XOpenDisplay
+   fun:_Z15fl_open_displayv
+   fun:_ZN2Fl6visualEi
+   fun:_ZN12RNAStructVizC1Ev
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <Xsomething3>
+   Memcheck:Leak
+   fun:malloc
+   fun:XInitExtension
+   fun:XextAddDisplay
+   fun:XdbeQueryExtension
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN2Fl6visualEi
+   fun:_ZN12RNAStructVizC1Ev
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <XSomething4>
+   Memcheck:Leak
+   fun:calloc
+   fun:XInitExtension
+   fun:XkbUseExtension
+   fun:XOpenDisplay
+   fun:_Z15fl_open_displayv
+   fun:_ZN2Fl6visualEi
+   fun:_ZN12RNAStructVizC1Ev
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <Xsomething5>
+   Memcheck:Leak
+   fun:calloc
+   fun:XInitExtension
+   fun:XextAddDisplay
+   fun:XdbeQueryExtension
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN2Fl6visualEi
+   fun:_ZN12RNAStructVizC1Ev
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <libGL3>
+   Memcheck:Leak
+   fun:calloc
+   fun:XInitExtension
+   fun:XextAddDisplay
+   obj:/usr/lib64/nvidia/libGL.so.256.35
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:_dl_lookup_symbol_x
+}
+
+{
+   <libGL4>
+   Memcheck:Leak
+   fun:calloc
+   fun:XInitExtension
+   fun:XextAddDisplay
+   obj:/usr/lib64/nvidia/libGL.so.256.35
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+}
+
+{
+   <Xft2>
+   Memcheck:Leak
+   fun:calloc
+   fun:XAddExtension
+   obj:/usr/lib64/libXft.so.2.1.2
+   fun:XftDefaultHasRender
+   fun:XftDefaultSubstitute
+   fun:XftFontMatch
+   fun:XftFontOpen
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN11Fl_FontSizeC1EPKc
+   fun:_Z7fl_fontii
+   fun:_Z15fl_normal_labelPK8Fl_Labeliiii8Fl_Align
+   fun:_ZNK9Fl_Widget10draw_labelEiiii8Fl_Align
+}
+
+{
+   <Xft3>
+   Memcheck:Leak
+   fun:calloc
+   fun:XInitExtension
+   fun:XRenderFindDisplay
+   fun:XRenderQueryExtension
+   obj:/usr/lib64/libXft.so.2.1.2
+   fun:XftDefaultHasRender
+   fun:XftDefaultSubstitute
+   fun:XftFontMatch
+   fun:XftFontOpen
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN11Fl_FontSizeC1EPKc
+   fun:_Z7fl_fontii
+}
+
+{
+   <Xinerama1>
+   Memcheck:Leak
+   fun:calloc
+   fun:XAddExtension
+   fun:XextAddDisplay
+   fun:XineramaIsActive
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN2Fl11screen_xywhERiS0_S0_S0_ii
+   fun:_ZN4Fl_X8make_xidEP9Fl_WindowP11XVisualInfom
+   fun:_ZN9Fl_Window4showEiPPc
+   fun:_ZN10MainWindow10InitializeEiPPc
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <Xsomething7>
+   Memcheck:Leak
+   fun:calloc
+   fun:XAddExtension
+   fun:_XcursorGetDisplayInfo
+   fun:XcursorSupportsARGB
+   fun:XcursorTryShapeCursor
+   fun:XCreateGlyphCursor
+   fun:XCreateFontCursor
+   fun:_ZN9Fl_Window6cursorE9Fl_Cursor8Fl_ColorS1_
+   fun:_ZN15Fl_File_Chooser4showEv
+   fun:_ZN10MainWindow16OpenFileCallbackEP9Fl_WidgetPv
+   fun:_ZN9Fl_Button6handleEi
+   obj:/usr/lib64/libfltk.so.1.1
+}
+
+{
+   <Xsomething8>
+   Memcheck:Leak
+   fun:malloc
+   fun:XGetWindowProperty
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN2Fl1xEv
+   fun:_ZN2Fl11screen_xywhERiS0_S0_S0_ii
+   fun:_ZN4Fl_X8make_xidEP9Fl_WindowP11XVisualInfom
+   fun:_ZN9Fl_Window4showEiPPc
+   fun:_ZN10MainWindow10InitializeEiPPc
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <lib64_libfont>
+   Memcheck:Leak
+   fun:malloc
+   fun:FcStrCopy
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/lib64/libexpat.so.0.5.0
+   obj:/lib64/libexpat.so.0.5.0
+   obj:/lib64/libexpat.so.0.5.0
+   obj:/lib64/libexpat.so.0.5.0
+   fun:XML_ParseBuffer
+   fun:FcConfigParseAndLoad
+   fun:FcConfigParseAndLoad
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/lib64/libexpat.so.0.5.0
+}
+
+{
+   <libfont_libXft>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/usr/lib64/libXft.so.2.1.2
+   obj:/usr/lib64/libXft.so.2.1.2
+   obj:/usr/lib64/libXft.so.2.1.2
+   obj:/usr/lib64/libXft.so.2.1.2
+   fun:XftDefaultHasRender
+   fun:XftDefaultSubstitute
+   fun:XftFontMatch
+   fun:XftFontOpen
+   obj:/usr/lib64/libfltk.so.1.1
+}
+
+{
+   <Xsomething9>
+   Memcheck:Leak
+   fun:malloc
+   fun:XGetVisualInfo
+   fun:_Z15fl_open_displayP9_XDisplay
+   fun:_ZN2Fl6visualEi
+   fun:_ZN12RNAStructVizC1Ev
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <lib64_libfont_1>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/lib64/libexpat.so.0.5.0
+   obj:/lib64/libexpat.so.0.5.0
+   obj:/lib64/libexpat.so.0.5.0
+   obj:/lib64/libexpat.so.0.5.0
+   fun:XML_ParseBuffer
+   fun:FcConfigParseAndLoad
+   fun:FcConfigParseAndLoad
+}
+
+{
+   <Xft_libfont>
+   Memcheck:Leak
+   fun:realloc
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   obj:/usr/lib64/libfontconfig.so.1.1.0
+   fun:FcFontRenderPrepare
+   fun:FcFontSetMatch
+   fun:FcFontMatch
+   fun:XftFontMatch
+   fun:XftFontOpen
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN11Fl_FontSizeC1EPKc
+   fun:_Z7fl_fontii
+   fun:_Z15fl_normal_labelPK8Fl_Labeliiii8Fl_Align
+}
+
+{
+   <libnvidia>
+   Memcheck:Cond
+   obj:/usr/lib64/nvidia/libnvidia-glcore.so.256.35
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+}
+
+{
+   <libGL6>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib64/nvidia/libGL.so.256.35
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+}
+
+{
+   <ConditionalJump-?>
+   Memcheck:Cond
+   fun:XftFontInfoEqual
+   fun:XftFontOpenInfo
+   fun:XftFontOpenPattern
+   fun:XftFontOpen
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN11Fl_FontSizeC1EPKc
+   fun:_Z7fl_fontii
+   fun:_Z15fl_normal_labelPK8Fl_Labeliiii8Fl_Align
+   fun:_ZNK9Fl_Widget10draw_labelEiiii8Fl_Align
+   fun:_ZN8Fl_Group13draw_childrenEv
+   fun:_ZNK8Fl_Group10draw_childER9Fl_Widget
+   fun:_ZN8Fl_Group13draw_childrenEv
+}
+
+{
+   <ConditionalJump1-?>
+   Memcheck:Cond
+   fun:XftFontOpenInfo
+   fun:XftFontOpenPattern
+   fun:XftFontOpen
+   obj:/usr/lib64/libfltk.so.1.1
+   fun:_ZN11Fl_FontSizeC1EPKc
+   fun:_Z7fl_fontii
+   fun:_Z15fl_normal_labelPK8Fl_Labeliiii8Fl_Align
+   fun:_ZNK9Fl_Widget10draw_labelEiiii8Fl_Align
+   fun:_ZN8Fl_Group13draw_childrenEv
+   fun:_ZNK8Fl_Group10draw_childER9Fl_Widget
+   fun:_ZN8Fl_Group13draw_childrenEv
+   fun:_ZN9Fl_Window4drawEv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:malloc_set_zone_name
+   fun:_malloc_initialize
+   fun:malloc_good_size
+   fun:__CFStringChangeSizeMultiple
+   fun:CFStringAppend
+   fun:_convertToURLRepresentation
+   fun:_CFURLInit
+   fun:CFURLCreateWithFileSystemPathRelativeToBase
+   fun:_CFBundleGetMainBundleAlreadyLocked
+   fun:CFBundleGetMainBundle
+   fun:_CFBundleGetMainBundleIfLooksLikeBundle
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:malloc_set_zone_name
+   fun:dispatch_once_f
+   fun:_dispatch_continuation_alloc_from_heap
+   fun:_dispatch_barrier_async_f_slow
+   fun:dispatch_source_create
+   fun:_dispatch_mach_notify_source_init
+   fun:dispatch_once_f
+   fun:dispatch_source_type_mach_send_init
+   fun:dispatch_source_create
+   fun:_ZL22connectToCoreServicesDv
+   fun:_ZL9getStatusv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:malloc_set_zone_name
+   fun:malloc_default_purgeable_zone
+   fun:ImageIO_Malloc
+   fun:copyImageBlockSetTIFF
+   fun:ImageProviderCopyImageBlockSetCallback
+   fun:CGImageProviderCopyImageBlockSet
+   fun:img_blocks_create
+   fun:img_data_lock
+   fun:CGSImageDataLock
+   fun:ripc_AcquireImage
+   fun:ripc_DrawImage
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Z17fl_create_bitmaskiiPKh
+   fun:_ZN25Fl_Quartz_Graphics_Driver4drawEP9Fl_Bitmapiiiiii
+   fun:_ZN9Fl_Bitmap4drawEiiiiii
+   fun:_Z7fl_drawPKciiiijPFvS0_iiiEP8Fl_Imagei
+   fun:_Z7fl_drawPKciiiijP8Fl_Imagei
+   fun:_Z15fl_normal_labelPK8Fl_Labeliiiij
+   fun:_ZNK9Fl_Widget10draw_labelEiiiij
+   fun:_ZN9Fl_Button4drawEv
+   fun:_ZNK8Fl_Group10draw_childER9Fl_Widget
+   fun:_ZN8Fl_Group13draw_childrenEv
+   fun:_ZNK8Fl_Group10draw_childER9Fl_Widget
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_Znam
+   fun:_ZL19OTFSetupHFMXAndVFMXRK9TSFNTDataiRPK12EndianScalarIsL11EEndianness0EES7_
+   fun:_ZN20TSFNTOpenTypeCIDFontC2ERK9TSFNTData
+   fun:_ZN24TOpenTypeCIDDataForkFontC2ERK18TFileDataSurrogate
+   fun:_ZN5TFont25CreateFontEntitiesForFileEPKcbR12TSimpleArrayIPS_EbsS1_
+   fun:FPFontCreateFontsWithPath
+   fun:create_private_data_with_path
+   fun:CGFontCreateFontsWithPath
+   fun:CGFontCreateFontsWithURL
+   fun:_ZN7TCGFontC2EPK7__CFURLb
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_Znam
+   fun:_ZL19OTFSetupHFMXAndVFMXRK9TSFNTDataiRPK12EndianScalarIsL11EEndianness0EES7_
+   fun:_ZN20TSFNTOpenTypeCIDFontC2ERK9TSFNTData
+   fun:_ZN24TOpenTypeCIDDataForkFontC2ERK18TFileDataSurrogate
+   fun:_ZN5TFont25CreateFontEntitiesForFileEPKcbR12TSimpleArrayIPS_EbsS1_
+   fun:FPFontCreateFontsWithPath
+   fun:create_private_data_with_path
+   fun:CGFontCreateFontsWithPath
+   fun:CGFontCreateFontsWithURL
+   fun:_ZN7TCGFontC2EPK7__CFURLb
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:__CFBasicHashRehash
+   fun:__CFBasicHashAddValue
+   fun:CFDictionarySetValue
+   fun:-[NSColorList _indexOfKey:]
+   fun:-[NSColorList colorWithKey:]
+   fun:-[NSCatalogColor colorUsingColorSpaceName:device:]
+   fun:-[NSColor colorUsingColorSpaceName:]
+   fun:-[NSColor blendedColorWithFraction:ofColor:]
+   fun:-[NSColor shadowWithLevel:]
+   fun:+[NSDynamicSystemColor controlDarkShadowColor]
+   fun:+[NSObject performSelector:]
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:__CFBasicHashRehash
+   fun:__CFBasicHashAddValue
+   fun:CFDictionarySetValue
+   fun:-[NSColorList _indexOfKey:]
+   fun:-[NSColorList colorWithKey:]
+   fun:-[NSCatalogColor colorUsingColorSpaceName:device:]
+   fun:-[NSColor colorUsingColorSpaceName:]
+   fun:-[NSColor blendedColorWithFraction:ofColor:]
+   fun:-[NSColor shadowWithLevel:]
+   fun:+[NSDynamicSystemColor controlDarkShadowColor]
+   fun:+[NSObject performSelector:]
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:_CFRuntimeCreateInstance
+   fun:CFBasicHashCreate
+   fun:__CFDictionaryCreateGeneric
+   fun:CFDictionaryCreateMutable
+   fun:-[NSColorList _indexOfKey:]
+   fun:-[NSColorList colorWithKey:]
+   fun:-[NSCatalogColor colorUsingColorSpaceName:device:]
+   fun:-[NSColor colorUsingColorSpaceName:]
+   fun:-[NSColor blendedColorWithFraction:ofColor:]
+   fun:-[NSColor shadowWithLevel:]
+   fun:+[NSDynamicSystemColor controlDarkShadowColor]
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+   fun:_ZNSs12_S_constructIPKcEEPcT_S3_RKSaIcESt20forward_iterator_tag
+   fun:_ZNSsC2EPKcRKSaIcE
+   fun:_ZNSt4pairIKjSsEC2IjPcEERKS_IT_T0_E
+   fun:MachPortTrackerAdd
+   fun:_ZN9SCSessionC2Ejj
+   fun:_ZN15SCClientSessionC2Ejjj
+   fun:_ZN15SCClientSession17checkinWithServerEPj
+   fun:_ZL22connectToCoreServicesDv
+   fun:_ZL9getStatusv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+   fun:_ZNSs12_S_constructIPKcEEPcT_S3_RKSaIcESt20forward_iterator_tag
+   fun:_ZNSsC2EPKcRKSaIcE
+   fun:_ZNSt4pairIKjSsEC2IjPcEERKS_IT_T0_E
+   fun:MachPortTrackerAdd
+   fun:_ZN9SCSessionC2Ejj
+   fun:_ZN15SCClientSessionC2Ejjj
+   fun:_ZN15SCClientSessionC2Ejjj
+   fun:_ZN15SCClientSession17checkinWithServerEPj
+   fun:_ZL22connectToCoreServicesDv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL36createOnePointEightGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN17ConversionManager11AddGrayConvEP10CMMProfile
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+   fun:ColorSyncTransformCreate
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL36createOnePointEightGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN17ConversionManager11AddGrayConvEP10CMMProfile
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+   fun:ColorSyncTransformCreate
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL36createOnePointEightGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN17ConversionManager11AddGrayConvEP10CMMProfile
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+   fun:ColorSyncTransformCreate
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:malloc_set_zone_name
+   fun:_malloc_initialize
+   fun:malloc_good_size
+   fun:__CFStringChangeSizeMultiple
+   fun:CFStringAppend
+   fun:_convertToURLRepresentation
+   fun:_CFURLInit
+   fun:CFURLCreateWithFileSystemPathRelativeToBase
+   fun:_CFBundleGetMainBundleAlreadyLocked
+   fun:CFBundleGetMainBundle
+   fun:_CFBundleGetMainBundleIfLooksLikeBundle
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:malloc_set_zone_name
+   fun:dispatch_once_f
+   fun:_dispatch_continuation_alloc_from_heap
+   fun:_dispatch_barrier_async_f_slow
+   fun:dispatch_source_create
+   fun:_dispatch_mach_notify_source_init
+   fun:dispatch_once_f
+   fun:dispatch_source_type_mach_send_init
+   fun:dispatch_source_create
+   fun:_ZL22connectToCoreServicesDv
+   fun:_ZL9getStatusv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:aglChoosePixelFormat
+   fun:_ZN12Fl_Gl_Choice4findEiPKi
+   fun:_ZN2Fl9gl_visualEiPi
+   fun:_ZN12RNAStructVizC2Ev
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:malloc_set_zone_name
+   fun:malloc_default_purgeable_zone
+   fun:ImageIO_Malloc
+   fun:copyImageBlockSetTIFF
+   fun:ImageProviderCopyImageBlockSetCallback
+   fun:CGImageProviderCopyImageBlockSet
+   fun:img_blocks_create
+   fun:img_data_lock
+   fun:CGSImageDataLock
+   fun:ripc_AcquireImage
+   fun:ripc_DrawImage
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Z17fl_create_bitmaskiiPKh
+   fun:_ZN25Fl_Quartz_Graphics_Driver4drawEP9Fl_Bitmapiiiiii
+   fun:_ZN9Fl_Bitmap4drawEiiiiii
+   fun:_Z7fl_drawPKciiiijPFvS0_iiiEP8Fl_Imagei
+   fun:_Z7fl_drawPKciiiijP8Fl_Imagei
+   fun:_Z15fl_normal_labelPK8Fl_Labeliiiij
+   fun:_ZNK9Fl_Widget10draw_labelEiiiij
+   fun:_ZN9Fl_Button4drawEv
+   fun:_ZNK8Fl_Group10draw_childER9Fl_Widget
+   fun:_ZN8Fl_Group13draw_childrenEv
+   fun:_ZNK8Fl_Group10draw_childER9Fl_Widget
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_Znam
+   fun:_ZL19OTFSetupHFMXAndVFMXRK9TSFNTDataiRPK12EndianScalarIsL11EEndianness0EES7_
+   fun:_ZN20TSFNTOpenTypeCIDFontC2ERK9TSFNTData
+   fun:_ZN24TOpenTypeCIDDataForkFontC2ERK18TFileDataSurrogate
+   fun:_ZN5TFont25CreateFontEntitiesForFileEPKcbR12TSimpleArrayIPS_EbsS1_
+   fun:FPFontCreateFontsWithPath
+   fun:create_private_data_with_path
+   fun:CGFontCreateFontsWithPath
+   fun:CGFontCreateFontsWithURL
+   fun:_ZN7TCGFontC2EPK7__CFURLb
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_Znam
+   fun:_ZL19OTFSetupHFMXAndVFMXRK9TSFNTDataiRPK12EndianScalarIsL11EEndianness0EES7_
+   fun:_ZN20TSFNTOpenTypeCIDFontC2ERK9TSFNTData
+   fun:_ZN24TOpenTypeCIDDataForkFontC2ERK18TFileDataSurrogate
+   fun:_ZN5TFont25CreateFontEntitiesForFileEPKcbR12TSimpleArrayIPS_EbsS1_
+   fun:FPFontCreateFontsWithPath
+   fun:create_private_data_with_path
+   fun:CGFontCreateFontsWithPath
+   fun:CGFontCreateFontsWithURL
+   fun:_ZN7TCGFontC2EPK7__CFURLb
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:class_createInstance
+   fun:+[NSObject allocWithZone:]
+   fun:+[NSAutoreleasePool allocWithZone:]
+   fun:_objc_rootAlloc
+   fun:_Z15fl_open_displayv
+   fun:_ZN12Fl_Gl_Choice4findEiPKi
+   fun:_ZN2Fl9gl_visualEiPi
+   fun:_ZN12RNAStructVizC2Ev
+   fun:_ZN12RNAStructViz10InitializeEiPPc
+   fun:main
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:__CFBasicHashRehash
+   fun:__CFBasicHashAddValue
+   fun:CFDictionarySetValue
+   fun:-[NSColorList _indexOfKey:]
+   fun:-[NSColorList colorWithKey:]
+   fun:-[NSCatalogColor colorUsingColorSpaceName:device:]
+   fun:-[NSColor colorUsingColorSpaceName:]
+   fun:-[NSColor blendedColorWithFraction:ofColor:]
+   fun:-[NSColor shadowWithLevel:]
+   fun:+[NSDynamicSystemColor controlDarkShadowColor]
+   fun:+[NSObject performSelector:]
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:__CFBasicHashRehash
+   fun:__CFBasicHashAddValue
+   fun:CFDictionarySetValue
+   fun:-[NSColorList _indexOfKey:]
+   fun:-[NSColorList colorWithKey:]
+   fun:-[NSCatalogColor colorUsingColorSpaceName:device:]
+   fun:-[NSColor colorUsingColorSpaceName:]
+   fun:-[NSColor blendedColorWithFraction:ofColor:]
+   fun:-[NSColor shadowWithLevel:]
+   fun:+[NSDynamicSystemColor controlDarkShadowColor]
+   fun:+[NSObject performSelector:]
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc_zone_malloc
+   fun:_CFRuntimeCreateInstance
+   fun:CFBasicHashCreate
+   fun:__CFDictionaryCreateGeneric
+   fun:CFDictionaryCreateMutable
+   fun:-[NSColorList _indexOfKey:]
+   fun:-[NSColorList colorWithKey:]
+   fun:-[NSCatalogColor colorUsingColorSpaceName:device:]
+   fun:-[NSColor colorUsingColorSpaceName:]
+   fun:-[NSColor blendedColorWithFraction:ofColor:]
+   fun:-[NSColor shadowWithLevel:]
+   fun:+[NSDynamicSystemColor controlDarkShadowColor]
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+   fun:_ZNSs12_S_constructIPKcEEPcT_S3_RKSaIcESt20forward_iterator_tag
+   fun:_ZNSsC2EPKcRKSaIcE
+   fun:_ZNSt4pairIKjSsEC2IjPcEERKS_IT_T0_E
+   fun:MachPortTrackerAdd
+   fun:_ZN9SCSessionC2Ejj
+   fun:_ZN15SCClientSessionC2Ejjj
+   fun:_ZN15SCClientSession17checkinWithServerEPj
+   fun:_ZL22connectToCoreServicesDv
+   fun:_ZL9getStatusv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_Znwm
+   fun:_ZNSs4_Rep9_S_createEmmRKSaIcE
+   fun:_ZNSs12_S_constructIPKcEEPcT_S3_RKSaIcESt20forward_iterator_tag
+   fun:_ZNSsC2EPKcRKSaIcE
+   fun:_ZNSt4pairIKjSsEC2IjPcEERKS_IT_T0_E
+   fun:MachPortTrackerAdd
+   fun:_ZN9SCSessionC2Ejj
+   fun:_ZN15SCClientSessionC2Ejjj
+   fun:_ZN15SCClientSessionC2Ejjj
+   fun:_ZN15SCClientSession17checkinWithServerEPj
+   fun:_ZL22connectToCoreServicesDv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL27createSRGBGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN12CMMRGBCurves12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgrj
+   fun:_ZN17ConversionManager13AddMatrixConvERA3_P9CMMXYZTagR12CMMRGBCurves
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL36createOnePointEightGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN17ConversionManager11AddGrayConvEP10CMMProfile
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+   fun:ColorSyncTransformCreate
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL36createOnePointEightGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN17ConversionManager11AddGrayConvEP10CMMProfile
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+   fun:ColorSyncTransformCreate
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL36createOnePointEightGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN17ConversionManager11AddGrayConvEP10CMMProfile
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+   fun:ColorSyncTransformCreate
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_ZN9CMMMemMgr3NewEm
+   fun:_ZN7CMMBase11NewInternalEmR9CMMMemMgrPKc
+   fun:_ZL36createOnePointEightGammaTableAndInfov
+   fun:pthread_once
+   fun:_ZN11CMMCurveTag12MakeLutTableEP15CMMFloatLutInfoR9CMMMemMgr18CMMLutRangeMappingd
+   fun:_ZN17ConversionManager11AddGrayConvEP10CMMProfile
+   fun:_ZN17ConversionManager22MakeConversionSequenceEP23CMMProfileInfoContainerP22CMMColorConversionInfo
+   fun:DoInitializeTransform
+   fun:AppleCMMInitializeTransform
+   fun:ColorSyncCMMInitializeTransform
+   fun:ColorSyncTransformCreate
+}
