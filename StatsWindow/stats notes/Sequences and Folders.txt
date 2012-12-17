@@ -1,0 +1,7 @@
+Create Folder for different type of sequences
+if a sequence is different as to create a new folder
+
+Determining Structures what Folder does it belong to
+
+1. Case doesn't matter 'a' == 'A', 
+2. 'u' == 't'
