@@ -1,0 +1,33 @@
+Visualization software for RNA folding structures.
+
+The software has been verified to work on Linux and Mac systems. 
+It requires the g++ compiler, the X11 and OpenGL libraries, and the FLTK package to be installed on your machine. X11 and OpenGL often come packaged with the g++ compiler on many systems.
+
+FLTK Installation instructions:
+
+To download FLTK, go to http://www.fltk.org/ and look for the latest stable 
+build version of fltk 1.3 (version 2.0 or later will NOT work). After you have downloaded and unpacked the archive, navigate to the fltk directory from the terminal and run
+  ./configure
+  make
+  sudo make install
+to install it on your machine. Note: the "sudo make install" command will ask for the password associated with your login and requires that your user profile has administrator access.
+
+For Ubuntu users, you can alternatively run "sudo apt-get install libfltk1.3-dev" from the terminal and it will install FLTK and any other necessary packages.
+
+To test that FLTK is installed on your machine, you can type
+  fltk-config --version
+in the terminal and check that it recognizes the command and returns the version number
+of the installed version on your machine. Installations of versions 1.1 or 1.3 should be
+sufficient; make sure you are not using version 2.0.
+
+
+
+To Install RNAStructViz:
+Download the repository from github. After you have unpacked the archive, navigate to
+the RNAStructViz directory in the terminal. Run the following:
+  ./configure
+  make
+This should compile the software on your machine. The RNAStructViz executable will 
+then be found in the RNAStructViz/src directory, and can be run by typing
+  ./RNAStructViz
+From within that directory.
