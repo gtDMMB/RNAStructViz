@@ -52,6 +52,8 @@ public:
     
     Fl_Button* menu_collapse;
     Fl_Button* folder_collapse;
+    
+    static void ShowFolderSelected();
 
 protected:
     /*

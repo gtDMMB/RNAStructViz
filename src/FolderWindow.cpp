@@ -17,19 +17,20 @@ void FolderWindow::Construct(int w, int h, int folderIndex)
 
 FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, int folderIndex): Fl_Group(x, y, wid, hgt, label)
 {
-    
+
     Fl_Button* diagramButton = new Fl_Button(x+20,y+10,90,30,"Diagram");
     diagramButton->callback(DiagramCallback);
     Fl_Button* statsButton = new Fl_Button(x+120,y+10,90,30,"Statistics");
     statsButton->callback(StatsCallback);
-    
+
     Fl_Button* closeButton = new Fl_Button(x+wid-25,y+5,20,20,"");
-    closeButton->callback(FolderWindow::CloseFolderCallback);
+
+    closeButton->callback(CloseFolderCallback);
     closeButton->label("@1+");
-    
+
     Fl_Box* fileLabel = new Fl_Box(x+20,y+40,120,30,"Files");
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    
+
     folderScroll = new Fl_Scroll(x+10, y+70, 280, 310);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
     folderPack = new Fl_Pack(x+10, y+70, 260, 310);
@@ -37,7 +38,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     
     folderScroll->color(FL_WHITE);
     folderPack->color(FL_WHITE);
-    
+
     this->resizable(folderScroll);
     this->color(FL_WHITE);
     this->selection_color(FL_WHITE);
@@ -58,6 +59,7 @@ FolderWindow::~FolderWindow()
 
 void FolderWindow::SetStructures(int folderIndex)
 {
+
     StructureManager* structureManager = RNAStructViz::GetInstance()->GetStructureManager();
     Folder* folder = structureManager->GetFolderAt(folderIndex);
     m_folderIndex = folderIndex;
@@ -98,7 +100,6 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     removeButton->user_data((void*)index);
     removeButton->label("@1+");
     
-    //printf("Added file: %s\n",label->label());
     
     group->resizable(label);
     group->end();
