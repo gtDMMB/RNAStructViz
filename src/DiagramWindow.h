@@ -129,6 +129,7 @@ private:
     bool m_redrawStructures;
     int numPairs[7];
     int folderIndex;
+    int pixelWidth;
 
 };
 
