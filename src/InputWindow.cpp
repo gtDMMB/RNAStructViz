@@ -49,7 +49,7 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
 {
 	InputWindow *window = (InputWindow*)widget->parent();
     window->name = (char*)window->input->value();
- 	//printf("new name: %s\n", window->getName());
+
 	free(window->string);
 	//window->string = NULL;
     window->hide();
@@ -59,7 +59,7 @@ void InputWindow::ButtonCallback(Fl_Widget *widget, void *userdata)
 {
     InputWindow *window = (InputWindow*)widget->parent();
     window->name = (char*)window->input->value();
-    //printf("new name: %s\n", window->getName());
+
     free(window->string);
    	//window->string = NULL;
     window->hide();

@@ -73,11 +73,6 @@ public:
     void DisplayFileContents(const int index);
     
     /*
-     Popup (or bring to front) a window displaying the files in the folder.
-     */
-    void DisplayFolderContents(const int index);
-    
-    /*
      Update Diagram Window, Stats Window, and Folder Window for a folder.
      */
     void AddNewStructure(const int folderIndex, const int index);

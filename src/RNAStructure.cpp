@@ -257,13 +257,13 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
     
     result->charSeqSize = tempSeq.size();
     result->charSeq = (char*)malloc(sizeof(char)*result->charSeqSize);
-    //printf("result->charSeqSize: %u\n", result->charSeqSize);
+
     for(unsigned i = 0; i < tempSeq.size(); i++)
     {
-        //printf("%u : %c\n", i, tempSeq.at(i));
+
         result->charSeq[i] = tempSeq.at(i);
     }
-    //printf("\ncharSeq:\n%s\n", result->charSeq);
+
 
     return result;
 }

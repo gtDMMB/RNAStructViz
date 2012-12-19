@@ -857,23 +857,13 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
 		if(strcmp(window->ref_menu->mvalue()->label(),
                   "Please select a reference"))
 		{
-			/*printf("Calculate - \nReference Structure: ");
-             printf(window->ref_menu->mvalue()->label());
-             
-             
-             
-             printf("\nComparison structures: \n");*/
+			
 			
 			for (int i=0; i < window->comp_pack->children(); i++)
 			{
 				Fl_Check_Button* button = 
                 (Fl_Check_Button*)window->comp_pack->child(i);
-				if (button->value() == 1)
-				{
-					/*printf(button->label());
-                     printf("\n");*/
-                    
-				}
+				
 			}
 			
             
@@ -1083,21 +1073,20 @@ void StatsWindow::ComputeStats()
                         && predicted->GetBaseAt(uj)->m_pair != RNAStructure::UNPAIRED
                         && predicted->GetBaseAt(uj)->m_pair > uj)
 				{
-					//printf("Check for false positive:\n");
+
                     
 					// Remember the current predicted base pair
 					unsigned int prime_5 = uj;
 					unsigned int prime_3 = predicted->GetBaseAt(uj)->m_pair;
 					
-					//printf("\tpredicted: %d->%d\n",prime_5,prime_3);
-					//printf("\treference: %d->%d\n",uj,reference->GetBaseAt(uj)->m_pair);
+
 					
 					// Look for contradicting base pairs: a different pair at that index
 					if (reference->GetBaseAt(prime_3)->m_pair != RNAStructure::UNPAIRED
 						|| reference->GetBaseAt(prime_5)->m_pair != RNAStructure::UNPAIRED)
 					{
 						statistics[statsIndex].contradict_count++;
-						//printf("\tcounted as contradicting\n");
+
 					}
 					// Look for conflicting base pairs: a pairing with one base inside and one outside the loop
 					else
@@ -1113,14 +1102,11 @@ void StatsWindow::ComputeStats()
 							{
 								b = true;
 								statistics[statsIndex].conflict_count++;
-								//printf("\tcounted as conflicting - k=%d\n",k);
+;
 							}
 							k++;
 						}
-						if (!b) 
-						{
-							//printf("\tcounted as compatible\n");
-						}
+						
 					}
 				}
 			}
