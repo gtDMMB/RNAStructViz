@@ -25,6 +25,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int>& structures)
     if (w > h-120) s = h-120;
     else s = w;
     
+    pixelWidth = 2;
+    
     m_glWindow = new GLWindow(0, 120, s,s);
     m_glWindow->SetTextureData(m_imageData[0], 2048);
     m_glWindow->SetTextureData(m_imageData[1], 1024);
@@ -142,6 +144,13 @@ void DiagramWindow::draw()
 		{
 		    sequences[j] = structureManager->GetStructure(
 		    	(intptr_t)(m_menuItems[m_menus[j]->value()].user_data()));
+            if (sequences[j]->GetLength() > 1000) {
+                pixelWidth = 1;
+            } else if (sequences[j]->GetLength() <= 1000 && sequences[j]->GetLength() >= 500) {
+                pixelWidth = 2;
+            } else {
+                pixelWidth = 3;
+            }
 		}
    	}
 
@@ -314,7 +323,7 @@ void DiagramWindow::DrawKey3()
     yPosn += 10;
 
     //fl_color(FL_YELLOW);
-	fl_color(fl_rgb_color(255,127,0));
+	fl_color(fl_rgb_color(255,200,0));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_line_style(FL_DOT);
@@ -412,7 +421,7 @@ void DiagramWindow::Draw3(RNAStructure** structures, const int resolution)
                 else
                 {
                     //fl_color(FL_YELLOW);
-			fl_color(fl_rgb_color(255,127,0));
+			fl_color(fl_rgb_color(255,200,0));
 				    DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase, 
 				    	angleDelta, radius);
                     
@@ -829,10 +838,18 @@ void DiagramWindow::DrawArc(
     if (arc2 > arc1)
     {
 		fl_arc(boundX, boundY, boundSize, boundSize, arc1, arc2);
+        if (pixelWidth > 1) 
+            fl_arc(boundX+1,boundY+1,boundSize,boundSize,arc1,arc2);
+        if (pixelWidth > 2)
+            fl_arc(boundX+1,boundY,boundSize,boundSize,arc1,arc2);
     }
     else
     {
 		fl_arc(boundX, boundY, boundSize, boundSize, arc2, arc1);
+        if (pixelWidth > 1)
+            fl_arc(boundX+1, boundY+1, boundSize, boundSize, arc2, arc1);
+        if (pixelWidth > 2)
+            fl_arc(boundX+1, boundY, boundSize, boundSize, arc2, arc1);
     }
     
 }
