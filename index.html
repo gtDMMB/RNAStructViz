@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Rnastructviz by gtfold</title>
+    <title>RNAStructViz by gtfold</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -17,7 +17,7 @@
   <body>
 
       <header>
-        <h1>Rnastructviz</h1>
+        <h1>RNAStructViz</h1>
         <p>Software package for visualizing, comparing, and analyzing RNA secondary structure</p>
       </header>
 
@@ -39,31 +39,31 @@
         <ul></ul>
       </nav>
       <section>
-        <p>RNAStructViz is a software package for interactive comparison of RNA secondary structures, using circular arc diagrams and calculated statistics.</p>
+        <p>RNAStructViz enables interactive comparison of RNA secondary structures.</p>
 
 <h3>Loading Structures</h3>
 
-<p>Secondary structures can be loaded into the program, with currently accepted file formats of .ct, .nopct, and .bpseq files. As the structures are loaded, the program automatically groups them according to their underlying RNA sequence. Whenever a file is loaded with an underlying sequence that does not match any currently loaded files, a folder is created for that structure. Any structures on that same sequence will be automatically grouped into that folder. When parsing the RNA sequence data of a loaded file, RNAStructViz treats upper and lowercase letters for bases the same, so you don't have to make sure that the files follow the same capitilazation scheme. Also, the letters 'U' and 'T' are both considered to represent uracil in case the files follow the DNA base representation convention.</p>
+<p>RNAStructViz accepts secondary structures in both .ct and .bpseq formats. As structures are loaded, they are automatically grouped into folders according to their underlying RNA sequence. Structures based on the same underlying sequence are grouped together, with the sequence parser ignoring case (upper vs. lower) and treating 'T' and 'U' as equivalent.</p>
 
-<p>//Screenshot of main menu</p>
+<p><img src="https://raw.github.com/gtfold/RNAStructViz/master/img/main_menu.png" alt="Main Menu"></p>
 
-<p>In the main menu window, a list of folders is presented on the left that can be reordered or removed using the adjacent buttons. Selecting a folder name will display its contents on the right, where the user can also open Diagram and Statistics windows on that folder. Users can open multiple Diagram and Statistics windows simultaneously on the same folder or on different folders.</p>
+<p>The main menu, lists the automatically generated sequence-based folders. In this  which can be reordered or removed using the adjacent buttons. Selecting a folder displays its contents, and brings up buttons that allow the user to to open Diagram and Statistics windows for that folder. Users can open as many  Diagram and Statistics windows for each sequence-folder as they wish. This feature allows users to compare multiple sets of structures simultaneously.</p>
 
-<p><img src="/screenshots/cerevisiae_chart.png" alt=""></p>
+<p><img src="https://raw.github.com/gtfold/RNAStructViz/master/img/cerevisiae_diagram.png" alt="S.Cerevisiae 5S Diagram"></p>
 
-<p><img src="/screenshots/elegans_diagram.png" alt=""></p>
+<p><img src="https://raw.github.com/gtfold/RNAStructViz/master/img/elegans_diagram.png" alt="C.Elegans 16S Diagram"></p>
 
-<p>The diagram windows let's users compare up to three structures on the same circular arc diagram. Arcs in the diagram correspond to base-pairs in a secondary structure, and the arcs are color-coded to represent which structures contain the base-pair.</p>
+<p>Users can compare up to three structures on the same diagram. RNAStructViz displays RNA secondary structures using a circular arcplots, where a circular backbone represents the RNA molecule’s underlying sequence, and an arc connects two positions in this backbone if the corresponding bases form a base-pair in the given secondary structure. Arcs are color-coded to represent which structures contain the base-pair.</p>
 
 <ul>
 <li>Base-pairs present in only the first structure will be colored red; the second and third have green and blue arcs.</li>
 <li>Base-pairs present in only two structures are colored the RGB combination of those structure colors, e.g. yellow for the first and second structures.</li>
 <li>Base-pairs present in all structures are colored black.</li>
-</ul><p><img src="/screenshots/cerevisiae_chart.png" alt="Cerevisiae 5S"></p>
+</ul><p><img src="https://raw.github.com/gtfold/RNAStructViz/master/img/cerevisiae_chart.png" alt="S.Cerevisiae 5S Chart"></p>
 
-<p><img src="/screenshots/elegans_chart.png" alt="Elegans 16S"></p>
+<p><img src="https://raw.github.com/gtfold/RNAStructViz/master/img/elegans_charts.png" alt="C.Elegans 16S Chart"></p>
 
-<p>The statistics windows allow direct quantitative comparison of structures against a selected reference structure. After the user selects structures for comparison and reference, RNAStructViz calculates and displays the following statistics for each structure comparing it to the reference:</p>
+<p>Statistics windows allow direct quantitative comparison of structures against a selected reference structure. After the user selects structures for comparison and reference, RNAStructViz calculates and displays the following statistics for each structure comparing it to the reference:</p>
 
 <ul>
 <li>True positive (TP): base-pairs present in both the reference and selected structures</li>
@@ -74,19 +74,9 @@
 <li>Positive predictive value (PPV): TP / (TP + FP)</li>
 </ul><p>Histograms for these statistics are displayed in tabs inside the statistics window. Another tab displays a Receiver Operating Characteristic (ROC) plot which plots selectivity versus sensitivity for each structure. The final tab displays all the calculated statistics in a table that can be exported to a comma-delimited file.</p>
 
-<h3>Links</h3>
-
-<p>This software was developed by the Discrete Mathematical Biology lab group at Georgia Tech, run by Dr. Christine Heitsch.</p>
-
-<p>GTfold is an RNA folding prediction software designed by the lab to run in parallel to utilize multi-core machines.</p>
-
 <h3>Authors and Contributors</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>This software was developed by the Discrete Mathematical Biology lab group at Georgia Tech, run by Dr. Christine Heitsch. We thank Stephen Chenney for the initial design and prototype, and Anna Morrow for significant contributions to the diagram window functionality. Chris Mize (<a href="https://github.com/themize" class="user-mention">@themize</a>) brought it to it's current incarnation with feedback from and the members of Discrete Mathematical Biology Group regarding features and the user interface.</p>
       </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/gtfold">gtfold</a></p>
