@@ -18,7 +18,7 @@
 
       <header>
         <h1>RNAStructViz</h1>
-        <p>Software package for visualizing, comparing, and analyzing RNA secondary structure</p>
+        <p>Enabling interactive comparison and analysis of RNA secondary structures.</p>
       </header>
 
       <div id="banner">
@@ -39,13 +39,15 @@
         <ul></ul>
       </nav>
       <section>
-        <p>RNAStructViz enables interactive comparison of RNA secondary structures.</p>
+        <p>By providing immediate visual and statistical comparison of RNA secondary structures, and allowing users to quickly change the sets of structures displayed, RNAStructViz supports more interactive comparison of RNA secondary structures than was previously available. </p>
 
 <h3>Loading Structures</h3>
 
 <p>RNAStructViz accepts secondary structures in both .ct and .bpseq formats. As structures are loaded, they are automatically grouped into folders according to their underlying RNA sequence. Structures based on the same underlying sequence are grouped together, with the sequence parser ignoring case (upper vs. lower) and treating 'T' and 'U' as equivalent.</p>
 
 <p><img src="https://raw.github.com/gtfold/RNAStructViz/master/img/main_menu.png" alt="Main Menu"></p>
+
+<h3>Managing Structures and Windows</h3>
 
 <p>The main menu, lists the automatically generated sequence-based folders. In this  which can be reordered or removed using the adjacent buttons. Selecting a folder displays its contents, and brings up buttons that allow the user to to open Diagram and Statistics windows for that folder. Users can open as many  Diagram and Statistics windows for each sequence-folder as they wish. This feature allows users to compare multiple sets of structures simultaneously.</p>
 
@@ -56,8 +58,8 @@
 <p>Users can compare up to three structures on the same diagram. RNAStructViz displays RNA secondary structures using a circular arcplots, where a circular backbone represents the RNA molecule’s underlying sequence, and an arc connects two positions in this backbone if the corresponding bases form a base-pair in the given secondary structure. Arcs are color-coded to represent which structures contain the base-pair.</p>
 
 <ul>
-<li>Base-pairs present in only the first structure will be colored red; the second and third have green and blue arcs.</li>
-<li>Base-pairs present in only two structures are colored the RGB combination of those structure colors, e.g. yellow for the first and second structures.</li>
+<li>Base-pairs present in only the first structure will be colored red; the second and third will be colored green and blue, respectively.</li>
+<li>Base-pairs present in only two structures are colored using the RGB combination of those structure colors, e.g. yellow for the first and second structures.</li>
 <li>Base-pairs present in all structures are colored black.</li>
 </ul><p><img src="https://raw.github.com/gtfold/RNAStructViz/master/img/cerevisiae_chart.png" alt="S.Cerevisiae 5S Chart"></p>
 
