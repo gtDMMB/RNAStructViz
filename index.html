@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Rnastructviz by gtfold</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Rnastructviz</h1>
+        <p>Software package for visualizing, comparing, and analyzing RNA secondary structure</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/gtfold/RNAStructViz" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/gtfold/RNAStructViz/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/gtfold/RNAStructViz/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <p>RNAStructViz is a software package for interactive comparison of RNA secondary structures, using circular arc diagrams and calculated statistics.</p>
+
+<h3>Loading Structures</h3>
+
+<p>Secondary structures can be loaded into the program, with currently accepted file formats of .ct, .nopct, and .bpseq files. As the structures are loaded, the program automatically groups them according to their underlying RNA sequence. Whenever a file is loaded with an underlying sequence that does not match any currently loaded files, a folder is created for that structure. Any structures on that same sequence will be automatically grouped into that folder. When parsing the RNA sequence data of a loaded file, RNAStructViz treats upper and lowercase letters for bases the same, so you don't have to make sure that the files follow the same capitilazation scheme. Also, the letters 'U' and 'T' are both considered to represent uracil in case the files follow the DNA base representation convention.</p>
+
+<p>//Screenshot of main menu</p>
+
+<p>In the main menu window, a list of folders is presented on the left that can be reordered or removed using the adjacent buttons. Selecting a folder name will display its contents on the right, where the user can also open Diagram and Statistics windows on that folder. Users can open multiple Diagram and Statistics windows simultaneously on the same folder or on different folders.</p>
+
+<p><img src="/screenshots/cerevisiae_chart.png" alt=""></p>
+
+<p><img src="/screenshots/elegans_diagram.png" alt=""></p>
+
+<p>The diagram windows let's users compare up to three structures on the same circular arc diagram. Arcs in the diagram correspond to base-pairs in a secondary structure, and the arcs are color-coded to represent which structures contain the base-pair.</p>
+
+<ul>
+<li>Base-pairs present in only the first structure will be colored red; the second and third have green and blue arcs.</li>
+<li>Base-pairs present in only two structures are colored the RGB combination of those structure colors, e.g. yellow for the first and second structures.</li>
+<li>Base-pairs present in all structures are colored black.</li>
+</ul><p><img src="/screenshots/cerevisiae_chart.png" alt="Cerevisiae 5S"></p>
+
+<p><img src="/screenshots/elegans_chart.png" alt="Elegans 16S"></p>
+
+<p>The statistics windows allow direct quantitative comparison of structures against a selected reference structure. After the user selects structures for comparison and reference, RNAStructViz calculates and displays the following statistics for each structure comparing it to the reference:</p>
+
+<ul>
+<li>True positive (TP): base-pairs present in both the reference and selected structures</li>
+<li>False negatives (FN): base-pairs present in the reference but not the selected structure</li>
+<li>False positives (FP): base-pairs present in the selected but not the reference structure</li>
+<li>Sensitivity: TP / (TP + FN)</li>
+<li>Selectivity: TP / (TP + FP - c) where c is the number of base-pairs in the selected structure that are not present but do not otherwise conflict with base-pairs in the reference</li>
+<li>Positive predictive value (PPV): TP / (TP + FP)</li>
+</ul><p>Histograms for these statistics are displayed in tabs inside the statistics window. Another tab displays a Receiver Operating Characteristic (ROC) plot which plots selectivity versus sensitivity for each structure. The final tab displays all the calculated statistics in a table that can be exported to a comma-delimited file.</p>
+
+<h3>Links</h3>
+
+<p>This software was developed by the Discrete Mathematical Biology lab group at Georgia Tech, run by Dr. Christine Heitsch.</p>
+
+<p>GTfold is an RNA folding prediction software designed by the lab to run in parallel to utilize multi-core machines.</p>
+
+<h3>Authors and Contributors</h3>
+
+<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+
+<h3>Support or Contact</h3>
+
+<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/gtfold">gtfold</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
