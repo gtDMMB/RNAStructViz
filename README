@@ -16,6 +16,8 @@ Note: the "sudo make install" command will ask for the password associated with 
 
 Ubuntu users, can alternatively run "sudo apt-get install libfltk1.3-dev" from the terminal and to install FLTK and any other necessary packages.
 
+Fedora users can run "sudo yum install mesa-libGLU-devel mesa-libGL-devel flt-devel" in the terminal to get the dependancies for this program.
+
 To test that FLTK is installed on your machine, type
   fltk-config --version
 in the terminal and check that it recognizes the command and returns the expected version number. 

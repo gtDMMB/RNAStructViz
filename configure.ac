@@ -13,7 +13,7 @@ AC_PROG_CC
 # Checks for libraries.
 
 CXXFLAGS_FLTK="`fltk-config --use-gl --cxxflags`"
-LDFLAGS_FLTK="`fltk-config --use-gl --ldflags`"
+LDFLAGS_FLTK="-lGL -lX11 `fltk-config --use-gl --ldflags`"
 
 AC_SUBST(CXXFLAGS_FLTK)
 AC_SUBST(LDFLAGS_FLTK)
