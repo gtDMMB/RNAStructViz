@@ -329,10 +329,11 @@ bool MainWindow::CreateFileChooser()
     
     m_fileChooser = new Fl_File_Chooser(currentWD, "*.{ct,nopct,bpseq}", 
                                         Fl_File_Chooser::MULTI, "Select RNA Sequences");
-    Fl_Box* message = new Fl_Box(0,0,400,40,"Loaded files will automatically be grouped into folders according to their underlying sequence.");
-    message->align(FL_ALIGN_WRAP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    m_fileChooser->add_extra(message);
-    
+    //Fl_Box* message = new Fl_Box(0,0,400,40,"Loaded files will automatically be grouped into folders according to their underlying sequence.");
+    //message->align(FL_ALIGN_WRAP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    //m_fileChooser->add_extra(message);
+    m_fileChooser->show_label = "Loaded files will automatically be grouped into folders according to their underlying sequence.";
+
     return true;
 }
 
@@ -621,7 +622,8 @@ void MainWindow::RemoveFolderByIndex(const int index)
             //appInstance->GetStructureManager()->RemoveFolder((int)userData);
             appInstance->GetStructureManager()->RemoveFolder(index , i);
             
-            pack->remove(pack->children()-1);
+            //pack->remove(pack->children()-1);
+            pack->remove(pack->child(pack->children()-1));
             ms_instance->m_structureInfo->redraw();
             
             //Fl::delete_widget(toRemove);
