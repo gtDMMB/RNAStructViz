@@ -44,7 +44,7 @@ Now we need to modify the linker flags included with the stock source to use
 the precompiled shared (.so) libraries on the system to avoid linker errors later on:
 ```
 $ cp configure.ac configure.ac-dist
-$ export FLTKLIBS=`find /usr/ -iname '*fltk*.so' | tr "\n" " " | sed 's/\/usr/-l\/usr/g'`
+$ export FLTKLIBS=`find /usr/ -iname '*fltk*.so' | tr "\n" " "'`
 $ sed -e 's/\(LDFLAGS_FLTK=.*$\)/#\1\nLDFLAGS_FLTK_SUBST/' configure.ac-dist > configure.ac
 $ sed -i "s|LDFLAGS_FLTK_SUBST|LDFLAGS_FLTK=\"${FLTKLIBS}/usr/lib/x86_64-linux-gnu/mesa/libGL.so.1 -lX11\"|" configure.ac
 ```
