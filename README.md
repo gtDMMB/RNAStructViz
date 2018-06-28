@@ -30,6 +30,8 @@ $ RNAStructVizBinary
 
 ### On Debian-based Linux (e.g., Ubuntu, Mint, etc.)
 
+#### Installing common system dependencies
+
 First install fltk and the Mesa/GL libs with apt if you do not already have them on your system:
 ```
 $ sudo apt-get install libmesa-dev mesa-common-dev libfltk1.1-dev
@@ -37,8 +39,15 @@ $ sudo apt-get install libmesa-dev mesa-common-dev libfltk1.1-dev
 If you are running an older version, of say Ubuntu 14.xx, the install of the package ``libmesa-dev`` may fail. If this happens, 
 try installing the required packages in the above line by running:
 ```
-$ sudo apt-get install libglu1-mesa-dev mesa-common-dev libfltk1.1-dev
+$ sudo apt-get install libglu1-mesa-dev libfltk1.1-dev
 ```
+If problems with the package names still arise, you can try searching for the correct ``mesa-dev`` package to install by issuing the following command:
+```
+apt-cache search mesa-dev
+```
+
+#### Installing the local copy of RNAStructViz
+
 Next, get yourself a copy of the lastest RNAStructViz source repo on GitHub:
 ```
 $ cd ~
@@ -65,6 +74,14 @@ At this point if all goes well you should have a working copy of the RNAStructVi
 $ echo "alias RNAStructVizBinary=\'~/RNAStructViz/src/RNAStructViz\'" >> ~/.bashrc
 $ source ~/.bashrc
 $ RNAStructVizBinary
+```
+The above three line procedure aliases the binary name ``RNAStructVizBinary`` to the current working user's bash configuration so 
+you do not need to be in the source directory, or type a long file path, to get at the ``RNAStructViz`` binary we just built. 
+Alternately, you can install a copy of this binary to the system for use by all users by running the following sequence of commands:
+```
+$ sudo mkdir -p /usr/local/bin/RNAStructViz
+$ sudo cp ~/RNAStructViz/src/RNAStructViz /usr/local/bin/RNAStructViz/RNAStructVizBinary
+$ which RNAStructVizBinary
 ```
 And we are done!
 
