@@ -34,6 +34,11 @@ First install fltk and the Mesa/GL libs with apt if you do not already have them
 ```
 $ sudo apt-get install libmesa-dev mesa-common-dev libfltk1.1-dev
 ```
+If you are running an older version, of say Ubuntu 14.xx, the install of the package ``libmesa-dev`` may fail. If this happens, 
+try installing the required packages in the above line by running:
+```
+$ sudo apt-get install libglu1-mesa-dev mesa-common-dev libfltk1.1-dev
+```
 Next, get yourself a copy of the lastest RNAStructViz source repo on GitHub:
 ```
 $ cd ~
@@ -44,9 +49,10 @@ Now we need to modify the linker flags included with the stock source to use
 the precompiled shared (.so) libraries on the system to avoid linker errors later on:
 ```
 $ cp configure.ac configure.ac-dist
-$ export FLTKLIBS=`find /usr/ -iname '*fltk*.so' | tr "\n" " "'`
+$ export LIBMESALIBS=`find /usr -iname '*libGL.so.1' | tr "\n" " "`
+$ export FLTKLIBS="`find /usr/ -iname '*fltk*.so' | tr "\n" " "` $LIBMESALIBS"
 $ sed -e 's/\(LDFLAGS_FLTK=.*$\)/#\1\nLDFLAGS_FLTK_SUBST/' configure.ac-dist > configure.ac
-$ sed -i "s|LDFLAGS_FLTK_SUBST|LDFLAGS_FLTK=\"${FLTKLIBS}/usr/lib/x86_64-linux-gnu/mesa/libGL.so.1 -lX11\"|" configure.ac
+$ sed -i "s|LDFLAGS_FLTK_SUBST|LDFLAGS_FLTK=\"${FLTKLIBS} -lX11\"|" configure.ac
 ```
 Next, we can compile the source in the usual way by running the following sequence of commands:
 ```
