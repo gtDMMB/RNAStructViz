@@ -5,6 +5,11 @@
 #ifndef DIAGRAMWINDOW_H
 #define DIAGRAMWINDOW_H
 
+#ifndef FLTK_HAVE_CAIRO
+     #define FLTK_HAVE_CAIRO
+#endif
+
+#include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Choice.H>
@@ -18,9 +23,15 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_WIDTH        (2048)
-#define IMAGE_HEIGHT       (2048)
+#define IMAGE_DIM          (640)
+#define IMAGE_WIDTH        (IMAGE_DIM)
+#define IMAGE_HEIGHT       (IMAGE_DIM)
 #define IMAGE_DEPTH        (3)
+
+#define GLWIN_TRANSLATEX   (0)
+#define GLWIN_TRANSLATEY   (300)
+
+#define GLWIN_REFRESH      (1.0)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -145,7 +156,7 @@ private:
 
     static void MenuCallback(Fl_Widget* widget, void* userData);
 
-	// Holds the title of the window
+    // Holds the title of the window
     char* title; 
 
     std::vector<int> m_structures;
@@ -159,9 +170,11 @@ private:
     GLWindow* m_glWindow;
     Fl_Offscreen m_offscreenImage[2];
     uchar* m_imageData[2];
+    int imageStride;
     cairo_surface_t *crSurface;
-    cairo_t *crDraw;
+    cairo_t *crDraw, *crDrawTemp;
     cairo_pattern_t *circleMask;
+    bool holdSurfaceRef;
 
     bool m_redrawStructures;
     int numPairs[7];
@@ -172,6 +185,27 @@ private:
     void WarnUserDrawingConflict();
     void CairoSetRGB(unsigned short R, unsigned short G, unsigned short B);
     char * GetExportPNGFilePath();
+
+    inline static void cbUpdateGLWindow(void *windowPtr) {
+         DiagramWindow *thisWindow = (DiagramWindow *) windowPtr;
+         cairo_status(thisWindow->crDraw); // try to wake up the buffer
+         cairo_pattern_t *localContextPattern = cairo_get_source(thisWindow->crDraw);
+         cairo_pattern_get_surface(localContextPattern, &(thisWindow->crSurface));
+         if(!thisWindow->holdSurfaceRef) { 
+              cairo_surface_reference(thisWindow->crSurface);
+              thisWindow->holdSurfaceRef = true;
+         }
+         cairo_surface_status(thisWindow->crSurface);
+         thisWindow->m_redrawStructures = true;
+         thisWindow->redraw();
+         thisWindow->m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+         thisWindow->m_glWindow->flush();
+         Fl::repeat_timeout(GLWIN_REFRESH, cbUpdateGLWindow, windowPtr);
+    }
+    
+    inline void startRefreshTimer() {
+         Fl::add_timeout(GLWIN_REFRESH, cbUpdateGLWindow, (void *) this);
+    }
 
 };
 
