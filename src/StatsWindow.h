@@ -15,6 +15,8 @@
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Chart.H>
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
 #include <vector>
 #include "RNAStructure.h"
 #include "StructureManager.h"

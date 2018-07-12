@@ -6,12 +6,35 @@
 #define DIAGRAMWINDOW_H
 
 #include <FL/Fl_Window.H>
+#include <FL/Fl_Widget.H>
 #include <FL/Fl_Choice.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Button.H>
 #include <FL/x.H>
+#include <cairo.h>
 #include <vector>
 
 #include "GLWindow.h"
 #include "RNAStructure.h"
+#include "BranchTypeIdentification.h"
+
+#define IMAGE_WIDTH        (2048)
+#define IMAGE_HEIGHT       (2048)
+#define IMAGE_DEPTH        (3)
+
+typedef enum {
+     CR_BLACK   = 0, 
+     CR_RED     = 1, 
+     CR_GREEN   = 2, 
+     CR_BLUE    = 3, 
+     CR_YELLOW  = 4, 
+     CR_MAGENTA = 5, 
+     CR_CYAN    = 6, 
+     CR_BRANCH1 = 7, 
+     CR_BRANCH2 = 8, 
+     CR_BRANCH3 = 9, 
+     CR_BRANCH4 = 10
+} CairoColorSpec_t;
 
 class DiagramWindow : public Fl_Window
 {
@@ -31,7 +54,7 @@ public:
     void RemoveStructure(const int index);
     void SetStructures(const std::vector<int>& structures);
     
-    void ResetWindow();
+    void ResetWindow(bool resetMenus);
     
     inline int GetFolderIndex()
     {
@@ -41,11 +64,15 @@ public:
     void SetFolderIndex(int index);
     
 protected:
+
+    static void checkBoxChangedStateCallback(Fl_Widget*, void *v);
+    static void exportToPNGButtonPressHandler(Fl_Widget*, void *v);
+    
     /*
 	Draws the contents of the window.
     */
     void draw();
-    
+
     void resize(int x, int y, int w, int h);
 
 private:
@@ -62,6 +89,11 @@ private:
     void DrawKey3(); // if 3 structures are selected
     void DrawKey2(const int a, const int b); // if 2 selected structures
     void DrawKey1(const int a); // if 1 selected structure
+    
+    void CairoPrepareDisplay();
+    void CairoBufferFinishingTouches();
+    void CairoDrawBufferToScreen(); 
+    void SetCairoBranchColor(const BranchID_t &branchType, int enabled, CairoColorSpec_t fallbackColorFlag);
 
 	/* Draws the arcs for all the base pairs, colored according to their 
 	   corresponding structures */
@@ -119,17 +151,27 @@ private:
     std::vector<int> m_structures;
 
     Fl_Choice* m_menus[3];
+    Fl_Check_Button *m_drawBranchesIndicator;
+    Fl_Button *exportButton;
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
 
     GLWindow* m_glWindow;
     Fl_Offscreen m_offscreenImage[2];
     uchar* m_imageData[2];
+    cairo_surface_t *crSurface;
+    cairo_t *crDraw;
+    cairo_pattern_t *circleMask;
 
     bool m_redrawStructures;
     int numPairs[7];
     int folderIndex;
     int pixelWidth;
+    bool userConflictAlerted;
+    
+    void WarnUserDrawingConflict();
+    void CairoSetRGB(unsigned short R, unsigned short G, unsigned short B);
+    char * GetExportPNGFilePath();
 
 };
 

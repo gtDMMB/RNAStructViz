@@ -79,7 +79,7 @@ void RNAStructViz::AddDiagramWindow(int index)
         {
             diagram->SetStructures(structures);
             diagram->SetFolderIndex(index);
-            diagram->ResetWindow();
+            diagram->ResetWindow(true);
             diagram->show();
             return;
         }
