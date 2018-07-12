@@ -24,7 +24,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     memset(m_imageData[0], 0, imageStride * IMAGE_HEIGHT);
     crSurface = cairo_image_surface_create_for_data(m_imageData[0], CAIRO_FORMAT_ARGB32, 
                                                     IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-    crDraw = cairo_create(crSurface);
+    //crDraw = cairo_create(crSurface);
     //Fl::cairo_autolink_context(true);
     //Fl::cairo_cc(crDraw, false);
     
@@ -48,7 +48,10 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     CairoDrawBufferToScreen();
 
     crDraw = Fl::cairo_make_current(m_glWindow); 
+    crDraw = cairo_reference(crDraw);
     m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
+    cairo_paint(crDraw);
     CairoPrepareDisplay();
 
     m_menus[0] = m_menus[1] = m_menus[2] = NULL;
@@ -112,10 +115,10 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
 
     delete[] m_imageData[0];
     delete[] m_imageData[1];
-    m_glWindow->clear();
-    cairo_destroy(crDraw);
-    if(holdSurfaceRef)
-         cairo_surface_destroy(crSurface);
+    //m_glWindow->clear();
+    //cairo_destroy(crDraw);
+    //if(holdSurfaceRef)
+    //     cairo_surface_destroy(crSurface);
     cairo_pattern_destroy(circleMask);
     cairo_destroy(crDrawTemp);
 
@@ -127,6 +130,9 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
                                                     IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
     //crDraw = cairo_create(crSurface);
     crDraw = Fl::cairo_make_current(m_glWindow);
+    crDraw = cairo_reference(crDraw);
+    cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
+    cairo_paint(crDraw);
     m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     CairoPrepareDisplay();
 
@@ -197,10 +203,12 @@ void DiagramWindow::draw() {
     fl_rectf(0, 0, w(), h());
     fl_color(priorColor);
 
+    //crDraw = Fl::cairo_make_current(m_glWindow);
+    //crDraw = cairo_reference(crDraw);
+    //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
+    //cairo_paint(crDraw);
     Fl_Window::draw();
-    crDraw = Fl::cairo_make_current(m_glWindow);
-    m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-
+    
     // Get the structures. Be sure the reference structure is first.
     RNAStructure *sequences[3];
     StructureManager *structureManager =
@@ -284,12 +292,23 @@ void DiagramWindow::draw() {
 
             //m_glWindow->UpdateTexture();
             m_redrawStructures = false;
-            //m_glWindow->redraw();
+            m_glWindow->redraw();
+            //startRefreshTimer();
+            cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
+            cairo_paint(crDraw);
+            cairo_mask(crDraw, circleMask);
+
     }
 
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
     fl_line_style(0);
+
+    crDraw = Fl::cairo_make_current(m_glWindow);
+    crDraw = cairo_reference(crDraw);
+    //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
+    //cairo_paint(crDraw);
+    m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
 
 }
 
@@ -426,6 +445,7 @@ void DiagramWindow::CairoPrepareDisplay() {
     cairo_set_source_rgba(crDrawTemp, 0.4, 0.4, 0.4, 1.0);
     cairo_fill(crDrawTemp);
     circleMask = cairo_pop_group(crDrawTemp);
+    //cairo_destroy(crDrawTemp);
     //cairo_pop_group_to_source(crDraw);
     //cairo_push_group(crDraw);
     //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
@@ -523,8 +543,8 @@ void DiagramWindow::Draw3(RNAStructure **structures, const int resolution) {
 
     for (unsigned int ui = 0; ui < numBases; ++ui) {
         const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
-        DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
-                 radius + 7.5f);
+        //DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
+        //         radius + 7.5f);
 
         const RNAStructure::BaseData *baseData2 = structures[1]->GetBaseAt(ui);
         const RNAStructure::BaseData *baseData3 = structures[2]->GetBaseAt(ui);
@@ -661,8 +681,8 @@ void DiagramWindow::Draw2(RNAStructure **structures, const int resolution) {
 
     for (unsigned int ui = 0; ui < numBases; ++ui) {
         const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
-        DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
-                 radius + 7.5f);
+        //DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
+        //         radius + 7.5f);
 
         const RNAStructure::BaseData *baseData2 = structures[1]->GetBaseAt(ui);
         if (baseData1->m_pair != RNAStructure::UNPAIRED
@@ -716,8 +736,8 @@ void DiagramWindow::Draw1(RNAStructure **structures, const int resolution) {
 
     for (unsigned int ui = 0; ui < numBases; ++ui) {
         const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
-        DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
-                 radius + 7.5f);
+        //DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
+        //         radius + 7.5f);
 
         if (baseData1->m_pair != RNAStructure::UNPAIRED
             && baseData1->m_pair > ui) {
@@ -1074,6 +1094,10 @@ void DiagramWindow::RebuildMenus() {
         exportButton = new Fl_Button(horizCheckBoxPos, 35, 125, 25, "Export PNG");
         exportButton->type(FL_NORMAL_BUTTON);
         exportButton->callback(exportToPNGButtonPressHandler, exportButton);
+
+        m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+        m_glWindow->show();
+        m_glWindow->callback(MenuCallback); // redraw the window when anything changes
 
         this->end();
     } else {

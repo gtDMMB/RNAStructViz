@@ -22,6 +22,12 @@ GLWindow::GLWindow(int x, int y, int w, int h, const char* label)
 
 }
 
+GLWindow::~GLWindow() {
+     if(crDraw != NULL) {
+          cairo_destroy(crDraw);
+     }
+}
+
 void GLWindow::SetTextureData(uchar* data, const int textureSize)
 {
     if (textureSize == 2048)
@@ -36,7 +42,7 @@ void GLWindow::SetTextureData(uchar* data, const int textureSize)
     }
 }
 
-void GLWindow::draw()
+void GLWindow::drawOld()
 {
     if (!valid())
     {
@@ -107,6 +113,15 @@ void GLWindow::draw()
     glTexCoord2f(m_origin[0], m_origin[1]);
     glVertex2f(0.0f, polyDelta[1]);
     glEnd();
+}
+
+void GLWindow::draw() {
+     if(!valid()) {
+          Fl_Gl_Window::ortho();
+          Fl_Window::draw();
+          crDraw = Fl::cairo_make_current(this);
+          crDraw = cairo_reference(crDraw);
+     }
 }
 
 void GLWindow::GetTexturingParameters(const float scale, float* polyDelta, float* texParamDelta)

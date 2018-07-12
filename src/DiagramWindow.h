@@ -31,7 +31,7 @@
 #define GLWIN_TRANSLATEX   (0)
 #define GLWIN_TRANSLATEY   (300)
 
-#define GLWIN_REFRESH      (1.0)
+#define GLWIN_REFRESH      (0.5)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -188,6 +188,10 @@ private:
 
     inline static void cbUpdateGLWindow(void *windowPtr) {
          DiagramWindow *thisWindow = (DiagramWindow *) windowPtr;
+         thisWindow->m_redrawStructures = true;
+         thisWindow->redraw();
+         //Fl::repeat_timeout(GLWIN_REFRESH, cbUpdateGLWindow, windowPtr);
+         return;
          cairo_status(thisWindow->crDraw); // try to wake up the buffer
          cairo_pattern_t *localContextPattern = cairo_get_source(thisWindow->crDraw);
          cairo_pattern_get_surface(localContextPattern, &(thisWindow->crSurface));
@@ -200,7 +204,6 @@ private:
          thisWindow->redraw();
          thisWindow->m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
          thisWindow->m_glWindow->flush();
-         Fl::repeat_timeout(GLWIN_REFRESH, cbUpdateGLWindow, windowPtr);
     }
     
     inline void startRefreshTimer() {
