@@ -4,8 +4,6 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_File_Chooser.H>
-#include <FL/Fl_Cairo.H>
-#include <cairo.h>
 #include <algorithm>
 #include <math.h>
 #include <iostream>
@@ -19,19 +17,11 @@ const int DiagramWindow::ms_menu_width = 190;
 void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) {
 
     imageStride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
-    //crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH, IMAGE_WIDTH);
     m_imageData[0] = new uchar[imageStride * IMAGE_HEIGHT];
     memset(m_imageData[0], 0, imageStride * IMAGE_HEIGHT);
     crSurface = cairo_image_surface_create_for_data(m_imageData[0], CAIRO_FORMAT_ARGB32, 
                                                     IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-    //crDraw = cairo_create(crSurface);
-    //Fl::cairo_autolink_context(true);
-    //Fl::cairo_cc(crDraw, false);
     
-    //m_offscreenImage[0] = fl_create_offscreen(2048, 2048);
-    //m_imageData[0] = new uchar[2048 * 2048 * 3];
-    //memset(m_imageData[0], 0, 2048 * 2048 * 3);
-    //m_offscreenImage[1] = fl_create_offscreen(1024, 1024);
     int windowImageBufSize = (IMAGE_WIDTH + 150) * (IMAGE_HEIGHT + 150) * IMAGE_DEPTH;
     m_imageData[1] = new uchar[windowImageBufSize];
     memset(m_imageData[1], 0, windowImageBufSize);
@@ -40,18 +30,15 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     pixelWidth = 1; //2;
 
-    m_glWindow = new GLWindow(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
-    m_glWindow->mode(FL_DOUBLE | FL_INDEX);
-    //m_glWindow->SetTextureData(m_imageData[0], 2048);
-    //m_glWindow->SetTextureData(m_imageData[1], 1024);
+    //m_glWindow = new GLWindow(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
+    //mode(FL_DOUBLE | FL_INDEX);
     CairoDrawBufferToScreen();
 
-    crDraw = Fl::cairo_make_current(m_glWindow); 
-    crDraw = cairo_reference(crDraw);
-    cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
-    cairo_paint(crDraw);
+    //crDraw = Fl::cairo_make_current(m_glWindow); 
+    //crDraw = cairo_reference(crDraw);
+    //cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
+    //cairo_paint(crDraw);
     CairoPrepareDisplay();
 
     m_menus[0] = m_menus[1] = m_menus[2] = NULL;
@@ -65,28 +52,30 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     //colors the top of the Diagram window where structures are chosen
     color(FL_WHITE);
-    //color(FL_BACKGROUND_COLOR);
-    //size_range(580, 700);
     size_range(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
     box(FL_NO_BOX);
 
-    //Fl_Box *resizeBox = new Fl_Box(0, 120, w, h - 120);
-    //resizable(resizeBox);
-
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
-    startRefreshTimer();
+    set_draw_cb(Draw); // cairo
 }
 
 DiagramWindow::DiagramWindow(int w, int h, const char *label,
-                             const std::vector<int> &structures)
-        : Fl_Window(w + 150, h, label), m_redrawStructures(true), holdSurfaceRef(false) {
+                             const std::vector<int> &structures) 
+        : Fl_Cairo_Window(w + 150, h), 
+          m_redrawStructures(true), 
+          secondDrawPassTimer(false) {
+    copy_label(label);
     Construct(w + 150, h, structures);
 }
 
 DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
                              const std::vector<int> &structures)
-        : Fl_Window(x, y, w + 150, h, label), m_redrawStructures(true), holdSurfaceRef(false) {
+        : Fl_Cairo_Window(w + 150, h), 
+          m_redrawStructures(true), 
+          secondDrawPassTimer(false) {
+    copy_label(label);
+    resize(x, y, w + 150, h);
     Construct(w + 150, h, structures);
 }
 
@@ -97,8 +86,7 @@ DiagramWindow::~DiagramWindow() {
     cairo_destroy(crDraw);
     cairo_pattern_destroy(circleMask);
     cairo_destroy(crDrawTemp);
-    if(holdSurfaceRef)
-         cairo_surface_destroy(crSurface);
+    cairo_surface_destroy(crSurface);
     cairo_surface_destroy(crMaskSurface);
     free(m_menuItems);
 }
@@ -117,46 +105,27 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
 
     delete[] m_imageData[0];
     delete[] m_imageData[1];
-    //m_glWindow->clear();
-    //cairo_destroy(crDraw);
-    //if(holdSurfaceRef)
-    //     cairo_surface_destroy(crSurface);
-    //cairo_pattern_destroy(circleMask);
     cairo_destroy(crDrawTemp);
     cairo_surface_destroy(crMaskSurface);
 
     imageStride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
-    //crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH, IMAGE_WIDTH);
     m_imageData[0] = new uchar[imageStride * IMAGE_HEIGHT];
     memset(m_imageData[0], 0, imageStride * IMAGE_HEIGHT);
     crSurface = cairo_image_surface_create_for_data(m_imageData[0], CAIRO_FORMAT_ARGB32, 
                                                     IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-    //crDraw = cairo_create(crSurface);
-    crDraw = Fl::cairo_make_current(m_glWindow);
-    crDraw = cairo_reference(crDraw);
-    cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
-    cairo_paint(crDraw);
+    //crDraw = Fl::cairo_make_current(m_glWindow);
+    //crDraw = cairo_reference(crDraw);
+    //cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    //cairo_paint(crDraw);
 
-    //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     CairoPrepareDisplay();
 
-    //m_offscreenImage[0] = fl_create_offscreen(2048, 2048);
-    //m_imageData[0] = new uchar[2048 * 2048 * 3];
-    //memset(m_imageData[0], 0, 2048 * 2048 * 3);
-    //m_offscreenImage[1] = fl_create_offscreen(1024, 1024);
     int windowImageBufSize = (IMAGE_WIDTH + 150) * (IMAGE_HEIGHT + 150) * IMAGE_DEPTH;
     m_imageData[1] = new uchar[windowImageBufSize];
     memset(m_imageData[1], 0, windowImageBufSize);
     crMaskSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH + 150, IMAGE_WIDTH + 150);
     crDrawTemp = cairo_create(crMaskSurface);
 
-    //crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH, IMAGE_WIDTH);
-    //crDraw = cairo_create(crSurface);
-    //CairoPrepareDisplay();
-
-    //m_glWindow->SetTextureData(m_imageData[0], 2048);
-    //m_glWindow->SetTextureData(m_imageData[1], 1024);
     CairoDrawBufferToScreen();
 
     if (resetMenus) {
@@ -175,7 +144,7 @@ void DiagramWindow::checkBoxChangedStateCallback(Fl_Widget *, void *v) {
     if (cbDrawIndicator->changed()) {
         DiagramWindow *thisWindow = (DiagramWindow *) cbDrawIndicator->parent();
         thisWindow->m_redrawStructures = true;
-        thisWindow->ResetWindow(false);
+        //thisWindow->ResetWindow(false);
         cbDrawIndicator->clear_changed();
         thisWindow->redraw();
     }
@@ -193,45 +162,44 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 
 void DiagramWindow::resize(int x, int y, int w, int h) {
     Fl_Window::resize(x, y, w, h);
-    int s;
-    if (w > h - 120) s = h - 120;
-    else s = w;
-    //m_glWindow->size(s,s);
-    m_glWindow->resize(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, w, h);
 }
 
-void DiagramWindow::draw() {
+void DiagramWindow::drawWidgets() {
+     Fl_Double_Window::draw();
+}
+
+void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
+
+    DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
+    thisWindow->crDraw = cr;
+    cairo_reference(thisWindow->crDraw);    
 
     Fl_Color priorColor = fl_color();
     int priorFont = fl_font();
     int priorFontSize = fl_size();
 
-    fl_color(color());
-    fl_rectf(0, 0, w(), h());
+    fl_color(thisWindow->color());
+    fl_rectf(0, 0, thisWindow->w(), thisWindow->h());
     fl_color(priorColor);
-
-    //crDraw = Fl::cairo_make_current(m_glWindow);
-    //crDraw = cairo_reference(crDraw);
-    //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
-    //cairo_paint(crDraw);
-    //Fl_Window::draw();
+    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.0);
     
     // Get the structures. Be sure the reference structure is first.
     RNAStructure *sequences[3];
     StructureManager *structureManager =
             RNAStructViz::GetInstance()->GetStructureManager();
     for (int j = 0; j < 3; ++j) {
-        if ((intptr_t) (m_menuItems[m_menus[j]->value()].user_data()) == -1) {
+        if ((intptr_t) (thisWindow->m_menuItems[thisWindow->m_menus[j]->value()].user_data()) == -1) {
             sequences[j] = 0;
         } else {
             sequences[j] = structureManager->GetStructure(
-                    (intptr_t) (m_menuItems[m_menus[j]->value()].user_data()));
+                    (intptr_t) (thisWindow->m_menuItems[thisWindow->m_menus[j]->value()].user_data()));
             if (sequences[j]->GetLength() > 1000) {
-                pixelWidth = 1;
-            } else if (sequences[j]->GetLength() <= 1000 && sequences[j]->GetLength() >= 500) {
-                pixelWidth = 2;
+                thisWindow->pixelWidth = 1;
+            } else if (sequences[j]->GetLength() <= 1000 && 
+                       sequences[j]->GetLength() >= 500) {
+                thisWindow->pixelWidth = 2;
             } else {
-                pixelWidth = 3;
+                thisWindow->pixelWidth = 3;
             }
         }
     }
@@ -241,22 +209,22 @@ void DiagramWindow::draw() {
         if (sequences[1]) {
             if (sequences[2]) {
                 numToDraw = 3;
-                ComputeNumPairs(sequences, 3);
-                DrawKey3();
+                thisWindow->ComputeNumPairs(sequences, 3);
+                thisWindow->DrawKey3();
             } else {
                 numToDraw = 2;
-                ComputeNumPairs(sequences, 2);
-                DrawKey2(0, 1);
+                thisWindow->ComputeNumPairs(sequences, 2);
+                thisWindow->DrawKey2(0, 1);
             }
         } else {
             if (sequences[2]) {
                 sequences[1] = sequences[2];
-                ComputeNumPairs(sequences, 2);
-                DrawKey2(0, 2);
+                thisWindow->ComputeNumPairs(sequences, 2);
+                thisWindow->DrawKey2(0, 2);
                 numToDraw = 2;
             } else {
-                ComputeNumPairs(sequences, 1);
-                DrawKey1(0);
+                thisWindow->ComputeNumPairs(sequences, 1);
+                thisWindow->DrawKey1(0);
                 numToDraw = 1;
             }
         }
@@ -265,20 +233,20 @@ void DiagramWindow::draw() {
             if (sequences[2]) {
                 sequences[0] = sequences[1];
                 sequences[1] = sequences[2];
-                ComputeNumPairs(sequences, 2);
-                DrawKey2(1, 2);
+                thisWindow->ComputeNumPairs(sequences, 2);
+                thisWindow->DrawKey2(1, 2);
                 numToDraw = 2;
             } else {
                 sequences[0] = sequences[1];
-                ComputeNumPairs(sequences, 1);
-                DrawKey1(1);
+                thisWindow->ComputeNumPairs(sequences, 1);
+                thisWindow->DrawKey1(1);
                 numToDraw = 1;
             }
         } else {
             if (sequences[2]) {
                 sequences[0] = sequences[2];
-                ComputeNumPairs(sequences, 1);
-                DrawKey1(2);
+                thisWindow->ComputeNumPairs(sequences, 1);
+                thisWindow->DrawKey1(2);
                 numToDraw = 1;
             } else {
                 numToDraw = 0;
@@ -286,45 +254,26 @@ void DiagramWindow::draw() {
         }
     }
 
-    if (m_redrawStructures) {
-            //fl_begin_offscreen(m_offscreenImage[0]);
-            RedrawBuffer(sequences, numToDraw, IMAGE_WIDTH);
-            //fl_read_image(m_imageData[0], 0, 0, 2048, 2048);
-            //fl_end_offscreen();
-            
-            //fl_begin_offscreen(m_offscreenImage[1]);
-            //RedrawBuffer(sequences, numToDraw, 1024);
-            //fl_read_image(m_imageData[1], 0, 0, 1024, 1024);
-            //fl_end_offscreen();
-
-            //m_glWindow->UpdateTexture();
-            m_redrawStructures = false;
-            m_glWindow->redraw();
-            //startRefreshTimer();
-            cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
-            cairo_paint(crDraw);
-            cairo_mask_surface(crDraw, crMaskSurface, IMAGE_WIDTH / 2, IMAGE_WIDTH / 2);
-
+    if (thisWindow->m_redrawStructures) {
+            cairo_push_group(cr);
+            cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+            thisWindow->RedrawBuffer(cr, sequences, numToDraw, IMAGE_WIDTH);
+            thisWindow->m_redrawStructures = false;
+            cairo_pop_group_to_source(cr);
+            cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+            cairo_arc(cr, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
+            cairo_clip(cr);
+            cairo_paint(cr);
     }
 
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
     fl_line_style(0);
-
-    crDraw = Fl::cairo_make_current(m_glWindow);
-    crDraw = cairo_reference(crDraw);
-    cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
-    //cairo_paint(crDraw);
-    //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    Fl_Window::draw();
-
+    thisWindow->drawWidgets();
 }
 
-void DiagramWindow::RedrawBuffer(RNAStructure **structures,
+void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
                                  const int numStructures, const int resolution) {
-    //fl_color(FL_WHITE);
-    //fl_rectf(0, 0, resolution, resolution);
 
     int priorFont = fl_font();
     int priorFontSize = fl_size();
@@ -333,11 +282,11 @@ void DiagramWindow::RedrawBuffer(RNAStructure **structures,
     fl_line_style(0);
 
     if (numStructures == 1) {
-        Draw1(structures, resolution);
-    } else if (numStructures == 2) {
-        Draw2(structures, resolution);
+        Draw1(cr, structures, resolution);
+    } else if (cr, numStructures == 2) {
+        Draw2(cr, structures, resolution);
     } else if (numStructures == 3) {
-        Draw3(structures, resolution);
+        Draw3(cr, structures, resolution);
     }
 
     fl_font(priorFont, priorFontSize);
@@ -382,7 +331,6 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    //fl_color(FL_YELLOW);
     fl_color(fl_rgb_color(255, 200, 0));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
@@ -447,15 +395,16 @@ void DiagramWindow::DrawKey1(const int a) {
 // draws / masks the outer circle on the arcs created by Draw*():
 void DiagramWindow::CairoPrepareDisplay() {
     cairo_set_source_rgb(crDrawTemp, 1.0, 1.0, 1.0);
-    cairo_fill(crDrawTemp);
+    cairo_paint(crDrawTemp);
     //crDrawTemp = cairo_create(crSurface);
     //cairo_push_group(crDrawTemp);
     //cairo_set_source_rgba(crDrawTemp, 1.0, 1.0, 1.0, 0.0);
     //cairo_paint(crDrawTemp);
-    cairo_translate(crDrawTemp, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    cairo_arc(crDrawTemp, IMAGE_WIDTH / 2, IMAGE_WIDTH / 2, 0.0, 0.0, 2.0 * M_PI);
-    cairo_set_source_rgba(crDrawTemp, 0.4, 0.4, 0.4, 1.0);
-    cairo_fill(crDrawTemp);
+    //cairo_translate(crDrawTemp, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    cairo_arc(crDrawTemp, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, IMAGE_WIDTH / 2, 0.0, 2.0 * M_PI);
+    //cairo_set_source_rgba(crDrawTemp, 0.4, 0.4, 0.4, 1.0);
+    cairo_clip(crDrawTemp);
+    cairo_paint(crDrawTemp);
     //circleMask = cairo_pop_group(crDrawTemp);
     ////cairo_destroy(crDrawTemp);
     //cairo_pop_group_to_source(crDraw);
@@ -478,7 +427,7 @@ void DiagramWindow::CairoDrawBufferToScreen() {
     //fl_draw_image(m_imageData[0], 0, 120, IMAGE_WIDTH, IMAGE_HEIGHT, imageStride / IMAGE_WIDTH, 0);
 }
 
-void DiagramWindow::SetCairoBranchColor(const BranchID_t &branchType, int enabled,
+void DiagramWindow::SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, int enabled,
                                         CairoColorSpec_t fallbackColorFlag) {
 
     int nextColorFlag = fallbackColorFlag;
@@ -502,37 +451,37 @@ void DiagramWindow::SetCairoBranchColor(const BranchID_t &branchType, int enable
     }
     switch (nextColorFlag) {
         case CR_BLACK:
-            CairoSetRGB(0, 0, 0);
+            CairoSetRGB(cr, 0, 0, 0);
             break;
         case CR_RED:
-            CairoSetRGB(239, 41, 41);
+            CairoSetRGB(cr, 239, 41, 41);
             break;
         case CR_GREEN:
-            CairoSetRGB(78, 154, 6);
+            CairoSetRGB(cr, 78, 154, 6);
             break;
         case CR_BLUE:
-            CairoSetRGB(52, 101, 164);
+            CairoSetRGB(cr, 52, 101, 164);
             break;
         case CR_YELLOW:
-            CairoSetRGB(252, 233, 79);
+            CairoSetRGB(cr, 252, 233, 79);
             break;
         case CR_MAGENTA:
-            CairoSetRGB(255, 57, 225);
+            CairoSetRGB(cr, 255, 57, 225);
             break;
         case CR_CYAN:
-            CairoSetRGB(60, 208, 237);
+            CairoSetRGB(cr, 60, 208, 237);
             break;
         case CR_BRANCH1:
-            CairoSetRGB(92, 160, 215);
+            CairoSetRGB(cr, 92, 160, 215);
             break;
         case CR_BRANCH2:
-            CairoSetRGB(183, 127, 77);
+            CairoSetRGB(cr, 183, 127, 77);
             break;
         case CR_BRANCH3:
-            CairoSetRGB(243, 153, 193);
+            CairoSetRGB(cr, 243, 153, 193);
             break;
         case CR_BRANCH4:
-            CairoSetRGB(123, 204, 153);
+            CairoSetRGB(cr, 123, 204, 153);
             break;
         default:
             break;
@@ -540,7 +489,7 @@ void DiagramWindow::SetCairoBranchColor(const BranchID_t &branchType, int enable
 
 }
 
-void DiagramWindow::Draw3(RNAStructure **structures, const int resolution) {
+void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int resolution) {
     float centerX = 0.0f;
     float centerY = 0.0f;
     float angleBase = 0.0f;
@@ -566,79 +515,79 @@ void DiagramWindow::Draw3(RNAStructure **structures, const int resolution) {
             if (baseData1->m_pair == baseData2->m_pair) {
                 if (baseData1->m_pair == baseData3->m_pair) {
                     fl_color(FL_BLACK);
-                    SetCairoBranchColor(structures[0]->GetBranchTypeAt(ui)->getBranchID(),
+                    SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CR_BLACK);
-                    DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase,
+                    DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
                 } else {
                     //fl_color(FL_YELLOW);
                     fl_color(fl_rgb_color(255, 200, 0));
-                    SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+                    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CR_YELLOW);
-                    DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase,
+                    DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
 
                     if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                         baseData3->m_pair > ui) {
                         fl_color(FL_BLUE);
-                        SetCairoBranchColor(structures[2]->GetBranchTypeAt(ui)->getBranchID(),
+                        SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                             (int) m_drawBranchesIndicator->value(), CR_BLUE);
-                        DrawArc(ui, baseData3->m_pair, centerX, centerY, angleBase,
+                        DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                                 angleDelta, radius);
                     }
                 }
             } else if (baseData1->m_pair == baseData3->m_pair) {
                 fl_color(FL_MAGENTA);
-                SetCairoBranchColor(structures[0]->GetBranchTypeAt(ui)->getBranchID(),
+                SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CR_MAGENTA);
-                DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase,
+                DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
 
                 if (baseData2->m_pair != RNAStructure::UNPAIRED &&
                     baseData2->m_pair > ui) {
                     fl_color(FL_GREEN);
-                    SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+                    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CR_GREEN);
-                    DrawArc(ui, baseData2->m_pair, centerX, centerY, angleBase,
+                    DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
                 }
             } else {
                 fl_color(FL_RED);
-                SetCairoBranchColor(structures[2]->GetBranchTypeAt(ui)->getBranchID(),
+                SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CR_RED);
-                DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase,
+                DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
 
                 if (baseData2->m_pair != RNAStructure::UNPAIRED &&
                     baseData2->m_pair > ui) {
                     if (baseData2->m_pair == baseData3->m_pair) {
                         fl_color(FL_CYAN);
-                        SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+                        SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                             (int) m_drawBranchesIndicator->value(), CR_CYAN);
-                        DrawArc(ui, baseData2->m_pair, centerX, centerY, angleBase,
+                        DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                                 angleDelta, radius);
                     } else {
                         fl_color(FL_GREEN);
-                        SetCairoBranchColor(structures[2]->GetBranchTypeAt(ui)->getBranchID(),
+                        SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                             (int) m_drawBranchesIndicator->value(), CR_GREEN);
-                        DrawArc(ui, baseData2->m_pair, centerX, centerY, angleBase,
+                        DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                                 angleDelta, radius);
 
                         if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                             baseData3->m_pair > ui) {
                             fl_color(FL_BLUE);
-                            SetCairoBranchColor(structures[2]->GetBranchTypeAt(ui)->getBranchID(),
+                            SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                                 (int) m_drawBranchesIndicator->value(), CR_BLUE);
-                            DrawArc(ui, baseData3->m_pair, centerX, centerY, angleBase,
+                            DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                                     angleDelta, radius);
                         }
                     }
                 } else if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                            baseData3->m_pair > ui) {
                     fl_color(FL_BLUE);
-                    SetCairoBranchColor(structures[2]->GetBranchTypeAt(ui)->getBranchID(),
+                    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CR_BLUE);
-                    DrawArc(ui, baseData3->m_pair, centerX, centerY, angleBase,
+                    DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
                 }
             }
@@ -646,32 +595,32 @@ void DiagramWindow::Draw3(RNAStructure **structures, const int resolution) {
                    baseData2->m_pair > ui) {
             if (baseData2->m_pair == baseData3->m_pair) {
                 fl_color(FL_CYAN);
-                SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+                SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CR_CYAN);
-                DrawArc(ui, baseData2->m_pair, centerX, centerY, angleBase,
+                DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
             } else {
                 fl_color(FL_GREEN);
-                SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+                SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CR_GREEN);
-                DrawArc(ui, baseData2->m_pair, centerX, centerY, angleBase,
+                DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
 
                 if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                     baseData3->m_pair > ui) {
                     fl_color(FL_BLUE);
-                    SetCairoBranchColor(structures[2]->GetBranchTypeAt(ui)->getBranchID(),
+                    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CR_BLUE);
-                    DrawArc(ui, baseData3->m_pair, centerX, centerY, angleBase,
+                    DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
                 }
             }
         } else if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                    baseData3->m_pair > ui) {
             fl_color(FL_BLUE);
-            SetCairoBranchColor(structures[2]->GetBranchTypeAt(ui)->getBranchID(),
+            SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                 (int) m_drawBranchesIndicator->value(), CR_BLUE);
-            DrawArc(ui, baseData3->m_pair, centerX, centerY, angleBase,
+            DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                     angleDelta, radius);
         }
     }
@@ -679,7 +628,7 @@ void DiagramWindow::Draw3(RNAStructure **structures, const int resolution) {
     CairoDrawBufferToScreen();
 }
 
-void DiagramWindow::Draw2(RNAStructure **structures, const int resolution) {
+void DiagramWindow::Draw2(cairo_t *cr, RNAStructure **structures, const int resolution) {
     float centerX = 0.0f;
     float centerY = 0.0f;
     float angleBase = 0.0f;
@@ -701,32 +650,32 @@ void DiagramWindow::Draw2(RNAStructure **structures, const int resolution) {
             && baseData1->m_pair > ui) {
             if (baseData1->m_pair == baseData2->m_pair) {
                 fl_color(FL_BLACK);
-                SetCairoBranchColor(structures[0]->GetBranchTypeAt(ui)->getBranchID(),
+                SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CR_BLACK);
-                DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase,
+                DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
             } else {
                 fl_color(FL_RED);
-                SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+                SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CR_RED);
-                DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase,
+                DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
 
                 if (baseData2->m_pair !=
                     RNAStructure::UNPAIRED && baseData2->m_pair > ui) {
                     fl_color(FL_GREEN);
-                    SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+                    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CR_GREEN);
-                    DrawArc(ui, baseData2->m_pair, centerX, centerY, angleBase,
+                    DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
                 }
             }
         } else if (baseData2->m_pair !=
                    RNAStructure::UNPAIRED && baseData2->m_pair > ui) {
             fl_color(FL_GREEN);
-            SetCairoBranchColor(structures[1]->GetBranchTypeAt(ui)->getBranchID(),
+            SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                 (int) m_drawBranchesIndicator->value(), CR_GREEN);
-            DrawArc(ui, baseData2->m_pair, centerX, centerY, angleBase,
+            DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                     angleDelta, radius);
         }
     }
@@ -734,7 +683,7 @@ void DiagramWindow::Draw2(RNAStructure **structures, const int resolution) {
     CairoDrawBufferToScreen();
 }
 
-void DiagramWindow::Draw1(RNAStructure **structures, const int resolution) {
+void DiagramWindow::Draw1(cairo_t *cr, RNAStructure **structures, const int resolution) {
     float centerX = 0.0f;
     float centerY = 0.0f;
     float angleBase = 0.0f;
@@ -754,9 +703,9 @@ void DiagramWindow::Draw1(RNAStructure **structures, const int resolution) {
         if (baseData1->m_pair != RNAStructure::UNPAIRED
             && baseData1->m_pair > ui) {
             fl_color(FL_BLACK);
-            SetCairoBranchColor(structures[0]->GetBranchTypeAt(ui)->getBranchID(),
+            SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
                                 (int) m_drawBranchesIndicator->value(), CR_BLACK);
-            DrawArc(ui, baseData1->m_pair, centerX, centerY, angleBase,
+            DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                     angleDelta, radius);
             counter++;
         }
@@ -916,6 +865,7 @@ void DiagramWindow::ComputeCircle(
 }
 
 void DiagramWindow::DrawArc(
+        cairo_t *cr, 
         const unsigned int b1,
         const unsigned int b2,
         const float centerX,
@@ -952,7 +902,7 @@ void DiagramWindow::DrawArc(
     int boundingBoxCenterX = boundX + boundSize / 2;
     int boundingBoxCenterY = boundY + boundSize / 2;
     float boundingBoxRadius = boundSize / 2.0;
-    cairo_set_line_width(crDraw, MAX(1, pixelWidth));
+    cairo_set_line_width(cr, pixelWidth);
     
     if (arc2 - arc1 > 180.0)
         arc1 += 360.0;
@@ -964,18 +914,18 @@ void DiagramWindow::DrawArc(
         //    fl_arc(boundX+1,boundY+1,boundSize,boundSize,arc1,arc2);
         //if (pixelWidth > 2)
         //    fl_arc(boundX+1,boundY,boundSize,boundSize,arc1,arc2);
-        cairo_arc(crDraw, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc1, arc2);
+        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc1, arc2);
     } else {
         //fl_arc(boundX, boundY, boundSize, boundSize, arc2, arc1);
         //if (pixelWidth > 1)
         //    fl_arc(boundX+1, boundY+1, boundSize, boundSize, arc2, arc1);
         //if (pixelWidth > 2)
         //    fl_arc(boundX+1, boundY, boundSize, boundSize, arc2, arc1);
-        cairo_arc(crDraw, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc2, arc1);
+        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc2, arc1);
     }
     //cairo_close_path(crDraw);
     //cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    cairo_stroke(crDraw);
+    cairo_stroke(cr);
     //cairo_move_to (crDraw, 0, 0);
     //cairo_line_to (crDraw, 10, 10);
     //cairo_stroke (crDraw);
@@ -1096,7 +1046,7 @@ void DiagramWindow::RebuildMenus() {
         activeSet[1] = false;
         activeSet[2] = false;
 
-        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + 15;
+        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + 65;
         m_drawBranchesIndicator = new Fl_Check_Button(horizCheckBoxPos, 5, 20, 20,
                                                       "Draw (16S) Domains");
         m_drawBranchesIndicator->callback(checkBoxChangedStateCallback, m_drawBranchesIndicator);
@@ -1106,10 +1056,6 @@ void DiagramWindow::RebuildMenus() {
         exportButton = new Fl_Button(horizCheckBoxPos, 35, 150, 25, "@filesaveas Export PNG");
         exportButton->type(FL_NORMAL_BUTTON);
         exportButton->callback(exportToPNGButtonPressHandler, exportButton);
-
-        //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-        m_glWindow->show();
-        m_glWindow->callback(MenuCallback); // redraw the window when anything changes
 
         this->end();
     } else {
@@ -1193,10 +1139,8 @@ void DiagramWindow::WarnUserDrawingConflict() {
     }
 }
 
-void DiagramWindow::CairoSetRGB(unsigned short R, unsigned short G, unsigned short B) {
-    //fprintf(stderr, "(%g, %g, %g)\n", R / 255.0, G / 255.0, B / 255.0);
-    //fprintf(stderr, "Cairo Enabled? %s\n", Fl::cairo_autolink_context() ? "Yes" : "No");
-    cairo_set_source_rgb(crDraw, R / 255.0, G / 255.0, B / 255.0);
+void DiagramWindow::CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, unsigned short B) {
+    cairo_set_source_rgb(cr, R / 255.0, G / 255.0, B / 255.0);
 }
 
 char *DiagramWindow::GetExportPNGFilePath() {

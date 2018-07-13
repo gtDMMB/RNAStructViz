@@ -5,21 +5,22 @@
 #ifndef DIAGRAMWINDOW_H
 #define DIAGRAMWINDOW_H
 
-#ifndef FLTK_HAVE_CAIRO
-     #define FLTK_HAVE_CAIRO
-#endif
+//#ifndef FLTK_HAVE_CAIRO
+     #define FLTK_USE_CAIRO 1
+     #define FLTK_HAVE_CAIRO 1
+//#endif
 
 #include <FL/Fl.H>
-#include <FL/Fl_Window.H>
+#include <cairo.h>
+#include <FL/Fl_Cairo.H>
+#include <FL/Fl_Cairo_Window.H>
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/x.H>
-#include <cairo.h>
 #include <vector>
 
-#include "GLWindow.h"
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
@@ -31,7 +32,7 @@
 #define GLWIN_TRANSLATEX   (15)
 #define GLWIN_TRANSLATEY   (110)
 
-#define GLWIN_REFRESH      (0.35)
+#define GLWIN_REFRESH      (2.5)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -47,7 +48,7 @@ typedef enum {
      CR_BRANCH4 = 10
 } CairoColorSpec_t;
 
-class DiagramWindow : public Fl_Window
+class DiagramWindow : public Fl_Cairo_Window
 {
 public:
     // Constructors
@@ -82,7 +83,8 @@ protected:
     /*
 	Draws the contents of the window.
     */
-    void draw();
+    void drawWidgets();
+    static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
     void resize(int x, int y, int w, int h);
 
@@ -92,7 +94,7 @@ private:
 
     void RebuildMenus();
 
-    void RedrawBuffer(RNAStructure** structures, const int numStructures, 
+    void RedrawBuffer(cairo_t *cr, RNAStructure** structures, const int numStructures, 
     	const int resolution);
 
 	/* Draws the color legend for the arcs. Input a and b correspond to the
@@ -104,13 +106,14 @@ private:
     void CairoPrepareDisplay();
     void CairoBufferFinishingTouches();
     void CairoDrawBufferToScreen(); 
-    void SetCairoBranchColor(const BranchID_t &branchType, int enabled, CairoColorSpec_t fallbackColorFlag);
+    void SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, int enabled, 
+                             CairoColorSpec_t fallbackColorFlag);
 
 	/* Draws the arcs for all the base pairs, colored according to their 
 	   corresponding structures */
-    void Draw3(RNAStructure** structures, const int resolution); // 3 structures
-    void Draw2(RNAStructure** structures, const int resolution); // 2 structures
-    void Draw1(RNAStructure** structures, const int resolution); // 1 structure
+    void Draw3(cairo_t *cr, RNAStructure** structures, const int resolution); // 3 structures
+    void Draw2(cairo_t *cr, RNAStructure** structures, const int resolution); // 2 structures
+    void Draw1(cairo_t *cr, RNAStructure** structures, const int resolution); // 1 structure
     
     /* Computes the numbers for the base pairs, updates the counters in the 
        legend */
@@ -128,7 +131,8 @@ private:
 		double& r);
 
     void DrawArc(
-		const unsigned int b1,
+		cairo_t *cr, 
+                const unsigned int b1,
 		const unsigned int b2,
 		const float centerX,
 		const float centerY,
@@ -167,14 +171,13 @@ private:
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
 
-    GLWindow* m_glWindow;
     Fl_Offscreen m_offscreenImage[2];
     uchar* m_imageData[2];
     int imageStride;
     cairo_surface_t *crSurface, *crMaskSurface;
     cairo_t *crDraw, *crDrawTemp;
     cairo_pattern_t *circleMask;
-    bool holdSurfaceRef;
+    bool secondDrawPassTimer;
 
     bool m_redrawStructures;
     int numPairs[7];
@@ -183,32 +186,8 @@ private:
     bool userConflictAlerted;
     
     void WarnUserDrawingConflict();
-    void CairoSetRGB(unsigned short R, unsigned short G, unsigned short B);
+    void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, unsigned short B);
     char * GetExportPNGFilePath();
-
-    inline static void cbUpdateGLWindow(void *windowPtr) {
-         DiagramWindow *thisWindow = (DiagramWindow *) windowPtr;
-         thisWindow->m_redrawStructures = true;
-         thisWindow->redraw();
-         //Fl::repeat_timeout(GLWIN_REFRESH, cbUpdateGLWindow, windowPtr);
-         return;
-         cairo_status(thisWindow->crDraw); // try to wake up the buffer
-         cairo_pattern_t *localContextPattern = cairo_get_source(thisWindow->crDraw);
-         cairo_pattern_get_surface(localContextPattern, &(thisWindow->crSurface));
-         if(!thisWindow->holdSurfaceRef) { 
-              cairo_surface_reference(thisWindow->crSurface);
-              thisWindow->holdSurfaceRef = true;
-         }
-         cairo_surface_status(thisWindow->crSurface);
-         thisWindow->m_redrawStructures = true;
-         thisWindow->redraw();
-         thisWindow->m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-         thisWindow->m_glWindow->flush();
-    }
-    
-    inline void startRefreshTimer() {
-         Fl::add_timeout(GLWIN_REFRESH, cbUpdateGLWindow, (void *) this);
-    }
 
 };
 

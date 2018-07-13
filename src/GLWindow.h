@@ -5,10 +5,6 @@
 #ifndef GLWINDOW_H
 #define GLWINDOW_H
 
-#ifndef FLTK_HAVE_CAIRO
-     #define FLTK_HAVE_CAIRO
-#endif
-
 #include <FL/Fl.H>
 #include <FL/gl.h>
 #include <FL/Fl_Gl_Window.H>
@@ -28,7 +24,6 @@ public:
     void SetTextureData(uchar* data, const int textureSize);
 
 protected:
-    void drawOld();
     void draw();
 
     int handle(int);
@@ -44,9 +39,6 @@ private:
     uchar* m_textureData[2];
     GLuint m_textureIndices[2];
     bool m_needTextureUpdate;
-
-    // new Cairo functionality:
-    cairo_t *crDraw;
 
     // Pan/Zoom params
     float m_origin[2]; // Origin in texture space
