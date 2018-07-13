@@ -16,30 +16,7 @@ const int DiagramWindow::ms_menu_width = 190;
 
 void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) {
 
-    imageStride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
-    m_imageData[0] = new uchar[imageStride * IMAGE_HEIGHT];
-    memset(m_imageData[0], 0, imageStride * IMAGE_HEIGHT);
-    crSurface = cairo_image_surface_create_for_data(m_imageData[0], CAIRO_FORMAT_ARGB32, 
-                                                    IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-    
-    int windowImageBufSize = (IMAGE_WIDTH + 150) * (IMAGE_HEIGHT + 150) * IMAGE_DEPTH;
-    m_imageData[1] = new uchar[windowImageBufSize];
-    memset(m_imageData[1], 0, windowImageBufSize);
-    crMaskSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH + 150, IMAGE_WIDTH + 150);
-    crDrawTemp = cairo_create(crMaskSurface);
-
     pixelWidth = 1; //2;
-
-    //m_glWindow = new GLWindow(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
-    //mode(FL_DOUBLE | FL_INDEX);
-    CairoDrawBufferToScreen();
-
-    //crDraw = Fl::cairo_make_current(m_glWindow); 
-    //crDraw = cairo_reference(crDraw);
-    //cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
-    //cairo_paint(crDraw);
-    CairoPrepareDisplay();
 
     m_menus[0] = m_menus[1] = m_menus[2] = NULL;
     m_menuItems = 0;
@@ -63,8 +40,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 DiagramWindow::DiagramWindow(int w, int h, const char *label,
                              const std::vector<int> &structures) 
         : Fl_Cairo_Window(w + 150, h), 
-          m_redrawStructures(true), 
-          secondDrawPassTimer(false) {
+          m_redrawStructures(true) {
     copy_label(label);
     Construct(w + 150, h, structures);
 }
@@ -72,22 +48,15 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
 DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
                              const std::vector<int> &structures)
         : Fl_Cairo_Window(w + 150, h), 
-          m_redrawStructures(true), 
-          secondDrawPassTimer(false) {
+          m_redrawStructures(true) {
     copy_label(label);
     resize(x, y, w + 150, h);
     Construct(w + 150, h, structures);
 }
 
 DiagramWindow::~DiagramWindow() {
-    delete[] m_imageData[0];
-    delete[] m_imageData[1];
     delete m_drawBranchesIndicator;
     cairo_destroy(crDraw);
-    cairo_pattern_destroy(circleMask);
-    cairo_destroy(crDrawTemp);
-    cairo_surface_destroy(crSurface);
-    cairo_surface_destroy(crMaskSurface);
     free(m_menuItems);
 }
 
@@ -102,31 +71,6 @@ void DiagramWindow::SetFolderIndex(int index) {
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
     this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
-
-    delete[] m_imageData[0];
-    delete[] m_imageData[1];
-    cairo_destroy(crDrawTemp);
-    cairo_surface_destroy(crMaskSurface);
-
-    imageStride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
-    m_imageData[0] = new uchar[imageStride * IMAGE_HEIGHT];
-    memset(m_imageData[0], 0, imageStride * IMAGE_HEIGHT);
-    crSurface = cairo_image_surface_create_for_data(m_imageData[0], CAIRO_FORMAT_ARGB32, 
-                                                    IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-    //crDraw = Fl::cairo_make_current(m_glWindow);
-    //crDraw = cairo_reference(crDraw);
-    //cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    //cairo_paint(crDraw);
-
-    CairoPrepareDisplay();
-
-    int windowImageBufSize = (IMAGE_WIDTH + 150) * (IMAGE_HEIGHT + 150) * IMAGE_DEPTH;
-    m_imageData[1] = new uchar[windowImageBufSize];
-    memset(m_imageData[1], 0, windowImageBufSize);
-    crMaskSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH + 150, IMAGE_WIDTH + 150);
-    crDrawTemp = cairo_create(crMaskSurface);
-
-    CairoDrawBufferToScreen();
 
     if (resetMenus) {
         m_menus[0]->value(0);
@@ -144,7 +88,6 @@ void DiagramWindow::checkBoxChangedStateCallback(Fl_Widget *, void *v) {
     if (cbDrawIndicator->changed()) {
         DiagramWindow *thisWindow = (DiagramWindow *) cbDrawIndicator->parent();
         thisWindow->m_redrawStructures = true;
-        //thisWindow->ResetWindow(false);
         cbDrawIndicator->clear_changed();
         thisWindow->redraw();
     }
@@ -392,41 +335,6 @@ void DiagramWindow::DrawKey1(const int a) {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, 55 + 3);
 }
 
-// draws / masks the outer circle on the arcs created by Draw*():
-void DiagramWindow::CairoPrepareDisplay() {
-    cairo_set_source_rgb(crDrawTemp, 1.0, 1.0, 1.0);
-    cairo_paint(crDrawTemp);
-    //crDrawTemp = cairo_create(crSurface);
-    //cairo_push_group(crDrawTemp);
-    //cairo_set_source_rgba(crDrawTemp, 1.0, 1.0, 1.0, 0.0);
-    //cairo_paint(crDrawTemp);
-    //cairo_translate(crDrawTemp, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-    cairo_arc(crDrawTemp, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, IMAGE_WIDTH / 2, 0.0, 2.0 * M_PI);
-    //cairo_set_source_rgba(crDrawTemp, 0.4, 0.4, 0.4, 1.0);
-    cairo_clip(crDrawTemp);
-    cairo_paint(crDrawTemp);
-    //circleMask = cairo_pop_group(crDrawTemp);
-    ////cairo_destroy(crDrawTemp);
-    //cairo_pop_group_to_source(crDraw);
-    //cairo_push_group(crDraw);
-    //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
-    //cairo_paint(crDraw);
-}
-
-void DiagramWindow::CairoBufferFinishingTouches() {
-    //cairo_mask(crDraw, circleMask);
-}
-
-void DiagramWindow::CairoDrawBufferToScreen() {
-    //m_glWindow->SetTextureData(cairo_image_surface_get_data(crSurface), IMAGE_WIDTH);
-    //fl_draw_image(cairo_image_surface_get_data(crSurface), 0, 120, IMAGE_WIDTH, IMAGE_HEIGHT,
-    //              IMAGE_DEPTH, 0);
-    ///char * outputFile = GetExportPNGFilePath();
-    ///cairo_surface_write_to_png(crSurface, outputFile);
-    ///return;
-    //fl_draw_image(m_imageData[0], 0, 120, IMAGE_WIDTH, IMAGE_HEIGHT, imageStride / IMAGE_WIDTH, 0);
-}
-
 void DiagramWindow::SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, int enabled,
                                         CairoColorSpec_t fallbackColorFlag) {
 
@@ -624,8 +532,6 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                     angleDelta, radius);
         }
     }
-    CairoBufferFinishingTouches();
-    CairoDrawBufferToScreen();
 }
 
 void DiagramWindow::Draw2(cairo_t *cr, RNAStructure **structures, const int resolution) {
@@ -679,8 +585,6 @@ void DiagramWindow::Draw2(cairo_t *cr, RNAStructure **structures, const int reso
                     angleDelta, radius);
         }
     }
-    CairoBufferFinishingTouches();
-    CairoDrawBufferToScreen();
 }
 
 void DiagramWindow::Draw1(cairo_t *cr, RNAStructure **structures, const int resolution) {
@@ -710,10 +614,6 @@ void DiagramWindow::Draw1(cairo_t *cr, RNAStructure **structures, const int reso
             counter++;
         }
     }
-
-    CairoBufferFinishingTouches();
-    CairoDrawBufferToScreen();
-
 }
 
 void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
@@ -909,26 +809,11 @@ void DiagramWindow::DrawArc(
     if (arc1 - arc2 > 180.0)
         arc2 += 360.0;
     if (arc2 > arc1) {
-        //fl_arc(boundX, boundY, boundSize, boundSize, arc1, arc2);
-        //if (pixelWidth > 1) 
-        //    fl_arc(boundX+1,boundY+1,boundSize,boundSize,arc1,arc2);
-        //if (pixelWidth > 2)
-        //    fl_arc(boundX+1,boundY,boundSize,boundSize,arc1,arc2);
         cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc1, arc2);
     } else {
-        //fl_arc(boundX, boundY, boundSize, boundSize, arc2, arc1);
-        //if (pixelWidth > 1)
-        //    fl_arc(boundX+1, boundY+1, boundSize, boundSize, arc2, arc1);
-        //if (pixelWidth > 2)
-        //    fl_arc(boundX+1, boundY, boundSize, boundSize, arc2, arc1);
         cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc2, arc1);
     }
-    //cairo_close_path(crDraw);
-    //cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_stroke(cr);
-    //cairo_move_to (crDraw, 0, 0);
-    //cairo_line_to (crDraw, 10, 10);
-    //cairo_stroke (crDraw);
 }
 
 void DiagramWindow::DrawBase(
@@ -943,9 +828,6 @@ void DiagramWindow::DrawBase(
     float xPosn1 = centerX + cos(angle1) * radius;
     float yPosn1 = centerY - sin(angle1) * radius - fl_descent() + 0.5 *
                                                                    fl_height();
-
-
-    //fl_color(128, 128, 128);
     fl_color(FL_WHITE);
     switch (base) {
         case RNAStructure::A:

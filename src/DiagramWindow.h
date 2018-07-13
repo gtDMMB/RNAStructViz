@@ -24,15 +24,13 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_DIM          (640)
+#define IMAGE_DIM          (700)
 #define IMAGE_WIDTH        (IMAGE_DIM)
 #define IMAGE_HEIGHT       (IMAGE_DIM)
 #define IMAGE_DEPTH        (3)
 
 #define GLWIN_TRANSLATEX   (15)
 #define GLWIN_TRANSLATEY   (110)
-
-#define GLWIN_REFRESH      (2.5)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -103,9 +101,6 @@ private:
     void DrawKey2(const int a, const int b); // if 2 selected structures
     void DrawKey1(const int a); // if 1 selected structure
     
-    void CairoPrepareDisplay();
-    void CairoBufferFinishingTouches();
-    void CairoDrawBufferToScreen(); 
     void SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, int enabled, 
                              CairoColorSpec_t fallbackColorFlag);
 
@@ -171,15 +166,9 @@ private:
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
 
-    Fl_Offscreen m_offscreenImage[2];
-    uchar* m_imageData[2];
-    int imageStride;
-    cairo_surface_t *crSurface, *crMaskSurface;
-    cairo_t *crDraw, *crDrawTemp;
-    cairo_pattern_t *circleMask;
-    bool secondDrawPassTimer;
-
+    cairo_t *crDraw;
     bool m_redrawStructures;
+    
     int numPairs[7];
     int folderIndex;
     int pixelWidth;
