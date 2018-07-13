@@ -32,16 +32,15 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //m_imageData[0] = new uchar[2048 * 2048 * 3];
     //memset(m_imageData[0], 0, 2048 * 2048 * 3);
     //m_offscreenImage[1] = fl_create_offscreen(1024, 1024);
-    m_imageData[1] = new uchar[1024 * 1024 * 3];
-    memset(m_imageData[1], 0, 1024 * 1024 * 3);
+    int windowImageBufSize = (IMAGE_WIDTH + 150) * (IMAGE_HEIGHT + 150) * IMAGE_DEPTH;
+    m_imageData[1] = new uchar[windowImageBufSize];
+    memset(m_imageData[1], 0, windowImageBufSize);
+    crMaskSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH + 150, IMAGE_WIDTH + 150);
+    crDrawTemp = cairo_create(crMaskSurface);
 
-    int s;
-    if (w > h - 120) s = h - 120;
-    else s = w;
+    pixelWidth = 1; //2;
 
-    pixelWidth = 2;
-
-    m_glWindow = new GLWindow(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, s, s);
+    m_glWindow = new GLWindow(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
     m_glWindow->mode(FL_DOUBLE | FL_INDEX);
     //m_glWindow->SetTextureData(m_imageData[0], 2048);
     //m_glWindow->SetTextureData(m_imageData[1], 1024);
@@ -49,7 +48,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     crDraw = Fl::cairo_make_current(m_glWindow); 
     crDraw = cairo_reference(crDraw);
-    m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
     cairo_paint(crDraw);
     CairoPrepareDisplay();
@@ -66,11 +66,12 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //colors the top of the Diagram window where structures are chosen
     color(FL_WHITE);
     //color(FL_BACKGROUND_COLOR);
-    size_range(580, 700);
+    //size_range(580, 700);
+    size_range(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
     box(FL_NO_BOX);
 
-    Fl_Box *resizeBox = new Fl_Box(0, 120, w, h - 120);
-    resizable(resizeBox);
+    //Fl_Box *resizeBox = new Fl_Box(0, 120, w, h - 120);
+    //resizable(resizeBox);
 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
@@ -98,6 +99,7 @@ DiagramWindow::~DiagramWindow() {
     cairo_destroy(crDrawTemp);
     if(holdSurfaceRef)
          cairo_surface_destroy(crSurface);
+    cairo_surface_destroy(crMaskSurface);
     free(m_menuItems);
 }
 
@@ -111,7 +113,7 @@ void DiagramWindow::SetFolderIndex(int index) {
 }
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
-    this->size(800 + 150, 700);
+    this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
 
     delete[] m_imageData[0];
     delete[] m_imageData[1];
@@ -119,8 +121,9 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
     //cairo_destroy(crDraw);
     //if(holdSurfaceRef)
     //     cairo_surface_destroy(crSurface);
-    cairo_pattern_destroy(circleMask);
+    //cairo_pattern_destroy(circleMask);
     cairo_destroy(crDrawTemp);
+    cairo_surface_destroy(crMaskSurface);
 
     imageStride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
     //crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH, IMAGE_WIDTH);
@@ -131,17 +134,22 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
     //crDraw = cairo_create(crSurface);
     crDraw = Fl::cairo_make_current(m_glWindow);
     crDraw = cairo_reference(crDraw);
+    cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.0);
     cairo_paint(crDraw);
-    m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+
+    //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     CairoPrepareDisplay();
 
     //m_offscreenImage[0] = fl_create_offscreen(2048, 2048);
     //m_imageData[0] = new uchar[2048 * 2048 * 3];
     //memset(m_imageData[0], 0, 2048 * 2048 * 3);
     //m_offscreenImage[1] = fl_create_offscreen(1024, 1024);
-    m_imageData[1] = new uchar[1024 * 1024 * 3];
-    memset(m_imageData[1], 0, 1024 * 1024 * 3);
+    int windowImageBufSize = (IMAGE_WIDTH + 150) * (IMAGE_HEIGHT + 150) * IMAGE_DEPTH;
+    m_imageData[1] = new uchar[windowImageBufSize];
+    memset(m_imageData[1], 0, windowImageBufSize);
+    crMaskSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH + 150, IMAGE_WIDTH + 150);
+    crDrawTemp = cairo_create(crMaskSurface);
 
     //crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH, IMAGE_WIDTH);
     //crDraw = cairo_create(crSurface);
@@ -178,9 +186,7 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
     if (buttonPressed->changed()) {
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
         char *exportFilePath = thisWindow->GetExportPNGFilePath();
-        //cairo_pattern_t *localContextPattern = cairo_get_source(thisWindow->crDraw);
-        //cairo_pattern_get_surface(localContextPattern, &(thisWindow->crSurface));
-        cairo_surface_write_to_png(thisWindow->crSurface, exportFilePath);
+        cairo_surface_write_to_png(cairo_get_target(thisWindow->crDraw), exportFilePath);
         buttonPressed->clear_changed();
     }
 }
@@ -190,7 +196,8 @@ void DiagramWindow::resize(int x, int y, int w, int h) {
     int s;
     if (w > h - 120) s = h - 120;
     else s = w;
-    m_glWindow->size(s,s);
+    //m_glWindow->size(s,s);
+    m_glWindow->resize(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, w, h);
 }
 
 void DiagramWindow::draw() {
@@ -207,7 +214,7 @@ void DiagramWindow::draw() {
     //crDraw = cairo_reference(crDraw);
     //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
     //cairo_paint(crDraw);
-    Fl_Window::draw();
+    //Fl_Window::draw();
     
     // Get the structures. Be sure the reference structure is first.
     RNAStructure *sequences[3];
@@ -296,7 +303,7 @@ void DiagramWindow::draw() {
             //startRefreshTimer();
             cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
             cairo_paint(crDraw);
-            cairo_mask(crDraw, circleMask);
+            cairo_mask_surface(crDraw, crMaskSurface, IMAGE_WIDTH / 2, IMAGE_WIDTH / 2);
 
     }
 
@@ -306,9 +313,11 @@ void DiagramWindow::draw() {
 
     crDraw = Fl::cairo_make_current(m_glWindow);
     crDraw = cairo_reference(crDraw);
+    cairo_translate(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
     //cairo_paint(crDraw);
-    m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+    Fl_Window::draw();
 
 }
 
@@ -437,15 +446,18 @@ void DiagramWindow::DrawKey1(const int a) {
 
 // draws / masks the outer circle on the arcs created by Draw*():
 void DiagramWindow::CairoPrepareDisplay() {
-    crDrawTemp = cairo_create(crSurface);
-    cairo_push_group(crDrawTemp);
-    cairo_set_source_rgba(crDrawTemp, 1.0, 1.0, 1.0, 0.0);
-    cairo_paint(crDrawTemp);
+    cairo_set_source_rgb(crDrawTemp, 1.0, 1.0, 1.0);
+    cairo_fill(crDrawTemp);
+    //crDrawTemp = cairo_create(crSurface);
+    //cairo_push_group(crDrawTemp);
+    //cairo_set_source_rgba(crDrawTemp, 1.0, 1.0, 1.0, 0.0);
+    //cairo_paint(crDrawTemp);
+    cairo_translate(crDrawTemp, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_arc(crDrawTemp, IMAGE_WIDTH / 2, IMAGE_WIDTH / 2, 0.0, 0.0, 2.0 * M_PI);
     cairo_set_source_rgba(crDrawTemp, 0.4, 0.4, 0.4, 1.0);
     cairo_fill(crDrawTemp);
-    circleMask = cairo_pop_group(crDrawTemp);
-    //cairo_destroy(crDrawTemp);
+    //circleMask = cairo_pop_group(crDrawTemp);
+    ////cairo_destroy(crDrawTemp);
     //cairo_pop_group_to_source(crDraw);
     //cairo_push_group(crDraw);
     //cairo_set_source_rgba(crDraw, 1.0, 1.0, 1.0, 0.5);
@@ -1084,18 +1096,18 @@ void DiagramWindow::RebuildMenus() {
         activeSet[1] = false;
         activeSet[2] = false;
 
-        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + 125;
+        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + 15;
         m_drawBranchesIndicator = new Fl_Check_Button(horizCheckBoxPos, 5, 20, 20,
                                                       "Draw (16S) Domains");
         m_drawBranchesIndicator->callback(checkBoxChangedStateCallback, m_drawBranchesIndicator);
         m_drawBranchesIndicator->tooltip(
                 "Set whether to color code the four domains in 16S structures?");
 
-        exportButton = new Fl_Button(horizCheckBoxPos, 35, 125, 25, "Export PNG");
+        exportButton = new Fl_Button(horizCheckBoxPos, 35, 150, 25, "@filesaveas Export PNG");
         exportButton->type(FL_NORMAL_BUTTON);
         exportButton->callback(exportToPNGButtonPressHandler, exportButton);
 
-        m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+        //m_glWindow->position(GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
         m_glWindow->show();
         m_glWindow->callback(MenuCallback); // redraw the window when anything changes
 

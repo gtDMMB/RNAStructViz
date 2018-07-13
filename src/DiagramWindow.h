@@ -28,10 +28,10 @@
 #define IMAGE_HEIGHT       (IMAGE_DIM)
 #define IMAGE_DEPTH        (3)
 
-#define GLWIN_TRANSLATEX   (0)
-#define GLWIN_TRANSLATEY   (300)
+#define GLWIN_TRANSLATEX   (15)
+#define GLWIN_TRANSLATEY   (110)
 
-#define GLWIN_REFRESH      (0.5)
+#define GLWIN_REFRESH      (0.35)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -171,7 +171,7 @@ private:
     Fl_Offscreen m_offscreenImage[2];
     uchar* m_imageData[2];
     int imageStride;
-    cairo_surface_t *crSurface;
+    cairo_surface_t *crSurface, *crMaskSurface;
     cairo_t *crDraw, *crDrawTemp;
     cairo_pattern_t *circleMask;
     bool holdSurfaceRef;

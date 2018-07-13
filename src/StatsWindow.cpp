@@ -71,7 +71,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         comp_menu->color(FL_WHITE);
 		
 		calc_button = new Fl_Toggle_Button(mwx+20,mwy+ mwh-60, mww-40, 
-                                           30, "Calculate");
+                                           30, "@refresh Calculate");
 		calc_button->callback(CalcCallback);
 		
 		menu_window->resizable(comp_menu);
@@ -82,7 +82,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 	/* Create the tabs section on the right */
 	tab_window = new Fl_Tabs(300,0,w-300,h,"Tabs Container");
 	{
-		overview_tab = new Fl_Group(300,20,w-300,h-20,"Overview"); 
+		overview_tab = new Fl_Group(300,20,w-300,h-20,"@filenew Overview"); 
 		{
 			Fl_Group *ov_charts_group = new Fl_Group(310,30,w-520,h-40,"");
 			{
@@ -166,7 +166,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         overview_tab->color(FL_WHITE);
 		
 		perc_tab = new Fl_Group(300,20,w-300,h-20,
-                                "Percentage Values");
+                                "@+ Percentage Values");
 		{
 			Fl_Group *perc_charts_group = new Fl_Group(310,30,w-520,h-40,""); // DOUBLEWINDOW
 		    {
@@ -263,7 +263,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 		perc_tab->end();
 		perc_tab->color(FL_WHITE);
         
-		pair_tab = new Fl_Group(300,20,w-300,h-20,"Base Pairings");
+		pair_tab = new Fl_Group(300,20,w-300,h-20,"@menu Base Pairings");
 		{
 			Fl_Group *pair_charts_group = new Fl_Group(310,30,w-520,h-40,""); // DOUBLEWINDOW
 			{
@@ -356,7 +356,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 		pair_tab->end();
         pair_tab->color(FL_WHITE);
 		
-		roc_tab = new Fl_Group(300,20,w-300,h-20,"ROC Plot");
+		roc_tab = new Fl_Group(300,20,w-300,h-20,"@<-> ROC Plot");
 		{
 			Fl_Group *roc_plot_group = new Fl_Group(310,30,w-520,h-40,""); // DOUBLEWINDOW
 			{
@@ -624,7 +624,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 		roc_tab->end();
 		roc_tab->color(FL_WHITE);
         
-		table_tab = new Fl_Group(300,20,w-300,h-20,"Table");
+		table_tab = new Fl_Group(300,20,w-300,h-20,"@line Table");
 		{
             // *** Is the text_display_group group necessary? *** //
             

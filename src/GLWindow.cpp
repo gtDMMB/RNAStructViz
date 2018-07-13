@@ -5,8 +5,8 @@
 #include <iostream>
 #include <assert.h>
 
-GLWindow::GLWindow(int x, int y, int w, int h, const char* label)
-    : Fl_Gl_Window(x, y, w, h, label)
+GLWindow::GLWindow(int x, int y, int width, int height, const char* label)
+    : Fl_Gl_Window(x, y, width, height, label)
     , m_panning(false)
     , m_zooming(false)
 {
@@ -19,6 +19,10 @@ GLWindow::GLWindow(int x, int y, int w, int h, const char* label)
     m_origin[1] = 0.0f;
     m_scale = 1.0f;
     k_scaleAmt = 1.0f;
+
+    //glLoadIdentity(); 
+    //glViewport(500, 500, w(), h()); 
+    //glOrtho(-w(), w(), -h(), h(), -1, 1);          
 
 }
 
@@ -117,10 +121,14 @@ void GLWindow::drawOld()
 
 void GLWindow::draw() {
      if(!valid()) {
-          Fl_Gl_Window::ortho();
+          glLoadIdentity(); 
+          //glViewport(500, 500, w(), h()); 
+          glOrtho(-w(), w(), -h(), h(), -1, 1);          
           Fl_Window::draw();
-          crDraw = Fl::cairo_make_current(this);
-          crDraw = cairo_reference(crDraw);
+          //crDraw = Fl::cairo_make_current(this);
+          //crDraw = cairo_reference(crDraw);
+          //cairo_translate(crDraw, 500, 500);
+          valid(1);
      }
 }
 
