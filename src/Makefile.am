@@ -1,12 +1,13 @@
-AM_CPPFLAGS = -g -Wall @CXXFLAGS_FLTK@
+AM_CPPFLAGS = -g -Wall @CXXFLAGS_EXTRA@
 
-AM_LDFLAGS =  -g -Wall @LDFLAGS_FLTK@
+AM_LDFLAGS =  -g -Wall @LDFLAGS_EXTRA@
 
-LIBS = @LDFLAGS_FLTK@
+LIBS = @LDFLAGS_EXTRA@
 
 bin_PROGRAMS = RNAStructViz
 
 RNAStructViz_SOURCES = \
+      BranchTypeIdentification.cpp \
       DiagramWindow.cpp \
       StatsWindow.cpp \
       GLWindow.cpp \

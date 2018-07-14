@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <math.h>
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
@@ -31,6 +33,11 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     color(FL_WHITE);
     size_range(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
     box(FL_NO_BOX);
+
+    //Fl_Color priorColor = fl_color();
+    //fl_color(color());
+    //fl_rectf(0, 0, this->w(), this->h());
+    //fl_color(priorColor);
 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
@@ -71,6 +78,11 @@ void DiagramWindow::SetFolderIndex(int index) {
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
     this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
+    
+    //Fl_Color priorColor = fl_color();
+    //fl_color(color());
+    //fl_rectf(0, 0, w(), h());
+    //fl_color(priorColor);
 
     if (resetMenus) {
         m_menus[0]->value(0);
@@ -96,10 +108,30 @@ void DiagramWindow::checkBoxChangedStateCallback(Fl_Widget *, void *v) {
 void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
     Fl_Button *buttonPressed = (Fl_Button *) v;
     if (buttonPressed->changed()) {
+        
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
         char *exportFilePath = thisWindow->GetExportPNGFilePath();
-        cairo_surface_write_to_png(cairo_get_target(thisWindow->crDraw), exportFilePath);
+        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        Fl::wait();
+        thisWindow->m_redrawStructures = true;
+        thisWindow->redraw();
+ 
+        int imageStride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
+        uchar *imageData = new uchar[imageStride * IMAGE_HEIGHT];
+        memset(imageData, 0, imageStride * IMAGE_HEIGHT);
+        cairo_surface_t *crSurface = cairo_image_surface_create_for_data(imageData, CAIRO_FORMAT_ARGB32, 
+                                                                         IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
+        cairo_t *cr = cairo_create(crSurface);
+        thisWindow->m_redrawStructures = true;
+        thisWindow->cairoTranslate = false;
+        DiagramWindow::Draw((Fl_Cairo_Window *) thisWindow, cr);
+        cairo_surface_write_to_png(cairo_get_target(cr), exportFilePath);
+        cairo_destroy(cr);
+        cairo_surface_destroy(crSurface);
+        delete imageData;
+
         buttonPressed->clear_changed();
+    
     }
 }
 
@@ -108,7 +140,12 @@ void DiagramWindow::resize(int x, int y, int w, int h) {
 }
 
 void DiagramWindow::drawWidgets() {
-     Fl_Double_Window::draw();
+    Fl_Color priorColor = fl_color();
+    fl_color(color());
+    fl_rectf(0, 0, w(), h());
+    fl_color(priorColor);
+    Fl_Double_Window::draw();
+    m_redrawStructures = true;
 }
 
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
@@ -116,15 +153,11 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
     thisWindow->crDraw = cr;
     cairo_reference(thisWindow->crDraw);    
+    thisWindow->drawWidgets();
 
     Fl_Color priorColor = fl_color();
     int priorFont = fl_font();
     int priorFontSize = fl_size();
-
-    fl_color(thisWindow->color());
-    fl_rectf(0, 0, thisWindow->w(), thisWindow->h());
-    fl_color(priorColor);
-    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.0);
     
     // Get the structures. Be sure the reference structure is first.
     RNAStructure *sequences[3];
@@ -199,20 +232,23 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     if (thisWindow->m_redrawStructures) {
             cairo_push_group(cr);
-            cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+            if(thisWindow->cairoTranslate)
+                 cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
             thisWindow->RedrawBuffer(cr, sequences, numToDraw, IMAGE_WIDTH);
-            thisWindow->m_redrawStructures = false;
             cairo_pop_group_to_source(cr);
-            cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+            if(thisWindow->cairoTranslate)            
+                 cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
             cairo_arc(cr, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
             cairo_clip(cr);
             cairo_paint(cr);
+            thisWindow->m_redrawStructures = false;
+            thisWindow->cairoTranslate = true;
     }
 
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
     fl_line_style(0);
-    thisWindow->drawWidgets();
+    //thisWindow->drawWidgets();
 }
 
 void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
@@ -221,9 +257,11 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     int priorFont = fl_font();
     int priorFontSize = fl_size();
     fl_font(priorFont, 10);
-
     fl_line_style(0);
 
+    cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+    cairo_fill(cr);
+    
     if (numStructures == 1) {
         Draw1(cr, structures, resolution);
     } else if (cr, numStructures == 2) {

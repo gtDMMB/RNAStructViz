@@ -167,6 +167,7 @@ private:
     int m_menuItemsSize;
 
     cairo_t *crDraw;
+    bool cairoTranslate;
     bool m_redrawStructures;
     
     int numPairs[7];

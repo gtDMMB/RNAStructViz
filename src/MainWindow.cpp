@@ -25,10 +25,10 @@ MainWindow::MainWindow(int argc, char **argv)
     {
         
         //Open button
-        Fl_Button* openButton = new Fl_Button(10, 10, 90, 30, "Load Files");
+        Fl_Button* openButton = new Fl_Button(10, 10, 90, 30, "@filenew Load Files");
         openButton->callback(OpenFileCallback);
         
-        Fl_Box* columnLabel = new Fl_Box(20,50,120,30,"Folders");
+        Fl_Box* columnLabel = new Fl_Box(20,50,120,30,"@fileopen Folders");
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         
         m_structureInfo = new Fl_Scroll(0,80,290,360);
