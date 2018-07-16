@@ -177,11 +177,11 @@ bool RNABranchType_t::PerformBranchClassification(class RNAStructure * &rnaStruc
      // we reset the branch types by number on all (except for the nubbins, 
      // see below) entries in the array: 
      vector<RNAStructure::BaseData *> enclosingArcs = getEnclosingArcs(rnaStructBase, false);
-     sort(enclosingArcs.begin(), enclosingArcs.begin() + 4, RNAStructureBaseDataIndexSort());
      if(enclosingArcs.size() < 7 || mostEnclosingArcsSize < 4) {
-          fprintf(stderr, "HUGE LOGISTICAL ERROR: There are not 7 / 4 main arcs / branches to classify!\n");
+          //fprintf(stderr, "HUGE LOGISTICAL ERROR: There are not 7 / 4 main arcs / branches to classify!\n");
           return false;
      }
+     sort(enclosingArcs.begin(), enclosingArcs.begin() + 4, RNAStructureBaseDataIndexSort());
      // handle labeling of the arc nubbins (and contained pairs) to the sides of the big arcs: 
      vector<RNAStructure::BaseData *> enclosingArcsNubbins(enclosingArcs.begin() + 4, enclosingArcs.begin() + 7);
      sort(enclosingArcsNubbins.begin(), enclosingArcsNubbins.end(), RNAStructureBaseDataIndexSort());
