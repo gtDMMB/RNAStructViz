@@ -24,7 +24,7 @@ $ sudo apt-get install libmesa-dev mesa-common-dev
 ```
 If you are running an older version, of say Ubuntu 14.xx, the install of the package ``libmesa-dev`` may fail. If this happens, try installing the required packages in the above line by running:
 ```
-$ sudo apt-get install libglu1-mesa-dev libfltk1.1-dev
+$ sudo apt-get install libglu1-mesa-dev
 ```
 If problems with the package names still arise, you can try searching for the correct ``mesa-dev`` package to install by issuing the following command:
 ```
