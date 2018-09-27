@@ -51,7 +51,7 @@ Now comes the main step in this configuration process: building FLTK *with Cairo
 First, fetch a copy of the most recent FLTK source: 
 ```
 $ cd ~
-$ wget http://www.fltk.org/software.php?VERSION=1.3.4&FILE=fltk/1.3.4/fltk-1.3.4-2-source.tar.bz2
+$ wget http://fltk.org/pub/fltk/1.3.4/fltk-1.3.4-2-source.tar.bz2 
 $ tar xvjf fltk-1.3.4-2-source.tar.bz2
 $ cd fltk-1.3.4-2
 ```
