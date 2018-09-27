@@ -333,6 +333,7 @@ void RNAStructure::DisplayFileContents()
 
     }
 
+    fprintf(stderr, "m_contentWindow = %p\n", m_contentWindow);
     m_contentWindow->show();
 }
 

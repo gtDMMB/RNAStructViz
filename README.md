@@ -78,6 +78,16 @@ $ cd ~
 $ git clone git@github.com:gtDMMB/RNAStructViz.git
 $ cd RNAStructViz
 ```
+Alternately, without the need for the public-key-based checkout, run: 
+```
+$ cd ~
+$ git clone https://github.com/gtDMMB/RNAStructViz.git
+$ cd RNAStructViz
+```
+Now we must switch to the current *with-cairo* branch source: 
+```
+$ git checkout with-cairo
+```
 Now we are ready to build the source: 
 ```
 $ ./configure
