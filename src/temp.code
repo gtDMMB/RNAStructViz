@@ -1,6 +1,0 @@
-
-#ifndef FLTK_HAVE_CAIRO
-     #define FLTK_HAVE_CAIRO
-#endif
-
-#include <FL/Fl.H>
