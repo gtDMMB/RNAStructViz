@@ -38,12 +38,19 @@ $ sudo apt-get install libcairo2-dev
 
 #### Installing the Cairo libraries on a Mac 
 
-Using [MacPorts](http://www.macports.org/) we can easily install Cairo on OS X: 
+Using [Homebrew](https://brew.sh) we can easily install Cairo on OS X: 
 ```
-$ sudo port install cairo
+$ brew install cairo
 ```
-See [this page](https://www.cairographics.org/download/) for more help with the 
-library installation if you have any trouble with the above steps. 
+
+#### Installing wget on a Mac (optional)
+The instructions below use the command `wget` to fetch files from the Internet.
+This small program is not installed on Macs by default.
+You can choose to install wget with Homebrew, or you can choose to download files using your web browser.
+To install wget:
+```
+$ brew install wget
+```
 
 #### Building FLTK from source 
 
@@ -90,7 +97,6 @@ $ git checkout with-cairo
 ```
 Now we are ready to build the source: 
 ```
-$ ./configure
 $ make clean && make
 ```
 At this point if all goes well you should have a working copy of the RNAStructViz binary in the src/ directory. Let's make an alias for this command so it's easier to find and use on the system:
