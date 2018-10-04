@@ -1,2 +1,16 @@
 # Compiled source #
 *.o
+
+#logs#
+*.log
+
+#compiled dependencies#
+src/.deps/*
+
+#executable#
+src/RNAStructViz
+
+#cache#
+*.cache
+
+
