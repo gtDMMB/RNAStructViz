@@ -10,9 +10,9 @@ AM_CPPFLAGS = -g -Wall -std=c++11 -DFLTK_HAVE_CAIRO -I/usr/local/include -I/usr/
 CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA) $(AM_CPPFLAGS)
 
 LDFLAGS = 
-LDFLAGS_EXTRA = `fltk-config --ldflags` `pkg-config --ldflags cairo` -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_gl -lfltk_cairo -lfltk_images -lstdc++ -lXfixes -lXext -lpthread -ldl -lm -lX11 -lGL -lGLU -lGL -lXext -lXfixes -ldl -lfontconfig -lfreetype -lXrender -lX11 -lcairo -lXext -lXrender -lX11 -lXft -lXinerama -lXcursor -lX11 -lcairo
-AM_LDFLAGS = -g -Wall -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_gl -lfltk_cairo -lfltk_images -lstdc++ -lXfixes -lXext -lpthread -ldl -lm -lX11 -lGL -lGLU -lGL -lXext -lXfixes -ldl -lfontconfig -lfreetype -lXrender -lX11 -lcairo -lXext -lXrender -lX11 -lXft -lXinerama -lXcursor -lX11 -lcairo
-LIBS = -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_gl -lfltk_cairo -lfltk_images -lstdc++ -lXfixes -lXext -lpthread -ldl -lm -lX11 -lGL -lGLU -lGL -lXext -lXfixes -ldl -lfontconfig -lfreetype -lXrender -lX11 -lcairo -lXext -lXrender -lX11 -lXft -lXinerama -lXcursor -lX11 -lcairo
+LDFLAGS_EXTRA = `fltk-config --ldflags` `pkg-config --ldflags cairo` -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_gl -lfltk_cairo -lfltk_images -lstdc++ -lpthread -ldl -lm -ldl -lfontconfig -lfreetype -lcairo -lcairo
+AM_LDFLAGS = -g -Wall -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_gl -lfltk_cairo -lfltk_images -lstdc++ -lpthread -ldl -lm -ldl -lfontconfig -lfreetype -lcairo -lcairo
+LIBS = -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_gl -lfltk_cairo -lfltk_images -lstdc++ -lpthread -ldl -lm -ldl -lfontconfig -lfreetype -lcairo -lcairo
 LDFLAGS_FULL=$(LDFLAGS) $(LDLAGS_EXTRA) $(AM_LDFLAGS) $(LIBS)
 
 RNAStructViz_SOURCES = \
