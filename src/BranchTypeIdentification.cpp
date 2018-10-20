@@ -47,7 +47,12 @@ vector<RNAStructure::BaseData *> RNABranchType_t::getEnclosingArcs(
      return rBaseDataVec;
 }
 
-RNABranchType_t::RNABranchType_t(BranchID_t bid = BRANCH_UNDEFINED, class RNAStructure::BaseData *bparent = NULL) {
+RNABranchType_t::RNABranchType_t() {
+     branchID = BRANCH_UNDEFINED;
+     branchParent = NULL;
+}
+
+RNABranchType_t::RNABranchType_t(BranchID_t bid, class RNAStructure::BaseData *bparent = NULL) {
      branchID = bid;
      branchParent = bparent;
 } 
