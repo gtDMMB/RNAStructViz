@@ -20,8 +20,6 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 {
 
     // label configuration:  
-    //align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    //labeltype(_FL_EMBOSSED_LABEL); 
     labelcolor(LOCAL_TEXT_COLOR);
     labelfont(LOCAL_BFFONT);
     labelsize(2 * LOCAL_TEXT_SIZE);    

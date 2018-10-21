@@ -13,8 +13,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Pixmap.H>
-//#include <X11/xpm.h>
-//#include "pixmaps/mainicon.xpm"
+#include <FL/Fl_PNG_Image.H>
 
 MainWindow* MainWindow::ms_instance = 0;
 
@@ -34,11 +33,29 @@ MainWindow::MainWindow(int argc, char **argv)
     mainMenuPane = new Fl_Group(0,0,300,450,"");
     {
         
+	// setup the program logo (for now dynamically loaded):
+	Fl_PNG_Image *appLogo = new Fl_PNG_Image("src/pixmaps/RNAStructViz.png");
+        Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, NAVBUTTONS_OFFSETY, 
+			                 appLogo->w(), appLogo->h());
+	appLogoCont->image(appLogo);
+
+	// consistent alignment with the folder window display:
+	int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
+        const char *dividerText = "--------------------------------------------";
+	int dividerTextHeight = 4;
+	Fl_Box *topTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
+                                            2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+					    dividerTextHeight, dividerText);
+        topTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+        topTextDivider->labelcolor(LOCAL_TEXT_COLOR);
+	topTextDivider->labelfont(LOCAL_BFFONT);
+	topTextDivider->labelsize(LOCAL_TEXT_SIZE);
+	upperYOffset += 5;
+
 	// make it more user friendly by including some help text: 
 	const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
 	int navButtonsLabelHeight = 2 * NAVBUTTONS_BHEIGHT;
-        Fl_Box *actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 
-		NAVBUTTONS_OFFSETY, 
+        Fl_Box *actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
 		2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
 	       navButtonsLabelHeight, navInstText); 	
         actionsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -48,7 +65,7 @@ MainWindow::MainWindow(int argc, char **argv)
 
 	//Open button
         Fl_Button* openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
-		   NAVBUTTONS_OFFSETY + navButtonsLabelHeight, 
+		   NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		   NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
 		   "@search Load Files @>|");
         openButton->callback(OpenFileCallback);
@@ -57,40 +74,39 @@ MainWindow::MainWindow(int argc, char **argv)
        	// The button to open configuration settings:
 	Fl_Button *configOptionsButton = new Fl_Button( 
 	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
-		  NAVBUTTONS_OFFSETY + navButtonsLabelHeight, 
+		  NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		  NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
 		  "@menu Config Options @>|");
 	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(LOCAL_BUTTON_COLOR);
 
-	const char *dividerText = "--------------------------------------------";
-	int dividerTextHeight = 4;
-	Fl_Box *textDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
-		NAVBUTTONS_OFFSETY + navButtonsLabelHeight + 
+	Fl_Box *midTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
+		NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
 		NAVBUTTONS_BHEIGHT + 15, 
 		2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
 	       dividerTextHeight, dividerText); 	
-        textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-        textDivider->labelcolor(LOCAL_TEXT_COLOR);
-	textDivider->labelfont(LOCAL_BFFONT);
-	textDivider->labelsize(LOCAL_TEXT_SIZE);
+        midTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+        midTextDivider->labelcolor(LOCAL_TEXT_COLOR);
+	midTextDivider->labelfont(LOCAL_BFFONT);
+	midTextDivider->labelsize(LOCAL_TEXT_SIZE);
 
 	const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
-        Fl_Box* columnLabel = new Fl_Box(20,50 + navButtonsLabelHeight + 
-			                 dividerTextHeight,120,75,
+        Fl_Box* columnLabel = new Fl_Box(20,50 + upperYOffset + navButtonsLabelHeight + 
+			                 dividerTextHeight, 120,75,
 			                 foldersInstText);
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         columnLabel->labelcolor(LOCAL_TEXT_COLOR);
 	columnLabel->labelfont(LOCAL_BFFONT);
 	columnLabel->labelsize(LOCAL_TEXT_SIZE);
 
-        m_structureInfo = new Fl_Scroll(0,105 + navButtonsLabelHeight + dividerTextHeight + 15,290,360 - navButtonsLabelHeight - dividerTextHeight - 50);
+        m_structureInfo = new Fl_Scroll(0, 105 + upperYOffset + navButtonsLabelHeight + 
+			  dividerTextHeight + 15,290,360 - upperYOffset - navButtonsLabelHeight - 
+			  dividerTextHeight - 50);
         m_structureInfo->type(Fl_Scroll::VERTICAL_ALWAYS);
-        m_packedInfo = new Fl_Pack(0,105 + navButtonsLabelHeight + 
+        m_packedInfo = new Fl_Pack(0,105 + upperYOffset + navButtonsLabelHeight + 
 			dividerTextHeight + 15,270,
-			360 - navButtonsLabelHeight - dividerTextHeight - 50);
+			360 - upperYOffset - navButtonsLabelHeight - dividerTextHeight - 50);
         m_packedInfo->type(Fl_Pack::VERTICAL);
-        
         
         m_packedInfo->end();
         m_packedInfo->color(FL_WHITE);
@@ -212,16 +228,21 @@ void MainWindow::AddFolder(const char* foldername,const int index,
 void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 {
     if (!ms_instance->m_fileChooser)
-		ms_instance->CreateFileChooser();
-    
+        ms_instance->CreateFileChooser();
     ms_instance->m_fileChooser->show();
-    
     while (ms_instance->m_fileChooser->visible())
-		Fl::wait();
+        Fl::wait();
     
+    const char *nextWorkingDir = ms_instance->m_fileChooser->directory();
+    if(nextWorkingDir != NULL && strcmp(nextWorkingDir, CTFILE_SEARCH_DIRECTORY)) { 
+	// update the working directory:
+        strncpy(CTFILE_SEARCH_DIRECTORY, nextWorkingDir, MAX_BUFFER_SIZE - 1);
+	ConfigParser::nullTerminateString(CTFILE_SEARCH_DIRECTORY);
+    }
+
     for (int i = 1; i <= ms_instance->m_fileChooser->count(); ++i)
     {
-		RNAStructViz::GetInstance()->GetStructureManager()->
+	RNAStructViz::GetInstance()->GetStructureManager()->
         AddFile(ms_instance->m_fileChooser->value(i));
     }
     
@@ -411,27 +432,12 @@ bool MainWindow::CreateFileChooser()
     
     m_fileChooser = new Fl_File_Chooser(currentWD, "*.{ct,nopct,bpseq}", 
                                         Fl_File_Chooser::MULTI, "Select RNA Sequences");
-    //Fl_Box* message = new Fl_Box(0,0,400,40,"Loaded files will automatically be grouped into folders according to their underlying sequence.");
-    //message->align(FL_ALIGN_WRAP | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    //m_fileChooser->add_extra(message);
     m_fileChooser->show_label = "Loaded files will automatically be grouped into folders according to their underlying sequence.";
+    m_fileChooser->color(FL_WHITE);
+    m_fileChooser->textcolor(LOCAL_TEXT_COLOR);
 
     return true;
 }
-
-/*void MainWindow::ShowFolderCallbackOld(Fl_Widget* widget, void* userData)
- {
- 
- const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
- int index;
- for (index = 0; index < folders.size(); ++index)
- {
- if (!strcmp(folders[index]->folderName,widget->label()))
- break;
- }
- 
- RNAStructViz::GetInstance()->GetStructureManager()->DisplayFolderContents(index);
- }*/
 
 void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
 {
@@ -716,117 +722,6 @@ void MainWindow::RemoveFolderByIndex(const int index)
         
     }
 }
-
-/*void MainWindow::RemoveFolderCallbackOld(Fl_Widget* widget, void* userData)
- {
- 
- // Find the group with this child
- Fl_Pack* packOld = ms_instance->m_packedInfoOld;
- 
- Fl_Button* nameButton = (Fl_Button*)(widget->parent()->child(1));
- 
- const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
- int index;
- for (index = 0; index < folders.size(); ++index)
- {
- if (!strcmp(folders[index]->folderName,nameButton->label()))
- break;
- }
- 
- for (int i = 0; i < packOld->children(); ++i)
- {
- Fl_Button* childButton = ((Fl_Button*)((Fl_Group*)packOld->child(i))->
- child(2));
- if (childButton == widget)
- {
- RNAStructViz* appInstance = RNAStructViz::GetInstance();
- 
- Folder* folder = appInstance->GetStructureManager()->
- GetFolderAt(index);
- const std::vector<DiagramWindow*>& diagrams = appInstance->
- GetDiagramWindows();
- const std::vector<StatsWindow*>& stats = appInstance->
- GetStatsWindows();
- int structNum = folder->structCount;
- 
- 
- for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
- {
- if(diagrams[ui]->GetFolderIndex() == index)
- {
- for(int j = structNum - 1; j >= 0; j--)
- {
- int index = folder->folderStructs[j];
- diagrams[ui]->RemoveStructure(index);
- }
- diagrams[ui]->hide();
- }
- }
- for (unsigned int ui = 0; ui < stats.size(); ++ui)
- {
- if(stats[ui]->GetFolderIndex() == index)
- {
- for(int j = structNum - 1; j >= 0; j--)
- {
- int index = folder->folderStructs[j];
- stats[ui]->RemoveStructure(index);
- }
- stats[ui]->hide();
- }
- }
- int shift = 0;
- for (int j = 0; j < folder->structCount; j++)
- {
- if(folder->folderStructs[(j+shift)] == -1)
- {
- shift++;
- }
- if(folder->folderStructs[(j+shift)] != -1)
- {   
- int index = folder->folderStructs[(j+shift)];
- appInstance->GetStructureManager()->RemoveStructure((index));
- }
- }
- folder->structCount = 0;
- 
- //appInstance->GetStructureManager()->RemoveFolder((int)userData);
- appInstance->GetStructureManager()->
- RemoveFolder(index , i);
- 
- for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
- {
- if (diagrams[ui]->GetFolderIndex() > index)
- {
- int prevIndex = diagrams[ui]->GetFolderIndex();
- diagrams[ui]->SetFolderIndex(prevIndex - 1);
- }
- }
- for (unsigned int ui = 0; ui < stats.size(); ++ui)
- {
- if(stats[ui]->GetFolderIndex() > index)
- {
- int prevIndex = stats[ui]->GetFolderIndex();
- stats[ui]->SetFolderIndex(prevIndex - 1);
- }
- }
- 
- 
- Fl_Group* toRemove = (Fl_Group*)packOld->child(i);
- packOld->remove(toRemove);
- ms_instance->m_structureInfoOld->redraw();
- 
- if(RNAStructViz::GetInstance()->GetStructureManager()->GetSelectedFolder() 
- == -1)
- {
- ms_instance->diagramButtonOld->deactivate();
- ms_instance->statsButtonOld->deactivate();
- }
- 
- Fl::delete_widget(toRemove);
- break;
- }
- }
- }*/
 
 void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
 {
