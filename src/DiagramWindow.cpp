@@ -1,6 +1,7 @@
 #include "DiagramWindow.h"
 #include "RNAStructViz.h"
 #include "BranchTypeIdentification.h"
+#include "ConfigOptions.h"
 #include <FL/fl_draw.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_File_Chooser.H>
@@ -1068,8 +1069,10 @@ char *DiagramWindow::GetExportPNGFilePath() {
     const char *fileExtMask = "*.png";
     time_t currentTime = time(NULL);
     struct tm *tmCurrentTime = localtime(&currentTime);
-    char defaultFilePath[256];
-    strftime(defaultFilePath, 255, "RNAStructViz-GUIView-%F-%H%M%S.png", tmCurrentTime);
+    char defaultFilePath[MAX_BUFFER_SIZE];
+    char pngImagePath[MAX_BUFFER_SIZE]; 
+    snprintf(pngImagePath, MAX_BUFFER_SIZE - 1, "%s/%s", PNG_OUTPUT_DIRECTORY, PNG_OUTPUT_PATH);
+    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, pngImagePath, tmCurrentTime);
     int pathNameType = 1; // 0 (absolute), otherise (relative)
     return fl_file_chooser(chooserMsg, fileExtMask, defaultFilePath, pathNameType);
 }

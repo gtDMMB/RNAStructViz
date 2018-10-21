@@ -14,6 +14,7 @@ RNAStructure::RNAStructure()
     , m_displayString(0)
 {
      branchType = NULL; //new RNABranchType_t(BRANCH_UNDEFINED, NULL);
+     m_contentWindow = NULL;
 }
 
 RNAStructure::RNAStructure(const RNAStructure &rnaStruct) { 
@@ -333,7 +334,6 @@ void RNAStructure::DisplayFileContents()
 
     }
 
-    fprintf(stderr, "m_contentWindow = %p\n", m_contentWindow);
     m_contentWindow->show();
 }
 

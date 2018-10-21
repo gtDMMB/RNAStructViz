@@ -15,6 +15,12 @@
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
 
+#define NAVBUTTONS_OFFSETX   (10)
+#define NAVBUTTONS_OFFSETY   (10) 
+#define NAVBUTTONS_BWIDTH    (125)
+#define NAVBUTTONS_BHEIGHT   (30)
+#define NAVBUTTONS_SPACING   (15)
+
 class MainWindow
 {
 public:
@@ -70,6 +76,9 @@ protected:
 	Callback for file loading.
     */
     static void OpenFileCallback(Fl_Widget* widget, void* userData);
+
+    /* Callback for options / config setup. */
+    static void ConfigOptionsCallback(Fl_Widget *widget, void *userData);
 
     /*
      Callback to show/hide a folder

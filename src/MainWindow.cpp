@@ -1,39 +1,83 @@
 #include "MainWindow.h"
 #include "RNAStructViz.h"
+#include "DisplayConfigWindow.h"
+#include "ConfigOptions.h"
+
 #include <unistd.h>
 #include <iostream>
 #include <vector>
+
+#include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Round_Button.H>
+#include <FL/Fl_Pixmap.H>
+#include <X11/xpm.h>
+#include "pixmaps/mainicon.xpm"
 
 MainWindow* MainWindow::ms_instance = 0;
+
 
 MainWindow::MainWindow(int argc, char **argv)
 : m_fileChooser(0)
 {
-    m_mainWindow = new Fl_Window(650, 450, "RNAStructViz");
+    m_mainWindow = new Fl_Window(650, 450, RNASTRUCTVIZ_VERSION_STRING);
     m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(FL_WHITE);
     
     //Fl_Box* resizableBoxOld = new Fl_Box(0, 60, 300, 340);
     //m_mainWindow->resizable(resizableBoxOld);
     
-    m_mainWindow->begin();
-    
+    m_mainWindow->begin();    
+
     mainMenuPane = new Fl_Group(0,0,300,450,"");
     {
         
-        //Open button
-        Fl_Button* openButton = new Fl_Button(10, 10, 90, 30, "@filenew Load Files");
+	// make it more user friendly by including some help text: 
+	const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
+	int navButtonsLabelHeight = 2 * NAVBUTTONS_BHEIGHT;
+        Fl_Box *actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 
+		NAVBUTTONS_OFFSETY, 
+		2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+	       navButtonsLabelHeight, navInstText); 	
+        actionsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+
+	//Open button
+        Fl_Button* openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
+		   NAVBUTTONS_OFFSETY + navButtonsLabelHeight, 
+		   NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
+		   "@search Load Files @>|");
         openButton->callback(OpenFileCallback);
-        
-        Fl_Box* columnLabel = new Fl_Box(20,50,120,30,"@fileopen Folders");
+       
+       	// The button to open configuration settings:
+	Fl_Button *configOptionsButton = new Fl_Button( 
+	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
+		  NAVBUTTONS_OFFSETY + navButtonsLabelHeight, 
+		  NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
+		  "@menu Config Options @>|");
+	// TODO:
+	//configOptionsButton->callback(ConfigOptionsCallback);
+
+	const char *dividerText = "--------------------------------------------";
+	int dividerTextHeight = 4;
+	Fl_Box *textDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
+		NAVBUTTONS_OFFSETY + navButtonsLabelHeight + 
+		NAVBUTTONS_BHEIGHT + 15, 
+		2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+	       dividerTextHeight, dividerText); 	
+        textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+
+	const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
+        Fl_Box* columnLabel = new Fl_Box(20,50 + navButtonsLabelHeight + 
+			                 dividerTextHeight,120,75,
+			                 foldersInstText);
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         
-        m_structureInfo = new Fl_Scroll(0,80,290,360);
+        m_structureInfo = new Fl_Scroll(0,105 + navButtonsLabelHeight + dividerTextHeight + 15,290,360 - navButtonsLabelHeight - dividerTextHeight - 50);
         m_structureInfo->type(Fl_Scroll::VERTICAL_ALWAYS);
-        m_packedInfo = new Fl_Pack(0,80,270,360);
+        m_packedInfo = new Fl_Pack(0,105 + navButtonsLabelHeight + 
+			dividerTextHeight + 15,270,
+			360 - navButtonsLabelHeight - dividerTextHeight - 50);
         m_packedInfo->type(Fl_Pack::VERTICAL);
         
         
@@ -72,6 +116,13 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->size_range(650,450,650,0);
     m_mainWindow->end();
     
+    // set the main window icon:
+    fl_open_display();
+    Pixmap icon_pixmap, mask;
+    XpmCreatePixmapFromData(fl_display, DefaultRootWindow(fl_display), 
+		            mainicon_xpm, &icon_pixmap, &mask, NULL);
+    m_mainWindow->icon((const void *) icon_pixmap);
+
     m_mainWindow->show(argc, argv);
     
 }
@@ -159,6 +210,16 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
+}
+
+void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
+    
+     DisplayConfigWindow *cfgWindow = new DisplayConfigWindow(); 
+     cfgWindow->show();
+     while(cfgWindow->visible()) 
+	     Fl::wait();
+     delete cfgWindow;
+
 }
 
 void MainWindow::TestCallback(Fl_Widget* widget, void* userData)
@@ -382,7 +443,7 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
     if (folders[index]->folderWindow == NULL)
     {
 
-        fwindow = new FolderWindow(340,40,300,390, folders[index]->folderName, index);
+	fwindow = new FolderWindow(340,40,300,390, folders[index]->folderName, index);
         //folders[index]->folderWindow = fwindow;
     }
     else

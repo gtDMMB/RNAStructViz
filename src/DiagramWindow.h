@@ -5,11 +5,6 @@
 #ifndef DIAGRAMWINDOW_H
 #define DIAGRAMWINDOW_H
 
-//#ifndef FLTK_HAVE_CAIRO
-     #define FLTK_USE_CAIRO 1
-     #define FLTK_HAVE_CAIRO 1
-//#endif
-
 #include <FL/Fl.H>
 #include <cairo.h>
 #include <FL/Fl_Cairo.H>
@@ -21,6 +16,7 @@
 #include <FL/x.H>
 #include <vector>
 
+#include "ConfigOptions.h"
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 

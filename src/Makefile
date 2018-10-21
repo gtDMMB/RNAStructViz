@@ -10,7 +10,7 @@ CXXFLAGS_FLTK=`fltk-config --use-gl --use-images --use-glut --use-forms --use-ca
 CXXFLAGS_EXTRA=$(CXXFLAGS_FLTK) $(CXXFLAGS_PKGCONFIG) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT 
 CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
 
-LDFLAGS =
+LDFLAGS=-g -Wall
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`fltk-config --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
@@ -31,7 +31,8 @@ RNAStructViz_SOURCES = \
       Fl_Rotated_Text.cpp \
       rocbox.cpp
 RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) \
-	DiagramWindow.$(OBJEXT) StatsWindow.$(OBJEXT) \
+	DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
+	StatsWindow.$(OBJEXT) \
 	GLWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
 	RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
@@ -57,6 +58,10 @@ DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 	BranchTypeIdentification.h RNAStructure.h DiagramWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
 
+DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
+	DisplayConfigWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
+
 StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h RNAStructViz.h\
 	RNAStructure.h InputWindow.h StatsWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
@@ -68,7 +73,7 @@ InputWindow.$(OBJEXT): InputWindow.h InputWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
 
 FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
-	MainWindow.h FolderWindow.cpp
+	ConfigOptions.h MainWindow.h FolderWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
 Main.$(OBJEXT): MainWindow.h RNAStructViz.h Main.cpp

@@ -1,13 +1,15 @@
 #include "MainWindow.h"
 #include "RNAStructViz.h"
+#include "ConfigOptions.h"
+#include "DisplayConfigWindow.h"
 
 #include <FL/Fl.H>
 
 int main(int argc, char **argv)
 {
     RNAStructViz::Initialize(argc, argv);
-    //Fl::scheme("gtk+");
-    Fl::scheme("gleam");
+    DisplayConfigWindow::SetupInitialConfig();
+    Fl::scheme(FLTK_THEME);
 
     return Fl::run();
 }

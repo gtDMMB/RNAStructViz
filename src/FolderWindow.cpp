@@ -2,6 +2,7 @@
 #include "StructureManager.h"
 #include "RNAStructViz.h"
 #include "MainWindow.h"
+#include "ConfigOptions.h"
 #include <unistd.h>
 #include <iostream>
 #include <FL/Fl_Button.H>
@@ -18,22 +19,31 @@ void FolderWindow::Construct(int w, int h, int folderIndex)
 FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, int folderIndex): Fl_Group(x, y, wid, hgt, label)
 {
 
-    Fl_Button* diagramButton = new Fl_Button(x+20,y+10,90,30,"Diagram");
+    // label configuration:  
+    //align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    //labeltype(_FL_EMBOSSED_LABEL); 
+    
+    Fl_Button* diagramButton = new Fl_Button(x+20,y+10,90,30,"@circle Diagram");
     diagramButton->callback(DiagramCallback);
-    Fl_Button* statsButton = new Fl_Button(x+120,y+10,90,30,"Statistics");
+    Fl_Button* statsButton = new Fl_Button(x+120,y+10,90,30,"@square Statistics");
     statsButton->callback(StatsCallback);
 
-    Fl_Button* closeButton = new Fl_Button(x+wid-25,y+5,20,20,"");
-
+    Fl_Button* closeButton = new Fl_Button(x+wid-25,y - 15,20,20,"");
     closeButton->callback(CloseFolderCallback);
     closeButton->label("@1+");
 
-    Fl_Box* fileLabel = new Fl_Box(x+20,y+40,120,30,"Files");
+    int fileLabelHeight = 25, fileLabelWidth = 120; 
+    const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents.";
+    Fl_Box* fileLabel = new Fl_Box(x+20,y+55,fileLabelWidth,fileLabelHeight, 
+		                   fileInstText);
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    fileLabel->labelsize(24);
+    fileLabel->labelfont(FL_COURIER_BOLD);
 
-    folderScroll = new Fl_Scroll(x+10, y+70, 280, 310);
+
+    folderScroll = new Fl_Scroll(x+10, y+70 + fileLabelHeight, 280, 310 - fileLabelHeight);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
-    folderPack = new Fl_Pack(x+10, y+70, 260, 310);
+    folderPack = new Fl_Pack(x+10, y+70 + fileLabelHeight, 260, 310 - fileLabelHeight);
     folderPack->type(Fl_Pack::VERTICAL);
     
     folderScroll->color(FL_WHITE);
@@ -72,7 +82,7 @@ void FolderWindow::SetStructures(int folderIndex)
         }
         int i = folder->folderStructs[(ui+shift)];
         RNAStructure *strct = structureManager->GetStructure(i);
-        AddStructure(strct->GetFilename(), i);
+	AddStructure(strct->GetFilename(), i);
     }
     this->label(folder->folderName);
     /*sprintf(title, "Folder: %-.48s", structureManager->GetFolderAt(folderIndex)->folderName);
@@ -85,7 +95,7 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     Fl_Pack* pack = folderPack;
     pack->begin();
     
-    int vertPosn = pack->children() * 30 + pack->y();
+    int vertPosn = pack->children() * 30 + pack->y() + 120;
     
     Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(), 30);
     group->begin();
