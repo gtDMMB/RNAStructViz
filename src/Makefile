@@ -5,12 +5,12 @@ OBJEXT=o
 BINARY_OUTPUT=RNAStructViz
 
 CXXFLAGS = -g -Wall -O2
-CXXFLAGS_PKGCONFIG=`echo -e -n "PKGS=(glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo xpm)\nCFLAGS=""\nfor pkg in \"\${PKGS[@]}\"; do\n     pkg-config --silence-errors --exists \$pkg\n     if [ \"\$?\" == \"0\" ]; then\n          CFLAGS=\"\${CF:AGS} \`pkg-config --cflags \$pkg\`\"\n     fi\ndone\necho \$CFLAGS" | bash`
+CXXFLAGS_PKGCONFIG=$(../scripts/pkg-config-flags.sh --cflags)
 CXXFLAGS_EXTRA = `fltk-config --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags --cxxflags` $(CXXFLAGS_PKGCONFIG) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT 
 CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
 
 LDFLAGS =
-LDFLAGS_PKGCONFIG=`echo -e -n "PKGS=(glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo xpm)\nLIBS=""\nfor pkg in \"\${PKGS[@]}\"; do\n     pkg-config --silence-errors --exists \$pkg\n     if [ \"\$?\" == \"0\" ]; then\n          LIBS=\"\${LIBS} \`pkg-config --libs \$pkg\`\"\n     fi\ndone\necho \$LIBS" | bash`
+LDFLAGS_PKGCONFIG=$(../scripts/pkg-config-flags.sh --libs)
 LDFLAGS_EXTRA = `fltk-config --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags` $(LDFLAGS_PKGCONFIG) -L`ls /usr/lib/$(uname -m)* | head -n 1` 
 LDFLAGS_FULL=$(LDFLAGS) $(LDFLAGS_EXTRA)
 
