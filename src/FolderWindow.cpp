@@ -23,9 +23,31 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     //align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     //labeltype(_FL_EMBOSSED_LABEL); 
     
-    Fl_Button* diagramButton = new Fl_Button(x+20,y+10,90,30,"@circle Diagram");
+    const char *dividerText = "----------------------------------------------";
+    int dividerTextHeight = 4, spacingHeight = 10;
+    Fl_Box *textDivider = new Fl_Box(x + 20, y + 10, 120, dividerTextHeight, 
+		                      dividerText); 
+    textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    
+    int fileOpsLabelHeight = 25, fileOpsLabelWidth = 120;
+    const char *fileOpsLabelText = "@reload Structure Operations.\nEach operation opens a new window.";
+    Fl_Box *fileOpsLabel = new Fl_Box(x + 20, y + 10 + dividerTextHeight + 
+		                      spacingHeight, 
+		                      fileOpsLabelWidth, fileOpsLabelHeight, 
+				      fileOpsLabelText);
+   fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
+
+    Fl_Button* diagramButton = new Fl_Button(x+20,y+10 + dividerTextHeight + 
+		                             fileOpsLabelHeight + 
+					     2 * spacingHeight,
+					     110,30,
+		                             "@circle Diagram @>|");
     diagramButton->callback(DiagramCallback);
-    Fl_Button* statsButton = new Fl_Button(x+120,y+10,90,30,"@square Statistics");
+    Fl_Button* statsButton = new Fl_Button(x+120,y+10 + dividerTextHeight + 
+		                           fileOpsLabelHeight + 
+					   2 * spacingHeight, 
+					   110,30,
+		                           "@square Statistics @>|");
     statsButton->callback(StatsCallback);
 
     Fl_Button* closeButton = new Fl_Button(x+wid-25,y - 15,20,20,"");
@@ -34,16 +56,27 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 
     int fileLabelHeight = 25, fileLabelWidth = 120; 
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents.";
-    Fl_Box* fileLabel = new Fl_Box(x+20,y+55,fileLabelWidth,fileLabelHeight, 
+    Fl_Box* fileLabel = new Fl_Box(x+20,y+55 + dividerTextHeight + 
+		                   fileOpsLabelHeight + 2 * spacingHeight, 
+				   fileLabelWidth, fileLabelHeight, 
 		                   fileInstText);
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     fileLabel->labelsize(24);
     fileLabel->labelfont(FL_COURIER_BOLD);
 
 
-    folderScroll = new Fl_Scroll(x+10, y+70 + fileLabelHeight, 280, 310 - fileLabelHeight);
+    folderScroll = new Fl_Scroll(x+10, y+70 + fileLabelHeight + 
+		                 dividerTextHeight + fileOpsLabelHeight + 
+				 2 * spacingHeight, 
+				 280, 310 - fileLabelHeight - 
+				 dividerTextHeight - fileOpsLabelHeight - 
+				 2 * spacingHeight);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
-    folderPack = new Fl_Pack(x+10, y+70 + fileLabelHeight, 260, 310 - fileLabelHeight);
+    folderPack = new Fl_Pack(x+10, y+70 + fileLabelHeight + 
+		             dividerTextHeight + fileOpsLabelHeight + 
+			     2 * spacingHeight, 260, 
+			     310 - fileLabelHeight - dividerTextHeight - 
+			     fileOpsLabelHeight - 2 * spacingHeight);
     folderPack->type(Fl_Pack::VERTICAL);
     
     folderScroll->color(FL_WHITE);
