@@ -20,7 +20,7 @@ terminal and a little know-how. Let's expand on this concept below.
 
 First install the Mesa/GL libs with apt if you do not already have them on your system:
 ```
-$ sudo apt-get install libmesa-dev mesa-common-dev
+$ sudo apt-get install libmesa-dev mesa-common-dev libxinerama-dev
 ```
 If you are running an older version, of say Ubuntu 14.xx, the install of the package ``libmesa-dev`` may fail. If this happens, try installing the required packages in the above line by running:
 ```

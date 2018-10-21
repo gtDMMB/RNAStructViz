@@ -5,12 +5,15 @@ OBJEXT=o
 BINARY_OUTPUT=RNAStructViz
 
 CXXFLAGS = -g -Wall -O2
-CXXFLAGS_EXTRA = `fltk-config --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags --cxxflags` `pkg-config --cflags cairo` -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT 
-CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
+CXXFLAGS_EXTRA = `fltk-config --cflags` `pkg-config --cflags cairo` -std=c++11 -DFLTK_HAVE_CAIRO -I/usr/local/include -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/local/include/FL/images -I/usr/include/freetype2 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12
+AM_CPPFLAGS = -g -Wall -std=c++11 -DFLTK_HAVE_CAIRO -I/usr/local/include -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/local/include/FL/images -I/usr/include/freetype2 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12
+CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA) $(AM_CPPFLAGS)
 
 LDFLAGS = 
-LDFLAGS_EXTRA = `fltk-config --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags` `pkg-config --libs glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo` -ljpeg -lpng -lstdc++ -lpthread -ldl -lm -lX11 
-LDFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
+LDFLAGS_EXTRA = `fltk-config --ldflags` `pkg-config --ldflags cairo` -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_cairo -lfltk_images -lstdc++ -lpthread -ldl -lm -ldl -lfontconfig -lfreetype -lcairo -lcairo
+AM_LDFLAGS = -g -Wall -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_cairo -lfltk_images -lstdc++ -lpthread -ldl -lm -ldl -lfontconfig -lfreetype -lcairo -lcairo
+LIBS = -std=c++11 /usr/local/lib/libfltk.a -lfltk -lfltk_cairo -lfltk_images -lstdc++ -lpthread -ldl -lm -ldl -lfontconfig -lfreetype -lcairo -lcairo
+LDFLAGS_FULL=$(LDFLAGS) $(LDLAGS_EXTRA) $(AM_LDFLAGS) $(LIBS)
 
 RNAStructViz_SOURCES = \
       BranchTypeIdentification.cpp \
