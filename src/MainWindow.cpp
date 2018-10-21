@@ -25,7 +25,7 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow = new Fl_Window(650, 450, RNASTRUCTVIZ_VERSION_STRING);
     m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(FL_WHITE);
-    
+
     //Fl_Box* resizableBoxOld = new Fl_Box(0, 60, 300, 340);
     //m_mainWindow->resizable(resizableBoxOld);
     
@@ -42,6 +42,9 @@ MainWindow::MainWindow(int argc, char **argv)
 		2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
 	       navButtonsLabelHeight, navInstText); 	
         actionsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+        actionsLabel->labelcolor(LOCAL_TEXT_COLOR);
+	actionsLabel->labelfont(LOCAL_BFFONT);
+	actionsLabel->labelsize(LOCAL_TEXT_SIZE);
 
 	//Open button
         Fl_Button* openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
@@ -49,7 +52,8 @@ MainWindow::MainWindow(int argc, char **argv)
 		   NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
 		   "@search Load Files @>|");
         openButton->callback(OpenFileCallback);
-       
+        openButton->labelcolor(LOCAL_BUTTON_COLOR);
+
        	// The button to open configuration settings:
 	Fl_Button *configOptionsButton = new Fl_Button( 
 	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
@@ -57,6 +61,7 @@ MainWindow::MainWindow(int argc, char **argv)
 		  NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
 		  "@menu Config Options @>|");
 	configOptionsButton->callback(ConfigOptionsCallback);
+        configOptionsButton->labelcolor(LOCAL_BUTTON_COLOR);
 
 	const char *dividerText = "--------------------------------------------";
 	int dividerTextHeight = 4;
@@ -66,13 +71,19 @@ MainWindow::MainWindow(int argc, char **argv)
 		2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
 	       dividerTextHeight, dividerText); 	
         textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+        textDivider->labelcolor(LOCAL_TEXT_COLOR);
+	textDivider->labelfont(LOCAL_BFFONT);
+	textDivider->labelsize(LOCAL_TEXT_SIZE);
 
 	const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
         Fl_Box* columnLabel = new Fl_Box(20,50 + navButtonsLabelHeight + 
 			                 dividerTextHeight,120,75,
 			                 foldersInstText);
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-        
+        columnLabel->labelcolor(LOCAL_TEXT_COLOR);
+	columnLabel->labelfont(LOCAL_BFFONT);
+	columnLabel->labelsize(LOCAL_TEXT_SIZE);
+
         m_structureInfo = new Fl_Scroll(0,105 + navButtonsLabelHeight + dividerTextHeight + 15,290,360 - navButtonsLabelHeight - dividerTextHeight - 50);
         m_structureInfo->type(Fl_Scroll::VERTICAL_ALWAYS);
         m_packedInfo = new Fl_Pack(0,105 + navButtonsLabelHeight + 

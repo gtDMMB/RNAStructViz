@@ -8,6 +8,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include <FL/Enumerations.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Round_Button.H>
@@ -26,32 +27,41 @@
      char FLTK_THEME[MAX_BUFFER_SIZE]; 
 
      const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT] = { 
-     	     "base", 
+     	     "local",
+	     "base", 
 	     "plastic", 
 	     "gtk+", 
-	     "gleam"
+	     "gleam",
+	     "custom"
      }; 
 
      const char *FLTK_THEME_HELP[FLTK_THEME_COUNT] = {
-             "Default old Windows (95/98/Me/NT/2000), old GTK/KDE", 
+             "A sane choice for the local RNAStructViz application", 
+	     "Default old Windows (95/98/Me/NT/2000), old GTK/KDE", 
 	     "Aqua theme inspired controls like in Max OSX", 
 	     "RedHat Bluecurve like theme", 
-	     "Scheme inspired by the Clearlooks Glossy theme"
+	     "Scheme inspired by the Clearlooks Glossy theme",
+	     "Something else (user defined)"
      };
+
+     char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #endif
 
 bool DisplayConfigWindow::SetupInitialConfig() { 
 
-     snprintf(CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1, 
-              DEFAULT_CTFILE_SEARCH_DIRECTORY);
+     strncpy(CTFILE_SEARCH_DIRECTORY, DEFAULT_CTFILE_SEARCH_DIRECTORY, 
+             MAX_BUFFER_SIZE - 1);
      ConfigParser::nullTerminateString(CTFILE_SEARCH_DIRECTORY); 
-     snprintf(PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1, 
-              DEFAULT_PNG_OUTPUT_DIRECTORY); 
+     strncpy(PNG_OUTPUT_DIRECTORY, DEFAULT_PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1); 
      ConfigParser::nullTerminateString(PNG_OUTPUT_DIRECTORY);
-     snprintf(PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1, DEFAULT_PNG_OUTPUT_PATH);
+     strncpy(PNG_OUTPUT_PATH, DEFAULT_PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
      ConfigParser::nullTerminateString(PNG_OUTPUT_PATH);
-     snprintf(FLTK_THEME, MAX_BUFFER_SIZE - 1, DEFAULT_FLTK_THEME); 
+     strncpy(FLTK_THEME, DEFAULT_FLTK_THEME, MAX_BUFFER_SIZE - 1); 
      ConfigParser::nullTerminateString(FLTK_THEME); 
+     snprintf(LIBFLTK_VERSION_STRING, MAX_BUFFER_SIZE - 1, 
+              "%d.%d.%d (%g) - API %g", FL_MAJOR_VERSION, FL_MINOR_VERSION, 
+	      FL_PATCH_VERSION, FL_VERSION, FL_API_VERSION);
+     ConfigParser::nullTerminateString(LIBFLTK_VERSION_STRING); 
 
      ConfigParser cfgParser(USER_CONFIG_PATH);
      cfgParser.storeVariables();      
