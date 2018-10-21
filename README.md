@@ -130,6 +130,19 @@ $ fltk-config --use-gl --use-glut --use-forms --use-images --use-cairo --ldstati
 ```
 That's it! Now on to building RNAStructViz from source.
 
+#### NOTE: In case of errors running the end RNAStructViz binary ...
+
+Repeat the above process except with the ``wget`` fetch stage of the install process changed to use the 
+updated Mac OSX drawing routines (see [this post](https://groups.google.com/forum/#!topic/fltkgeneral/QpUkp4KnScY) and [this post](https://groups.google.com/forum/#!topic/fltkgeneral/QpUkp4KnScY) for concrete details) employed in the **FLTK 1.4.x** 
+source code branch:
+```
+$ cd ~
+$ wget http://fltk.org/pub/fltk/snapshots/fltk-1.4.x-r13071.tar.bz2
+$ tar xvjf fltk-1.4.x-r13071.tar.bz2
+$ cd fltk-1.4*
+```
+That should definitely do it! 
+
 ## Building RNAStructViz from source
 
 We need to fetch a local copy of the RNAStructViz source code (using the new ``with-cairo`` 
