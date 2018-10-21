@@ -22,7 +22,10 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     // label configuration:  
     //align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     //labeltype(_FL_EMBOSSED_LABEL); 
-    
+    labelcolor(LOCAL_TEXT_COLOR);
+    labelfont(LOCAL_BFFONT);
+    labelsize(2 * LOCAL_TEXT_SIZE);    
+
     const char *dividerText = "----------------------------------------------";
     int dividerTextHeight = 4, spacingHeight = 10;
     Fl_Box *textDivider = new Fl_Box(x + 20, y + 10, 120, dividerTextHeight, 
@@ -39,18 +42,21 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
     fileOpsLabel->labelcolor(LOCAL_TEXT_COLOR);
 
+    int opButtonWidth = 110;
     Fl_Button* diagramButton = new Fl_Button(x+20,y+10 + dividerTextHeight + 
 		                             fileOpsLabelHeight + 
 					     2 * spacingHeight,
-					     110,30,
+					     opButtonWidth, 30,
 		                             "@circle Diagram @>|");
     diagramButton->callback(DiagramCallback);
     diagramButton->labelcolor(LOCAL_BUTTON_COLOR);
 
-    Fl_Button* statsButton = new Fl_Button(x+120,y+10 + dividerTextHeight + 
+    Fl_Button* statsButton = new Fl_Button(x + 20 + opButtonWidth + 
+		                           spacingHeight, y + 10 + 
+					   dividerTextHeight + 
 		                           fileOpsLabelHeight + 
 					   2 * spacingHeight, 
-					   110,30,
+					   opButtonWidth, 30,
 		                           "@square Statistics @>|");
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(LOCAL_BUTTON_COLOR);
@@ -61,7 +67,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     closeButton->labelcolor(LOCAL_TEXT_COLOR);
 
     int fileLabelHeight = 25, fileLabelWidth = 120; 
-    const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents.";
+    const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents in new window.";
     Fl_Box* fileLabel = new Fl_Box(x+20,y+55 + dividerTextHeight + 
 		                   fileOpsLabelHeight + 2 * spacingHeight, 
 				   fileLabelWidth, fileLabelHeight, 

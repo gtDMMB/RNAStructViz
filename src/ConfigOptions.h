@@ -8,7 +8,7 @@
 
 #include <FL/Enumerations.H>
 
-#define RNASTRUCTVIZ_VERSION_STRING    ("RNAStructViz -- v1.0")
+#define RNASTRUCTVIZ_VERSION_STRING    ("RNAStructViz v1.0")
 
 #define FLTK_USE_CAIRO 1
 #define FLTK_HAVE_CAIRO 1
