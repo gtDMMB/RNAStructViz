@@ -58,7 +58,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     Fl_Button* closeButton = new Fl_Button(x+wid-25,y - 15,20,20,"");
     closeButton->callback(CloseFolderCallback);
     closeButton->label("@1+");
-    closeButton->labelcolor(LOCAL_BUTTON_COLOR);
+    closeButton->labelcolor(LOCAL_TEXT_COLOR);
 
     int fileLabelHeight = 25, fileLabelWidth = 120; 
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents.";
@@ -76,6 +76,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 				 dividerTextHeight - fileOpsLabelHeight - 
 				 2 * spacingHeight);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
+    
     folderPack = new Fl_Pack(x+10, y+70 + fileLabelHeight + 
 		             dividerTextHeight + fileOpsLabelHeight + 
 			     2 * spacingHeight, 260, 
@@ -141,11 +142,16 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     label->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     label->callback(FolderWindow::ShowFileCallback);
     label->user_data((void*)index);
+    label->labelcolor(LOCAL_BUTTON_COLOR);
+    char labelWithIcon[MAX_BUFFER_SIZE];
+    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew %s  @|>",              filename);
+    label->copy_label(labelWithIcon); 
     
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
     removeButton->callback(FolderWindow::RemoveCallback);
     removeButton->user_data((void*)index);
     removeButton->label("@1+");
+    removeButton->labelcolor(LOCAL_TEXT_COLOR);
     
     
     group->resizable(label);
@@ -159,6 +165,7 @@ void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData)
 {
     FolderWindow* fwindow = (FolderWindow*)(widget->parent());
     MainWindow::HideFolderByName(fwindow->label());
+    fprintf(stderr, "%s\n", fwindow->label());
 }
 
 void FolderWindow::ShowFileCallback(Fl_Widget* widget, void* userData)

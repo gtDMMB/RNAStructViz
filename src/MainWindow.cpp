@@ -13,8 +13,8 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Pixmap.H>
-#include <X11/xpm.h>
-#include "pixmaps/mainicon.xpm"
+//#include <X11/xpm.h>
+//#include "pixmaps/mainicon.xpm"
 
 MainWindow* MainWindow::ms_instance = 0;
 
@@ -104,8 +104,10 @@ MainWindow::MainWindow(int argc, char **argv)
     
     menu_collapse = new Fl_Button(300,0,15,450,"@>");
     menu_collapse->callback(CollapseMainCallback);
+    menu_collapse->labelcolor(LOCAL_TEXT_COLOR);
     folder_collapse = new Fl_Button(315,0,15,450,"@<");
     folder_collapse->callback(CollapseFolderCallback);
+    folder_collapse->labelcolor(LOCAL_TEXT_COLOR);
     
     folderWindowPane = new Fl_Group(330,0,320,450,"");
     {
@@ -128,11 +130,11 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->end();
     
     // set the main window icon:
-    fl_open_display();
-    Pixmap icon_pixmap, mask;
-    XpmCreatePixmapFromData(fl_display, DefaultRootWindow(fl_display), 
-		            mainicon_xpm, &icon_pixmap, &mask, NULL);
-    m_mainWindow->icon((const void *) icon_pixmap);
+    //fl_open_display();
+    //Pixmap icon_pixmap, mask;
+    //XpmCreatePixmapFromData(fl_display, DefaultRootWindow(fl_display), 
+    //		            mainicon_xpm, &icon_pixmap, &mask, NULL);
+    //m_mainWindow->default_icon((const void *) icon_pixmap);
 
     m_mainWindow->show(argc, argv);
     
@@ -182,18 +184,22 @@ void MainWindow::AddFolder(const char* foldername,const int index,
     label->user_data((void*)foldername);
     
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
-    sprintf(folder->folderNameFileCount, "%-.48s (%d)", folder->folderName, folder->structCount);
+    sprintf(folder->folderNameFileCount, "@+ %-.48s (%d)", folder->folderName, folder->structCount);
     label->label(folder->folderNameFileCount);
-    
+    label->labelcolor(LOCAL_BUTTON_COLOR);
+
     Fl_Button* moveUpButton = new Fl_Button(pack->x()+pack->w()-60,vertPosn+5,20,20,"@8>");
     moveUpButton->callback(MainWindow::MoveFolderUp);
+    moveUpButton->labelcolor(LOCAL_TEXT_COLOR);
+
     Fl_Button* moveDownButton = new Fl_Button(pack->x()+pack->w()-40,vertPosn+5,20,20,"@2>");
     moveDownButton->callback(MainWindow::MoveFolderDown);
-    
+    moveDownButton->labelcolor(LOCAL_TEXT_COLOR);
+
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
     removeButton->callback(MainWindow::RemoveFolderCallback);
-    //removeButton->user_data((void*)index);
     removeButton->label("@1+");
+    removeButton->labelcolor(LOCAL_TEXT_COLOR);
     
     group->resizable(label);
     pack->end();
@@ -248,6 +254,7 @@ void MainWindow::CollapseMainMenu()
         {
             mainMenu->hide();
             button->label("@<");
+	    button->labelcolor(LOCAL_TEXT_COLOR);
             
             int x = ms_instance->m_mainWindow->x() + 300;
             int y = ms_instance->m_mainWindow->y();
@@ -265,6 +272,7 @@ void MainWindow::CollapseMainMenu()
         {
             mainMenu->show();
             button->label("@>");
+	    button->labelcolor(LOCAL_TEXT_COLOR);
             
             int x = ms_instance->m_mainWindow->x() - 300;
             if (x < 0)
@@ -438,8 +446,8 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
         childLabel->color(FL_BACKGROUND_COLOR);
 
     }
-    folderLabel->color(FL_CYAN);
-
+    folderLabel->color(FL_LIGHT2);
+    folderLabel->labelcolor(FL_DARK1);
     
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
     int index;
@@ -489,7 +497,7 @@ void MainWindow::ShowFolderSelected()
 
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         
-        if (childLabel->color() == FL_CYAN) {
+        if (childLabel->color() == FL_LIGHT2) {
             folderLabel = childLabel;
             break;
         }
@@ -569,6 +577,7 @@ void MainWindow::HideFolderByIndex(const int index)
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childLabel->user_data()),folder->folderName))
             childLabel->color(FL_BACKGROUND_COLOR);
+	    childLabel->labelcolor(LOCAL_BUTTON_COLOR);
     }
     
     if (pane->children() > 0)
@@ -608,6 +617,7 @@ void MainWindow::HideFolderByName(const char* foldername)
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childLabel->user_data()),foldername))
             childLabel->color(FL_BACKGROUND_COLOR);
+	    childLabel->labelcolor(LOCAL_BUTTON_COLOR);
     }
     
     Fl_Group* pane = ms_instance->folderWindowPane;
