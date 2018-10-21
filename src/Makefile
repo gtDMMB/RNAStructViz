@@ -16,21 +16,7 @@ LDFLAGS_FLTK=`fltk-config --use-gl --use-images --use-glut --use-forms --use-cai
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
 LDFLAGS_FULL=$(LDFLAGS) $(LDFLAGS_EXTRA)
 
-RNAStructViz_SOURCES = \
-      BranchTypeIdentification.cpp \
-      DiagramWindow.cpp \
-      StatsWindow.cpp \
-      GLWindow.cpp \
-      InputWindow.cpp \
-      FolderWindow.cpp \
-      Main.cpp \
-      MainWindow.cpp \
-      RNAStructure.cpp \
-      RNAStructViz.cpp \
-      StructureManager.cpp \
-      Fl_Rotated_Text.cpp \
-      rocbox.cpp
-RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) \
+RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)\
 	DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
 	StatsWindow.$(OBJEXT) \
 	GLWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
@@ -53,6 +39,9 @@ install: default
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c BranchTypeIdentification.cpp
+
+ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h ConfigParser.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
 
 DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 	BranchTypeIdentification.h RNAStructure.h DiagramWindow.cpp

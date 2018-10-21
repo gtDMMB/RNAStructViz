@@ -18,12 +18,14 @@
 #define DEFAULT_PNG_OUTPUT_PATH         ("RNAStructViz-GUIView-%F-%H%M%S.png") 
                                         /* As a strftime format string */
 #define DEFAULT_FLTK_THEME              ("gleam")
+#define FLTK_THEME_COUNT                (4)
+#define USER_CONFIG_PATH                ("~/.RNAStructViz/config.cfg")
 
 extern char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
 extern char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
 extern char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
 extern char FLTK_THEME[MAX_BUFFER_SIZE];
-extern const char *ALL_FLTK_THEMES[5];
-extern const char *FLTK_THEME_HELP[5];
+extern const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT];
+extern const char *FLTK_THEME_HELP[FLTK_THEME_COUNT];
 
 #endif

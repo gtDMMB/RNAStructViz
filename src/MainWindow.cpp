@@ -2,6 +2,7 @@
 #include "RNAStructViz.h"
 #include "DisplayConfigWindow.h"
 #include "ConfigOptions.h"
+#include "ConfigParser.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -55,8 +56,7 @@ MainWindow::MainWindow(int argc, char **argv)
 		  NAVBUTTONS_OFFSETY + navButtonsLabelHeight, 
 		  NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
 		  "@menu Config Options @>|");
-	// TODO:
-	//configOptionsButton->callback(ConfigOptionsCallback);
+	configOptionsButton->callback(ConfigOptionsCallback);
 
 	const char *dividerText = "--------------------------------------------";
 	int dividerTextHeight = 4;
@@ -381,9 +381,11 @@ bool MainWindow::CreateFileChooser()
         return true;
     
     // Get the current working directory.
-    char currentWD[4096];
-    if (!getcwd(currentWD, 4096))
-    {
+    char currentWD[MAX_BUFFER_SIZE];
+    if(ConfigParser::directoryExists(CTFILE_SEARCH_DIRECTORY)) { 
+        strncpy(currentWD, CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1); 
+    }
+    else if (!getcwd(currentWD, MAX_BUFFER_SIZE)) {
         std::cerr << "Error: getcwd failed. Cannot create file chooser.\n";
         return false;
     }
