@@ -172,4 +172,8 @@ $ echo "alias RNAStructViz=\'~/RNAStructViz/src/RNAStructViz\'" >> ~/.bashrc
 $ source ~/.bashrc
 $ RNAStructViz
 ```
-
+Alternately, you can choose to just install the application globally on 
+your system by running the following command:
+```
+$ sudo make install
+```

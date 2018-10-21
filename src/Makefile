@@ -46,6 +46,8 @@ clean:
 
 install: default
 	cp $(BINARY_OBJECT) /usr/local/bin
+	mkdir -p /usr/local/share/RNAStructViz/sample_structures
+	cp sample_structures/* /usr/local/share/RNAStructViz/sample_structures
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp
