@@ -10,7 +10,7 @@ for pkg in "${PKGS[@]}"; do
 	fi
 done
 
-if [[ "$(uname -o)" == "GNU/Linux" && "$1" == "--libs" ]]; then
+if [[ "$(uname -s)" == "Linux" && "$1" == "--libs" ]]; then
 	PKGOUT+=" -L$(ls -d /usr/lib/$(uname -m)-linux-gnu)"
 fi
 
