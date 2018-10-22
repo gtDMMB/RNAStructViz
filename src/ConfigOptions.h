@@ -23,12 +23,19 @@
 #define FLTK_THEME_COUNT                (6)
 #define USER_CONFIG_PATH                ("~/.RNAStructViz/config.cfg")
 
+/* Some basic color operations for getting shades of color: */
+#define RGBColor(r, g, b)               (((r & 0xff) << 24) | ((g & 0xff) << 16) | ((b & 0xff) << 8))
+#define Lighter(color, alpha)           (fl_color_average(color, FL_WHITE, alpha))
+#define Darker(color, alpha)            (fl_color_average(color, FL_BLACK, alpha))
+#define Inactive(color)                 (fl_inactive(color))
+#define Contrast(color)                 (fl_contrast(color, FL_WHITE))
+
 /* Local "theme" defines for RNAStructViz: */
 #define LOCAL_FGCOLOR                   (FL_DARK1)
-#define LOCAL_BGCOLOR                   (FL_DARK_CYAN)
+#define LOCAL_BGCOLOR                   (RGBColor(123, 77, 211))
 #define LOCAL_BG2COLOR                  (FL_LIGHT2)
-#define LOCAL_BUTTON_COLOR              (FL_LIGHT2)
-#define LOCAL_TEXT_COLOR                (FL_DARK1)
+#define LOCAL_BUTTON_COLOR              (Lighter(RGBColor(210, 194, 240), 0.5f))
+#define LOCAL_TEXT_COLOR                (RGBColor(52, 25, 102))
 #define LOCAL_TEXT_SIZE                 (24)
 #define LOCAL_RMFONT                    (FL_SCREEN)
 #define LOCAL_BFFONT                    (FL_SCREEN_BOLD)
