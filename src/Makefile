@@ -69,7 +69,7 @@ Main.$(OBJEXT): MainWindow.h RNAStructViz.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h RNAStructViz.h MainWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c MainWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
 
 RNAStructure.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	RNAStructure.cpp

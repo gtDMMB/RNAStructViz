@@ -15,8 +15,9 @@
 #include <FL/Fl_Pixmap.H>
 #include <FL/Fl_PNG_Image.H>
 
-MainWindow* MainWindow::ms_instance = 0;
+#include "pixmaps/RNAStructVizLogo.c"
 
+MainWindow* MainWindow::ms_instance = 0;
 
 MainWindow::MainWindow(int argc, char **argv)
 : m_fileChooser(0)
@@ -24,18 +25,16 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow = new Fl_Window(650, 450, RNASTRUCTVIZ_VERSION_STRING);
     m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(FL_WHITE);
-
-    //Fl_Box* resizableBoxOld = new Fl_Box(0, 60, 300, 340);
-    //m_mainWindow->resizable(resizableBoxOld);
-    
     m_mainWindow->begin();    
 
     mainMenuPane = new Fl_Group(0,0,300,450,"");
     {
         
 	// setup the program logo (for now dynamically loaded):
-	Fl_PNG_Image *appLogo = new Fl_PNG_Image("src/pixmaps/RNAStructViz.png");
-        Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, NAVBUTTONS_OFFSETY, 
+        //Fl_PNG_Image *appLogo = new Fl_PNG_Image("src/pixmaps/RNAStructViz.png");
+        Fl_RGB_Image *appLogo = new Fl_RGB_Image(RNAStructViz_Logo.pixel_data,RNAStructViz_Logo.width, 
+			                         RNAStructViz_Logo.height, RNAStructViz_Logo.bytes_per_pixel);
+	Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, NAVBUTTONS_OFFSETY, 
 			                 appLogo->w(), appLogo->h());
 	appLogoCont->image(appLogo);
 
@@ -50,6 +49,7 @@ MainWindow::MainWindow(int argc, char **argv)
         topTextDivider->labelcolor(LOCAL_TEXT_COLOR);
 	topTextDivider->labelfont(LOCAL_BFFONT);
 	topTextDivider->labelsize(LOCAL_TEXT_SIZE);
+	fprintf(stderr, "%d\n", upperYOffset);
 	upperYOffset += 5;
 
 	// make it more user friendly by including some help text: 

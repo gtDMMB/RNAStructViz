@@ -26,14 +26,14 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 
     const char *dividerText = "----------------------------------------------";
     int dividerTextHeight = 4, spacingHeight = 10;
-    Fl_Box *textDivider = new Fl_Box(x + 20, y + 10, 120, dividerTextHeight, 
+    Fl_Box *textDivider = new Fl_Box(x + 20, y + 36, 120, dividerTextHeight, 
 		                      dividerText); 
     textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     textDivider->labelcolor(LOCAL_TEXT_COLOR); 
 
     int fileOpsLabelHeight = 25, fileOpsLabelWidth = 120;
     const char *fileOpsLabelText = "@reload Structure Operations.\nEach operation opens a new window.";
-    Fl_Box *fileOpsLabel = new Fl_Box(x + 20, y + 10 + dividerTextHeight + 
+    Fl_Box *fileOpsLabel = new Fl_Box(x + 20, y + 36 + dividerTextHeight + 
 		                      spacingHeight, 
 		                      fileOpsLabelWidth, fileOpsLabelHeight, 
 				      fileOpsLabelText);
@@ -41,7 +41,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     fileOpsLabel->labelcolor(LOCAL_TEXT_COLOR);
 
     int opButtonWidth = 110;
-    Fl_Button* diagramButton = new Fl_Button(x+20,y+10 + dividerTextHeight + 
+    Fl_Button* diagramButton = new Fl_Button(x+20,y+36 + dividerTextHeight + 
 		                             fileOpsLabelHeight + 
 					     2 * spacingHeight,
 					     opButtonWidth, 30,
@@ -50,7 +50,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     diagramButton->labelcolor(LOCAL_BUTTON_COLOR);
 
     Fl_Button* statsButton = new Fl_Button(x + 20 + opButtonWidth + 
-		                           spacingHeight, y + 10 + 
+		                           spacingHeight, y + 36 + 
 					   dividerTextHeight + 
 		                           fileOpsLabelHeight + 
 					   2 * spacingHeight, 
@@ -66,22 +66,22 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 
     int fileLabelHeight = 25, fileLabelWidth = 120; 
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents in new window.";
-    Fl_Box* fileLabel = new Fl_Box(x+20,y+55 + dividerTextHeight + 
+    Fl_Box* fileLabel = new Fl_Box(x+20,y+55 + 26 + dividerTextHeight + 
 		                   fileOpsLabelHeight + 2 * spacingHeight, 
 				   fileLabelWidth, fileLabelHeight, 
 		                   fileInstText);
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     fileLabel->labelcolor(LOCAL_TEXT_COLOR);
 
-    folderScroll = new Fl_Scroll(x+10, y+70 + fileLabelHeight + 
+    folderScroll = new Fl_Scroll(x+10, y+70 + 26 + fileLabelHeight + 
 		                 dividerTextHeight + fileOpsLabelHeight + 
 				 2 * spacingHeight, 
 				 280, 310 - fileLabelHeight - 
 				 dividerTextHeight - fileOpsLabelHeight - 
 				 2 * spacingHeight);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
-    
-    folderPack = new Fl_Pack(x+10, y+70 + fileLabelHeight + 
+
+    folderPack = new Fl_Pack(x+10, y+70 + 26 + fileLabelHeight + 
 		             dividerTextHeight + fileOpsLabelHeight + 
 			     2 * spacingHeight, 260, 
 			     310 - fileLabelHeight - dividerTextHeight - 
@@ -94,9 +94,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     this->resizable(folderScroll);
     this->color(FL_WHITE);
     this->selection_color(FL_WHITE);
-    //size_range(300, 400, 300);
     
-    //title = (char*)malloc(sizeof(char) * 64);
     SetStructures(folderIndex);
 }
 /*FolderWindow::FolderWindow(int wid, int hgt, const char *label, int folderIndex): Fl_Window(wid, hgt, label)
