@@ -7,20 +7,13 @@
 #include <iostream>
 #include <FL/Fl_Button.H>
 
-/*Fl_Scroll* FolderWindow::folderScroll= 0;
-Fl_Pack* FolderWindow::folderPack = 0;
-int FolderWindow::m_folderIndex = -1;*/
-
-void FolderWindow::Construct(int w, int h, int folderIndex)
-{
-    
-}
+void FolderWindow::Construct(int w, int h, int folderIndex) {}
 
 FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, int folderIndex): Fl_Group(x, y, wid, hgt, label)
 {
 
     // label configuration:  
-    labelcolor(LOCAL_TEXT_COLOR);
+    labelcolor(GUI_TEXT_COLOR);
     labelfont(LOCAL_BFFONT);
     labelsize(2 * LOCAL_TEXT_SIZE);    
 
@@ -29,83 +22,76 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     Fl_Box *textDivider = new Fl_Box(x + 20, y + 36, 120, dividerTextHeight, 
 		                      dividerText); 
     textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    textDivider->labelcolor(LOCAL_TEXT_COLOR); 
+    textDivider->labelcolor(GUI_TEXT_COLOR); 
 
     int fileOpsLabelHeight = 25, fileOpsLabelWidth = 120;
     const char *fileOpsLabelText = "@reload Structure Operations.\nEach operation opens a new window.";
     Fl_Box *fileOpsLabel = new Fl_Box(x + 20, y + 36 + dividerTextHeight + 
-		                      spacingHeight, 
-		                      fileOpsLabelWidth, fileOpsLabelHeight, 
-				      fileOpsLabelText);
+		                              spacingHeight, 
+		                              fileOpsLabelWidth, fileOpsLabelHeight, 
+				                      fileOpsLabelText);
     fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
-    fileOpsLabel->labelcolor(LOCAL_TEXT_COLOR);
+    fileOpsLabel->labelcolor(GUI_TEXT_COLOR);
 
     int opButtonWidth = 110;
     Fl_Button* diagramButton = new Fl_Button(x+20,y+36 + dividerTextHeight + 
 		                             fileOpsLabelHeight + 
-					     2 * spacingHeight,
-					     opButtonWidth, 30,
+				            	     2 * spacingHeight,
+					                 opButtonWidth, 30,
 		                             "@circle Diagram @>|");
     diagramButton->callback(DiagramCallback);
-    diagramButton->labelcolor(LOCAL_BUTTON_COLOR);
+    diagramButton->labelcolor(GUI_BTEXT_COLOR);
 
     Fl_Button* statsButton = new Fl_Button(x + 20 + opButtonWidth + 
 		                           spacingHeight, y + 36 + 
-					   dividerTextHeight + 
+					               dividerTextHeight + 
 		                           fileOpsLabelHeight + 
-					   2 * spacingHeight, 
-					   opButtonWidth, 30,
+					               2 * spacingHeight, 
+					               opButtonWidth, 30,
 		                           "@square Statistics @>|");
     statsButton->callback(StatsCallback);
-    statsButton->labelcolor(LOCAL_BUTTON_COLOR);
+    statsButton->labelcolor(GUI_BTEXT_COLOR);
 
     Fl_Button* closeButton = new Fl_Button(x+wid-25,y - 15,20,20,"");
     closeButton->callback(CloseFolderCallback);
     closeButton->label("@1+");
-    closeButton->labelcolor(LOCAL_TEXT_COLOR);
+    closeButton->labelcolor(GUI_TEXT_COLOR);
 
     int fileLabelHeight = 25, fileLabelWidth = 120; 
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents in new window.";
     Fl_Box* fileLabel = new Fl_Box(x+20,y+55 + 26 + dividerTextHeight + 
 		                   fileOpsLabelHeight + 2 * spacingHeight, 
-				   fileLabelWidth, fileLabelHeight, 
+				           fileLabelWidth, fileLabelHeight, 
 		                   fileInstText);
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    fileLabel->labelcolor(LOCAL_TEXT_COLOR);
+    fileLabel->labelcolor(GUI_TEXT_COLOR);
 
     folderScroll = new Fl_Scroll(x+10, y+70 + 26 + fileLabelHeight + 
-		                 dividerTextHeight + fileOpsLabelHeight + 
-				 2 * spacingHeight, 
-				 280, 310 - fileLabelHeight - 
-				 dividerTextHeight - fileOpsLabelHeight - 
-				 2 * spacingHeight);
+		                         dividerTextHeight + fileOpsLabelHeight + 
+			                	 2 * spacingHeight, 
+			                	 280, 310 - fileLabelHeight - 
+				                 dividerTextHeight - fileOpsLabelHeight - 
+				                 2 * spacingHeight);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
 
     folderPack = new Fl_Pack(x+10, y+70 + 26 + fileLabelHeight + 
-		             dividerTextHeight + fileOpsLabelHeight + 
-			     2 * spacingHeight, 260, 
-			     310 - fileLabelHeight - dividerTextHeight - 
-			     fileOpsLabelHeight - 2 * spacingHeight);
+		                     dividerTextHeight + fileOpsLabelHeight + 
+			                 2 * spacingHeight, 260, 
+			                 310 - fileLabelHeight - dividerTextHeight - 
+			                 fileOpsLabelHeight - 2 * spacingHeight);
     folderPack->type(Fl_Pack::VERTICAL);
     
-    folderScroll->color(FL_WHITE);
-    folderPack->color(FL_WHITE);
+    folderScroll->color(GUI_WINDOW_BGCOLOR);
+    folderPack->color(GUI_WINDOW_BGCOLOR);
 
     this->resizable(folderScroll);
-    this->color(FL_WHITE);
-    this->selection_color(FL_WHITE);
+    this->color(GUI_WINDOW_BGCOLOR);
+    this->selection_color(GUI_BTEXT_COLOR);
     
     SetStructures(folderIndex);
 }
-/*FolderWindow::FolderWindow(int wid, int hgt, const char *label, int folderIndex): Fl_Window(wid, hgt, label)
-{
-    Construct(wid,hgt,folderIndex);
-}*/
 
-FolderWindow::~FolderWindow()
-{
-
-}
+FolderWindow::~FolderWindow() {}
 
 void FolderWindow::SetStructures(int folderIndex)
 {
@@ -122,11 +108,10 @@ void FolderWindow::SetStructures(int folderIndex)
         }
         int i = folder->folderStructs[(ui+shift)];
         RNAStructure *strct = structureManager->GetStructure(i);
-	AddStructure(strct->GetFilename(), i);
+	    AddStructure(strct->GetFilename(), i);
     }
     this->label(folder->folderName);
-    /*sprintf(title, "Folder: %-.48s", structureManager->GetFolderAt(folderIndex)->folderName);
-    label(title);*/
+
 }
 
 void FolderWindow::AddStructure(const char* filename, const int index)
@@ -144,17 +129,16 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     label->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     label->callback(FolderWindow::ShowFileCallback);
     label->user_data((void*)index);
-    label->labelcolor(LOCAL_BUTTON_COLOR);
+    label->labelcolor(GUI_BTEXT_COLOR);
     char labelWithIcon[MAX_BUFFER_SIZE];
-    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew %s  @|>",              filename);
+    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew %s  @|>", filename);
     label->copy_label(labelWithIcon); 
     
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
     removeButton->callback(FolderWindow::RemoveCallback);
     removeButton->user_data((void*)index);
     removeButton->label("@1+");
-    removeButton->labelcolor(LOCAL_TEXT_COLOR);
-    
+    removeButton->labelcolor(GUI_TEXT_COLOR);
     
     group->resizable(label);
     group->end();

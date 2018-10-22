@@ -17,10 +17,8 @@ RNAStructViz::~RNAStructViz()
 {
     for (unsigned int i = 0; i < m_diagramWindows.size(); ++i)
 	delete m_diagramWindows[i];
-	
 	for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
 	delete m_statsWindows[i];
-
     delete m_structureManager;
 }
 
@@ -28,24 +26,20 @@ bool RNAStructViz::Initialize(int argc, char** argv)
 {
     if (!ms_instance)
     {
-	ms_instance = new RNAStructViz();
+	    ms_instance = new RNAStructViz();
     }
-
     MainWindow::Initialize(argc, argv);
-
     return true;
 }
 
 void RNAStructViz::Shutdown()
 {
     MainWindow::Shutdown();
-
     if (ms_instance)
     {
-	delete ms_instance;
-	ms_instance = 0;
+	    delete ms_instance;
+	    ms_instance = 0;
     }
-
     exit(0);
 }
 void RNAStructViz::AddDiagramWindow(int index)
@@ -85,10 +79,10 @@ void RNAStructViz::AddDiagramWindow(int index)
         }
     }
     
-    char* title = (char*)malloc(sizeof(char) * 64);
+    char* title = (char*) malloc(sizeof(char) * 64);
     snprintf(title, 64, "Structure Diagram %lu", m_diagramWindows.size() + 1);
     diagram = new DiagramWindow(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150, title, structures);
-    free(title); //title = NULL;
+    free(title); 
     
     diagram->SetFolderIndex(index);
     m_diagramWindows.push_back(diagram);

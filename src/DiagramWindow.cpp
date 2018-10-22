@@ -31,14 +31,9 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     Fl::visual(FL_RGB);
 
     //colors the top of the Diagram window where structures are chosen
-    color(FL_WHITE);
+    color(GUI_WINDOW_BGCOLOR);
     size_range(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
     box(FL_NO_BOX);
-
-    //Fl_Color priorColor = fl_color();
-    //fl_color(color());
-    //fl_rectf(0, 0, this->w(), this->h());
-    //fl_color(priorColor);
 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
@@ -79,11 +74,6 @@ void DiagramWindow::SetFolderIndex(int index) {
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
     this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
-    
-    //Fl_Color priorColor = fl_color();
-    //fl_color(color());
-    //fl_rectf(0, 0, w(), h());
-    //fl_color(priorColor);
 
     if (resetMenus) {
         m_menus[0]->value(0);
@@ -866,7 +856,7 @@ void DiagramWindow::DrawBase(
     float xPosn1 = centerX + cos(angle1) * radius;
     float yPosn1 = centerY - sin(angle1) * radius - fl_descent() + 0.5 *
                                                                    fl_height();
-    fl_color(FL_WHITE);
+    fl_color(GUI_WINDOW_BGCOLOR);
     switch (base) {
         case RNAStructure::A:
             fl_draw("A", (int) (xPosn1 - fl_width('A') * 0.5f), (int) yPosn1);
@@ -948,27 +938,27 @@ void DiagramWindow::RebuildMenus() {
 
         Fl_Box *label = new Fl_Box(ms_menu_minx[0], 0, ms_menu_width, 25,
                                    "Structure 1");
-        label->labelcolor(LOCAL_TEXT_COLOR);
+        label->labelcolor(GUI_TEXT_COLOR);
         label = new Fl_Box(ms_menu_minx[1], 0, ms_menu_width, 25, "Structure 2");
-        label->labelcolor(LOCAL_TEXT_COLOR);
+        label->labelcolor(GUI_TEXT_COLOR);
         label = new Fl_Box(ms_menu_minx[2], 0, ms_menu_width, 25, "Structure 3");
-        label->labelcolor(LOCAL_TEXT_COLOR);
+        label->labelcolor(GUI_TEXT_COLOR);
         m_menus[0] = new Fl_Choice(ms_menu_minx[0], 25, ms_menu_width, 25);
         m_menus[1] = new Fl_Choice(ms_menu_minx[1], 25, ms_menu_width, 25);
         m_menus[2] = new Fl_Choice(ms_menu_minx[2], 25, ms_menu_width, 25);
         m_menus[0]->callback(MenuCallback);
         m_menus[1]->callback(MenuCallback);
         m_menus[2]->callback(MenuCallback);
-	m_menus[0]->labelcolor(LOCAL_BUTTON_COLOR);
-	m_menus[1]->labelcolor(LOCAL_BUTTON_COLOR);
-	m_menus[2]->labelcolor(LOCAL_BUTTON_COLOR);
-	m_menus[0]->textcolor(LOCAL_BUTTON_COLOR);
-	m_menus[1]->textcolor(LOCAL_BUTTON_COLOR);
-	m_menus[2]->textcolor(LOCAL_BUTTON_COLOR);
+	    m_menus[0]->labelcolor(GUI_BTEXT_COLOR);
+	    m_menus[1]->labelcolor(GUI_BTEXT_COLOR);
+     	m_menus[2]->labelcolor(GUI_BTEXT_COLOR);
+	    m_menus[0]->textcolor(GUI_BTEXT_COLOR);
+	    m_menus[1]->textcolor(GUI_BTEXT_COLOR);
+	    m_menus[2]->textcolor(GUI_BTEXT_COLOR);
         m_menus[0]->selection_color(FL_LIGHT2);
-	m_menus[1]->selection_color(FL_LIGHT2);
-	m_menus[2]->selection_color(FL_LIGHT2);
-	activeMenuIndex[0] = -1;
+	    m_menus[1]->selection_color(FL_LIGHT2);
+	    m_menus[2]->selection_color(FL_LIGHT2);
+	    activeMenuIndex[0] = -1;
         activeMenuIndex[1] = -1;
         activeMenuIndex[2] = -1;
         activeSet[0] = false;
@@ -981,12 +971,12 @@ void DiagramWindow::RebuildMenus() {
         m_drawBranchesIndicator->callback(checkBoxChangedStateCallback, m_drawBranchesIndicator);
         m_drawBranchesIndicator->tooltip(
                 "Set whether to color code the four domains in 16S structures?");
-        m_drawBranchesIndicator->labelcolor(LOCAL_TEXT_COLOR);
+        m_drawBranchesIndicator->labelcolor(GUI_TEXT_COLOR);
 
         exportButton = new Fl_Button(horizCheckBoxPos, 35, 150, 25, "@filesaveas Export PNG");
         exportButton->type(FL_NORMAL_BUTTON);
         exportButton->callback(exportToPNGButtonPressHandler, exportButton);
-        exportButton->labelcolor(LOCAL_BUTTON_COLOR);
+        exportButton->labelcolor(GUI_BTEXT_COLOR);
 
         this->end();
     } else {
@@ -1015,7 +1005,7 @@ void DiagramWindow::RebuildMenus() {
             m_menuItems[i].callback((Fl_Callback *) 0);
             m_menuItems[i].labeltype(FL_NORMAL_LABEL);
             m_menuItems[i].labelsize(m_menus[0]->textsize());
-            m_menuItems[i].labelcolor(LOCAL_BUTTON_COLOR);
+            m_menuItems[i].labelcolor(GUI_BTEXT_COLOR);
             m_menuItems[i].labelfont(m_menus[0]->textfont());
 	    m_menuItems[i].flags = 0;
         }

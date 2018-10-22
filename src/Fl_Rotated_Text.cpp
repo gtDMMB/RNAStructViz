@@ -176,9 +176,3 @@ void Fl_Rotated_Text::draw(int x, int y, int W, int H, int cx, int cy){
   Fl_Bitmap::draw(x, y, W, H, cx, cy); // finaly drawing the bitmap
 
 };
-
-        
-    
-
-
-

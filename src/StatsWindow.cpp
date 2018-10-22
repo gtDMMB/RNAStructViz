@@ -25,19 +25,15 @@
 
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
-	/* Refer to DiagramWindow.cpp */
-	//SetStructures();
-	
-	/* look into creating an offscreen version of the graph if calculation/
-     creation makes it do odd things. May only work the openGL*/
+
+	/* TODO: look into creating an offscreen version of the graph if calculation/
+     creation makes it do odd things. May only work the openGL */
 	
 	folderIndex = -1;
 	referenceIndex = -1;
-	
 	numStats = 0;
 	statistics = NULL;
-    
-    color(FL_WHITE);
+    color(GUI_WINDOW_BGCOLOR);
 	
 	/* Create the menu section on the left */
 	menu_window = new Fl_Group(0,0,300,h,"Menu Group");
@@ -46,9 +42,6 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         int mwy = menu_window->y();
         int mww = menu_window->w();
         int mwh = menu_window->h();
-		/*Fl_Box* ref_menu_label = new Fl_Box(20, 30, 300-40, 30, 
-         "Reference Structure");
-         ref_menu_label->labelcolor(FL_BLACK);*/
 		ref_menu = new Fl_Choice(mwx+20,mwy+ 60, mww-40, 30, "Reference Structure");
 		ref_menu->labelcolor(FL_BLACK);
 		ref_menu->align(FL_ALIGN_TOP);    
@@ -163,7 +156,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			overview_tab->resizable(ov_charts_group);	
 		}
 		overview_tab->end();
-        overview_tab->color(FL_WHITE);
+        overview_tab->color(GUI_WINDOW_BGCOLOR);
+	overview_tab->labelcolor(GUI_BTEXT_COLOR);
 		
 		perc_tab = new Fl_Group(300,20,w-300,h-20,
                                 "@+ Percentage Values");
@@ -261,8 +255,9 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			perc_tab->resizable(perc_charts_group);
 		}
 		perc_tab->end();
-		perc_tab->color(FL_WHITE);
-        
+		perc_tab->color(GUI_WINDOW_BGCOLOR);
+                perc_tab->labelcolor(GUI_BTEXT_COLOR);
+
 		pair_tab = new Fl_Group(300,20,w-300,h-20,"@menu Base Pairings");
 		{
 			Fl_Group *pair_charts_group = new Fl_Group(310,30,w-520,h-40,""); // DOUBLEWINDOW
@@ -354,7 +349,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			pair_tab->resizable(pair_charts_group);	
 		}
 		pair_tab->end();
-        pair_tab->color(FL_WHITE);
+        pair_tab->color(GUI_WINDOW_BGCOLOR);
+	pair_tab->labelcolor(GUI_BTEXT_COLOR);
 		
 		roc_tab = new Fl_Group(300,20,w-300,h-20,"@<-> ROC Plot");
 		{
@@ -622,7 +618,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			roc_tab->resizable(roc_plot_group);
 		}
 		roc_tab->end();
-		roc_tab->color(FL_WHITE);
+		roc_tab->color(GUI_WINDOW_BGCOLOR);
+		roc_tab->labelcolor(GUI_BTEXT_COLOR);
         
 		table_tab = new Fl_Group(300,20,w-300,h-20,"@line Table");
 		{
@@ -652,11 +649,11 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			table_tab->resizable(text_display_group);
 		}
 		table_tab->end();
-        table_tab->color(FL_WHITE);
+        table_tab->color(GUI_WINDOW_BGCOLOR);
+	table_tab->labelcolor(GUI_BTEXT_COLOR);
 	}
 	tab_window->labeltype(FL_NO_LABEL);
 	tab_window->end();
-	//tab_window->color(FL_WHITE);
     
 	this->resizable(tab_window);
 	this->size_range(800,600);

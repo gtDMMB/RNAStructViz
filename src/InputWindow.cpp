@@ -1,4 +1,5 @@
 #include "InputWindow.h"
+#include "ConfigOptions.h"
 #include "FL/Fl_Input.H"
 #include "FL/Fl_Button.H"
 #include "FL/Fl_Box.H"
@@ -9,7 +10,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	const char *defaultName, InputWindowType type) : Fl_Window(w, h, label)
 {	
     string = (char*)malloc(sizeof(char)*90);
-    color(FL_WHITE);
+    color(GUI_WINDOW_BGCOLOR);
     
     if (type == InputWindow::FILE_INPUT)
     {
@@ -49,9 +50,7 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
 {
 	InputWindow *window = (InputWindow*)widget->parent();
     window->name = (char*)window->input->value();
-
 	free(window->string);
-	//window->string = NULL;
     window->hide();
 }
 
@@ -59,9 +58,7 @@ void InputWindow::ButtonCallback(Fl_Widget *widget, void *userdata)
 {
     InputWindow *window = (InputWindow*)widget->parent();
     window->name = (char*)window->input->value();
-
     free(window->string);
-   	//window->string = NULL;
     window->hide();
 }
 
@@ -69,7 +66,6 @@ void InputWindow::CloseCallback(Fl_Widget* widget, void* userData)
 {
     InputWindow *window = (InputWindow*)widget;
     window->name = "";
-    free(window->string);
-	//window->string = NULL;    
+    free(window->string);    
     window->hide();
 }

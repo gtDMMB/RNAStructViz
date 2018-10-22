@@ -21,6 +21,7 @@
 /* Setup initial definitions of the extern'ed variables here: */
 #ifndef _SETUP_GLOBAL_EXTERNS_
 #define _SETUP_GLOBAL_EXTERNS_
+     
      char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE]; 
      char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
      char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
@@ -45,6 +46,12 @@
      };
 
      char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
+
+     Fl_Color GUI_WINDOW_BGCOLOR;
+     Fl_Color GUI_BGCOLOR;
+     Fl_Color GUI_BTEXT_COLOR;
+     Fl_Color GUI_TEXT_COLOR;
+
 #endif
 
 bool DisplayConfigWindow::SetupInitialConfig() { 
@@ -63,6 +70,11 @@ bool DisplayConfigWindow::SetupInitialConfig() {
 	      FL_PATCH_VERSION, FL_VERSION, FL_API_VERSION);
      ConfigParser::nullTerminateString(LIBFLTK_VERSION_STRING); 
 
+     GUI_WINDOW_BGCOLOR = LOCAL_WINDOW_BGCOLOR;
+     GUI_BGCOLOR = LOCAL_BGCOLOR;
+     GUI_BTEXT_COLOR = LOCAL_BUTTON_COLOR;
+     GUI_TEXT_COLOR = LOCAL_TEXT_COLOR;
+
      ConfigParser cfgParser(USER_CONFIG_PATH);
      cfgParser.storeVariables();      
      
@@ -75,7 +87,7 @@ DisplayConfigWindow::DisplayConfigWindow() :
 
      Fl::visual(FL_RGB);
      label(CONFIG_WINDOW_TITLE);
-     color(FL_WHITE); 
+     color(GUI_WINDOW_BGCOLOR); 
      size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
      box(FL_NO_BOX);
 
