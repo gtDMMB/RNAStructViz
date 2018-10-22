@@ -31,27 +31,28 @@ MainWindow::MainWindow(int argc, char **argv)
     {
         
 	    // setup the program logo (for now dynamically loaded):
-        Fl_RGB_Image *appLogo = new Fl_RGB_Image(RNAStructViz_Logo.pixel_data,RNAStructViz_Logo.width, 
-			                                     RNAStructViz_Logo.height, RNAStructViz_Logo.bytes_per_pixel);
+            Fl_RGB_Image *appLogo = new Fl_RGB_Image(RNAStructViz_Logo.pixel_data, 
+			        RNAStructViz_Logo.width, 
+			        RNAStructViz_Logo.height, RNAStructViz_Logo.bytes_per_pixel);
 	    Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, NAVBUTTONS_OFFSETY, 
 			                             appLogo->w(), appLogo->h());
 	    appLogoCont->image(appLogo);
 
 	    // consistent alignment with the folder window display:
 	    int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
-        const char *dividerText = "--------------------------------------------";
+            const char *dividerText = "--------------------------------------------";
 	    int dividerTextHeight = 4;
 	    Fl_Box *topTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
                                             2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-				                    	    dividerTextHeight, dividerText);
-        topTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-        topTextDivider->labelcolor(GUI_TEXT_COLOR);
+				            dividerTextHeight, dividerText);
+            topTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+            topTextDivider->labelcolor(GUI_TEXT_COLOR);
 	    topTextDivider->labelfont(LOCAL_BFFONT);
 	    topTextDivider->labelsize(LOCAL_TEXT_SIZE);
 	    upperYOffset += 5;
 
     	// make it more user friendly by including some help text: 
-	    const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
+	const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
     	int navButtonsLabelHeight = 2 * NAVBUTTONS_BHEIGHT;
         Fl_Box *actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
 		                                  2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 

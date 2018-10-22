@@ -3,13 +3,17 @@
 #include "RNAStructViz.h"
 #include "MainWindow.h"
 #include "ConfigOptions.h"
+#include "ConfigParser.h"
 #include <unistd.h>
 #include <iostream>
 #include <FL/Fl_Button.H>
 
+#include "pixmaps/StructureOperationIcon.c"
+
 void FolderWindow::Construct(int w, int h, int folderIndex) {}
 
-FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, int folderIndex): Fl_Group(x, y, wid, hgt, label)
+FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, int folderIndex): 
+	      Fl_Group(x, y, wid, hgt, label)
 {
 
     // label configuration:  
@@ -17,6 +21,13 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     labelfont(LOCAL_BFFONT);
     labelsize(2 * LOCAL_TEXT_SIZE);    
 
+    // icon configuration:
+    structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
+		    StructureOperationIcon.width, StructureOperationIcon.height, 
+		    StructureOperationIcon.bytes_per_pixel);
+    Fl_Box *structIconBox = new Fl_Box(x - 14, y - 50, structureIcon->w(), structureIcon->h());
+    structIconBox->image(structureIcon);
+    
     const char *dividerText = "----------------------------------------------";
     int dividerTextHeight = 4, spacingHeight = 10;
     Fl_Box *textDivider = new Fl_Box(x + 20, y + 36, 120, dividerTextHeight, 
@@ -89,9 +100,13 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     this->selection_color(GUI_BTEXT_COLOR);
     
     SetStructures(folderIndex);
+
 }
 
-FolderWindow::~FolderWindow() {}
+FolderWindow::~FolderWindow() {
+     delete structureIcon;
+     structureIcon = NULL;
+}
 
 void FolderWindow::SetStructures(int folderIndex)
 {
@@ -111,7 +126,11 @@ void FolderWindow::SetStructures(int folderIndex)
 	    AddStructure(strct->GetFilename(), i);
     }
     this->label(folder->folderName);
-
+    char structLabel[MAX_BUFFER_SIZE];
+    snprintf(structLabel, MAX_BUFFER_SIZE - 1, "Structure:\n%s", folder->folderName);
+    ConfigParser::nullTerminateString(structLabel);
+    copy_label(structLabel);
+    
 }
 
 void FolderWindow::AddStructure(const char* filename, const int index)

@@ -10,6 +10,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_RGB_Image.H>
 #include <vector>
 
 class FolderWindow : public Fl_Group
@@ -51,6 +52,9 @@ class FolderWindow : public Fl_Group
          */
         Fl_Scroll *folderScroll;
         Fl_Pack *folderPack;
+        
+	/* The watermark structure icon at the top of the folder window. */
+	Fl_RGB_Image *structureIcon;
 
         /*
          folderIndex of the folder being shown.
