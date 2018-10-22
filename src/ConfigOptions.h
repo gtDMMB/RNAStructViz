@@ -32,10 +32,13 @@
 
 /* Local "theme" defines for RNAStructViz: */
 #define LOCAL_FGCOLOR                   (FL_DARK1)
-#define LOCAL_BGCOLOR                   (RGBColor(123, 77, 211))
 #define LOCAL_BG2COLOR                  (FL_LIGHT2)
-#define LOCAL_BUTTON_COLOR              (Lighter(RGBColor(210, 194, 240), 0.5f))
-#define LOCAL_TEXT_COLOR                (RGBColor(52, 25, 102))
+//#define LOCAL_BGCOLOR                   (RGBColor(123, 77, 211))
+//#define LOCAL_BUTTON_COLOR              (Lighter(RGBColor(210, 194, 240), 0.5f))
+//#define LOCAL_TEXT_COLOR                (RGBColor(52, 25, 102))
+#define LOCAL_BGCOLOR                   (RGBColor(0x1F, 0x78, 0x0D))
+#define LOCAL_BUTTON_COLOR              (RGBColor(0xB9, 0xDA, 0xB5))
+#define LOCAL_TEXT_COLOR                (RGBColor(0x13, 0x48, 0x09))
 #define LOCAL_TEXT_SIZE                 (24)
 #define LOCAL_RMFONT                    (FL_SCREEN)
 #define LOCAL_BFFONT                    (FL_SCREEN_BOLD)
