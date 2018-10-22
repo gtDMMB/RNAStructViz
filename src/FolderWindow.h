@@ -18,7 +18,7 @@ class FolderWindow : public Fl_Group
     public:
         void Construct(int w, int h, int folderIndex);
         FolderWindow(int x, int y, int wid, int hgt, const char *label, int folderIndex);
-	    virtual ~FolderWindow();
+	virtual ~FolderWindow();
 
         /*
          Add a new sequence to the list of displayed sequences.
@@ -46,7 +46,7 @@ class FolderWindow : public Fl_Group
         static void DiagramCallback(Fl_Widget* widget, void* userData);
         static void StatsCallback(Fl_Widget* widget, void* userData);
 
-        /*
+	/*
          The scrolling group containing the folder info and files, and the packed group inside it.
          */
         Fl_Scroll *folderScroll;

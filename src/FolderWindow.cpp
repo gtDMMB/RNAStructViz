@@ -20,7 +20,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     const char *dividerText = "----------------------------------------------";
     int dividerTextHeight = 4, spacingHeight = 10;
     Fl_Box *textDivider = new Fl_Box(x + 20, y + 36, 120, dividerTextHeight, 
-		                      dividerText); 
+		                     dividerText); 
     textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     textDivider->labelcolor(GUI_TEXT_COLOR); 
 

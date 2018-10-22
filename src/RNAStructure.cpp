@@ -1,5 +1,6 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
+#include "ConfigOptions.h"
 #include <FL/Fl_Box.H>
 #include <stdlib.h>
 #include <fstream>
