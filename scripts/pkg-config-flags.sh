@@ -18,7 +18,7 @@ fi
 # Define the target OS (Linux or Mac or Unix)
 if [[ "$(uname -s)" == "Linux" ]]; then
 	PKGOUT+=" -DTARGETOS_LINUX"
-elif [[ "$(uname -s)" == "" ]]; then
+elif [[ "$(uname -s)" == "Darwin" ]]; then
 	PKGOUT+=" -DTARGETOS_APPLE"
 else 
 	PKGOUT+=" -DTARGETOS_GENERIC_UNIX"
