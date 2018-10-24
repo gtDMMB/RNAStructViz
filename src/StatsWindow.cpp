@@ -66,6 +66,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 		calc_button = new Fl_Toggle_Button(mwx+20,mwy+ mwh-60, mww-40, 
                                            30, "@refresh Calculate");
 		calc_button->callback(CalcCallback);
+		calc_button->labelcolor(GUI_BTEXT_COLOR); 
 		
 		menu_window->resizable(comp_menu);
 	}
@@ -817,6 +818,7 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
     for (int i=0; i < window->comp_pack->children(); i++)
 	{
 		Fl_Check_Button* button = (Fl_Check_Button*)window->comp_pack->child(i);
+		button->labelcolor(GUI_TEXT_COLOR); 
 		if (!strcmp(button->label(),window->ref_menu->mvalue()->label()))
 		{
 			button->value(1);
@@ -1959,6 +1961,7 @@ void StatsWindow::BuildRefMenu()
 	
 	ref_menu->clear();
 	ref_menu->add("Please select a reference",0,0,0,0);
+	ref_menu->labelcolor(GUI_BTEXT_COLOR);
 	
     
 	// Add entries

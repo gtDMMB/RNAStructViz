@@ -63,7 +63,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(GUI_BTEXT_COLOR);
 
-    Fl_Button* closeButton = new Fl_Button(x+wid-25,y - 15,20,20,"");
+    Fl_Button* closeButton = new Fl_Button(x+wid-18,y - 29,20,20,"");
     closeButton->callback(CloseFolderCallback);
     closeButton->label("@1+");
     closeButton->labelcolor(GUI_TEXT_COLOR);
@@ -227,14 +227,13 @@ void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)
     Fl_Group* folderGroup = (Fl_Group*)(widget->parent());
     
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
-    int index;
-    for (index = 0; index < folders.size(); ++index)
+    for (int index = 0; index < folders.size(); ++index)
     {
         if (!strcmp(folders[index]->folderName,folderGroup->label()))
             break;
+        RNAStructViz::GetInstance()->AddDiagramWindow(index);
     }
     
-    RNAStructViz::GetInstance()->AddDiagramWindow(index);
 }
 
 void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
@@ -242,12 +241,10 @@ void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
     Fl_Group* folderGroup = (Fl_Group*)(widget->parent());
     
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
-    int index;
-    for (index = 0; index < folders.size(); ++index)
+    for (int index = 0; index < folders.size(); ++index)
     {
         if (!strcmp(folders[index]->folderName,folderGroup->label()))
             break;
-    }
-    
 	RNAStructViz::GetInstance()->AddStatsWindow(index);
+    }
 }

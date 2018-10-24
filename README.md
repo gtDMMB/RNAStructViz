@@ -109,9 +109,9 @@ Now comes the main step in this configuration process: building FLTK *with Cairo
 First, fetch a copy of the most recent FLTK source: 
 ```
 $ cd ~
-$ wget http://fltk.org/pub/fltk/1.3.4/fltk-1.3.4-2-source.tar.bz2 
-$ tar xvjf fltk-1.3.4-2-source.tar.bz2
-$ cd fltk-1.3.4-2
+$ wget http://fltk.org/pub/fltk/snapshots/fltk-1.4.x-r13071.tar.bz2 
+$ tar xvjf fltk-1.4.x-r13071.tar.bz2
+$ cd fltk-1.4.x-r13071
 ```
 Now we need to enable the configure-time options which will enable Cairo support by default in 
 our FLTK build along with some other necessary options. 
@@ -129,19 +129,6 @@ $ fltk-config --use-gl --use-glut --use-forms --use-images --use-cairo --ldstati
 /usr/local/lib/libfltk_cairo.a -lcairo -lpixman-1 /usr/local/lib/libfltk_images.a -lpng -lz -ljpeg /usr/local/lib/libfltk_gl.a -framework OpenGL /usr/local/lib/libfltk_forms.a /usr/local/lib/libfltk.a -lpthread -framework Cocoa
 ```
 That's it! Now on to building RNAStructViz from source.
-
-#### NOTE: In case of errors running the end RNAStructViz binary ...
-
-Repeat the above process except with the ``wget`` fetch stage of the install process changed to use the 
-updated Mac OSX drawing routines (see [this post](https://groups.google.com/forum/#!topic/fltkgeneral/QpUkp4KnScY) and [this post](https://groups.google.com/forum/#!topic/fltkgeneral/QpUkp4KnScY) for concrete details) employed in the **FLTK 1.4.x** 
-source code branch:
-```
-$ cd ~
-$ wget http://fltk.org/pub/fltk/snapshots/fltk-1.4.x-r13071.tar.bz2
-$ tar xvjf fltk-1.4.x-r13071.tar.bz2
-$ cd fltk-1.4*
-```
-That should definitely do it! 
 
 ## Building RNAStructViz from source
 

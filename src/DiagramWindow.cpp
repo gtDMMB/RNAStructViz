@@ -73,8 +73,8 @@ void DiagramWindow::SetFolderIndex(int index) {
 }
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
+    
     this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
-
     if (resetMenus) {
         m_menus[0]->value(0);
         m_menus[1]->value(0);
@@ -82,8 +82,8 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
         m_drawBranchesIndicator->clear();
         userConflictAlerted = false;
     }
-
     redraw();
+
 }
 
 void DiagramWindow::checkBoxChangedStateCallback(Fl_Widget *, void *v) {
@@ -238,7 +238,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
     fl_line_style(0);
-    //thisWindow->drawWidgets();
+    thisWindow->drawWidgets();
 }
 
 void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
@@ -924,7 +924,6 @@ void DiagramWindow::SetStructures(const std::vector<int> &structures) {
     for (unsigned int ui = 0; ui < structures.size(); ++ui) {
         m_structures.push_back(structures[ui]);
     }
-
     RebuildMenus();
     redraw();
 }
@@ -949,16 +948,16 @@ void DiagramWindow::RebuildMenus() {
         m_menus[0]->callback(MenuCallback);
         m_menus[1]->callback(MenuCallback);
         m_menus[2]->callback(MenuCallback);
-	    m_menus[0]->labelcolor(GUI_BTEXT_COLOR);
-	    m_menus[1]->labelcolor(GUI_BTEXT_COLOR);
+	m_menus[0]->labelcolor(GUI_BTEXT_COLOR);
+	m_menus[1]->labelcolor(GUI_BTEXT_COLOR);
      	m_menus[2]->labelcolor(GUI_BTEXT_COLOR);
-	    m_menus[0]->textcolor(GUI_BTEXT_COLOR);
-	    m_menus[1]->textcolor(GUI_BTEXT_COLOR);
-	    m_menus[2]->textcolor(GUI_BTEXT_COLOR);
+	m_menus[0]->textcolor(GUI_BTEXT_COLOR);
+	m_menus[1]->textcolor(GUI_BTEXT_COLOR);
+	m_menus[2]->textcolor(GUI_BTEXT_COLOR);
         m_menus[0]->selection_color(FL_LIGHT2);
-	    m_menus[1]->selection_color(FL_LIGHT2);
-	    m_menus[2]->selection_color(FL_LIGHT2);
-	    activeMenuIndex[0] = -1;
+	m_menus[1]->selection_color(FL_LIGHT2);
+	m_menus[2]->selection_color(FL_LIGHT2);
+	activeMenuIndex[0] = -1;
         activeMenuIndex[1] = -1;
         activeMenuIndex[2] = -1;
         activeSet[0] = false;
