@@ -10,8 +10,18 @@ for pkg in "${PKGS[@]}"; do
 	fi
 done
 
+# Conditional library flags for Linux platform:
 if [[ "$(uname -s)" == "Linux" && "$1" == "--libs" ]]; then
 	PKGOUT+=" -L$(ls -d /usr/lib/$(uname -m)-linux-gnu)"
+fi
+
+# Define the target OS (Linux or Mac or Unix)
+if [[ "$(uname -s)" == "Linux" ]]; then
+	PKGOUT+=" -DTARGETOS_LINUX"
+elif [[ "$(uname -s)" == "" ]]; then
+	PKGOUT+=" -DTARGETOS_APPLE"
+else 
+	PKGOUT+=" -DTARGETOS_GENERIC_UNIX"
 fi
 
 echo $PKGOUT

@@ -32,9 +32,10 @@ clean:
 	rm -f *.o *.code $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
 
 install: default
-	cp $(BINARY_OBJECT) /usr/local/bin
+	cp -ap $(BINARY_OUTPUT) /usr/local/bin/
+	mkdir -p /usr/local/share/RNAStructViz
 	mkdir -p /usr/local/share/RNAStructViz/sample_structures
-	cp sample_structures/* /usr/local/share/RNAStructViz/sample_structures
+	cp -ap sample_structures/* /usr/local/share/RNAStructViz/sample_structures/
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp

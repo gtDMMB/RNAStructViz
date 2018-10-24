@@ -9,6 +9,19 @@
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
 
+#ifdef TARGETOS_LINUX
+     #define __TARGETOS_LINUX__
+     #define TARGETOS "GNU/Linux"
+#endif
+#ifdef TARGETOS_MACOSX
+     #define __TARGETOS_APPLE__
+     #define TARGETOS "Mac/OSX"
+#endif
+#ifdef TARGETOS_GENERIC_UNIX
+     #define __TARGETOS_UNIX__
+     #define TARGETOS "Unix"
+#endif
+
 #define RNASTRUCTVIZ_VERSION_STRING    ("RNAStructViz v1.0")
 
 #define FLTK_USE_CAIRO 1
