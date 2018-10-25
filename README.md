@@ -60,7 +60,7 @@ $ which fltk-config
 ```
 That's it! Now on to building RNAStructViz from source.
 
-## Installing the Cairo libraries on a Mac 
+## Installing the Cairo and FLTK libraries on a Mac 
 
 ### Prerequisites 
 
@@ -99,26 +99,12 @@ libraries to run the application.
 We need to install some other basic libraries and utilities with the userland 
 [Homebrew](https://brew.sh) installed on your machine:
 ```
-$ brew install wget cairo pkg-config cctools
-$ brew install --with-toolchain llvm
+$ brew install wget cairo pkg-config 
+$ brew install --build-from-source gtDMMB/core/fltkwithcairo
+Now we need to add the new FLTK libraries into our ``PATH``:
 ```
-
-### Building FLTK 1.3.x from source 
-
-Now comes the main step in this configuration process: building FLTK *with Cairo support enabled*. 
-First, fetch a copy of the most recent FLTK source: 
-```
-$ cd ~
-$ wget http://fltk.org/pub/fltk/snapshots/fltk-1.4.x-r13071.tar.bz2 
-$ tar xvjf fltk-1.4.x-r13071.tar.bz2
-$ cd fltk-1.4.x-r13071
-```
-Now we need to enable the configure-time options which will enable Cairo support by default in 
-our FLTK build along with some other necessary options. 
-```
-$ ./configure --enable-cairo --enable-threads --with-archflags="-arch $(uname -m)" CC="clang -g -DBUILD_SHARED_LIBS -D__APPLE__ -arch $(uname -m)" CXX="clang++ -g -DBUILD_SHARED_LIBS -D__APPLE__ -arch $(uname -m)"
-$ make 
-$ sudo make install
+$ export PATH="/usr/local/opt/fltkwithcairo/bin:$PATH"
+$ echo $PATH
 ```
 You can verify that the install was successful by verifying that the following output is sane:
 ```
