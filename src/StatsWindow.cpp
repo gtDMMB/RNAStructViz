@@ -42,14 +42,22 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         int mwy = menu_window->y();
         int mww = menu_window->w();
         int mwh = menu_window->h();
-		ref_menu = new Fl_Choice(mwx+20,mwy+ 60, mww-40, 30, "Reference Structure");
+		ref_menu = new Fl_Choice(mwx+20,mwy+ 60, mww-40, 30, 
+		           "Select Reference Structure:");
 		ref_menu->labelcolor(GUI_TEXT_COLOR);
+		ref_menu->textcolor(GUI_BTEXT_COLOR);
 		ref_menu->align(FL_ALIGN_TOP);    
 		
-		/*Fl_Box* comp_menu_label = new Fl_Box(20, 90, 300-40, 30, 
-         "Comparison Structures");
-         comp_menu_label->labelcolor(GUI_TEXT_COLOR);*/
-		comp_menu = new Fl_Scroll(mwx+20,mwy+ 120, mww-40, mwh-120-90,"Comparison Structures");
+		const char *dividerText = "--------------------------------------------";
+		dividerTextBox = new Fl_Box(mwx + 20, mwy + 95, mww - 40, 
+				 5, dividerText);
+		dividerTextBox->labelcolor(GUI_TEXT_COLOR);
+		dividerTextBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | 
+				      FL_ALIGN_CENTER);
+
+		comp_menu = new Fl_Scroll(mwx+20,mwy+ 120, mww-40, 
+			    mwh-120-90, 
+			    "Select Comparison Structures:");
 		{	
 			comp_pack = new Fl_Pack(mwx+20,mwy+120,mww-60,150);
 			comp_pack->type(Fl_Pack::VERTICAL);
@@ -60,8 +68,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 		comp_menu->box(FL_FLAT_BOX);
 		comp_menu->labelcolor(GUI_TEXT_COLOR);
 		comp_menu->align(FL_ALIGN_TOP);
-		comp_menu->end();
                 comp_menu->color(GUI_WINDOW_BGCOLOR);
+		comp_menu->end();
 		
 		calc_button = new Fl_Toggle_Button(mwx+20,mwy+ mwh-60, mww-40, 
                                            30, "@refresh Calculate");
@@ -655,6 +663,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 	table_tab->labelcolor(GUI_BTEXT_COLOR);
 	}
 	tab_window->labeltype(FL_NO_LABEL);
+	tab_window->labelcolor(Darker(FL_LIGHT3, 0.95f));
 	tab_window->end();
     
 	this->resizable(tab_window);
@@ -684,7 +693,7 @@ StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label,
 StatsWindow::~StatsWindow()
 {
 	/* memory management */
-	free (title); //title = NULL;
+	free (title); 
 	delete[] statistics;
 }
 
@@ -1961,7 +1970,6 @@ void StatsWindow::BuildRefMenu()
 	
 	ref_menu->clear();
 	ref_menu->add("Please select a reference",0,0,0,0);
-	ref_menu->labelcolor(GUI_BTEXT_COLOR);
 	
     
 	// Add entries

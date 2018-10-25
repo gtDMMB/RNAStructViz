@@ -177,12 +177,16 @@ private:
     
     // Holds menu of structures for comparison
 	Fl_Scroll* comp_menu;
-	// Contains the check buttons for each comparison structure as children
+    
+    // Contains the check buttons for each comparison structure as children
     Fl_Pack* comp_pack;
     
     // "Calculate" button
     Fl_Toggle_Button* calc_button;
     
+    // GUI divider:
+    Fl_Box *dividerTextBox;
+
     StructureManager* structureManager;
     
     // Holds the calculated statistics for the window
