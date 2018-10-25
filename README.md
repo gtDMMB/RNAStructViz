@@ -101,6 +101,7 @@ We need to install some other basic libraries and utilities with the userland
 ```
 $ brew install wget cairo pkg-config 
 $ brew install --build-from-source gtDMMB/core/fltkwithcairo
+```
 Now we need to add the new FLTK libraries into our ``PATH``:
 ```
 $ export PATH="/usr/local/opt/fltkwithcairo/bin:$PATH"
