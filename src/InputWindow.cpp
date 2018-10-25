@@ -5,6 +5,7 @@
 #include "FL/Fl_Box.H"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 
 InputWindow::InputWindow(int w, int h, const char *label, 
 	const char *defaultName, InputWindowType type) : Fl_Window(w, h, label)
@@ -29,18 +30,19 @@ InputWindow::InputWindow(int w, int h, const char *label,
     else
     {
 	    sprintf(string, "Creating folder for the RNA sequence of %s", defaultName);
-		input = new Fl_Input(160, 50, 100, 30, "New Folder Name:");
-		input->when(FL_WHEN_ENTER_KEY);
-        input->maximum_size(60);
+	    input = new Fl_Input(160, 50, 100, 30, "@fileopen New Folder Name:");
+	    input->when(FL_WHEN_ENTER_KEY);
+            input->maximum_size(60);
 	    Fl_Box *box = new Fl_Box(50, 10, 300, 40, (const char*)string);
 	    box->box(FL_NO_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-	    Fl_Button *button = new Fl_Button(265, 50, 50, 30, "OK");
+	    Fl_Button *button = new Fl_Button(265, 50, 100, 30, "Add Folder @arrow");
 	    button->callback(ButtonCallback, (void*)0);
+	    button->labelcolor(GUI_BTEXT_COLOR);
 	    input->callback(InputCallback, (void*)0);
 	    callback(CloseCallback);
-        Fl_Box* message = new Fl_Box(50,100,300,40,"All structures with the same underlying RNA sequence will be put in this folder.");
-        message->box(FL_NO_BOX);
+            Fl_Box* message = new Fl_Box(50,100,300,40,"All structures with the same underlying RNA sequence will be put in this folder.");
+            message->box(FL_NO_BOX);
 	    message->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 	}
 	show();
@@ -48,9 +50,13 @@ InputWindow::InputWindow(int w, int h, const char *label,
 
 void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
 {
-	InputWindow *window = (InputWindow*)widget->parent();
+    InputWindow *window = (InputWindow*)widget->parent();
     window->name = (char*)window->input->value();
-	free(window->string);
+    //int dotIndex = std::string(window->name).rfind('.');
+    //if(dotIndex > 0) {
+    //    window->name[dotIndex] = '\0';
+    //}
+    free(window->string);
     window->hide();
 }
 

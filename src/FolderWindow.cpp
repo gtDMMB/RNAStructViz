@@ -130,6 +130,7 @@ void FolderWindow::SetStructures(int folderIndex)
     snprintf(structLabel, MAX_BUFFER_SIZE - 1, "Structure:\n%s", folder->folderName);
     ConfigParser::nullTerminateString(structLabel);
     copy_label(structLabel);
+    this->labelsize(LOCAL_TEXT_SIZE);
     
 }
 
@@ -227,12 +228,14 @@ void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)
     Fl_Group* folderGroup = (Fl_Group*)(widget->parent());
     
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
-    for (int index = 0; index < folders.size(); ++index)
+    int index;
+    for (index = 0; index < folders.size(); ++index)
     {
-        if (!strcmp(folders[index]->folderName,folderGroup->label()))
+        if (!strcmp(folders[index]->folderName, 
+		    folderGroup->label() + strlen("Structure:\n")))
             break;
-        RNAStructViz::GetInstance()->AddDiagramWindow(index);
     }
+    RNAStructViz::GetInstance()->AddDiagramWindow(index);
     
 }
 
@@ -241,10 +244,12 @@ void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
     Fl_Group* folderGroup = (Fl_Group*)(widget->parent());
     
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
-    for (int index = 0; index < folders.size(); ++index)
+    int index;
+    for (index = 0; index < folders.size(); ++index)
     {
-        if (!strcmp(folders[index]->folderName,folderGroup->label()))
+        if (!strcmp(folders[index]->folderName, 
+		    folderGroup->label() + strlen("Structure:\n")))
             break;
-	RNAStructViz::GetInstance()->AddStatsWindow(index);
     }
+    RNAStructViz::GetInstance()->AddStatsWindow(index);
 }
