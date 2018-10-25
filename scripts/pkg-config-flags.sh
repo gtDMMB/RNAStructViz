@@ -11,14 +11,14 @@ for pkg in "${PKGS[@]}"; do
 done
 
 # Conditional library flags for Linux and Mac platform:
-if [[ "$(uname -s)" -eq "Linux" && "$1" -eq "--libs" ]]; then
+if [[ "$(uname -s)" == "Linux" && "$1" == "--libs" ]]; then
 	PKGOUT+=" -L$(ls -d /usr/lib/$(uname -m)-linux-gnu)"
 fi
 
 # Define the target OS (Linux or Mac or Unix)
-if [[ "$(uname -s)" -eq "Linux" ]]; then
+if [[ "$(uname -s)" == "Linux" ]]; then
 	PKGOUT+=" -DTARGETOS_LINUX"
-elif [[ "$(uname -s)" -eq "Darwin" ]]; then
+elif [[ "$(uname -s)" == "Darwin" ]]; then
 	PKGOUT+=" -DTARGETOS_APPLE"
 else 
 	PKGOUT+=" -DTARGETOS_GENERIC_UNIX"
