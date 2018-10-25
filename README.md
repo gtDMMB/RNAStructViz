@@ -97,7 +97,8 @@ libraries to run the application.
 ### Installing applications with Homebrew
 
 We need to install some other basic libraries and utilities with the userland 
-[Homebrew](https://brew.sh) installed on your machine:
+[Homebrew](https://brew.sh) installed on your machine (NOTE: The second command will 
+require approximately 5-20 minutes to complete depending on the speed of your system):
 ```
 $ brew install wget cairo pkg-config 
 $ brew install --build-from-source gtDMMB/core/fltkwithcairo
@@ -110,10 +111,10 @@ $ echo $PATH
 You can verify that the install was successful by verifying that the following output is sane:
 ```
 $ which fltk-config
-/usr/local/bin/fltk-config
+/usr/local/opt/fltkwithcairo/bin/fltk-config
 $ fltk-config --use-gl --use-glut --use-forms --use-images --use-cairo --ldstaticflags --cxxflags
--I/usr/local/include -I/usr/local/Cellar/cairo/1.14.12/include/cairo -I/usr/local/Cellar/glib/2.58.1/include/glib-2.0 -I/usr/local/Cellar/glib/2.58.1/lib/glib-2.0/include -I/usr/local/opt/gettext/include -I/usr/local/Cellar/pcre/8.42/include -I/usr/local/Cellar/pixman/0.34.0_1/include/pixman-1 -I/usr/local/Cellar/fontconfig/2.13.1/include -I/usr/local/opt/freetype/include/freetype2 -I/usr/local/Cellar/libpng/1.6.35/include/libpng16 -I/usr/local/Cellar/cairo/1.14.12/include/cairo -I/usr/local/Cellar/glib/2.58.1/include/glib-2.0 -I/usr/local/Cellar/glib/2.58.1/lib/glib-2.0/include -I/usr/local/opt/gettext/include -I/usr/local/Cellar/pcre/8.42/include -I/usr/local/Cellar/pixman/0.34.0_1/include/pixman-1 -I/usr/local/Cellar/fontconfig/2.13.1/include -I/usr/local/opt/freetype/include/freetype2 -I/usr/local/Cellar/libpng/1.6.35/include/libpng16 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT
-/usr/local/lib/libfltk_cairo.a -lcairo -lpixman-1 /usr/local/lib/libfltk_images.a -lpng -lz -ljpeg /usr/local/lib/libfltk_gl.a -framework OpenGL /usr/local/lib/libfltk_forms.a /usr/local/lib/libfltk.a -lpthread -framework Cocoa
+-I/usr/local/Cellar/fltkwithcairo/1.4.x-r13071/include -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT
+/usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_cairo.a -lcairo -lpixman-1 /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_images.a -ljpeg -lpng -lz /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_gl.a -framework OpenGL /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_forms.a /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk.a -lpthread -framework Cocoa
 ```
 That's it! Now on to building RNAStructViz from source.
 
