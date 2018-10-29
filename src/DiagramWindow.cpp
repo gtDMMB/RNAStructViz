@@ -135,6 +135,11 @@ void DiagramWindow::drawWidgets() {
     fl_rectf(0, 0, w(), h());
     fl_color(priorColor);
     Fl_Double_Window::draw();
+    for(int m = 0; m < 3; m++) {
+        if(m_menus[m] != NULL) {
+	    m_menus[m]->redraw();
+	}
+    }
     m_redrawStructures = true;
 }
 
