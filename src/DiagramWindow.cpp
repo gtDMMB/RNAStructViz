@@ -37,6 +37,16 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
+    
+    imageStride = cairo_format_stride_for_width( 
+		      CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
+    imageData = new uchar[imageStride * IMAGE_HEIGHT];
+    memset(imageData, 0, imageStride * IMAGE_HEIGHT);
+    cairo_surface_t *crSurface = cairo_image_surface_create_for_data( 
+			imageData, CAIRO_FORMAT_ARGB32, 
+                        IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
+    crDraw = cairo_create(crSurface);   
+    Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw); // cairo
 }
 
@@ -59,8 +69,11 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
 
 DiagramWindow::~DiagramWindow() {
     delete m_drawBranchesIndicator;
-    cairo_destroy(crDraw);
+    //cairo_destroy(crDraw);
     free(m_menuItems);
+    cairo_surface_destroy(crSurface);
+    delete imageData;
+
 }
 
 void DiagramWindow::SetFolderIndex(int index) {
@@ -106,19 +119,13 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
         thisWindow->m_redrawStructures = true;
         thisWindow->redraw();
  
-        int imageStride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
-        uchar *imageData = new uchar[imageStride * IMAGE_HEIGHT];
-        memset(imageData, 0, imageStride * IMAGE_HEIGHT);
-        cairo_surface_t *crSurface = cairo_image_surface_create_for_data(imageData, CAIRO_FORMAT_ARGB32, 
-                                                                         IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-        cairo_t *cr = cairo_create(crSurface);
+        memset(thisWindow->imageData, 0, thisWindow->imageStride * 
+			                 IMAGE_HEIGHT);
         thisWindow->m_redrawStructures = true;
         thisWindow->cairoTranslate = false;
-        DiagramWindow::Draw((Fl_Cairo_Window *) thisWindow, cr);
-        cairo_surface_write_to_png(cairo_get_target(cr), exportFilePath);
-        cairo_destroy(cr);
-        cairo_surface_destroy(crSurface);
-        delete imageData;
+        DiagramWindow::Draw((Fl_Cairo_Window *) thisWindow, thisWindow->crDraw);
+        cairo_surface_write_to_png(cairo_get_target(thisWindow->crDraw), 
+			           exportFilePath);
 
         buttonPressed->clear_changed();
     
@@ -947,28 +954,15 @@ void DiagramWindow::RebuildMenus() {
         label->labelcolor(GUI_TEXT_COLOR);
         label = new Fl_Box(ms_menu_minx[2], 0, ms_menu_width, 25, "Structure 3");
         label->labelcolor(GUI_TEXT_COLOR);
-        m_menus[0] = new Fl_Choice(ms_menu_minx[0], 25, ms_menu_width, 25);
-        m_menus[1] = new Fl_Choice(ms_menu_minx[1], 25, ms_menu_width, 25);
-        m_menus[2] = new Fl_Choice(ms_menu_minx[2], 25, ms_menu_width, 25);
-        m_menus[0]->callback(MenuCallback);
-        m_menus[1]->callback(MenuCallback);
-        m_menus[2]->callback(MenuCallback);
-	m_menus[0]->labelcolor(GUI_BTEXT_COLOR);
-	m_menus[1]->labelcolor(GUI_BTEXT_COLOR);
-     	m_menus[2]->labelcolor(GUI_BTEXT_COLOR);
-	m_menus[0]->textcolor(GUI_BTEXT_COLOR);
-	m_menus[1]->textcolor(GUI_BTEXT_COLOR);
-	m_menus[2]->textcolor(GUI_BTEXT_COLOR);
-        m_menus[0]->selection_color(FL_LIGHT2);
-	m_menus[1]->selection_color(FL_LIGHT2);
-	m_menus[2]->selection_color(FL_LIGHT2);
-	activeMenuIndex[0] = -1;
-        activeMenuIndex[1] = -1;
-        activeMenuIndex[2] = -1;
-        activeSet[0] = false;
-        activeSet[1] = false;
-        activeSet[2] = false;
-
+        for(int m = 0; m < 3; m++) { 
+	    m_menus[m] = new Fl_Choice(ms_menu_minx[m], 25, ms_menu_width, 25);
+            m_menus[m]->callback(MenuCallback);
+	    m_menus[m]->labelcolor(GUI_BTEXT_COLOR);
+	    m_menus[m]->textcolor(GUI_BTEXT_COLOR);
+            m_menus[m]->selection_color(FL_LIGHT2);
+	    activeMenuIndex[m] = -1;
+            activeSet[m] = false;
+	}
         int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + 65;
         m_drawBranchesIndicator = new Fl_Check_Button(horizCheckBoxPos, 5, 20, 20,
                                                       "Draw (16S) Domains");
@@ -1048,14 +1042,21 @@ void DiagramWindow::RebuildMenus() {
 }
 
 void DiagramWindow::MenuCallback(Fl_Widget *widget, void *userData) {
+    
     DiagramWindow *window = (DiagramWindow *) widget->parent();
     window->m_redrawStructures = true;
-    window->redraw();
+    //window->redraw();
+    
+    // make sure the diagram is drawn right away:
+    window->cairoTranslate = false;
+    DiagramWindow::Draw((Fl_Cairo_Window *) window, window->crDraw);
+
 }
 
 void DiagramWindow::WarnUserDrawingConflict() {
     if (!userConflictAlerted && m_drawBranchesIndicator->value()) {
-        int turnOff = fl_ask(
+        fl_message_title("User Warning ... ");
+	int turnOff = fl_ask(
                 "You are attempting to draw multiple structures with distinct branch coding enabled. \nWe recommend against this due to readability concerns! \nDo you want to turn off branch / domain color coding now?");
         if (turnOff) {
             m_drawBranchesIndicator->value(0);

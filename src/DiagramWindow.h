@@ -20,7 +20,7 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_DIM          (700)
+#define IMAGE_DIM          (600)
 #define IMAGE_WIDTH        (IMAGE_DIM)
 #define IMAGE_HEIGHT       (IMAGE_DIM)
 #define IMAGE_DEPTH        (3)
@@ -162,7 +162,10 @@ private:
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
 
+    int imageStride;
+    cairo_surface_t *crSurface;
     cairo_t *crDraw;
+    uchar *imageData;
     bool cairoTranslate;
     bool m_redrawStructures;
     
