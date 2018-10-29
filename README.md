@@ -100,7 +100,7 @@ We need to install some other basic libraries and utilities with the userland
 [Homebrew](https://brew.sh) installed on your machine (NOTE: The second command will 
 require approximately 5-20 minutes to complete depending on the speed of your system):
 ```
-$ brew install wget cairo pkg-config 
+$ brew install cairo pkg-config 
 $ brew install --build-from-source gtDMMB/core/fltkwithcairo
 ```
 Now we need to add the new FLTK libraries into our ``PATH``:
