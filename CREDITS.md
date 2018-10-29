@@ -4,6 +4,7 @@
 
 In alphabetical order: 
 Stephen Chenney, 
+[Christine Heitch](https://sites.google.com/site/christineheitsch/), 
 [Anna Kirkpatrick](https://github.com/annakirkpatrick), 
 [Chris Mize](https://github.com/themize), 
 Anna Panlilio, 
