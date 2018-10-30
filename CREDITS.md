@@ -22,4 +22,6 @@ particular icons (see [here](https://www.flaticon.com/free-icon/dna_620410#term=
 which we have modified from this site which appear in the main application 
 are credited to the author [Freepik](http://www.freepik.com/). The modifications of these black-and-white icons 
 we have made to appear in our program were performed with [The GIMP](https://www.gimp.org/) open-source 
-image editing application.
+image editing application. 
+The other images modified for display in our README file are originally
+obtained from the [FlatIcon](flaticon.com) site.

@@ -154,7 +154,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
     thisWindow->crDraw = cr;
-    cairo_reference(thisWindow->crDraw);    
+    //cairo_reference(thisWindow->crDraw);    
     thisWindow->drawWidgets();
 
     Fl_Color priorColor = fl_color();
@@ -261,7 +261,10 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     fl_font(priorFont, 10);
     fl_line_style(0);
 
-    cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+    cairo_set_source_rgb(cr, 
+		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_fill(cr);
     
     if (numStructures == 1) {

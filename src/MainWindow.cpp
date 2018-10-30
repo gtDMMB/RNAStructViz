@@ -71,17 +71,17 @@ MainWindow::MainWindow(int argc, char **argv)
         openButton->labelcolor(GUI_BTEXT_COLOR);
 
        	// The button to open configuration settings:
-	    Fl_Button *configOptionsButton = new Fl_Button( 
-	              NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
-		          NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
+	Fl_Button *configOptionsButton = new Fl_Button( 
+	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
+		  NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		          NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-		          "@menu Config Options @>|");
-	    configOptionsButton->callback(ConfigOptionsCallback);
+		  "@menu Config Options @>|");
+	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
 
-	    Fl_Box *midTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
-		                         NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
-		                         NAVBUTTONS_BHEIGHT + 15, 
+	Fl_Box *midTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
+		                     NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
+		                     NAVBUTTONS_BHEIGHT + 15, 
 	                             2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
 	                             dividerTextHeight, dividerText); 	
         midTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -235,8 +235,8 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
     
      DisplayConfigWindow *cfgWindow = new DisplayConfigWindow(); 
      cfgWindow->show();
-     while(cfgWindow->visible()) 
-	     Fl::wait();
+     while(!cfgWindow->isDone()) 
+          Fl::wait();
      delete cfgWindow;
 
 }

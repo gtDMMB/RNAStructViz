@@ -9,14 +9,19 @@
 #include <errno.h>
 
 #include <FL/Enumerations.H>
+#include <FL/fl_draw.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Group.H>
+#include <FL/Fl_RGB_Image.H>
 
 #include "DisplayConfigWindow.h"
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
+
+#include "pixmaps/ConfigPathsIcon.c"
+#include "pixmaps/ConfigThemesIcon.c"
 
 /* Setup initial definitions of the extern'ed variables here: */
 #ifndef _SETUP_GLOBAL_EXTERNS_
@@ -83,52 +88,79 @@ bool DisplayConfigWindow::SetupInitialConfig() {
 }
 
 DisplayConfigWindow::DisplayConfigWindow() : 
-     Fl_Cairo_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT) { 
+     Fl_Cairo_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT),
+     finished(false) { 
 
-     Fl::visual(FL_RGB);
      label(CONFIG_WINDOW_TITLE);
      color(GUI_WINDOW_BGCOLOR); 
      size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
-     box(FL_NO_BOX);
+     set_draw_cb(Draw); 
+     callback(WindowCloseCallback);
 
-     Fl_Box *appThemesLabel = new Fl_Box(CFGWIN_WIDGET_OFFSETX, 
-            CFGWIN_WIDGET_OFFSETY, CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-	    "@FLTK Application Theme:\nMouseover to see theme descriptions.");
-     appThemesLabel->labelfont(FL_COURIER_BOLD_ITALIC);
-     appThemesLabel->labelsize(32);
-     appThemesLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-
-     int workingYOffset = CFGWIN_WIDGET_OFFSETY + CFGWIN_LABEL_HEIGHT + 
-	                  CFGWIN_SPACING;
-     int radioButtonHeight = 30; 
-     Fl_Group *themeRadioButtons = new Fl_Group(CFGWIN_WIDGET_OFFSETX, 
-	      workingYOffset, CFGWIN_LABEL_WIDTH, 
-	      FLTK_THEME_COUNT * (radioButtonHeight + CFGWIN_SPACING));
-     {
-          for(int t = 0; t < FLTK_THEME_COUNT; t++) { 
-               Fl_Round_Button *rb = new Fl_Round_Button( 
-			       CFGWIN_WIDGET_OFFSETX + CFGWIN_SPACING, 
-			       workingYOffset += CFGWIN_SPACING, 
-			       CFGWIN_LABEL_WIDTH - 2 * CFGWIN_SPACING, 
-			       radioButtonHeight, 
-			       ALL_FLTK_THEMES[t]);
-	       rb->tooltip(FLTK_THEME_HELP[t]);
-	       rb->type(102);
-	       rb->down_box(FL_ROUND_DOWN_BOX); 
-	       rb->callback((Fl_Callback *) ThemeButtonCallback); 
-	       rb->value(t); 
-	  }
-     } 
+     imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
+     imageData = new uchar[imageStride * CONFIG_WINDOW_WIDTH];
+     memset(imageData, 0, imageStride * CONFIG_WINDOW_WIDTH);
+     cairo_surface_t *crSurface = cairo_image_surface_create_for_data( 
+			          imageData, CAIRO_FORMAT_ARGB32, 
+                                  CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
+				  imageStride);
+     crDraw = cairo_create(crSurface);   
+     Fl::cairo_cc(crDraw, false);
      
-
-
+     // place the widgets in the window:
+     int workingYOffset = CFGWIN_WIDGET_OFFSETY + CFGWIN_SPACING;
+     
+     themesIcon = new Fl_RGB_Image(ConfigThemesIcon.pixel_data, 
+		  ConfigThemesIcon.width, ConfigThemesIcon.height, 
+		  ConfigThemesIcon.bytes_per_pixel);
+     Fl_Box *themesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
+		             themesIcon->w(), themesIcon->h());
+     themesIconBox->image(themesIcon);
+     windowWidgets.push_back(themesIconBox);
+     Fl_Box *themesDescLabel = new Fl_Box(CFGWIN_WIDGET_OFFSETX + 
+		               ConfigThemesIcon.width + CFGWIN_SPACING, 
+		               workingYOffset, CFGWIN_LABEL_WIDTH, themesIcon->h(), 
+			       "Application Theme Settings:");
+     themesDescLabel->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+     themesDescLabel->labelcolor(GUI_TEXT_COLOR);
+     windowWidgets.push_back(themesDescLabel); 
+     workingYOffset += themesIcon->h() + CFGWIN_SPACING;
+     
 } 
 
-DisplayConfigWindow::~DisplayConfigWindow() {}
+DisplayConfigWindow::~DisplayConfigWindow() {
+     for(int w = 0; w < windowWidgets.size(); w++) {
+          delete windowWidgets[w];
+	  windowWidgets[w] = NULL;
+     }
+     delete themesIcon;
+     delete pathsIcon;
+}
 
 bool DisplayConfigWindow::ApplyConfigOptions() { return true; }
 
-bool DisplayConfigWindow::CloseWindow() { return true; } 
+bool DisplayConfigWindow::isDone() const {
+     return finished;
+}
+
+void DisplayConfigWindow::drawWidgets() {
+     for(int w = 0; w < windowWidgets.size(); w++) {
+          windowWidgets[w]->redraw();
+     }
+}
+
+void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
+
+    DisplayConfigWindow *thisWin = (DisplayConfigWindow *) crWin;
+    cairo_set_source_rgb(thisWin->crDraw, 
+		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
+		         GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    cairo_scale(thisWin->crDraw, thisWin->w(), thisWin->h());
+    cairo_fill(thisWin->crDraw);
+    thisWin->drawWidgets();
+
+}
 
 void DisplayConfigWindow::ThemeButtonCallback(Fl_Button *rb, void *userData) {
      
@@ -137,4 +169,9 @@ void DisplayConfigWindow::ThemeButtonCallback(Fl_Button *rb, void *userData) {
           Fl::scheme(themeName);
      }
 
+}
+
+void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
+     DisplayConfigWindow *thisWin = (DisplayConfigWindow *) win;
+     thisWin->finished = true;
 }

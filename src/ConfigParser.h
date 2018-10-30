@@ -13,6 +13,10 @@ class ConfigParser {
                 char pngOutputDirectory[MAX_BUFFER_SIZE];
 		char pngOutputPath[MAX_BUFFER_SIZE];
 		char fltkTheme[MAX_BUFFER_SIZE];
+		Fl_Color guiWindowBGColor;
+		Fl_Color guiBGColor;
+		Fl_Color guiBTextColor;
+		Fl_Color guiTextColor;
 
 	public:
 		ConfigParser(); 

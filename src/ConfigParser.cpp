@@ -88,6 +88,18 @@ int ConfigParser::parseFile(const char *userCfgFile) {
 		             parsedLine.cfgValue);
 		}
           }
+	  else if(!strcmp(parsedLine.cfgOption, "GUI_WINDOW_BGCOLOR")) { 
+               guiWindowBGColor = atoi(parsedLine.cfgValue);
+	  }
+          else if(!strcmp(parsedLine.cfgOption, "GUI_BGCOLOR")) { 
+               guiBGColor = atoi(parsedLine.cfgValue);
+	  }
+	  else if(!strcmp(parsedLine.cfgOption, "GUI_TEXT_COLOR")) { 
+               guiBTextColor = atoi(parsedLine.cfgValue);
+	  }
+	  else if(!strcmp(parsedLine.cfgOption, "GUI_BTEXT_COLOR")) { 
+               guiTextColor = atoi(parsedLine.cfgValue);
+	  }
 	  else {
 	       fprintf(stderr, "Unknown config option \"%s\" ... skipping.\n", 
 	               parsedLine.cfgOption);
@@ -116,25 +128,51 @@ int ConfigParser::writeFile(const char *userCfgFile) const {
 	  pngOutputPath,
 	  fltkTheme
      }; 
-     
+     const char *cfgColorOptions[] = {
+          "GUI_WINDOW_BGCOLOR", 
+	  "GUI_BGCOLOR", 
+	  "GUI_BTEXT_COLOR", 
+	  "GUI_TEXT_COLOR"
+     };
+     const Fl_Color cfgColorValues[] = {
+          guiWindowBGColor, 
+	  guiBGColor, 
+	  guiBTextColor, 
+          guiTextColor
+     };
+
      FILE *fpCfgFile = fopen(userCfgFile, "r+"); 
      if(fpCfgFile == NULL) { 
           fprintf(stderr, "Unable to open user config file \"%s\" for writing: %s\n", 
 	          userCfgFile, strerror(errno)); 
 	  return errno;
      }
+     
      for(int line = 0; line < sizeof(cfgValues); line++) {
 	  char nextOutputLine[MAX_BUFFER_SIZE];
 	  snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=%s\n", 
 	           cfgOptions[line], cfgValues[line]); 
 	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
-          if(!fwrite(cfgValues[line], sizeof(char), strlen(nextOutputLine), fpCfgFile)) { 
+          if(!fwrite(nextOutputLine, sizeof(char), strlen(nextOutputLine), fpCfgFile)) { 
                fprintf(stderr, "Error writing line #%d to file: %s\n", 
 	               line + 1, strerror(errno));
 	       fclose(fpCfgFile); 
 	       return errno;
 	  }
      }
+     for(int line = 0; line < sizeof(cfgColorValues); line++) {
+	  char nextOutputLine[MAX_BUFFER_SIZE];
+	  snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=0x%08x\n", 
+	           cfgColorOptions[line], cfgColorValues[line]); 
+	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
+          if(!fwrite(nextOutputLine, sizeof(char), strlen(nextOutputLine), fpCfgFile)) { 
+               fprintf(stderr, "Error writing line #%d to file: %s\n", 
+	               line + sizeof(cfgValues) + 1, strerror(errno));
+	       fclose(fpCfgFile); 
+	       return errno;
+	  }
+     }
+     
      fclose(fpCfgFile); 
      return 0;
 
@@ -150,6 +188,11 @@ void ConfigParser::storeVariables() const {
      nullTerminateString(PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);  
      strncpy(FLTK_THEME, fltkTheme, MAX_BUFFER_SIZE - 1); 
      nullTerminateString(FLTK_THEME, MAX_BUFFER_SIZE - 1); 
+
+     GUI_WINDOW_BGCOLOR = guiWindowBGColor;
+     GUI_BGCOLOR = guiBGColor;
+     GUI_BTEXT_COLOR = guiBTextColor;
+     GUI_TEXT_COLOR = guiTextColor;
 
 } 
 
@@ -186,6 +229,11 @@ void ConfigParser::setDefaults() {
      nullTerminateString(pngOutputPath);
      strncpy(fltkTheme, FLTK_THEME, MAX_BUFFER_SIZE - 1);
      nullTerminateString(fltkTheme);
+     
+     guiWindowBGColor = GUI_WINDOW_BGCOLOR;
+     guiBGColor = GUI_BGCOLOR;
+     guiBTextColor = GUI_BTEXT_COLOR;
+     guiTextColor = GUI_TEXT_COLOR;
 
 }
 

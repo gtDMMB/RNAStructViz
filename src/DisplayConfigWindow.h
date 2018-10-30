@@ -8,9 +8,13 @@
 #define _DISPLAY_CONFIG_WINDOW_H_
 
 #include <cairo.h>
+
+#include <FL/Fl_Widget.H>
 #include <FL/Fl_Cairo.H>
 #include <FL/Fl_Cairo_Window.H>
 #include <FL/Fl_Button.H>
+
+#include <vector>
 
 #include "ConfigOptions.h"
 
@@ -34,10 +38,24 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 		~DisplayConfigWindow();
 
 		bool ApplyConfigOptions();
-		bool CloseWindow();
+		bool isDone() const;
 
 	protected:
-                static void ThemeButtonCallback(Fl_Button *rb, void *userData); 
+                void drawWidgets();        
+		static void Draw(Fl_Cairo_Window *crWin, cairo_t *cr);
+		
+		static void ThemeButtonCallback(Fl_Button *rb, void *userData); 
+                static void WindowCloseCallback(Fl_Widget *win, void *udata);
+
+		bool finished; 
+
+		cairo_surface_t *crSurface;
+		cairo_t *crDraw;
+		int imageStride;
+		uchar *imageData;
+
+		Fl_RGB_Image *themesIcon, *pathsIcon;
+		std::vector<Fl_Widget *> windowWidgets;
 };
 
 #endif
