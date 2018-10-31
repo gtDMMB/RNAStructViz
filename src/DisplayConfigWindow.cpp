@@ -115,7 +115,7 @@ DisplayConfigWindow::DisplayConfigWindow() :
                                   CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
 				  imageStride);
      crDraw = cairo_create(crSurface);   
-     Fl::cairo_cc(crDraw, true);
+     Fl::cairo_cc(crDraw, false);
 
      label(CONFIG_WINDOW_TITLE);
      color(GUI_WINDOW_BGCOLOR); 
@@ -136,8 +136,8 @@ DisplayConfigWindow::~DisplayConfigWindow() {
      if(pngNewPathIcon != NULL) {
           delete pngNewPathIcon;
      }
-     cairo_destroy(crDraw);
-     cairo_surface_destroy(crSurface);
+     //cairo_destroy(crDraw);
+     //cairo_surface_destroy(crSurface);
      delete imageData;
      imageData = NULL;
 }
@@ -285,14 +285,6 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(closeWinBtn);
      offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
 
-     Fl_Button *aboutAppBtn = new Fl_Button(offsetX, workingYOffset, 
-		              CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-			      "About This Application @>>");
-     aboutAppBtn->color(GUI_BGCOLOR);
-     aboutAppBtn->labelcolor(GUI_BTEXT_COLOR);
-     aboutAppBtn->callback(DisplayAboutCallback);
-     windowWidgets.push_back(aboutAppBtn);
-
 } 
 
 bool DisplayConfigWindow::isDone() const {
@@ -399,11 +391,6 @@ void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
           parentWin->colorDisplayBoxes[colorIdx]->redraw();
      }
 
-}
-
-void DisplayConfigWindow::DisplayAboutCallback(Fl_Widget *btn, void *udata) {
-     // TODO: add icon ... 
-     ApplicationBuildInfo::DisplayAboutMessage();
 }
 
 void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {

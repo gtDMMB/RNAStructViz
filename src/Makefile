@@ -25,11 +25,14 @@ RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)
 	StructureManager.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT)\
 	rocbox.$(OBJEXT) 
 
-default: $(RNASTRUCTVIZ_OBJECTS)
+prelims:
+	/bin/bash `readlink -f ../scripts/build-platform-header.sh` `readlink -f ./BuildTargetInfo.h`
+
+default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
 
 clean:
-	rm -f *.o *.code $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
+	rm -f *.o *.code BuildTargetInfo.h $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
 
 install: default
 	cp -ap $(BINARY_OUTPUT) /usr/local/bin/
@@ -52,7 +55,7 @@ DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
 	DisplayConfigWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
 
-StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h RNAStructViz.h\
+StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h RNAStructViz.h\
 	RNAStructure.h InputWindow.h StatsWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
 
@@ -66,13 +69,13 @@ FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 	ConfigOptions.h MainWindow.h FolderWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
-Main.$(OBJEXT): MainWindow.h RNAStructViz.h Main.cpp
+Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
-MainWindow.$(OBJEXT): MainWindow.h RNAStructViz.h MainWindow.cpp
+MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
 
-RNAStructure.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
+RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h BranchTypeIdentification.h\
 	RNAStructure.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
 

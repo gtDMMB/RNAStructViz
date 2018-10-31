@@ -11,11 +11,6 @@
 
 #include "BuildTargetInfo.h"
 
-#define RNASTRUCTVIZ_VSTRING    ("RNAStructViz v1.1 -- CT File Viewer and Structure Comparison Tool")
-
-#define FLTK_USE_CAIRO 1
-#define FLTK_HAVE_CAIRO 1
-
 #define MAX_BUFFER_SIZE                 (256)
 
 #define DEFAULT_CTFILE_SEARCH_DIRECTORY ("./")

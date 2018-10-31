@@ -20,19 +20,16 @@ HEADER_SKELETON_FILE="${LOCAL_SCRIPTS_DIR}/scripts/BuildTargetInfo.h.in"
 
 GIT_COMMITREV_HASHNUM=$(git show | head -n 1 | sed -e 's/commit //')
 GIT_COMMITREV_HASHNUM_SHORT=$(echo $GIT_COMMITREV_HASHNUM | cut -c-12)
-GIT_COMMITREV_DATE=$(git show | grep "Date: " | sed -e 's/Date:[ ]*//')
+GIT_COMMITREV_DATE=$(git show | grep Date: | head -n 1 | sed -e 's/Date:[ ]*//')
 GIT_DESCRIBE_REVSTRING=$(git describe --all --abbrev=6 HEAD^)
 BUILD_PLATFORM_IDSTRING=$(printf "%s (%s) [%s] @ %s" $(uname -s) $(uname -r) $(uname -m) $(uname -n))
 LOCAL_BUILD_TIME=$(date +"%c")
 
-REPL_PATTERNS=("##__GIT_COMMITREV_HASHNUM_SHORT__##" \
-	"##__GIT_COMMITREV_HASHNUM__##" \
-	"##__GIT_COMMITREV_DATE__##" \
-	"##__GIT_DESCRIBE_REVSTRING__##" \
-	"##__BUILD_PLATFORM_ID__##" \
-	"##__LOCAL_BUILD_TIME__##"\
+REPL_PATTERNS=("##__GIT_COMMITREV_HASHNUM_SHORT__##" "##__GIT_COMMITREV_HASHNUM__##" \
+	"##__GIT_COMMITREV_DATE__##" "##__GIT_DESCRIBE_REVSTRING__##" \
+	"##__BUILD_PLATFORM_ID__##" "##__LOCAL_BUILD_TIME__##"\
 )
-REPLACEMENTS=("${GIT_COMMITREV_HASHNUM}" "${GIT_COMMITREV_HASHNUM_SHORT}" \
+REPLACEMENTS=("${GIT_COMMITREV_HASHNUM_SHORT}" "${GIT_COMMITREV_HASHNUM}" \
 	"${GIT_COMMITREV_DATE}" "${GIT_DESCRIBE_REVSTRING}" \
 	"${BUILD_PLATFORM_IDSTRING}" "${LOCAL_BUILD_TIME}"\
 )

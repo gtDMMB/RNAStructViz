@@ -22,6 +22,11 @@
      #define TARGETOS "Unknown Build Target"
 #endif
 
+#define FLTK_USE_CAIRO 1
+#define FLTK_HAVE_CAIRO 1
+
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.1 -- CT File Viewer and Structure Comparison Tool")
+
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
 #define GIT_COMMIT_DATE              ("##__GIT_COMMITREV_DATE__##")
@@ -30,6 +35,9 @@
 #define BUILD_DATETIME               ("##__LOCAL_BUILD_TIME__##")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
+
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
@@ -78,15 +86,19 @@ class ApplicationBuildInfo {
 	       return string("FLTK Library Version: ") + string(fltkVersionStr);
 	  }
 
-	  static inline void DisplayAboutMessage() {
-	       fl_message_hotspot(1);
-	       fl_message_title("About This Application ...");
-	       const char *bugReportMsg = "Please include a screenshot containing this information with any bug report you submit. New issues with the application can be submitted at https://github.com/gtDMMB/RNAStructViz/issues.";
-	       fl_message("%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n(**%s**)", 
+	  static inline void PrintAboutListing(FILE *whichOut = stderr) {
+               if(whichOut == NULL) {
+                    whichOut = stderr;
+	       }
+	       fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
+	       fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
+               fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
 			  UserManualWikiLink().c_str(), GitRevisionInfo().c_str(), 
 			  GitRevisionDate().c_str(), FLTKVersionString().c_str(), 
 			  CairoVersionString().c_str(), BuildPlatform().c_str(), 
-			  LocalBuildDateTime().c_str(), bugReportMsg);
+			  LocalBuildDateTime().c_str());
+	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. New issues with the application can be submitted at https://github.com/gtDMMB/RNAStructViz/issues.";
+	       fprintf(whichOut, "BUG REPORT INFORMATION:\n**%s**\n", bugReportMsg);
 	  }
 
 };

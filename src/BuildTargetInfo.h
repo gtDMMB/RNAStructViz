@@ -22,14 +22,22 @@
      #define TARGETOS "Unknown Build Target"
 #endif
 
-#define GIT_COMMIT_HASH              ("b487ff95edd5")
-#define GIT_COMMIT_HASH_SHORT        ("b487ff95edd595fa3d4becbfb5215ce935b86326")
-#define GIT_COMMIT_DATE              ("Mon Oct 29 20:41:36 2018 -0400")
-#define GIT_BRANCH_REVSTRING         ("heads/master-62-gb90bfc")
+#define FLTK_USE_CAIRO 1
+#define FLTK_HAVE_CAIRO 1
+
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.1 -- CT File Viewer and Structure Comparison Tool")
+
+#define GIT_COMMIT_HASH              ("280d7bb1e98c80582fa044d2925ba0ca99c5462a")
+#define GIT_COMMIT_HASH_SHORT        ("280d7bb1e98c")
+#define GIT_COMMIT_DATE              ("Wed Oct 31 17:47:25 2018 -0400")
+#define GIT_BRANCH_REVSTRING         ("heads/master-63-gb487ff")
 #define BUILD_PLATFORM_ID            ("Linux (4.15.0-20-generic) [x86_64] @ penguinboxhp")
-#define BUILD_DATETIME               ("Wed 31 Oct 2018 05:45:47 PM EDT")
+#define BUILD_DATETIME               ("Wed 31 Oct 2018 06:39:55 PM EDT")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
+
+#include <stdlib.h>
+#include <stdio.h>
 
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
@@ -78,15 +86,19 @@ class ApplicationBuildInfo {
 	       return string("FLTK Library Version: ") + string(fltkVersionStr);
 	  }
 
-	  static inline void DisplayAboutMessage() {
-	       fl_message_hotspot(1);
-	       fl_message_title("About This Application ...");
-	       const char *bugReportMsg = "Please include a screenshot containing this information with any bug report you submit. New issues with the application can be submitted at https://github.com/gtDMMB/RNAStructViz/issues.";
-	       fl_message("%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n(**%s**)", 
+	  static inline void PrintAboutListing(FILE *whichOut = stderr) {
+               if(whichOut == NULL) {
+                    whichOut = stderr;
+	       }
+	       fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
+	       fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
+               fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
 			  UserManualWikiLink().c_str(), GitRevisionInfo().c_str(), 
 			  GitRevisionDate().c_str(), FLTKVersionString().c_str(), 
 			  CairoVersionString().c_str(), BuildPlatform().c_str(), 
-			  LocalBuildDateTime().c_str(), bugReportMsg);
+			  LocalBuildDateTime().c_str());
+	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. New issues with the application can be submitted at https://github.com/gtDMMB/RNAStructViz/issues.";
+	       fprintf(whichOut, "BUG REPORT INFORMATION:\n**%s**\n", bugReportMsg);
 	  }
 
 };
