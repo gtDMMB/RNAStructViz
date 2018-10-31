@@ -9,20 +9,9 @@
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
 
-#ifdef TARGETOS_LINUX
-     #define __TARGETOS_LINUX__
-     #define TARGETOS "GNU/Linux"
-#endif
-#ifdef TARGETOS_MACOSX
-     #define __TARGETOS_APPLE__
-     #define TARGETOS "Mac/OSX"
-#endif
-#ifdef TARGETOS_GENERIC_UNIX
-     #define __TARGETOS_UNIX__
-     #define TARGETOS "Unix"
-#endif
+#include "BuildTargetInfo.h"
 
-#define RNASTRUCTVIZ_VERSION_STRING    ("RNAStructViz v1.0")
+#define RNASTRUCTVIZ_VSTRING    ("RNAStructViz v1.1 -- CT File Viewer and Structure Comparison Tool")
 
 #define FLTK_USE_CAIRO 1
 #define FLTK_HAVE_CAIRO 1
@@ -35,6 +24,7 @@
                                         /* As a strftime format string */
 #define DEFAULT_FLTK_THEME              ("local")
 #define FLTK_THEME_COUNT                (6)
+#define USER_CONFIG_DIR                 ("~/.RNAStructViz")
 #define USER_CONFIG_PATH                ("~/.RNAStructViz/config.cfg")
 
 extern char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
@@ -56,16 +46,13 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define GetBlue(flc)                    ((flc >> 8) & 0x000000ff)
 
 /* Local "theme" defines for RNAStructViz: */
-#define LOCAL_WINDOW_BGCOLOR            (FL_WHITE)
+#define LOCAL_WINDOW_BGCOLOR            (0xffffff00)
 #define LOCAL_FGCOLOR                   (FL_DARK1)
 #define LOCAL_BG2COLOR                  (FL_LIGHT2)
 #define LOCAL_HIGHLIGHT_COLOR           (FL_LIGHT3)
 #define LOCAL_BGCOLOR                   (RGBColor(123, 77, 211))
 #define LOCAL_BUTTON_COLOR              (Lighter(RGBColor(210, 194, 240), 0.5f))
 #define LOCAL_TEXT_COLOR                (RGBColor(52, 25, 102))
-//#define LOCAL_BGCOLOR                   (RGBColor(0x1F, 0x78, 0x0D))
-//#define LOCAL_BUTTON_COLOR              (RGBColor(0xB9, 0xDA, 0xB5))
-//#define LOCAL_TEXT_COLOR                (Lighter(RGBColor(0x13, 0x48, 0x09), 0.95f))
 #define LOCAL_TEXT_SIZE                 (12)
 #define LOCAL_RMFONT                    (FL_SCREEN)
 #define LOCAL_BFFONT                    (FL_SCREEN_BOLD)

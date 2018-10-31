@@ -14,29 +14,30 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 
-#ifndef IS_DIR
-     #define IS_DIR(mode)     (mode == S_IFDIR)
-#endif
-
 ConfigParser::ConfigParser() { 
      setDefaults(); 
 }
 
-ConfigParser::ConfigParser(const char *userCfgFile) { 
+ConfigParser::ConfigParser(const char *userCfgFile, 
+		           bool silenceErrors = false) { 
      setDefaults(); 
-     parseFile(userCfgFile); 
+     parseFile(userCfgFile, silenceErrors); 
 } 
 
-int ConfigParser::parseFile(const char *userCfgFile) { 
+int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) { 
 
      if(userCfgFile == NULL) {
           return -1;
      }
 
      FILE *fpCfgFile = fopen(userCfgFile, "r+");
-     if(fpCfgFile == NULL) {
-          fprintf(stderr, "Unable to open file \"%s\": %s\n", userCfgFile, strerror(errno));
+     if(fpCfgFile == NULL && !silenceErrors) {
+          fprintf(stderr, "Unable to open file \"%s\": %s\n", 
+	          userCfgFile, strerror(errno));
 	  return errno;
+     }
+     else if(fpCfgFile == NULL) {
+          return errno;
      }
 
      char nextLine[MAX_BUFFER_SIZE];
@@ -110,7 +111,7 @@ int ConfigParser::parseFile(const char *userCfgFile) {
 
 } 
 
-int ConfigParser::writeFile(const char *userCfgFile) const { 
+int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const { 
 
      if(userCfgFile == NULL) { 
           return -1;
@@ -142,10 +143,14 @@ int ConfigParser::writeFile(const char *userCfgFile) const {
      };
 
      FILE *fpCfgFile = fopen(userCfgFile, "r+"); 
-     if(fpCfgFile == NULL) { 
-          fprintf(stderr, "Unable to open user config file \"%s\" for writing: %s\n", 
-	          userCfgFile, strerror(errno)); 
+     if(fpCfgFile == NULL && !silenceErrors) { 
+          fprintf(stderr, "Unable to open config file \"%s\" for writing: ",
+	          userCfgFile);
+	  fprintf(stderr, "%s\n", strerror(errno)); 
 	  return errno;
+     }
+     else if(fpCfgFile == NULL) {
+          return errno;
      }
      
      for(int line = 0; line < sizeof(cfgValues); line++) {

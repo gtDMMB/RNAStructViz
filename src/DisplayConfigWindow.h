@@ -18,34 +18,46 @@
 
 #include "ConfigOptions.h"
 
-#define CONFIG_WINDOW_WIDTH    (500)
-#define CONFIG_WINDOW_HEIGHT   (500)
-#define CONFIG_WINDOW_TITLE    ("RNAStructViz Configuration Settings")
+#define CONFIG_WINDOW_WIDTH         (750)
+#define CONFIG_WINDOW_HEIGHT        (450)
+#define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Settings")
 
-#define CFGWIN_WIDGET_OFFSETX  (10)
-#define CFGWIN_WIDGET_OFFSETY  (10)
-#define CFGWIN_LABEL_HEIGHT    (15)
-#define CFGWIN_LABEL_WIDTH     (400)
-#define CFGWIN_SPACING         (15)
+#define CFGWIN_WIDGET_OFFSETX       (10)
+#define CFGWIN_WIDGET_OFFSETY       (10)
+#define CFGWIN_LABEL_HEIGHT         (20)
+#define CFGWIN_LABEL_WIDTH          (200)
+#define CFGWIN_BUTTON_WIDTH         (200)
+#define CFGWIN_COLOR_WIDTH          (25)
+#define CFGWIN_SPACING              (15)
+#define CFGWIN_CDIALOG_X            (100)
+#define CFGWIN_CDIALOG_Y            (100)
+#define CFGWIN_CDIALOG_WIDTH        (250)
+#define CFGWIN_CDIALOG_HEIGHT       (250)
+#define CFGWIN_MAX_FPATH_LENGTH     (48)
 
 class DisplayConfigWindow : public Fl_Cairo_Window { 
 
 	public:
 		static bool SetupInitialConfig(); 
+	        static char * TrimFilePathDisplay(const char *path, int maxlen);
 	
 	public:
 		DisplayConfigWindow(); 
 		~DisplayConfigWindow();
 
-		bool ApplyConfigOptions();
+		void ConstructWindow();
 		bool isDone() const;
 
 	protected:
                 void drawWidgets();        
 		static void Draw(Fl_Cairo_Window *crWin, cairo_t *cr);
-		
-		static void ThemeButtonCallback(Fl_Button *rb, void *userData); 
-                static void WindowCloseCallback(Fl_Widget *win, void *udata);
+	
+	        static void SelectDirectoryCallback(Fl_Widget *btn, void *ud);	
+		static void UpdatePNGPathCallback(Fl_Widget *btn, void *udata);
+		static void ChangeColorCallback(Fl_Widget *btn, void *udata); 
+                static void WriteConfigFileCallback(Fl_Widget *btn, void *);
+		static void DisplayAboutCallback(Fl_Widget *btn, void *);
+		static void WindowCloseCallback(Fl_Widget *win, void *udata);
 
 		bool finished; 
 
@@ -54,7 +66,14 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 		int imageStride;
 		uchar *imageData;
 
-		Fl_RGB_Image *themesIcon, *pathsIcon;
+                #define NUMSETTINGS      (3)
+                #define GUICOLORS        (4)
+
+		Fl_RGB_Image *fpathsIcon, *themesIcon, *pngNewPathIcon;
+	        Fl_Box *fpathsSettingBoxes[NUMSETTINGS];
+	        char *fpathsUpdateRefs[NUMSETTINGS];	
+		Fl_Box *colorDisplayBoxes[GUICOLORS];
+		Fl_Color *colorChangeRefs[GUICOLORS];
 		std::vector<Fl_Widget *> windowWidgets;
 };
 

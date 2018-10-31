@@ -15,11 +15,13 @@
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
 
+#include "ConfigOptions.h"
+
 #define NAVBUTTONS_OFFSETX   (10)
 #define NAVBUTTONS_OFFSETY   (10) 
-#define NAVBUTTONS_BWIDTH    (125)
+#define NAVBUTTONS_BWIDTH    (135)
 #define NAVBUTTONS_BHEIGHT   (30)
-#define NAVBUTTONS_SPACING   (15)
+#define NAVBUTTONS_SPACING   (8)
 
 class MainWindow
 {
@@ -59,6 +61,15 @@ class MainWindow
         Fl_Button* folder_collapse;
     
         static void ShowFolderSelected();
+
+	/* Resets the color theme for the window */
+	static inline void RethemeMainWindow() {
+	     Fl::foreground(GetRed(LOCAL_FGCOLOR), GetGreen(LOCAL_FGCOLOR), GetBlue(LOCAL_FGCOLOR));
+	     Fl::background(GetRed(GUI_BGCOLOR), GetGreen(GUI_BGCOLOR), GetBlue(GUI_BGCOLOR)); 
+             Fl::background2(GetRed(LOCAL_BG2COLOR), GetGreen(LOCAL_BG2COLOR), GetBlue(LOCAL_BG2COLOR));
+	     ms_instance->m_mainWindow->color(GUI_WINDOW_BGCOLOR);
+             ms_instance->m_mainWindow->redraw();
+	}
 
     protected:
         /*

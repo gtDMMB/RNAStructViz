@@ -22,7 +22,7 @@ MainWindow* MainWindow::ms_instance = 0;
 MainWindow::MainWindow(int argc, char **argv)
           : m_fileChooser(0)
 {
-    m_mainWindow = new Fl_Window(650, 450, RNASTRUCTVIZ_VERSION_STRING);
+    m_mainWindow = new Fl_Window(650, 450, RNASTRUCTVIZ_VSTRING);
     m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(GUI_WINDOW_BGCOLOR);
     m_mainWindow->begin();    
@@ -66,7 +66,7 @@ MainWindow::MainWindow(int argc, char **argv)
         Fl_Button* openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
 		                        NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		                        NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-		                        "@search Load Files @>|");
+		                        "@search   Load Files @>|");
         openButton->callback(OpenFileCallback);
         openButton->labelcolor(GUI_BTEXT_COLOR);
 
@@ -75,7 +75,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
 		  NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		          NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-		  "@menu Config Options @>|");
+		  "@menu   Config Options @>|");
 	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
 

@@ -6,6 +6,10 @@
 #ifndef _CONFIG_PARSER_H_
 #define _CONFIG_PARSER_H_
 
+#ifndef IS_DIR
+     #define IS_DIR(mode)     (mode == S_IFDIR)
+#endif
+
 class ConfigParser {
 
 	public:
@@ -20,14 +24,16 @@ class ConfigParser {
 
 	public:
 		ConfigParser(); 
-                ConfigParser(const char *userCfgFile); 
+                ConfigParser(const char *userCfgFile, bool silenceErrors); 
 
-		int parseFile(const char *userCfgFile);
-		int writeFile(const char *userCfgFile) const;
+		int parseFile(const char *userCfgFile, 
+			      bool silenceErrors = false);
+		int writeFile(const char *userCfgFile, 
+			      bool silenceErrors = false) const;
 		void storeVariables() const; 
 
 		static void nullTerminateString(char *str, 
-				                int nullCharPos = MAX_BUFFER_SIZE - 1); 
+		            int nullCharPos = MAX_BUFFER_SIZE - 1); 
 	        static bool fileExists(const char *filePath);
 		static bool directoryExists(const char *dirPath); 
 

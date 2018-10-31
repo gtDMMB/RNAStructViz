@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 #include <FL/Enumerations.H>
 #include <FL/fl_draw.H>
@@ -15,13 +16,16 @@
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_RGB_Image.H>
+#include <FL/Fl_Color_Chooser.H>
 
 #include "DisplayConfigWindow.h"
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
+#include "MainWindow.h"
 
 #include "pixmaps/ConfigPathsIcon.c"
 #include "pixmaps/ConfigThemesIcon.c"
+#include "pixmaps/PNGNewPathIcon.c"
 
 /* Setup initial definitions of the extern'ed variables here: */
 #ifndef _SETUP_GLOBAL_EXTERNS_
@@ -80,22 +84,28 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      GUI_BTEXT_COLOR = LOCAL_BUTTON_COLOR;
      GUI_TEXT_COLOR = LOCAL_TEXT_COLOR;
 
-     ConfigParser cfgParser(USER_CONFIG_PATH);
+     ConfigParser cfgParser(USER_CONFIG_PATH, true);
      cfgParser.storeVariables();      
      
      return true;
 
 }
 
+char * DisplayConfigWindow::TrimFilePathDisplay(const char *path, int maxlen = CFGWIN_MAX_FPATH_LENGTH) { 
+     char *truncPath = (char *) malloc((maxlen + 1) * sizeof(char));
+     if(strlen(path) < maxlen) {
+          strncpy(truncPath, path, strlen(path) + 1);
+     }
+     else {
+          truncPath[0] = truncPath[1] = truncPath[2] = '.';
+	  strncpy(truncPath + 3, path + strlen(path) - maxlen, maxlen - 2);
+     }
+     return truncPath;
+}
+
 DisplayConfigWindow::DisplayConfigWindow() : 
      Fl_Cairo_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT),
-     finished(false) { 
-
-     label(CONFIG_WINDOW_TITLE);
-     color(GUI_WINDOW_BGCOLOR); 
-     size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
-     set_draw_cb(Draw); 
-     callback(WindowCloseCallback);
+     finished(false), pngNewPathIcon(NULL), imageData(NULL) { 
 
      imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
      imageData = new uchar[imageStride * CONFIG_WINDOW_WIDTH];
@@ -105,11 +115,107 @@ DisplayConfigWindow::DisplayConfigWindow() :
                                   CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
 				  imageStride);
      crDraw = cairo_create(crSurface);   
-     Fl::cairo_cc(crDraw, false);
-     
+     Fl::cairo_cc(crDraw, true);
+
+     label(CONFIG_WINDOW_TITLE);
+     color(GUI_WINDOW_BGCOLOR); 
+     size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
+     set_draw_cb(Draw); 
+     callback(WindowCloseCallback);
+     ConstructWindow();
+
+}
+
+DisplayConfigWindow::~DisplayConfigWindow() {
+     for(int w = 0; w < windowWidgets.size(); w++) {
+          delete windowWidgets[w];
+	  windowWidgets[w] = NULL;
+     }
+     delete fpathsIcon;
+     delete themesIcon;
+     if(pngNewPathIcon != NULL) {
+          delete pngNewPathIcon;
+     }
+     cairo_destroy(crDraw);
+     cairo_surface_destroy(crSurface);
+     delete imageData;
+     imageData = NULL;
+}
+
+void DisplayConfigWindow::ConstructWindow() {
+
      // place the widgets in the window:
      int workingYOffset = CFGWIN_WIDGET_OFFSETY + CFGWIN_SPACING;
-     
+    
+     fpathsIcon = new Fl_RGB_Image(ConfigPathsIcon.pixel_data, 
+		  ConfigPathsIcon.width, ConfigPathsIcon.height, 
+		  ConfigPathsIcon.bytes_per_pixel);
+     Fl_Box *fpathsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
+		             fpathsIcon->w(), fpathsIcon->h());
+     fpathsIconBox->image(fpathsIcon);
+     windowWidgets.push_back(fpathsIconBox);
+     workingYOffset += fpathsIcon->h() + CFGWIN_SPACING;
+
+     const char *fieldDesc[] = {
+	"@->   Structure Search Directory:", 
+	"@->   PNG Output Directory:", 
+	"@->   PNG Output File Name:"
+     };
+     char *fieldUpdateVars[] = {
+         (char *) CTFILE_SEARCH_DIRECTORY, 
+	 (char *) PNG_OUTPUT_DIRECTORY, 
+	 (char *) PNG_OUTPUT_PATH
+     };
+     bool needsDirChooser[] {
+          true, 
+          true,
+	  false
+     };
+     for(int f = 0; f < NUMSETTINGS; f++) {
+         int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+         Fl_Box *descBox = new Fl_Box(offsetX, workingYOffset, 
+	 		   CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+	 		   fieldDesc[f]);
+	 descBox->labelcolor(GUI_TEXT_COLOR);
+	 descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	 windowWidgets.push_back(descBox);
+	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
+         Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
+			      (int) 1.75 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                              fieldUpdateVars[f]);
+	 settingBox->copy_label(TrimFilePathDisplay(fieldUpdateVars[f]));
+	 settingBox->color(GUI_BTEXT_COLOR);
+	 settingBox->labelcolor(GUI_TEXT_COLOR);
+	 settingBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+         fpathsSettingBoxes[f] = settingBox;
+	 fpathsUpdateRefs[f] = fieldUpdateVars[f];
+	 windowWidgets.push_back(settingBox);
+	 offsetX += (int) 1.75 * CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
+	 if(needsDirChooser[f]) { 
+              Fl_Button *chooseDirBtn = new Fl_Button(offsetX, workingYOffset, 
+			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+			"Select @|>");
+	      chooseDirBtn->color(GUI_BGCOLOR);
+	      chooseDirBtn->labelcolor(GUI_BTEXT_COLOR);
+	      chooseDirBtn->user_data((void *) f);
+	      chooseDirBtn->callback(SelectDirectoryCallback);
+	      windowWidgets.push_back(chooseDirBtn);
+	 }
+	 else {
+              Fl_Button *updatePathBtn = new Fl_Button(offsetX, workingYOffset, 
+			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+			"Update @filesaveas");
+	      updatePathBtn->color(GUI_BGCOLOR);
+	      updatePathBtn->labelcolor(GUI_BTEXT_COLOR);
+	      updatePathBtn->user_data((void *) f);
+	      updatePathBtn->callback(UpdatePNGPathCallback);
+	      windowWidgets.push_back(updatePathBtn);
+	 }
+	 workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+     }
+
+     workingYOffset += CFGWIN_SPACING;
+
      themesIcon = new Fl_RGB_Image(ConfigThemesIcon.pixel_data, 
 		  ConfigThemesIcon.width, ConfigThemesIcon.height, 
 		  ConfigThemesIcon.bytes_per_pixel);
@@ -117,27 +223,77 @@ DisplayConfigWindow::DisplayConfigWindow() :
 		             themesIcon->w(), themesIcon->h());
      themesIconBox->image(themesIcon);
      windowWidgets.push_back(themesIconBox);
-     Fl_Box *themesDescLabel = new Fl_Box(CFGWIN_WIDGET_OFFSETX + 
-		               ConfigThemesIcon.width + CFGWIN_SPACING, 
-		               workingYOffset, CFGWIN_LABEL_WIDTH, themesIcon->h(), 
-			       "Application Theme Settings:");
-     themesDescLabel->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-     themesDescLabel->labelcolor(GUI_TEXT_COLOR);
-     windowWidgets.push_back(themesDescLabel); 
      workingYOffset += themesIcon->h() + CFGWIN_SPACING;
-     
-} 
 
-DisplayConfigWindow::~DisplayConfigWindow() {
-     for(int w = 0; w < windowWidgets.size(); w++) {
-          delete windowWidgets[w];
-	  windowWidgets[w] = NULL;
+     const char *colorFieldDesc[] = {
+          "@->   GUI Window Background Color:", 
+	  "@->   GUI Widget Color:", 
+	  "@->   GUI Button Text Color:", 
+	  "@->   GUI Primary (Dark) Text Color:"
+     };
+     Fl_Color *colorVarRefs[] = {
+          &GUI_WINDOW_BGCOLOR, 
+	  &GUI_BGCOLOR, 
+	  &GUI_BTEXT_COLOR, 
+	  &GUI_TEXT_COLOR
+     };
+     for(int c = 0; c < GUICOLORS; c++) { 
+	 int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+         Fl_Box *descBox = new Fl_Box(offsetX, workingYOffset, 
+			   CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+			   colorFieldDesc[c]);
+	 descBox->labelcolor(GUI_TEXT_COLOR);
+	 descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	 windowWidgets.push_back(descBox);
+	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
+	 Fl_Box *colorBox = new Fl_Box(offsetX, workingYOffset, 
+			    CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "@square");
+	 colorBox->labelcolor(*(colorVarRefs[c]));
+	 colorDisplayBoxes[c] = colorBox;
+	 colorChangeRefs[c] = colorVarRefs[c];
+	 windowWidgets.push_back(colorBox);
+	 offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
+	 Fl_Button *selectColorButton = new Fl_Button(offsetX, workingYOffset, 
+			                CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+					"Choose Color @|>");
+	 selectColorButton->user_data((void *) c);
+	 selectColorButton->labelcolor(GUI_BTEXT_COLOR); 
+	 selectColorButton->color(GUI_BGCOLOR);
+	 selectColorButton->callback(ChangeColorCallback); 
+	 windowWidgets.push_back(selectColorButton);
+         workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
-     delete themesIcon;
-     delete pathsIcon;
-}
 
-bool DisplayConfigWindow::ApplyConfigOptions() { return true; }
+     workingYOffset += CFGWIN_SPACING;
+     int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+
+     Fl_Button *writeConfigBtn = new Fl_Button(offsetX, workingYOffset, 
+		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+				 "@filenew   Write New Settings To File");
+     writeConfigBtn->color(GUI_BGCOLOR);
+     writeConfigBtn->labelcolor(GUI_BTEXT_COLOR);
+     writeConfigBtn->callback(WriteConfigFileCallback);
+     windowWidgets.push_back(writeConfigBtn);
+     offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+
+     Fl_Button *closeWinBtn = new Fl_Button(offsetX, workingYOffset, 
+		              CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+			      "@||   Close Window"); 
+     closeWinBtn->color(GUI_BGCOLOR);
+     closeWinBtn->labelcolor(GUI_BTEXT_COLOR);
+     closeWinBtn->callback(WindowCloseCallback);
+     windowWidgets.push_back(closeWinBtn);
+     offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+
+     Fl_Button *aboutAppBtn = new Fl_Button(offsetX, workingYOffset, 
+		              CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+			      "About This Application @>>");
+     aboutAppBtn->color(GUI_BGCOLOR);
+     aboutAppBtn->labelcolor(GUI_BTEXT_COLOR);
+     aboutAppBtn->callback(DisplayAboutCallback);
+     windowWidgets.push_back(aboutAppBtn);
+
+} 
 
 bool DisplayConfigWindow::isDone() const {
      return finished;
@@ -162,16 +318,97 @@ void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
 
 }
 
-void DisplayConfigWindow::ThemeButtonCallback(Fl_Button *rb, void *userData) {
+void DisplayConfigWindow::SelectDirectoryCallback(Fl_Widget *btn, void *udata) { 
+
+     DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
+     long int settingIdx = (long int) ((int *) btn->user_data());
+     char *nextDirectory = fl_dir_chooser("Select New Default Directory ...", 
+		                          parentWin->fpathsUpdateRefs[settingIdx], 0);
+     if(nextDirectory == NULL) {
+          return;
+     }
+     strncpy(parentWin->fpathsUpdateRefs[settingIdx], nextDirectory, MAX_BUFFER_SIZE - 1);
+     ConfigParser::nullTerminateString(parentWin->fpathsUpdateRefs[settingIdx]);
+     parentWin->fpathsSettingBoxes[settingIdx]->copy_label(nextDirectory);
+     parentWin->fpathsSettingBoxes[settingIdx]->redraw();
+
+}
+
+void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
+
+     DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
+     long int settingIdx = (long int) ((int *) btn->user_data());
      
-     const char *themeName = ALL_FLTK_THEMES[rb->value()];
-     if(Fl::is_scheme(themeName)) { 
-          Fl::scheme(themeName);
+     fl_message_title("Choose New Format String for Saved PNG Output Paths ...");
+     Fl_Box *msgIconBox = (Fl_Box *) fl_message_icon();
+     if(parentWin->pngNewPathIcon == NULL) { 
+          parentWin->pngNewPathIcon = new Fl_RGB_Image(PNGNewPathIcon.pixel_data, 
+	     	                      PNGNewPathIcon.width, PNGNewPathIcon.height, 
+		                      PNGNewPathIcon.bytes_per_pixel);
+     }
+     if(msgIconBox != NULL) { 
+          msgIconBox->image(parentWin->pngNewPathIcon);
+          msgIconBox->color(GUI_BGCOLOR);
+          msgIconBox->labelcolor(GUI_BTEXT_COLOR);
+     }
+
+     const char *inputDialogMsg = "Choose the format of the PNG image paths saved by the diagram window. \nNote that C-style strftime-like modifiers such as %%F, %%H,%%M%%S, \nare supported in the format description entered below. \nSee \"man strftime\", or strftime(3), in your terminal for a complete \ndescription of supported timestamp modifiers.";
+     const char *nextPNGPath = fl_input(inputDialogMsg, parentWin->fpathsUpdateRefs[settingIdx]);
+     if(nextPNGPath == NULL) {
+          return;
+     }
+     strncpy(parentWin->fpathsUpdateRefs[settingIdx], nextPNGPath, MAX_BUFFER_SIZE - 1);
+     ConfigParser::nullTerminateString(parentWin->fpathsUpdateRefs[settingIdx]);
+     parentWin->fpathsSettingBoxes[settingIdx]->copy_label(nextPNGPath);
+     parentWin->fpathsSettingBoxes[settingIdx]->redraw();
+
+}
+
+void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
+     
+     if(ConfigParser::directoryExists(USER_CONFIG_DIR)) {
+          int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	  if(dirCreateErr == -1) { 
+               fprintf(stderr, "Unable to create directory \"%s\" ... Aborting\n", USER_CONFIG_DIR);
+	       return;
+	  }
+     }
+     ConfigParser cfgParser;
+     cfgParser.writeFile(USER_CONFIG_PATH, false);
+     MainWindow::RethemeMainWindow();
+
+}
+
+void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
+
+     DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
+     long int colorIdx = (long int) ((int *) btn->user_data());
+     Fl_Color currentColor = *(parentWin->colorChangeRefs[colorIdx]);
+     double currentR = GetRed(currentColor) / 255.0;
+     double currentG = GetGreen(currentColor) / 255.0;
+     double currentB = GetBlue(currentColor) / 255.0;
+     
+     int colorSelectOK = fl_color_chooser("@search   Select New Theme Color ...", 
+		         currentR, currentG, currentB, 0);
+     if(colorSelectOK) { 
+          int nextR = (int) (currentR * 255.0);
+          int nextG = (int) (currentG * 255.0);
+          int nextB = (int) (currentB * 255.0);
+          *(parentWin->colorChangeRefs[colorIdx]) = RGBColor(nextR, nextG, nextB);
+          parentWin->colorDisplayBoxes[colorIdx]->labelcolor(RGBColor(nextR, nextG, nextB));
+          parentWin->colorDisplayBoxes[colorIdx]->redraw();
      }
 
 }
 
+void DisplayConfigWindow::DisplayAboutCallback(Fl_Widget *btn, void *udata) {
+     // TODO: add icon ... 
+     ApplicationBuildInfo::DisplayAboutMessage();
+}
+
 void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
      DisplayConfigWindow *thisWin = (DisplayConfigWindow *) win;
+     thisWin->hide();
      thisWin->finished = true;
+     MainWindow::RethemeMainWindow();
 }

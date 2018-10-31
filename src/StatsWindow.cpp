@@ -22,6 +22,8 @@
 #include "rocbox.h"
 #include "InputWindow.h"
 #include <algorithm>
+#include "ConfigOptions.h"
+#include <time.h>
 
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
@@ -1886,11 +1888,17 @@ void StatsWindow::ExportTable()
     menu_window->deactivate();
     tab_window->deactivate();
     
-	char* filename = "table_output"; // Change to be a better name
-	input_window = new InputWindow(400,150,"Export To File",
+	char filename[MAX_BUFFER_SIZE];
+        char dateStamp[MAX_BUFFER_SIZE];
+        time_t currentTime = time(NULL);
+        struct tm *tmCurrentTime = localtime(&currentTime);
+        strftime(dateStamp, MAX_BUFFER_SIZE - 1, "%F-%H%M%S", tmCurrentTime);
+	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s/StatsTableOutput-%s.dat", 
+		 PNG_OUTPUT_DIRECTORY, dateStamp);
+	input_window = new InputWindow(400, 150, "Export Table To File ...",
                                    filename, InputWindow::FILE_INPUT);
 	exp_button->value(1);
-    exp_button->deactivate();
+        exp_button->deactivate();
 	while (input_window != NULL && input_window->visible())
 	{
 		Fl::wait();
@@ -1901,14 +1909,12 @@ void StatsWindow::ExportTable()
         
         if(strcmp(input_window->getName(),""))
         {
-            filename = input_window->getName();
+            strncpy(filename, input_window->getName(), MAX_BUFFER_SIZE - 1);
             strcat(filename, ".txt");
         }
-        else
-        {
-            filename = "table_output.txt";
-        }
-        FILE * expFile = fopen(filename,"a+");
+        else {}
+
+	FILE * expFile = fopen(filename, "a+");
         if (expFile != NULL)
         {
             /* 	Check whether file is empty (i.e. whether it already existed. 
