@@ -124,8 +124,8 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
         memset(thisWindow->imageData, 0, thisWindow->imageStride * 
 			                 IMAGE_HEIGHT);
         thisWindow->m_redrawStructures = true;
-        thisWindow->cairoTranslate = false;
-        DiagramWindow::Draw((Fl_Cairo_Window *) thisWindow, thisWindow->crDraw);
+        thisWindow->cairoTranslate = true;
+	thisWindow->redraw();
         cairo_surface_write_to_png(cairo_get_target(thisWindow->crDraw), 
 			           exportFilePath);
 
