@@ -10,6 +10,8 @@ else
 	READLINK=readlink
 endif
 
+
+
 BINARY_OUTPUT=RNAStructViz
 OBJEXT=o
 
@@ -48,10 +50,14 @@ clean:
 	rm -f *.o *.code BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
 
 install: default
-	cp -ap $(BINARY_OUTPUT) /usr/local/bin/
-	mkdir -p /usr/local/share/RNAStructViz
-	mkdir -p /usr/local/share/RNAStructViz/sample_structures
-	cp -ap sample_structures/* /usr/local/share/RNAStructViz/sample_structures/
+	if test -z "$$INSTALL_PREFIX"; then INSTALL_PREFIX=/usr/local/; fi;\
+	echo "Install Prefix: $$INSTALL_PREFIX";\
+	mkdir -p $(INSTALL_PREFIX)/bin;\
+	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz;\
+	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures;\
+	cp -ap $(BINARY_OUTPUT) $(INSTALL_PREFIX)/bin/;\
+	cp -ap sample_structures/* \
+		$(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp
