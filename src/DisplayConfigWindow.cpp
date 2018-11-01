@@ -98,7 +98,8 @@ char * DisplayConfigWindow::TrimFilePathDisplay(const char *path, int maxlen = C
      }
      else {
           truncPath[0] = truncPath[1] = truncPath[2] = '.';
-	  strncpy(truncPath + 3, path + strlen(path) - maxlen, maxlen - 2);
+	  strncpy(truncPath + 3, path + strlen(path) - maxlen, maxlen);
+	  truncPath[maxlen + 2] = '\0';
      }
      return truncPath;
 }
@@ -181,7 +182,7 @@ void DisplayConfigWindow::ConstructWindow() {
 	 windowWidgets.push_back(descBox);
 	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
          Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
-			      (int) (1.3 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
+			      (int) (1.5 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
                               *(fieldUpdateVars[f]));
 	 settingBox->copy_label(TrimFilePathDisplay(*(fieldUpdateVars[f])));
 	 settingBox->color(GUI_BTEXT_COLOR);
@@ -190,7 +191,7 @@ void DisplayConfigWindow::ConstructWindow() {
          fpathsSettingBoxes[f] = settingBox;
 	 fpathsUpdateRefs[f] = *(fieldUpdateVars[f]);
 	 windowWidgets.push_back(settingBox);
-	 offsetX += (int) (1.3 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
+	 offsetX += (int) (1.5 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
 	 if(needsDirChooser[f]) { 
               Fl_Button *chooseDirBtn = new Fl_Button(offsetX, workingYOffset, 
 			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
@@ -266,12 +267,26 @@ void DisplayConfigWindow::ConstructWindow() {
 
      workingYOffset += CFGWIN_SPACING;
 
-     int offsetX = CONFIG_WINDOW_WIDTH - (CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING);
+     // draw bounding box for the two action buttons on the 
+     // bottom right of the window:
+     int boundingBoxWidth = 2 * CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING;
+     int offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth - 
+	           CFGWIN_SPACING / 2;
+     int bdBoxHeight = (int) 1.5 * (CONFIG_WINDOW_HEIGHT - workingYOffset);
+     int bdBoxYOffset = CONFIG_WINDOW_HEIGHT - bdBoxHeight - CFGWIN_SPACING;
+     Fl_Box *btnBoundingBox = new Fl_Box(offsetX, bdBoxYOffset, 
+		              boundingBoxWidth, bdBoxHeight);
+     btnBoundingBox->box(FL_RSHADOW_BOX);
+     btnBoundingBox->color(GUI_BGCOLOR);
+     windowWidgets.push_back(btnBoundingBox);
+
+     offsetX = CONFIG_WINDOW_WIDTH - 
+	       (CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING / 2);
      Fl_Button *writeConfigBtn = new Fl_Button(offsetX, workingYOffset, 
 		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				 "@filenew   Save Settings");
-     writeConfigBtn->color(GUI_BGCOLOR);
-     writeConfigBtn->labelcolor(GUI_BTEXT_COLOR);
+     writeConfigBtn->color(FL_LIGHT2);
+     writeConfigBtn->labelcolor(FL_DARK2);
      writeConfigBtn->callback(WriteConfigFileCallback);
      windowWidgets.push_back(writeConfigBtn);
      offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
@@ -279,8 +294,8 @@ void DisplayConfigWindow::ConstructWindow() {
      Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, workingYOffset, 
 		                     CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				     "@redo   Restore Defaults");
-     restoreDefaultsBtn->color(GUI_BGCOLOR);
-     restoreDefaultsBtn->labelcolor(GUI_BTEXT_COLOR);
+     restoreDefaultsBtn->color(FL_LIGHT2);
+     restoreDefaultsBtn->labelcolor(FL_DARK2);
      restoreDefaultsBtn->callback(RestoreDefaultsCallback);
      windowWidgets.push_back(restoreDefaultsBtn);
 

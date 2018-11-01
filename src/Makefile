@@ -90,11 +90,13 @@ DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
 
 DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
-	DisplayConfigWindow.cpp
+	pixmaps/ConfigPathsIcon.c pixmaps/ConfigThemesIcon.c\
+	pixmaps/PNGNewPathIcon.c DisplayConfigWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
 
-StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h RNAStructViz.h\
-	RNAStructure.h InputWindow.h StatsWindow.cpp
+StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
+	RNAStructViz.h RNAStructure.h InputWindow.h \
+	pixmaps/StatsFormula.c StatsWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
 
 GLWindow.$(OBJEXT): GLWindow.h
@@ -104,7 +106,8 @@ InputWindow.$(OBJEXT): InputWindow.h InputWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
 
 FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
-	ConfigOptions.h MainWindow.h FolderWindow.cpp
+	ConfigOptions.h MainWindow.h pixmaps/StructureOperationIcon.c\
+	FolderWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
 Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h Main.cpp
@@ -113,8 +116,8 @@ Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h Main.cpp
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
 
-RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h BranchTypeIdentification.h\
-	RNAStructure.cpp
+RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
+	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c RNAStructure.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
 
 RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
