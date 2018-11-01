@@ -54,6 +54,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //                    IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
     //crDraw = cairo_create(crSurface);   
     #ifdef __APPLE__
+         CGContextTranslateCTM(fl_gc, 0.0, this->h());
+	 CGContextScaleCTM(fl_gc, 1.0, -1.0); 
          crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
 		     this->w(), this->h());
     #else
