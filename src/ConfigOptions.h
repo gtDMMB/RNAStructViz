@@ -13,6 +13,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
+#include <FL/x.H>
 
 #include <string>
 using std::string;
