@@ -17,7 +17,10 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_RGB_Image.H>
+
 #include <vector>
+
 #include "RNAStructure.h"
 #include "StructureManager.h"
 #include "InputWindow.h"
@@ -173,7 +176,7 @@ private:
     Fl_Choice* ref_menu;
     
     // Holds menu of structures for comparison
-	Fl_Scroll* comp_menu;
+    Fl_Scroll* comp_menu;
     
     // Contains the check buttons for each comparison structure as children
     Fl_Pack* comp_pack;
@@ -206,7 +209,11 @@ private:
     Fl_Group *au_chart; // histogram for A-U base pairs
     Fl_Group *gu_chart; // histogram for G-U base pairs
     Fl_Group *non_canon_chart; // histogram for non-canonical base pairs
-    
+  
+    // Formulas image:
+    Fl_RGB_Image *statsFormulasImage;
+    Fl_Box *statsFormulasBox;
+
     // ROC Plot group
     Fl_Group *roc_plot;
   
