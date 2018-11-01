@@ -1,4 +1,4 @@
-# Welcome to the RNAStructViz wiki!
+# Welcome to the RNAStructViz install documentation!
 
 ## Application Description 
 
@@ -24,11 +24,11 @@ We have the following specific instructions for several common operating system 
 If you do not see your platform supported below, or have issues installing with our instructions, 
 consider contacting us -- *or especially* -- posting a 
 [new issue]() in this repository.
-* [Mac OSX using Homebrew only]()
-* [Mac OSX from source]() (see also [RNAStructViz from-source instructions]())
-* [Debian-based Linux from source (requires sudo)]() (see also [RNAStructViz from-source instructions]())
-* [Generic Linux from source (local FLTK library build)]() (see also [RNAStructViz from-source instructions]())
-* [RNAStructViz from-source install instructions]() (generic Unix assuming the correct libraries are installed)
+* [Mac OSX using Homebrew only](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#mac-osx-using-homebrew-only)
+* [Mac OSX from source](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#mac-osx-using-homebrew-fltk-with-cairo-and-rnastructviz-from-source) (see also [RNAStructViz from-source instructions](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions))
+* [Debian-based Linux from source (requires sudo)](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#debian-based-linux-from-source-requires-sudo) (see also [RNAStructViz from-source instructions](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions))
+* [Generic Linux from source (local FLTK library build)](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#generic-linux-from-source-local-fltk-library-build) (see also [RNAStructViz from-source instructions](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions))
+* [RNAStructViz from-source install instructions](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions) (generic Unix assuming the correct libraries are installed)
 
 
 # Installation on Mac OSX
@@ -105,7 +105,7 @@ $ fltk-config --use-gl --use-glut --use-forms --use-images --use-cairo --ldstati
 -I/usr/local/Cellar/fltkwithcairo/1.4.x-r13071/include -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT
 /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_cairo.a -lcairo -lpixman-1 /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_images.a -ljpeg -lpng -lz /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_gl.a -framework OpenGL /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk_forms.a /usr/local/Cellar/fltkwithcairo/1.4.x-r13071/lib/libfltk.a -lpthread -framework Cocoa
 ```
-That's it! Now on to building [RNAStructViz from source]().
+That's it! Now on to building [RNAStructViz from source](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions).
 
 # Installation on Linux
 
@@ -139,7 +139,7 @@ $ which fltk-config
 $ fltk-config --libs --use-cairo
 ```
 Now we need to build ``RNAStructViz`` from source using 
-[these instructions]().
+[these instructions](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions).
 
 ## Generic Linux from source (local FLTK library build)
 
@@ -189,7 +189,7 @@ export the following variable:
 $ export FLTK_INSTALL_DIR=$(readlink -f ./)
 ```
 Finally, continue on to the building ``RNAStructViz`` from source step 
-[below]().
+[below](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions).
 
 # RNAStructViz from-source install instructions
 
