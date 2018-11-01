@@ -199,23 +199,24 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 				// Display formulas for the different percentage value statistics
                 int vgap = 20;
                 int hgap = 10; // Should be between 0 and 40
-                //statsFormulasImage = new Fl_RGB_Image(StatsFormula.pixel_data, 
-		//                     StatsFormula.width, StatsFormula.height, 
-		//                     StatsFormula.bytes_per_pixel);
-                //statsFormulasBox = new Fl_Box(percx+50+(percw-60)/2,percy+40+(perch-60)/2, 
-		//		   statsFormulasImage->w(), statsFormulasImage->h());
-		//statsFormulasBox->image(statsFormulasImage);
-		tp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap,(percw-60)/2+40-hgap,20,"TP: true positive");
-		fp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+30,(percw-60)/2+40-hgap,20,"FP: false positive");
-		fp_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+80,(percw-60)/2+40-hgap,20,"FP = conflict + contradict + compatible");
-                fp_equ_label->align(FL_ALIGN_WRAP);
-		sens_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+130,(percw-60)/2+40-hgap,20,"sensitivity = TP / (TP + FN)");
-                sens_label->align(FL_ALIGN_WRAP);
-		sel_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+170,(percw-60)/2+40-hgap,20,"selectivity = TP / (TP + FP - compatible)");
-                sel_label->align(FL_ALIGN_WRAP);
-		ppv_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+210,(percw-60)/2+40-hgap,20,"PPV: positive predictive value");
-		ppv_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+240,(percw-60)/2+40-hgap,20,"PPV = TP / (TP + FP)");
-                ppv_equ_label->align(FL_ALIGN_WRAP);
+                //fprintf(stderr, "%d; %d\n", percx+50+(percw-60)/2,percy+40+(perch-60)/2);
+		statsFormulasImage = new Fl_RGB_Image(StatsFormula.pixel_data, 
+		                     StatsFormula.width, StatsFormula.height, 
+		                     StatsFormula.bytes_per_pixel);
+                statsFormulasBox = new Fl_Box(percx+30+(percw-60)/2,percy+75+(perch-60)/2, 
+				   statsFormulasImage->w(), statsFormulasImage->h());
+		statsFormulasBox->image(statsFormulasImage);
+		//tp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap,(percw-60)/2+40-hgap,20,"TP: true positive");
+		//fp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+30,(percw-60)/2+40-hgap,20,"FP: false positive");
+		//fp_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+80,(percw-60)/2+40-hgap,20,"FP = conflict + contradict + compatible");
+                //fp_equ_label->align(FL_ALIGN_WRAP);
+		//sens_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+130,(percw-60)/2+40-hgap,20,"sensitivity = TP / (TP + FN)");
+                //sens_label->align(FL_ALIGN_WRAP);
+		//sel_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+170,(percw-60)/2+40-hgap,20,"selectivity = TP / (TP + FP - compatible)");
+                //sel_label->align(FL_ALIGN_WRAP);
+		//ppv_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+210,(percw-60)/2+40-hgap,20,"PPV: positive predictive value");
+		//ppv_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+240,(percw-60)/2+40-hgap,20,"PPV = TP / (TP + FP)");
+                //ppv_equ_label->align(FL_ALIGN_WRAP);
                 
 				ppv_chart = new Fl_Group(percx+10,percy+40+(perch-60)/2,(percw-60)/2,(perch-60)/2,"Positive Predictive Value");
 				ppv_chart->box(FL_BORDER_BOX);
@@ -937,11 +938,11 @@ void StatsWindow::resize(int x, int y, int w, int h)
         non_canon_chart->label("Non-Canonical Base Pairs");
     }
     
-    if (ppv_label->w() < 175) {
-        ppv_label->label("PPV: pos. pred. value");
-    } else {
-        ppv_label->label("PPV: positive predictive value");
-    }
+    //if (ppv_label->w() < 175) {
+    //    ppv_label->label("PPV: pos. pred. value");
+    //} else {
+    //    ppv_label->label("PPV: positive predictive value");
+    //}
     
 }
 
