@@ -31,11 +31,13 @@ MainWindow::MainWindow(int argc, char **argv)
     {
         
 	    // setup the program logo (for now dynamically loaded):
-            Fl_RGB_Image *appLogo = new Fl_RGB_Image(RNAStructViz_Logo.pixel_data, 
-			        RNAStructViz_Logo.width, 
-			        RNAStructViz_Logo.height, RNAStructViz_Logo.bytes_per_pixel);
-	    Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, NAVBUTTONS_OFFSETY, 
-			                             appLogo->w(), appLogo->h());
+            Fl_RGB_Image *appLogo = new Fl_RGB_Image( 
+			  RNAStructVizLogo.pixel_data, 
+			  RNAStructVizLogo.width, 
+			  RNAStructVizLogo.height, 
+			  RNAStructVizLogo.bytes_per_pixel);
+	    Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, 
+	           NAVBUTTONS_OFFSETY, appLogo->w(), appLogo->h());
 	    appLogoCont->image(appLogo);
 
 	    // consistent alignment with the folder window display:

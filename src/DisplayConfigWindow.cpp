@@ -278,7 +278,7 @@ void DisplayConfigWindow::ConstructWindow() {
 
      Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, workingYOffset, 
 		                     CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-				     "@||   Restore Defaults");
+				     "@redo   Restore Defaults");
      restoreDefaultsBtn->color(GUI_BGCOLOR);
      restoreDefaultsBtn->labelcolor(GUI_BTEXT_COLOR);
      restoreDefaultsBtn->callback(RestoreDefaultsCallback);
