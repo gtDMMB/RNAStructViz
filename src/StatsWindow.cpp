@@ -692,13 +692,16 @@ StatsWindow::StatsWindow(int w, int h, const char *label,
                          const std::vector<int>& structures)
 : Fl_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL)
 {
-     
+    
+    #ifndef __APPLE__	
     fl_open_display();
     Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
 		        DefaultRootWindow(fl_display),
                         StatsWindowIcon_bits, StatsWindowIcon_width, 
 			StatsWindowIcon_height);
     this->icon((const void *) iconPixmap);
+    #endif
+    
     Construct(w, h, structures);
 }
 

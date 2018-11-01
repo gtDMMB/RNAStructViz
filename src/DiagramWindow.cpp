@@ -75,14 +75,16 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
         : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
-        
+    
+    #ifndef __APPLE__ 
     fl_open_display();
     Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
 		        DefaultRootWindow(fl_display),
                         DiagramWindowIcon_bits, DiagramWindowIcon_width, 
 			DiagramWindowIcon_height);
     this->icon((const void *) iconPixmap);
-    
+    #endif
+
     Construct(w + WINW_EXTENSION, h, structures);
 }
 
@@ -93,13 +95,15 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
     copy_label(label);
     resize(x, y, w + WINW_EXTENSION, h);
     
+    #ifndef __APPLE__
     fl_open_display();
     Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
 		        DefaultRootWindow(fl_display),
                         DiagramWindowIcon_bits, DiagramWindowIcon_width, 
 			DiagramWindowIcon_height);
     this->icon((const void *) iconPixmap);
-    
+    #endif
+
     Construct(w + WINW_EXTENSION, h, structures);
 }
 

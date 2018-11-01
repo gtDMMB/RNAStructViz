@@ -139,12 +139,14 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->size_range(650, 450, 650, 0);
     m_mainWindow->end();
 
+    #ifndef __APPLE__
     fl_open_display();
     Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
 		        DefaultRootWindow(fl_display),
                         RNAWindowIcon_bits, RNAWindowIcon_width, 
 			RNAWindowIcon_height);
     m_mainWindow->icon((const void *) iconPixmap);
+    #endif
 
     m_mainWindow->show(argc, argv);
     

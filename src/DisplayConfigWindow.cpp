@@ -125,12 +125,14 @@ DisplayConfigWindow::DisplayConfigWindow() :
      set_draw_cb(Draw); 
      callback(WindowCloseCallback);
 
+     #ifndef __APPLE__
      fl_open_display();
      Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
  		         DefaultRootWindow(fl_display),
                          ConfigWindowIcon_bits, ConfigWindowIcon_width, 
          	         ConfigWindowIcon_height);
      this->icon((const void *) iconPixmap);
+     #endif
 
      ConstructWindow();
 
