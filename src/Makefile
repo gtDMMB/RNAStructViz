@@ -56,7 +56,7 @@ install: default
 	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz;\
 	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures;\
 	cp -ap $(BINARY_OUTPUT) $(INSTALL_PREFIX)/bin/;\
-	cp -ap sample_structures/* \
+	cp -ap ../sample_structures/* \
 		$(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
