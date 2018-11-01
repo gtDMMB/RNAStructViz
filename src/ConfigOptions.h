@@ -19,6 +19,7 @@ using std::string;
 
 #include "BuildTargetInfo.h"
 
+#define PERFORM_BRANCH_TYPE_ID          (false)
 #define MAX_BUFFER_SIZE                 (256)
 
 static inline const char * GetUserHome() {

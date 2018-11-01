@@ -89,7 +89,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
     int numElements = 0;
     while (true)
     {
-		numElements++;
+	numElements++;
         unsigned int junk;
 
 		// Check for a number. If not, ignore the line, or maybe the file is 
@@ -263,7 +263,13 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
 
     result->m_sequence = (BaseData*)realloc(result->m_sequence, 
                                             sizeof(BaseData)*result->m_sequenceLength);
-    result->branchType = (RNABranchType_t*) malloc(sizeof(RNABranchType_t) * result->m_sequenceLength);
+    //fprintf(stderr, "%d, %d, *= %g", sizeof(RNABranchType_t), 
+    //        result->m_sequenceLength, 
+    //	    sizeof(RNABranchType_t) * result->m_sequenceLength / 1024.0);
+    if(PERFORM_BRANCH_TYPE_ID) {
+        result->branchType = (RNABranchType_t*) malloc( 
+		sizeof(RNABranchType_t) * result->m_sequenceLength);
+    }
     result->m_pathname = strdup(filename);
     result->charSeqSize = tempSeq.size();
     result->charSeq = (char*) malloc(sizeof(char) *result->charSeqSize);
@@ -271,7 +277,10 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
     {
         result->charSeq[i] = tempSeq.at(i);
     }
-    //RNABranchType_t::PerformBranchClassification(result, result->m_sequenceLength);
+    if(PERFORM_BRANCH_TYPE_ID) {
+        RNABranchType_t::PerformBranchClassification(result, 
+			 result->m_sequenceLength);
+    }
 
     return result;
 }

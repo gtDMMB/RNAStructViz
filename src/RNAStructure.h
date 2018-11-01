@@ -41,7 +41,7 @@ class RNAStructure
 	        public:
                 unsigned int m_index; // The index of this structure
                 unsigned int m_pair; // The index of the base it is paired with, or UNPAIRED.
-	            Base m_base;	// The base type.
+	        Base m_base;	// The base type.
 
                 inline char getBaseChar() const {
                      if(m_base == A)
