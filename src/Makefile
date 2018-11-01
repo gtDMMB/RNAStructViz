@@ -1,8 +1,9 @@
 CXX=g++
 LD=g++
 
+TARGET_PLATFORM=`uname -s`
 READLINK=readlink
-ifeq (`uname -s`, "Darwin")
+ifeq ($(TARGET_PLATFORM), Darwin)
 	READLINK=greadlink
 endif
 
