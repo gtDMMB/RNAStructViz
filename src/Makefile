@@ -34,12 +34,15 @@ RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)
 	StructureManager.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT)\
 	rocbox.$(OBJEXT) 
 
+default: prelims $(RNASTRUCTVIZ_OBJECTS)
+	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
+
 prelims:
 	/bin/bash `$(READLINK) -f ../scripts/build-platform-header.sh` \
 		`$(READLINK) -f ./BuildTargetInfo.h`
 
-default: prelims $(RNASTRUCTVIZ_OBJECTS)
-	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
+run: default
+	./RNAStructViz
 
 clean:
 	rm -f *.o *.code BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)

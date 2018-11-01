@@ -20,7 +20,7 @@
 MainWindow* MainWindow::ms_instance = 0;
 
 MainWindow::MainWindow(int argc, char **argv)
-          : m_fileChooser(0), selectedFolderBtn(NULL)
+          : m_fileChooser(NULL), selectedFolderBtn(NULL)
 {
     m_mainWindow = new Fl_Window(650, 450, RNASTRUCTVIZ_VSTRING);
     m_mainWindow->callback(CloseCallback);
@@ -154,6 +154,10 @@ MainWindow::~MainWindow()
     delete midTextDivider;
     delete openButton;
     delete configOptionsButton;
+    for(int w = 0; w < folderDataBtns.size(); w++) {
+        delete folderDataBtns[w];
+	folderDataBtns[w] = NULL;
+    }
 }
 
 bool MainWindow::Initialize(int argc, char **argv)
@@ -183,12 +187,14 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     
     Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(),30);
     
-    Fl_Button* label = new Fl_Button(pack->x() + 10, vertPosn, pack->w() - 70, 30, "");
+    Fl_Button* label = new Fl_Button(pack->x() + 10, vertPosn, 
+		                     pack->w() - 70, 30, "");
     label->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     label->callback(MainWindow::ShowFolderCallback);
     label->user_data((void*)foldername);
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
-    sprintf(folder->folderNameFileCount, "@+   %-.48s (%d)", folder->folderName, folder->structCount);
+    sprintf(folder->folderNameFileCount, "@+   %-.48s (%d)", 
+            folder->folderName, folder->structCount);
     label->label(folder->folderNameFileCount);
     label->labelcolor(GUI_BTEXT_COLOR);
     ms_instance->folderDataBtns.push_back(label);
@@ -218,8 +224,7 @@ void MainWindow::AddFolder(const char* foldername, const int index,
 
 void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 {
-    if (!ms_instance->m_fileChooser)
-        ms_instance->CreateFileChooser();
+    ms_instance->CreateFileChooser();
     ms_instance->m_fileChooser->show();
     while (ms_instance->m_fileChooser->visible())
         Fl::wait();
@@ -395,8 +400,10 @@ void MainWindow::MoveFolderDown(Fl_Widget *widget, void* userData)
 
 bool MainWindow::CreateFileChooser()
 {
-    if (m_fileChooser)
-        return true;
+    if(m_fileChooser) {
+	delete m_fileChooser;
+        m_fileChooser = NULL;
+    }
     
     // Get the current working directory.
     char currentWD[MAX_BUFFER_SIZE];
@@ -409,7 +416,7 @@ bool MainWindow::CreateFileChooser()
     }
     
     m_fileChooser = new Fl_File_Chooser(currentWD, "*.{ct,nopct,bpseq}", 
-                                        Fl_File_Chooser::MULTI, "Select RNA Sequences");
+                        Fl_File_Chooser::MULTI, "Select RNA Sequences");
     m_fileChooser->show_label = "Loaded files will automatically be grouped into folders according to their underlying sequence.";
     m_fileChooser->color(GUI_WINDOW_BGCOLOR);
     m_fileChooser->textcolor(GUI_TEXT_COLOR);
@@ -529,7 +536,7 @@ void MainWindow::HideFolderByIndex(const int index)
     {
         Fl_Group* childGroup = (Fl_Group*)(pane->child(0));
         if (!strcmp(childGroup->label(),folder->folderName)) {
-            pane->remove(0);
+	    pane->remove(0);
         }
     }
     

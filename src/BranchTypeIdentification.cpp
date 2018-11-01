@@ -177,7 +177,6 @@ bool RNABranchType_t::PerformBranchClassification(class RNAStructure * &rnaStruc
      // see below) entries in the array: 
      vector<RNAStructure::BaseData *> enclosingArcs = getEnclosingArcs(rnaStructBase, false);
      if(enclosingArcs.size() < 7 || mostEnclosingArcsSize < 4) {
-          //fprintf(stderr, "HUGE LOGISTICAL ERROR: There are not 7 / 4 main arcs / branches to classify!\n");
           return false;
      }
      sort(enclosingArcs.begin(), enclosingArcs.begin() + 4, RNAStructureBaseDataIndexSort());

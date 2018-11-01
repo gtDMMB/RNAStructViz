@@ -81,7 +81,9 @@ void RNAStructViz::AddDiagramWindow(int index)
     
     char* title = (char*) malloc(sizeof(char) * 64);
     snprintf(title, 64, "Structure Diagram %lu", m_diagramWindows.size() + 1);
-    diagram = new DiagramWindow(IMAGE_WIDTH + 250, IMAGE_HEIGHT + 150, title, structures);
+    diagram = new DiagramWindow(3 * DiagramWindow::ms_menu_width, 
+		                IMAGE_HEIGHT + GLWIN_TRANSLATEY + 35, 
+				title, structures);
     free(title); 
     
     diagram->SetFolderIndex(index);

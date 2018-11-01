@@ -32,7 +32,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
-    size_range(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
+    size_range(w, h);
     box(FL_NO_BOX);
 
     title = (char *) malloc(sizeof(char) * 64);
@@ -46,25 +46,25 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 			imageData, CAIRO_FORMAT_ARGB32, 
                         IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
     crDraw = cairo_create(crSurface);   
-    Fl::cairo_cc(crDraw, false);
+    //Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw); // cairo
 }
 
 DiagramWindow::DiagramWindow(int w, int h, const char *label,
                              const std::vector<int> &structures) 
-        : Fl_Cairo_Window(w + 150, h), 
+        : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
           m_redrawStructures(true) {
     copy_label(label);
-    Construct(w + 150, h, structures);
+    Construct(w + WINW_EXTENSION, h, structures);
 }
 
 DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
                              const std::vector<int> &structures)
-        : Fl_Cairo_Window(w + 150, h), 
+        : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
           m_redrawStructures(true) {
     copy_label(label);
-    resize(x, y, w + 150, h);
-    Construct(w + 150, h, structures);
+    resize(x, y, w + WINW_EXTENSION, h);
+    Construct(w + WINW_EXTENSION, h, structures);
 }
 
 DiagramWindow::~DiagramWindow() {
@@ -87,7 +87,7 @@ void DiagramWindow::SetFolderIndex(int index) {
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
     
-    this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
+    //this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
     if (resetMenus) {
         m_menus[0]->value(0);
         m_menus[1]->value(0);
@@ -136,12 +136,15 @@ void DiagramWindow::resize(int x, int y, int w, int h) {
     Fl_Window::resize(x, y, w, h);
 }
 
-void DiagramWindow::drawWidgets() {
-    Fl_Color priorColor = fl_color();
-    fl_color(color());
-    fl_rectf(0, 0, w(), h());
-    fl_color(priorColor);
-    Fl_Double_Window::draw();
+void DiagramWindow::drawWidgets(bool fillWin = true) {
+    if(fillWin) {
+         Fl_Color priorColor = fl_color();
+         fl_color(color());
+         //fl_color(GUI_WINDOW_BGCOLOR);
+	 fl_rectf(0, 0, w(), h());
+         fl_color(priorColor);
+         Fl_Double_Window::draw();
+    }
     for(int m = 0; m < 3; m++) {
         if(m_menus[m] != NULL) {
 	    m_menus[m]->redraw();
@@ -153,13 +156,13 @@ void DiagramWindow::drawWidgets() {
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
-    thisWindow->crDraw = cr;
+    //thisWindow->crDraw = cr;
     //cairo_reference(thisWindow->crDraw);    
-    thisWindow->drawWidgets();
+    thisWindow->drawWidgets(true);
 
-    Fl_Color priorColor = fl_color();
-    int priorFont = fl_font();
-    int priorFontSize = fl_size();
+    //Fl_Color priorColor = fl_color();
+    //int priorFont = fl_font();
+    //int priorFontSize = fl_size();
     
     // Get the structures. Be sure the reference structure is first.
     RNAStructure *sequences[3];
@@ -182,27 +185,30 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
         }
     }
 
-    int numToDraw = 0;
+    int numToDraw = 0, keyA = 0, keyB = 0;
     if (sequences[0]) {
         if (sequences[1]) {
             if (sequences[2]) {
                 numToDraw = 3;
                 thisWindow->ComputeNumPairs(sequences, 3);
-                thisWindow->DrawKey3();
+                //thisWindow->DrawKey3();
             } else {
                 numToDraw = 2;
                 thisWindow->ComputeNumPairs(sequences, 2);
-                thisWindow->DrawKey2(0, 1);
+                keyA = 0; keyB = 1;
+		//thisWindow->DrawKey2(0, 1);
             }
         } else {
             if (sequences[2]) {
                 sequences[1] = sequences[2];
                 thisWindow->ComputeNumPairs(sequences, 2);
-                thisWindow->DrawKey2(0, 2);
+                keyA = 0; keyB = 2;
+		//thisWindow->DrawKey2(0, 2);
                 numToDraw = 2;
             } else {
                 thisWindow->ComputeNumPairs(sequences, 1);
-                thisWindow->DrawKey1(0);
+                keyA = 0;
+		//thisWindow->DrawKey1(0);
                 numToDraw = 1;
             }
         }
@@ -212,19 +218,22 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
                 sequences[0] = sequences[1];
                 sequences[1] = sequences[2];
                 thisWindow->ComputeNumPairs(sequences, 2);
-                thisWindow->DrawKey2(1, 2);
+                keyA = 1; keyB = 2;
+		//thisWindow->DrawKey2(1, 2);
                 numToDraw = 2;
             } else {
                 sequences[0] = sequences[1];
                 thisWindow->ComputeNumPairs(sequences, 1);
-                thisWindow->DrawKey1(1);
+                keyA = 1;
+		//thisWindow->DrawKey1(1);
                 numToDraw = 1;
             }
         } else {
             if (sequences[2]) {
                 sequences[0] = sequences[2];
                 thisWindow->ComputeNumPairs(sequences, 1);
-                thisWindow->DrawKey1(2);
+                keyA = 2;
+		//thisWindow->DrawKey1(2);
                 numToDraw = 1;
             } else {
                 numToDraw = 0;
@@ -234,51 +243,76 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     if (thisWindow->m_redrawStructures) {
             cairo_push_group(cr);
-            if(thisWindow->cairoTranslate)
-                 cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-            thisWindow->RedrawBuffer(cr, sequences, numToDraw, IMAGE_WIDTH);
-            cairo_pop_group_to_source(cr);
+            int drawParams[] = { numToDraw, keyA, keyB };
+	    if(thisWindow->cairoTranslate)
+	        cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+	    thisWindow->RedrawBuffer(cr, sequences, drawParams, IMAGE_WIDTH);
+	    cairo_pop_group_to_source(cr);
             if(thisWindow->cairoTranslate)            
                  cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
             cairo_arc(cr, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
             cairo_clip(cr);
             cairo_paint(cr);
-            thisWindow->m_redrawStructures = false;
+	    thisWindow->m_redrawStructures = false;
             thisWindow->cairoTranslate = true;
     }
+    
+    //cairo_push_group(cr);
+    cairo_move_to(cr, 0, 0);
+    if(numToDraw == 1) {
+	thisWindow->DrawKey1(cr, keyA);
+    }
+    else if(numToDraw == 2) { 
+	thisWindow->DrawKey2(cr, keyA, keyB);
+    }
+    else if(numToDraw == 3) {
+        thisWindow->DrawKey3(cr);
+    }
+    //cairo_pop_group_to_source(cr);
 
-    fl_color(priorColor);
-    fl_font(priorFont, priorFontSize);
-    fl_line_style(0);
-    thisWindow->drawWidgets();
+    //fl_color(priorColor);
+    //fl_font(priorFont, priorFontSize);
+    //fl_line_style(0);
+    thisWindow->drawWidgets(true);
 }
 
 void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
-                                 const int numStructures, const int resolution) {
+                                 const int *structParams, 
+				 const int resolution) {
 
-    int priorFont = fl_font();
-    int priorFontSize = fl_size();
-    fl_font(priorFont, 10);
-    fl_line_style(0);
-
+    //int priorFont = fl_font();
+    //int priorFontSize = fl_size();
+    //fl_font(priorFont, 10);
+    //fl_line_style(0);
+    
+    //cairo_scale(cr, this->w(), this->h());
     cairo_set_source_rgb(cr, 
 		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    //CairoRectangle(cr, 0, 0, this->w(), this->h());
     cairo_fill(cr);
-    
+
+    int numStructures = structParams[0];
+    int keyA = structParams[1], keyB = structParams[2];
     if (numStructures == 1) {
-        Draw1(cr, structures, resolution);
+	Draw1(cr, structures, resolution);
     } else if (cr, numStructures == 2) {
-        Draw2(cr, structures, resolution);
+	Draw2(cr, structures, resolution);
     } else if (numStructures == 3) {
         Draw3(cr, structures, resolution);
     }
 
-    fl_font(priorFont, priorFontSize);
+    //fl_font(priorFont, priorFontSize);
 }
 
-void DiagramWindow::DrawKey3() {
+void DiagramWindow::DrawKey3(cairo_t *cr) {
+    
+    cairo_select_font_face(cr, "Serif", 
+		           CAIRO_FONT_SLANT_NORMAL, 
+			   CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, 10);
+
     int yPosn = 55;
     char mystr[10] = "";
 
@@ -335,51 +369,86 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_CYAN);
-    fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
-    fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
-    fl_line_style(FL_DOT);
-    fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
+    SetCairoColor(cr, FL_CYAN);
+    CairoRectangle(cr, m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
+    CairoRectangle(cr, m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
+    cairo_fill(cr);
+    //fl_line_style(FL_DOT);
+    cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+    cairo_move_to(cr, m_menus[0]->x(), yPosn);
+    cairo_line_to(cr, m_menus[0]->x() + m_menus[0]->w(), yPosn);
+    cairo_fill(cr);
+    //fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
     sprintf(mystr, "%d", numPairs[5]);
-    fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
+    //fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
+    cairo_move_to(cr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
+    cairo_show_text(cr, mystr);
 
 }
 
-void DiagramWindow::DrawKey2(const int a, const int b) {
+void DiagramWindow::DrawKey2(cairo_t *cr, const int a, const int b) {
+     
+    cairo_select_font_face(cr, "Serif", 
+		           CAIRO_FONT_SLANT_NORMAL, 
+			   CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, 10);
+   
     int yPosn = 55;
     char mystr[10] = "";
 
-    fl_color(FL_BLACK);
-    fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
-    fl_rectf(m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
+    SetCairoColor(cr, CR_BLACK);
+    CairoRectangle(cr, m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
+    CairoRectangle(cr, m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
+    //cairo_stroke_preserve(cr);
+    cairo_fill(cr);
     sprintf(mystr, "%d", numPairs[0]);
-    fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
+    cairo_move_to(cr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
+    cairo_show_text(cr, mystr);
     yPosn += 10;
 
-    fl_color(FL_RED);
-    fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
+    SetCairoColor(cr, CR_RED);
+    CairoRectangle(cr, m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
+    //cairo_stroke_preserve(cr);
+    cairo_fill(cr);
     sprintf(mystr, "%d", numPairs[1]);
-    fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
+    cairo_move_to(cr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
+    cairo_show_text(cr, mystr);
     yPosn += 10;
 
-    fl_color(FL_GREEN);
-    fl_rectf(m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
+    SetCairoColor(cr, CR_GREEN);
+    CairoRectangle(cr, m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
+    //cairo_stroke_preserve(cr);
+    cairo_fill(cr);
     sprintf(mystr, "%d", numPairs[2]);
-    fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
+    cairo_move_to(cr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
+    cairo_show_text(cr, mystr);
 
 }
 
-void DiagramWindow::DrawKey1(const int a) {
-    fl_color(FL_BLACK);
-    fl_rectf(m_menus[a]->x(), 55, m_menus[a]->w(), 3);
+void DiagramWindow::DrawKey1(cairo_t *cr, const int a) {
+        
+    cairo_select_font_face(cr, "Serif", 
+		           CAIRO_FONT_SLANT_NORMAL, 
+			   CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, 10);
+	
+    //fl_color(FL_BLACK);
+    //fl_rectf(m_menus[a]->x(), 55, m_menus[a]->w(), 3);
+    SetCairoColor(cr, CR_BLACK);
+    CairoRectangle(cr, m_menus[a]->x(), 55, m_menus[a]->w(), 3);
+    cairo_stroke_preserve(cr);
+    cairo_fill(cr);
 
     char mystr[10] = "";
     sprintf(mystr, "%d", numPairs[0]);
-    fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, 55 + 3);
+    //fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, 55 + 3);
+    cairo_move_to(cr, m_menus[2]->x() + m_menus[2]->w() + 10, 55 + 3);
+    cairo_show_text(cr, mystr);
 }
 
-void DiagramWindow::SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, int enabled,
-                                        CairoColorSpec_t fallbackColorFlag) {
+void DiagramWindow::SetCairoBranchColor(cairo_t *cr, 
+		    const BranchID_t &branchType, int enabled,
+                    CairoColorSpec_t fallbackColorFlag) {
 
     int nextColorFlag = fallbackColorFlag;
     if (enabled && branchType != BRANCH_UNDEFINED) {
@@ -400,6 +469,12 @@ void DiagramWindow::SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchTyp
                 break;
         }
     }
+    SetCairoColor(cr, nextColorFlag);
+
+}
+    
+void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
+
     switch (nextColorFlag) {
         case CR_BLACK:
             CairoSetRGB(cr, 0, 0, 0);
@@ -852,9 +927,11 @@ void DiagramWindow::DrawArc(
     if (arc1 - arc2 > 180.0)
         arc2 += 360.0;
     if (arc2 > arc1) {
-        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc1, arc2);
+        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, 
+		  boundingBoxRadius, arc1, arc2);
     } else {
-        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, boundingBoxRadius, arc2, arc1);
+        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, 
+	          boundingBoxRadius, arc2, arc1);
     }
     cairo_stroke(cr);
 }
@@ -966,15 +1043,18 @@ void DiagramWindow::RebuildMenus() {
 	    activeMenuIndex[m] = -1;
             activeSet[m] = false;
 	}
-        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + 65;
-        m_drawBranchesIndicator = new Fl_Check_Button(horizCheckBoxPos, 5, 20, 20,
-                                                      "Draw (16S) Domains");
-        m_drawBranchesIndicator->callback(checkBoxChangedStateCallback, m_drawBranchesIndicator);
+        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + WIDGET_SPACING;
+        m_drawBranchesIndicator = new Fl_Check_Button(horizCheckBoxPos, 5, 
+			          20, 20,"Draw (16S) Domains");
+        m_drawBranchesIndicator->callback(checkBoxChangedStateCallback, 
+			         m_drawBranchesIndicator);
         m_drawBranchesIndicator->tooltip(
-                "Set whether to color code the four domains in 16S structures?");
+                "Whether to color code the four domains in 16S structures");
         m_drawBranchesIndicator->labelcolor(GUI_TEXT_COLOR);
+	m_drawBranchesIndicator->hide(); // make this option invisible
 
-        exportButton = new Fl_Button(horizCheckBoxPos, 35, 150, 25, "@filesaveas Export PNG");
+        exportButton = new Fl_Button(horizCheckBoxPos, 25, 
+		       EXPORT_BUTTON_WIDTH, 25, "@filesaveas   Export PNG");
         exportButton->type(FL_NORMAL_BUTTON);
         exportButton->callback(exportToPNGButtonPressHandler, exportButton);
         exportButton->labelcolor(GUI_BTEXT_COLOR);

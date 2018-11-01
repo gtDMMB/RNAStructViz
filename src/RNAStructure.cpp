@@ -271,7 +271,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
     {
         result->charSeq[i] = tempSeq.at(i);
     }
-    RNABranchType_t::PerformBranchClassification(result, result->m_sequenceLength);
+    //RNABranchType_t::PerformBranchClassification(result, result->m_sequenceLength);
 
     return result;
 }

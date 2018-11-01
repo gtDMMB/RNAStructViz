@@ -20,13 +20,17 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_DIM          (600)
-#define IMAGE_WIDTH        (IMAGE_DIM)
-#define IMAGE_HEIGHT       (IMAGE_DIM)
-#define IMAGE_DEPTH        (3)
+#define IMAGE_DIM             (550)
+#define IMAGE_WIDTH           (IMAGE_DIM)
+#define IMAGE_HEIGHT          (IMAGE_DIM)
+#define IMAGE_DEPTH           (3)
 
-#define GLWIN_TRANSLATEX   (15)
-#define GLWIN_TRANSLATEY   (110)
+#define GLWIN_TRANSLATEX      (35)
+#define GLWIN_TRANSLATEY      (110)
+
+#define WIDGET_SPACING        (35)
+#define EXPORT_BUTTON_WIDTH   (115)
+#define WINW_EXTENSION        (EXPORT_BUTTON_WIDTH + 3 * WIDGET_SPACING)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -77,31 +81,43 @@ protected:
     /*
 	Draws the contents of the window.
     */
-    void drawWidgets();
+    void drawWidgets(bool fillWin);
     static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
     void resize(int x, int y, int w, int h);
 
-private:
+public:
     static const int ms_menu_minx[3];
     static const int ms_menu_width;
 
+private:
     void RebuildMenus();
 
-    void RedrawBuffer(cairo_t *cr, RNAStructure** structures, const int numStructures, 
-    	const int resolution);
+    void RedrawBuffer(cairo_t *cr, RNAStructure** structures, 
+		      const int *structDrawParams, 
+    	              const int resolution);
 
 	/* Draws the color legend for the arcs. Input a and b correspond to the
 	   index of the relevant structures*/
-    void DrawKey3(); // if 3 structures are selected
-    void DrawKey2(const int a, const int b); // if 2 selected structures
-    void DrawKey1(const int a); // if 1 selected structure
+    void DrawKey3(cairo_t *cr); // if 3 structures are selected
+    void DrawKey2(cairo_t *cr, const int a, const int b); // if 2 selected structures
+    void DrawKey1(cairo_t *cr, const int a); // if 1 selected structure
     
-    void SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, int enabled, 
+    void SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, 
+		             int enabled, 
                              CairoColorSpec_t fallbackColorFlag);
+    void SetCairoColor(cairo_t *cr, int colorFlag); 
 
-	/* Draws the arcs for all the base pairs, colored according to their 
-	   corresponding structures */
+    inline void CairoRectangle(cairo_t *cr, int x, int y, int w, int h) {
+         double rectX = (double) x / this->w();
+	 double rectY = (double) y / this->h();
+	 double rectW = (double) w / this->w();
+	 double rectH = (double) h / this->h();
+	 cairo_rectangle(cr, rectX, rectY, rectW, rectH);
+    }
+
+    /* Draws the arcs for all the base pairs, colored according to their 
+       corresponding structures */
     void Draw3(cairo_t *cr, RNAStructure** structures, const int resolution); // 3 structures
     void Draw2(cairo_t *cr, RNAStructure** structures, const int resolution); // 2 structures
     void Draw1(cairo_t *cr, RNAStructure** structures, const int resolution); // 1 structure

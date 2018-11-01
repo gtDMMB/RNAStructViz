@@ -38,7 +38,8 @@ void StructureManager::AddFile(const char* filename)
 		return;
     }
 
-    // Strip any trailing directory markers. Maybe we could load all files in the directory in this case,
+    // Strip any trailing directory markers. 
+    // Maybe we could load all files in the directory in this case,
     // but it hardly seems worth the effort.
     while (strlen(localCopy) > 0 && localCopy[strlen(localCopy) - 1] == '/')
     	localCopy[strlen(localCopy) - 1] = 0;
@@ -58,8 +59,10 @@ void StructureManager::AddFile(const char* filename)
         {
             if (!strcmp(m_structures[i]->GetFilename(), basename))
             {
-            	fl_message("Already have a structure loaded with the filename: %s", basename);
-            	return;
+            	fl_message("Already have a structure loaded with filename: %s", 
+			   basename);
+            	free(localCopy);
+		return;
             }
         }
     }
@@ -92,11 +95,12 @@ void StructureManager::AddFile(const char* filename)
     {
     	// TODO: Check for duplicates.
     	int count = (int)folders.size();
-		AddFirstEmpty(structure);
+	AddFirstEmpty(structure);
         if(count == (int) folders.size()-1)
         {
-            InputWindow* input_window = new InputWindow(400, 150, "New Folder Added", 
-            	folders[count]->folderName, InputWindow::FOLDER_INPUT);
+            InputWindow* input_window = new InputWindow(400, 150, 
+			 "New Folder Added", folders[count]->folderName, 
+			 InputWindow::FOLDER_INPUT);
             while (input_window->visible())
             {
                 Fl::wait();

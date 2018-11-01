@@ -226,7 +226,6 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
 void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)
 {
     Fl_Group* folderGroup = (Fl_Group*)(widget->parent());
-    
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
     int index;
     for (index = 0; index < folders.size(); ++index)
