@@ -21,10 +21,10 @@ int main(int argc, char **argv) {
     
     Fl::own_colormap();
     uchar rc, bc, gc;
+    Fl::get_color(GUI_BGCOLOR, rc, bc, gc); 
+    Fl::background(rc, bc, gc);
     Fl::get_color(LOCAL_FGCOLOR, rc, bc, gc); 
     Fl::foreground(rc, bc, gc);
-    Fl::get_color(LOCAL_BGCOLOR, rc, bc, gc); 
-    Fl::background(rc, bc, gc);
     Fl::get_color(LOCAL_BG2COLOR, rc, bc, gc); 
     Fl::background2(rc, bc, gc);
     
