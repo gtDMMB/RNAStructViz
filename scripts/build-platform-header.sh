@@ -11,7 +11,7 @@ ReplaceHeaderComponent() {
      replacePattern=$2;
      replacementStr=$3;
      echo "REPLACING \"$replacePattern\" WITH \"$replacementStr\" IN \"$headerFile\"";
-     sed -i "s|${replacePattern}|${replacementStr}|" "$headerFile";
+     sed -i -e "s|${replacePattern}|${replacementStr}|" "$headerFile";
 }
 
 OUTPUT_HEADER_FILE=$1

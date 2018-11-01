@@ -1,10 +1,13 @@
 CXX=g++
 LD=g++
 
-TARGET_PLATFORM=`uname -s`
-READLINK=readlink
-ifeq ($(TARGET_PLATFORM), Darwin)
+TARGET_PLATFORM=$(shell uname -s)
+ifeq "$(TARGET_PLATFORM)" "Darwin"
+	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
+else
+	FLTKCONFIG=fltk-config
+	READLINK=readlink
 endif
 
 BINARY_OUTPUT=RNAStructViz
@@ -12,13 +15,13 @@ OBJEXT=o
 
 CXXFLAGS = -g -Wall -Wextra -O2
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
-CXXFLAGS_FLTK=`fltk-config --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
+CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CXXFLAGS_FLTK) $(CXXFLAGS_PKGCONFIG) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT 
 CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
 
 LDFLAGS=-g -Wall -Wextra -rdynamic
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
-LDFLAGS_FLTK=`fltk-config --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
+LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
 LDFLAGS_FULL=$(LDFLAGS) $(LDFLAGS_EXTRA)
 
@@ -39,7 +42,7 @@ default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
 
 clean:
-	rm -f *.o *.code BuildTargetInfo.h $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
+	rm -f *.o *.code BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
 
 install: default
 	cp -ap $(BINARY_OUTPUT) /usr/local/bin/
