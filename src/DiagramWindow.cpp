@@ -106,8 +106,9 @@ void DiagramWindow::checkBoxChangedStateCallback(Fl_Widget *, void *v) {
     if (cbDrawIndicator->changed()) {
         DiagramWindow *thisWindow = (DiagramWindow *) cbDrawIndicator->parent();
         thisWindow->m_redrawStructures = true;
+        thisWindow->cairoTranslate = true;
+	thisWindow->redraw();
         cbDrawIndicator->clear_changed();
-        thisWindow->redraw();
     }
 }
 
