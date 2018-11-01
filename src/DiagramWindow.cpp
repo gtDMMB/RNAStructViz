@@ -14,6 +14,13 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <FL/x.H>
+#ifdef __APPLE__
+     #include <cairo-quartz.h>
+#else
+     #include <cairo-xlib.h>
+#endif
+
 const int DiagramWindow::ms_menu_minx[3] = {5, 205, 405};
 const int DiagramWindow::ms_menu_width = 190;
 
@@ -38,14 +45,22 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
     
-    imageStride = cairo_format_stride_for_width( 
-		      CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
-    imageData = new uchar[imageStride * IMAGE_HEIGHT];
-    memset(imageData, 0, imageStride * IMAGE_HEIGHT);
-    cairo_surface_t *crSurface = cairo_image_surface_create_for_data( 
-			imageData, CAIRO_FORMAT_ARGB32, 
-                        IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-    crDraw = cairo_create(crSurface);   
+    //imageStride = cairo_format_stride_for_width( 
+    //		      CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
+    //imageData = new uchar[imageStride * IMAGE_HEIGHT];
+    //memset(imageData, 0, imageStride * IMAGE_HEIGHT);
+    //*crSurface = cairo_image_surface_create_for_data( 
+    //			imageData, CAIRO_FORMAT_ARGB32, 
+    //                    IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
+    //crDraw = cairo_create(crSurface);   
+    #ifdef __APPLE__
+         crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
+		     this->w(), this->h());
+    #else
+         crSurface = cairo_xlib_surface_create(fl_display, fl_window,
+		                fl_visual->visual, this->w(), this->h());
+    #endif
+    crDraw = cairo_create(crSurface);
     Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw); // cairo
 }
@@ -271,18 +286,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
     fl_line_style(0);
-     
-    /*thisWindow->drawWidgets(false);
-    if(numToDraw == 1) {
-	thisWindow->DrawKey1(keyA);
-    }
-    else if(numToDraw == 2) { 
-	thisWindow->DrawKey2(keyA, keyB);
-    }
-    else if(numToDraw == 3) {
-        thisWindow->DrawKey3();
-    }*/
-
+    
 }
 
 void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
@@ -396,7 +400,7 @@ void DiagramWindow::DrawKey2(const int a, const int b) {
     fl_color(FL_RED);
     fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
     sprintf(mystr, "%d", numPairs[1]);
-    fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
+    fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
     fl_color(FL_GREEN);

@@ -166,10 +166,7 @@ to our local home directory:
 ```
 $ cd ~
 $ wget http://fltk.org/pub/fltk/1.3.4/fltk-1.3.4-2-source.tar.bz2 
-$ if [[ "$(echo $(sha256sum < fltk-1.3.4-2-source.tar.bz2) | sed -e 's/[[:blank:]-]*$//')" ==\
-    "8cfe7690d70f9a3db5cd88748a82aa7958a9dc7ec3d7e94eef9063e107864150" ]]; \
-    then echo "SHA256 SUM OK"; \
-    else echo "SHA256 SUM IS MALFORMED ... ABORT!"; fi
+$ if [[ "$(echo $(sha256sum < fltk-1.3.4-2-source.tar.bz2) | sed -e 's/[[:blank:]-]*$//')" == "8cfe7690d70f9a3db5cd88748a82aa7958a9dc7ec3d7e94eef9063e107864150" ]]; then echo "SHA256 SUM OK"; else echo "SHA256 SUM IS MALFORMED ... ABORT!"; fi
 $ tar xvjf fltk-1.3.4-2-source.tar.bz2
 $ cd fltk-1.3.4-2
 ```
