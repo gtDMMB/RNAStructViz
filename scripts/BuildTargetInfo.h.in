@@ -33,6 +33,7 @@
 #define GIT_BRANCH_REVSTRING         ("##__GIT_DESCRIBE_REVSTRING__##")
 #define BUILD_PLATFORM_ID            ("##__BUILD_PLATFORM_ID__##")
 #define BUILD_DATETIME               ("##__LOCAL_BUILD_TIME__##")
+#define BUILD_FLTK_CONFIG            ("##__BUILD_FLTK_CONFIG__##")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 
@@ -73,6 +74,11 @@ class ApplicationBuildInfo {
 	       return string("Local Build Time: ") + string(BUILD_DATETIME);
 	  }
 
+	  static inline string BuildFLTKConfig() {
+               return string("Compile-Time FLTK-Config: ") + 
+		      string(BUILD_FLTK_CONFIG);
+	  }
+
 	  static inline string CairoVersionString() {
                return string("Cairo Library Version: ") + string(CAIRO_VERSION_STRING);
 	  }
@@ -92,9 +98,10 @@ class ApplicationBuildInfo {
 	       }
 	       fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
 	       fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
-               fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
+               fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
 			  UserManualWikiLink().c_str(), GitRevisionInfo().c_str(), 
-			  GitRevisionDate().c_str(), FLTKVersionString().c_str(), 
+			  GitRevisionDate().c_str(), FLTKVersionString().c_str(),
+			  BuildFLTKConfig().c_str(),  
 			  CairoVersionString().c_str(), BuildPlatform().c_str(), 
 			  LocalBuildDateTime().c_str());
 	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. New issues with the application can be submitted at https://github.com/gtDMMB/RNAStructViz/issues.";

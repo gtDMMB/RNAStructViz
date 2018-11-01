@@ -1,6 +1,9 @@
 CXX=g++
 LD=g++
 
+.DEFAULT: default
+
+# OSX-specific locations and utility names:
 TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
@@ -10,15 +13,25 @@ else
 	READLINK=readlink
 endif
 
-
+.EXPORT_ALL_VARIABLES:
+# option to build FLTK without sudo on Linux:
+CFLAGS_FLTK_OVERRIDES=
+BUILD_FLTK_LOCAL=$(shell env | grep FLTK_INSTALL_DIR | sed -e 's/^.*=//')
+ifneq "$(BUILD_FLTK_LOCAL)" ""
+	BUILD_FLTK_LOCAL_ABS=$(shell $(READLINK) -f $(BUILD_FLTK_LOCAL))
+	FLTKCONFIG=$(BUILD_FLTK_LOCAL_ABS)/fltk-config
+        CFLAGS_FLTK_OVERRIDES=-isystem $(BUILD_FLTK_LOCAL_ABS)
+	CPLUS_INCLUDE_PATH=$(BUILD_FLTK_LOCAL_ABS)
+	LIBRARY_PATH=$(BUILD_FLTK_LOCAL_ABS)/lib
+endif
 
 BINARY_OUTPUT=RNAStructViz
 OBJEXT=o
 
-CXXFLAGS = -g -Wall -Wextra -O2
+CXXFLAGS= -g -Wall -Wextra -O2
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
-CXXFLAGS_EXTRA=$(CXXFLAGS_FLTK) $(CXXFLAGS_PKGCONFIG) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT 
+CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_FLTK) $(CXXFLAGS_PKGCONFIG) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT 
 CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
 
 LDFLAGS=-g -Wall -Wextra -rdynamic
@@ -41,10 +54,16 @@ default: prelims $(RNASTRUCTVIZ_OBJECTS)
 
 prelims:
 	/bin/bash `$(READLINK) -f ../scripts/build-platform-header.sh` \
-		`$(READLINK) -f ./BuildTargetInfo.h`
+		`$(READLINK) -f ./BuildTargetInfo.h`\
+		`$(READLINK) -f $(FLTKCONFIG)`
+
+diagnostic:
+	echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
+	echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
+	$(CXX) --version -v $(CXXFLAGS_FULL)
 
 run: default
-	./RNAStructViz
+	./RNAStructViz --about
 
 clean:
 	rm -f *.o *.code BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
