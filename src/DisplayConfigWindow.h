@@ -20,13 +20,13 @@
 
 #define CONFIG_WINDOW_WIDTH         (750)
 #define CONFIG_WINDOW_HEIGHT        (450)
-#define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Settings")
+#define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Options")
 
 #define CFGWIN_WIDGET_OFFSETX       (10)
 #define CFGWIN_WIDGET_OFFSETY       (10)
 #define CFGWIN_LABEL_HEIGHT         (20)
 #define CFGWIN_LABEL_WIDTH          (200)
-#define CFGWIN_BUTTON_WIDTH         (200)
+#define CFGWIN_BUTTON_WIDTH         (150)
 #define CFGWIN_COLOR_WIDTH          (25)
 #define CFGWIN_SPACING              (15)
 #define CFGWIN_CDIALOG_X            (100)
@@ -56,6 +56,7 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 		static void UpdatePNGPathCallback(Fl_Widget *btn, void *udata);
 		static void ChangeColorCallback(Fl_Widget *btn, void *udata); 
                 static void WriteConfigFileCallback(Fl_Widget *btn, void *);
+		static void RestoreDefaultsCallback(Fl_Widget *btn, void *);
 		static void WindowCloseCallback(Fl_Widget *win, void *udata);
 
 		bool finished; 

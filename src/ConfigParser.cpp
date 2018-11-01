@@ -44,7 +44,8 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
      ParsedConfigOption_t parsedLine;
      while(!feof(fpCfgFile)) { 
           if(!fgets(nextLine, MAX_BUFFER_SIZE - 1, fpCfgFile)) {
-               perror("Unable to read in config file line");
+               if(!silenceErrors) 
+	            perror("Unable to read in config file line");
 	       fclose(fpCfgFile);
 	       return errno;
 	  }
@@ -85,21 +86,21 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 		    nullTerminateString(fltkTheme);
 		}
 		else {
-		     fprintf(stderr, "No such FLTK theme \"%s\" ... skipping this.\b", 
-		             parsedLine.cfgValue);
+		     //fprintf(stderr, "No such FLTK theme \"%s\" ... skipping this.\b", 
+		     //        parsedLine.cfgValue);
 		}
           }
 	  else if(!strcmp(parsedLine.cfgOption, "GUI_WINDOW_BGCOLOR")) { 
-               guiWindowBGColor = atoi(parsedLine.cfgValue);
+               guiWindowBGColor = strtol(parsedLine.cfgValue, NULL, 16);
 	  }
           else if(!strcmp(parsedLine.cfgOption, "GUI_BGCOLOR")) { 
-               guiBGColor = atoi(parsedLine.cfgValue);
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "GUI_TEXT_COLOR")) { 
-               guiBTextColor = atoi(parsedLine.cfgValue);
+               guiBGColor = strtol(parsedLine.cfgValue, NULL, 16);
 	  }
 	  else if(!strcmp(parsedLine.cfgOption, "GUI_BTEXT_COLOR")) { 
-               guiTextColor = atoi(parsedLine.cfgValue);
+               guiBTextColor = strtol(parsedLine.cfgValue, NULL, 16);
+	  }
+	  else if(!strcmp(parsedLine.cfgOption, "GUI_TEXT_COLOR")) { 
+               guiTextColor = strtol(parsedLine.cfgValue, NULL, 16);
 	  }
 	  else {
 	       fprintf(stderr, "Unknown config option \"%s\" ... skipping.\n", 
@@ -117,6 +118,7 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
           return -1;
      }
      
+     int NUM_OPTIONS = 4;
      const char *cfgOptions[] = { 
           "CTFILE_SEARCH_DIR", 
 	  "PNGOUT_DIR", 
@@ -142,7 +144,7 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
           guiTextColor
      };
 
-     FILE *fpCfgFile = fopen(userCfgFile, "r+"); 
+     FILE *fpCfgFile = fopen(userCfgFile, "w+"); 
      if(fpCfgFile == NULL && !silenceErrors) { 
           fprintf(stderr, "Unable to open config file \"%s\" for writing: ",
 	          userCfgFile);
@@ -153,24 +155,24 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
           return errno;
      }
      
-     for(int line = 0; line < sizeof(cfgValues); line++) {
+     for(int line = 0; line < NUM_OPTIONS; line++) {
 	  char nextOutputLine[MAX_BUFFER_SIZE];
-	  snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=%s\n", 
-	           cfgOptions[line], cfgValues[line]); 
+	  int lineLength = snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=%s\n", 
+	                   cfgOptions[line], cfgValues[line]); 
 	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
-          if(!fwrite(nextOutputLine, sizeof(char), strlen(nextOutputLine), fpCfgFile)) { 
+          if(!fwrite(nextOutputLine, sizeof(char), lineLength, fpCfgFile)) { 
                fprintf(stderr, "Error writing line #%d to file: %s\n", 
 	               line + 1, strerror(errno));
 	       fclose(fpCfgFile); 
 	       return errno;
 	  }
      }
-     for(int line = 0; line < sizeof(cfgColorValues); line++) {
+     for(int line = 0; line < NUM_OPTIONS; line++) {
 	  char nextOutputLine[MAX_BUFFER_SIZE];
-	  snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=0x%08x\n", 
-	           cfgColorOptions[line], cfgColorValues[line]); 
+	  int lineLength = snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=0x%08x\n", 
+	                   cfgColorOptions[line], cfgColorValues[line]); 
 	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
-          if(!fwrite(nextOutputLine, sizeof(char), strlen(nextOutputLine), fpCfgFile)) { 
+          if(!fwrite(nextOutputLine, sizeof(char), lineLength, fpCfgFile)) { 
                fprintf(stderr, "Error writing line #%d to file: %s\n", 
 	               line + sizeof(cfgValues) + 1, strerror(errno));
 	       fclose(fpCfgFile); 
@@ -264,8 +266,10 @@ int ConfigParser::parseConfigLine(const char *configLine, ParsedConfigOption_t *
           return -2;
      }
      strncpy(result->cfgOption, configLine, delimiterPos);
-     strncpy(result->cfgValue, configLine + delimiterPos, lineLength - delimiterPos - 1);
-     
+     nullTerminateString(result->cfgOption, delimiterPos);
+     strncpy(result->cfgValue, configLine + delimiterPos + 1, lineLength - delimiterPos - 1);
+     nullTerminateString(result->cfgValue, lineLength - delimiterPos - 1);
+
      return 0;
 
 }

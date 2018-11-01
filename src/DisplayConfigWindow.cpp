@@ -181,7 +181,7 @@ void DisplayConfigWindow::ConstructWindow() {
 	 windowWidgets.push_back(descBox);
 	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
          Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
-			      (int) 1.75 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+			      (int) (1.3 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
                               fieldUpdateVars[f]);
 	 settingBox->copy_label(TrimFilePathDisplay(fieldUpdateVars[f]));
 	 settingBox->color(GUI_BTEXT_COLOR);
@@ -190,7 +190,7 @@ void DisplayConfigWindow::ConstructWindow() {
          fpathsSettingBoxes[f] = settingBox;
 	 fpathsUpdateRefs[f] = fieldUpdateVars[f];
 	 windowWidgets.push_back(settingBox);
-	 offsetX += (int) 1.75 * CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
+	 offsetX += (int) (1.3 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
 	 if(needsDirChooser[f]) { 
               Fl_Button *chooseDirBtn = new Fl_Button(offsetX, workingYOffset, 
 			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
@@ -265,25 +265,24 @@ void DisplayConfigWindow::ConstructWindow() {
      }
 
      workingYOffset += CFGWIN_SPACING;
-     int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
 
+     int offsetX = CONFIG_WINDOW_WIDTH - (CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING);
      Fl_Button *writeConfigBtn = new Fl_Button(offsetX, workingYOffset, 
 		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-				 "@filenew   Write New Settings To File");
+				 "@filenew   Save Settings");
      writeConfigBtn->color(GUI_BGCOLOR);
      writeConfigBtn->labelcolor(GUI_BTEXT_COLOR);
      writeConfigBtn->callback(WriteConfigFileCallback);
      windowWidgets.push_back(writeConfigBtn);
-     offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+     offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
 
-     Fl_Button *closeWinBtn = new Fl_Button(offsetX, workingYOffset, 
-		              CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-			      "@||   Close Window"); 
-     closeWinBtn->color(GUI_BGCOLOR);
-     closeWinBtn->labelcolor(GUI_BTEXT_COLOR);
-     closeWinBtn->callback(WindowCloseCallback);
-     windowWidgets.push_back(closeWinBtn);
-     offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+     Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, workingYOffset, 
+		                     CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+				     "@||   Restore Defaults");
+     restoreDefaultsBtn->color(GUI_BGCOLOR);
+     restoreDefaultsBtn->labelcolor(GUI_BTEXT_COLOR);
+     restoreDefaultsBtn->callback(RestoreDefaultsCallback);
+     windowWidgets.push_back(restoreDefaultsBtn);
 
 } 
 
@@ -340,8 +339,11 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
      }
      if(msgIconBox != NULL) { 
           msgIconBox->image(parentWin->pngNewPathIcon);
-          msgIconBox->color(GUI_BGCOLOR);
+          msgIconBox->label("");
+	  msgIconBox->type(FL_NO_BOX);
+	  msgIconBox->color(GUI_BGCOLOR);
           msgIconBox->labelcolor(GUI_BTEXT_COLOR);
+	  msgIconBox->redraw();
      }
 
      const char *inputDialogMsg = "Choose the format of the PNG image paths saved by the diagram window. \nNote that C-style strftime-like modifiers such as %%F, %%H,%%M%%S, \nare supported in the format description entered below. \nSee \"man strftime\", or strftime(3), in your terminal for a complete \ndescription of supported timestamp modifiers.";
@@ -358,15 +360,19 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
 
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
      
-     if(ConfigParser::directoryExists(USER_CONFIG_DIR)) {
+     bool writeCfgFile = true;
+     if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
           int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	  if(dirCreateErr == -1) { 
                fprintf(stderr, "Unable to create directory \"%s\" ... Aborting\n", USER_CONFIG_DIR);
-	       return;
+	       perror("Directory Creation Error");
+	       writeCfgFile = false;
 	  }
      }
-     ConfigParser cfgParser;
-     cfgParser.writeFile(USER_CONFIG_PATH, false);
+     if(writeCfgFile) {
+          ConfigParser cfgParser;
+          cfgParser.writeFile(USER_CONFIG_PATH, false);
+     }
      MainWindow::RethemeMainWindow();
 
 }
@@ -391,6 +397,20 @@ void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
           parentWin->colorDisplayBoxes[colorIdx]->redraw();
      }
 
+}
+
+void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {
+     DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
+     DisplayConfigWindow::SetupInitialConfig();
+     for(int fp = 0; fp < NUMSETTINGS; fp++) {
+          parentWin->fpathsSettingBoxes[fp]->copy_label(parentWin->fpathsUpdateRefs[fp]);
+          parentWin->fpathsSettingBoxes[fp]->redraw();
+     }
+     for(int c = 0; c < GUICOLORS; c++) {
+          parentWin->colorDisplayBoxes[c]->labelcolor(*(parentWin->colorChangeRefs[c]));
+	  parentWin->colorDisplayBoxes[c]->redraw();
+     }
+     MainWindow::RethemeMainWindow();
 }
 
 void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {

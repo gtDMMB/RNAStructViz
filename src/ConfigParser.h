@@ -7,7 +7,7 @@
 #define _CONFIG_PARSER_H_
 
 #ifndef IS_DIR
-     #define IS_DIR(mode)     (mode == S_IFDIR)
+     #define IS_DIR(mode)     ((mode & S_IFMT) == S_IFDIR)
 #endif
 
 class ConfigParser {

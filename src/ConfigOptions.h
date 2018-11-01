@@ -6,21 +6,41 @@
 #ifndef _CONFIG_OPTIONS_H_
 #define _CONFIG_OPTIONS_H_
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <pwd.h>
+#include <unistd.h>
+
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
+
+#include <string>
+using std::string;
 
 #include "BuildTargetInfo.h"
 
 #define MAX_BUFFER_SIZE                 (256)
 
-#define DEFAULT_CTFILE_SEARCH_DIRECTORY ("./")
-#define DEFAULT_PNG_OUTPUT_DIRECTORY    ("./")
+static inline const char * GetUserHome() {
+     const char *userHomeDir = getenv("HOME");
+     if(userHomeDir == NULL) {
+          struct passwd *uhdPasswd = getpwuid(getuid());
+	  if(uhdPasswd) 
+               userHomeDir = uhdPasswd->pw_dir;
+	  else
+	       userHomeDir = "";
+     }
+     return userHomeDir;
+}
+
+#define DEFAULT_CTFILE_SEARCH_DIRECTORY (GetUserHome())
+#define DEFAULT_PNG_OUTPUT_DIRECTORY    (GetUserHome())
 #define DEFAULT_PNG_OUTPUT_PATH         ("RNAStructViz-GUIView-%F-%H%M%S.png") 
                                         /* As a strftime format string */
-#define DEFAULT_FLTK_THEME              ("local")
+#define DEFAULT_FLTK_THEME              ("base")
 #define FLTK_THEME_COUNT                (6)
-#define USER_CONFIG_DIR                 ("~/.RNAStructViz")
-#define USER_CONFIG_PATH                ("~/.RNAStructViz/config.cfg")
+#define USER_CONFIG_DIR                 ((string(GetUserHome()) + string("/.RNAStructViz/")).c_str())
+#define USER_CONFIG_PATH                ((USER_CONFIG_DIR + string("config.cfg")).c_str())
 
 extern char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
 extern char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];

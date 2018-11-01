@@ -49,7 +49,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 		                             fileOpsLabelHeight + 
 				            	     2 * spacingHeight,
 					                 opButtonWidth, 30,
-		                             "@circle Diagram @>|");
+		                             "@circle   Diagram @>|");
     diagramButton->callback(DiagramCallback);
     diagramButton->labelcolor(GUI_BTEXT_COLOR);
 
@@ -59,7 +59,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 		                           fileOpsLabelHeight + 
 					               2 * spacingHeight, 
 					               opButtonWidth, 30,
-		                           "@square Statistics @>|");
+		                           "@square   Statistics @>|");
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(GUI_BTEXT_COLOR);
 
