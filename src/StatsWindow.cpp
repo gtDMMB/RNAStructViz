@@ -26,6 +26,7 @@
 #include <time.h>
 
 #include "pixmaps/StatsFormula.c"
+#include "pixmaps/StatsWindowIcon.xbm"
 
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
@@ -691,6 +692,13 @@ StatsWindow::StatsWindow(int w, int h, const char *label,
                          const std::vector<int>& structures)
 : Fl_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL)
 {
+     
+    fl_open_display();
+    Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
+		        DefaultRootWindow(fl_display),
+                        StatsWindowIcon_bits, StatsWindowIcon_width, 
+			StatsWindowIcon_height);
+    this->icon((const void *) iconPixmap);
     Construct(w, h, structures);
 }
 

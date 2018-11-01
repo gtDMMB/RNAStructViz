@@ -28,12 +28,12 @@
 
 #define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.1 -- CT File Viewer and Structure Comparison Tool")
 
-#define GIT_COMMIT_HASH              ("9114eea2bf891a823dccb1f1b34098c442d99541")
-#define GIT_COMMIT_HASH_SHORT        ("9114eea2bf89")
-#define GIT_COMMIT_DATE              ("Thu Nov 1 17:39:51 2018 -0400")
-#define GIT_BRANCH_REVSTRING         ("heads/master-90-g761be8")
+#define GIT_COMMIT_HASH              ("7e6ed3807898d8d601604b18f30efa5c3d843c09")
+#define GIT_COMMIT_HASH_SHORT        ("7e6ed3807898")
+#define GIT_COMMIT_DATE              ("Thu Nov 1 18:28:02 2018 -0400")
+#define GIT_BRANCH_REVSTRING         ("heads/master-93-g2a31f7")
 #define BUILD_PLATFORM_ID            ("Linux (4.15.0-20-generic) [x86_64] @ penguinboxhp")
-#define BUILD_DATETIME               ("Thu 01 Nov 2018 06:03:38 PM EDT")
+#define BUILD_DATETIME               ("Thu 01 Nov 2018 07:20:13 PM EDT")
 #define BUILD_FLTK_CONFIG            ("/home/maxie/RNA-projects/RNAStructViz/src/fltk-config")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)

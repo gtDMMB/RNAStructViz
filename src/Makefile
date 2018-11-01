@@ -31,7 +31,7 @@ OBJEXT=o
 CXXFLAGS= -g -Wall -Wextra -O2
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
-CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_FLTK) $(CXXFLAGS_PKGCONFIG) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT 
+CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_FLTK) $(CXXFLAGS_PKGCONFIG) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -funsigned-char 
 CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
 
 LDFLAGS=-g -Wall -Wextra -rdynamic
@@ -86,17 +86,19 @@ ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h ConfigParser.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
 
 DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
-	BranchTypeIdentification.h RNAStructure.h DiagramWindow.cpp
+	BranchTypeIdentification.h RNAStructure.h\
+	pixmaps/DiagramWindowIcon.xbm DiagramWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
 
 DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
 	pixmaps/ConfigPathsIcon.c pixmaps/ConfigThemesIcon.c\
-	pixmaps/PNGNewPathIcon.c DisplayConfigWindow.cpp
+	pixmaps/PNGNewPathIcon.c pixmaps/ConfigWindowIcon.xbm\
+	DisplayConfigWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
 
 StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
 	RNAStructViz.h RNAStructure.h InputWindow.h \
-	pixmaps/StatsFormula.c StatsWindow.cpp
+	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm StatsWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
 
 GLWindow.$(OBJEXT): GLWindow.h
@@ -113,7 +115,8 @@ FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
-MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h MainWindow.cpp
+MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
+	pixmaps/RNAWindowIcon.xbm MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
 
 RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \

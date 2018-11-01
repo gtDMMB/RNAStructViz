@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "pixmaps/DiagramWindowIcon.xbm"
+
 #include <FL/x.H>
 #ifdef __APPLE__
      #include <cairo-quartz.h>
@@ -73,6 +75,14 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
         : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
+        
+    fl_open_display();
+    Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
+		        DefaultRootWindow(fl_display),
+                        DiagramWindowIcon_bits, DiagramWindowIcon_width, 
+			DiagramWindowIcon_height);
+    this->icon((const void *) iconPixmap);
+    
     Construct(w + WINW_EXTENSION, h, structures);
 }
 
@@ -82,6 +92,14 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
     resize(x, y, w + WINW_EXTENSION, h);
+    
+    fl_open_display();
+    Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
+		        DefaultRootWindow(fl_display),
+                        DiagramWindowIcon_bits, DiagramWindowIcon_width, 
+			DiagramWindowIcon_height);
+    this->icon((const void *) iconPixmap);
+    
     Construct(w + WINW_EXTENSION, h, structures);
 }
 
@@ -173,7 +191,8 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
          //fl_color(GUI_WINDOW_BGCOLOR);
 	 fl_rectf(0, 0, w(), h());
          fl_color(priorColor);
-         Fl_Double_Window::draw();
+         //Fl_Double_Window::draw();
+         Fl_Window::draw();
     }
 
 }

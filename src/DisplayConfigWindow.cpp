@@ -26,6 +26,7 @@
 #include "pixmaps/ConfigPathsIcon.c"
 #include "pixmaps/ConfigThemesIcon.c"
 #include "pixmaps/PNGNewPathIcon.c"
+#include "pixmaps/ConfigWindowIcon.xbm"
 
 /* Setup initial definitions of the extern'ed variables here: */
 #ifndef _SETUP_GLOBAL_EXTERNS_
@@ -123,6 +124,14 @@ DisplayConfigWindow::DisplayConfigWindow() :
      size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
      set_draw_cb(Draw); 
      callback(WindowCloseCallback);
+
+     fl_open_display();
+     Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
+ 		         DefaultRootWindow(fl_display),
+                         ConfigWindowIcon_bits, ConfigWindowIcon_width, 
+         	         ConfigWindowIcon_height);
+     this->icon((const void *) iconPixmap);
+
      ConstructWindow();
 
 }

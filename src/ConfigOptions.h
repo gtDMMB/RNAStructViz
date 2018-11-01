@@ -70,7 +70,7 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define LOCAL_BGCOLOR                   (RGBColor(123, 77, 211))
 #define LOCAL_BUTTON_COLOR              (Lighter(RGBColor(210, 194, 240), 0.5f))
 #define LOCAL_TEXT_COLOR                (RGBColor(52, 25, 102))
-#define LOCAL_TEXT_SIZE                 (12)
+#define LOCAL_TEXT_SIZE                 (10)
 #define LOCAL_RMFONT                    (FL_SCREEN)
 #define LOCAL_BFFONT                    (FL_SCREEN_BOLD)
 

@@ -16,6 +16,7 @@
 #include <FL/Fl_PNG_Image.H>
 
 #include "pixmaps/RNAStructVizLogo.c"
+#include "pixmaps/RNAWindowIcon.xbm"
 
 MainWindow* MainWindow::ms_instance = 0;
 
@@ -137,6 +138,13 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->resizable(mainMenuPane);
     m_mainWindow->size_range(650, 450, 650, 0);
     m_mainWindow->end();
+
+    fl_open_display();
+    Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
+		        DefaultRootWindow(fl_display),
+                        RNAWindowIcon_bits, RNAWindowIcon_width, 
+			RNAWindowIcon_height);
+    m_mainWindow->icon((const void *) iconPixmap);
 
     m_mainWindow->show(argc, argv);
     
