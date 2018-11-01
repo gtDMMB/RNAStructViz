@@ -1,8 +1,13 @@
 CXX=g++
 LD=g++
-OBJEXT=o
+
+READLINK=readlink
+ifeq (`uname -s`, "Darwin")
+	READLINK=greadlink
+endif
 
 BINARY_OUTPUT=RNAStructViz
+OBJEXT=o
 
 CXXFLAGS = -g -Wall -Wextra -O2
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
@@ -26,7 +31,8 @@ RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)
 	rocbox.$(OBJEXT) 
 
 prelims:
-	/bin/bash `readlink -f ../scripts/build-platform-header.sh` `readlink -f ./BuildTargetInfo.h`
+	/bin/bash `$(READLINK) -f ../scripts/build-platform-header.sh` \
+		`$(READLINK) -f ./BuildTargetInfo.h`
 
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
