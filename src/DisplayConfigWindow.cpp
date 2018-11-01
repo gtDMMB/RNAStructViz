@@ -161,10 +161,10 @@ void DisplayConfigWindow::ConstructWindow() {
 	"@->   PNG Output Directory:", 
 	"@->   PNG Output File Name:"
      };
-     char *fieldUpdateVars[] = {
-         (char *) CTFILE_SEARCH_DIRECTORY, 
-	 (char *) PNG_OUTPUT_DIRECTORY, 
-	 (char *) PNG_OUTPUT_PATH
+     char (*fieldUpdateVars[])[MAX_BUFFER_SIZE] = {
+         &CTFILE_SEARCH_DIRECTORY, 
+	 &PNG_OUTPUT_DIRECTORY, 
+	 &PNG_OUTPUT_PATH
      };
      bool needsDirChooser[] {
           true, 
@@ -182,13 +182,13 @@ void DisplayConfigWindow::ConstructWindow() {
 	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
          Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
 			      (int) (1.3 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
-                              fieldUpdateVars[f]);
-	 settingBox->copy_label(TrimFilePathDisplay(fieldUpdateVars[f]));
+                              *(fieldUpdateVars[f]));
+	 settingBox->copy_label(TrimFilePathDisplay(*(fieldUpdateVars[f])));
 	 settingBox->color(GUI_BTEXT_COLOR);
 	 settingBox->labelcolor(GUI_TEXT_COLOR);
 	 settingBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
          fpathsSettingBoxes[f] = settingBox;
-	 fpathsUpdateRefs[f] = fieldUpdateVars[f];
+	 fpathsUpdateRefs[f] = *(fieldUpdateVars[f]);
 	 windowWidgets.push_back(settingBox);
 	 offsetX += (int) (1.3 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
 	 if(needsDirChooser[f]) { 
