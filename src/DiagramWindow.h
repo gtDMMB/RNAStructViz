@@ -99,9 +99,9 @@ private:
 
 	/* Draws the color legend for the arcs. Input a and b correspond to the
 	   index of the relevant structures*/
-    void DrawKey3(cairo_t *cr); // if 3 structures are selected
-    void DrawKey2(cairo_t *cr, const int a, const int b); // if 2 selected structures
-    void DrawKey1(cairo_t *cr, const int a); // if 1 selected structure
+    void DrawKey3(); // if 3 structures are selected
+    void DrawKey2(const int a, const int b); // if 2 selected structures
+    void DrawKey1(const int a); // if 1 selected structure
     
     void SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, 
 		             int enabled, 

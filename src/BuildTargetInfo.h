@@ -27,12 +27,12 @@
 
 #define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.1 -- CT File Viewer and Structure Comparison Tool")
 
-#define GIT_COMMIT_HASH              ("f5bf1d385e6e7ae612f01d9bdb990e7e45bdabeb")
-#define GIT_COMMIT_HASH_SHORT        ("f5bf1d385e6e")
-#define GIT_COMMIT_DATE              ("Thu Nov 1 00:01:34 2018 -0400")
-#define GIT_BRANCH_REVSTRING         ("heads/master-71-gf2a213")
+#define GIT_COMMIT_HASH              ("3a3528ab7bcc85ae0676f604047e6534140afee9")
+#define GIT_COMMIT_HASH_SHORT        ("3a3528ab7bcc")
+#define GIT_COMMIT_DATE              ("Thu Nov 1 04:01:10 2018 -0400")
+#define GIT_BRANCH_REVSTRING         ("heads/master-72-gf5bf1d")
 #define BUILD_PLATFORM_ID            ("Linux (4.15.0-20-generic) [x86_64] @ penguinboxhp")
-#define BUILD_DATETIME               ("Thu 01 Nov 2018 03:58:14 AM EDT")
+#define BUILD_DATETIME               ("Thu 01 Nov 2018 04:30:56 AM EDT")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 
