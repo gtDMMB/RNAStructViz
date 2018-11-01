@@ -102,6 +102,7 @@ require approximately 5-20 minutes to complete depending on the speed of your sy
 ```
 $ brew install cairo pkg-config git coreutils
 $ brew install --build-from-source gtDMMB/core/fltkwithcairo
+$ brew install --build-from-source gtDMMB/core/RNAStructViz
 ```
 Now we need to add the new FLTK libraries into our ``PATH``:
 ```
