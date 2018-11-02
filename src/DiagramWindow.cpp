@@ -56,6 +56,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //                    IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
     //crDraw = cairo_create(crSurface);   
     #ifdef __APPLE__
+         #define ROTATE
          fprintf(stderr, "Working on the __APPLE__ platform...\n");
          CGContextTranslateCTM(fl_gc, 0.0, this->h());
 	 CGContextScaleCTM(fl_gc, 1.0, -1.0); 
