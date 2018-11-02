@@ -59,7 +59,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
          fprintf(stderr, "Working on the __APPLE__ platform...\n");
          CGContextTranslateCTM(fl_gc, 0.0, this->h());
 	 CGContextScaleCTM(fl_gc, 1.0, -1.0); 
-         crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
+         CGContextSaveGState(fl_gc);
+	 crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
 		     this->w(), this->h());
     #else
          crSurface = cairo_xlib_surface_create(fl_display, fl_window,
