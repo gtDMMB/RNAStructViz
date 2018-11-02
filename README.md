@@ -145,19 +145,23 @@ Now we need to build ``RNAStructViz`` from source using
 
 The stock binary install of modern FLTK versions will in all likelihood not have Cairo 
 support enabled by default. We require for parts of the windowing and enhanced drawing 
-routines used in this branch of ``RNAStructViz``. Therefore we will need to build FLTK from 
-source with the Cairo configure-time options. Fortunately, this is easy enough with a 
-terminal and a little know-how. Let's expand on this concept below. Note that our FLTK 
-install (read: build from source) is *very* customized on the OSX platform and hence will 
-require the user to have administrator, or ``sudo``, rights to get this necessary library 
-installed. 
-
+routines used in this branch of ``RNAStructViz``. 
 We assume that you will have *GL*, *Cairo*, etc. along with other dependencies needed on your system to 
 build the FLTK windowing library (*with-cairo support*) on your local system. If this is already the 
 case, the you will not need ``sudo``, or superuser, privileges to install ``RNAStructViz`` from source.
 If for some reason these dependencies are not met on your Linux system, then we recommend that you 
 contact your system administrator to install these necessary packages for you before proceeding to the 
-next step.
+next step. You can verify that the appropriate libraries are installed by running the following:
+```
+$ pkg-config glu --cflags --libs
+-I/usr/include/libdrm -lGLU -lGL
+$ pkg-config cairo --cflags --libs
+-I/usr/include/cairo -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/freetype2 -I/usr/include/libpng16 -lcairo
+$ glxinfo | grep "OpenGL version"
+OpenGL version string: 3.0 Mesa 18.0.5
+```
+Note that the output of these commands does not need to exactly match what appears above. The sample 
+output from the previous commands is intended to give the user a good sense if you're on the right track. 
 
 ### Installing FLTK from source
 
