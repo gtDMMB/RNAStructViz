@@ -57,10 +57,10 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //crDraw = cairo_create(crSurface);   
     #ifdef __APPLE__
          #define ROTATE
-         fprintf(stderr, "Working on the __APPLE__ platform...\n");
-         CGContextTranslateCTM(fl_gc, 0.0, this->h());
-	 CGContextScaleCTM(fl_gc, 1.0, -1.0); 
-         CGContextSaveGState(fl_gc);
+         //fprintf(stderr, "Working on the __APPLE__ platform...\n");
+         //CGContextTranslateCTM(fl_gc, 0.0, this->h());
+	 //CGContextScaleCTM(fl_gc, 1.0, -1.0); 
+         //CGContextSaveGState(fl_gc);
 	 crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
 		     this->w(), this->h());
     #else
@@ -194,11 +194,10 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
     if(fillWin) {
          Fl_Color priorColor = fl_color();
          fl_color(color());
-         //fl_color(GUI_WINDOW_BGCOLOR);
 	 fl_rectf(0, 0, w(), h());
          fl_color(priorColor);
-         //Fl_Double_Window::draw();
-         Fl_Window::draw();
+	 //CGContextRestoreGState(fl_gc)
+	 Fl_Double_Window::draw();
     }
 
 }
@@ -206,8 +205,6 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
-    //thisWindow->crDraw = cr;
-    //cairo_reference(thisWindow->crDraw);    
     thisWindow->drawWidgets(true);
 
     Fl_Color priorColor = fl_color();
