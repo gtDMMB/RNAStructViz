@@ -42,8 +42,7 @@ LDFLAGS_FULL=$(LDFLAGS) $(LDFLAGS_EXTRA)
 
 RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)\
 	DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
-	StatsWindow.$(OBJEXT) \
-	GLWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
+	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
 	RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
 	StructureManager.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT)\
