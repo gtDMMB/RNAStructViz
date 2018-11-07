@@ -37,7 +37,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     m_drawBranchesIndicator = NULL;
     userConflictAlerted = false;
 
-    Fl::visual(FL_RGB);
+    Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
@@ -475,25 +475,32 @@ void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
 
     switch (nextColorFlag) {
         case CR_BLACK:
-            CairoSetRGB(cr, 0, 0, 0);
-            break;
+            //CairoSetRGB(cr, 0, 0, 0);
+            CairoSetRGB(cr, 46, 52, 54);
+	    break;
         case CR_RED:
-            CairoSetRGB(cr, 239, 41, 41);
+            //CairoSetRGB(cr, 239, 41, 41);
+	    CairoSetRGB(cr, 164, 0, 0);
             break;
         case CR_GREEN:
-            CairoSetRGB(cr, 78, 154, 6);
+            //CairoSetRGB(cr, 78, 154, 6);
+	    CairoSetRGB(cr, 115, 210, 22);
             break;
         case CR_BLUE:
-            CairoSetRGB(cr, 52, 101, 164);
+            //CairoSetRGB(cr, 52, 101, 164);
+	    CairoSetRGB(cr, 32, 74, 135);
             break;
         case CR_YELLOW:
-            CairoSetRGB(cr, 252, 233, 79);
+            //CairoSetRGB(cr, 252, 233, 79);
+	    CairoSetRGB(cr, 196, 160, 0);
             break;
         case CR_MAGENTA:
-            CairoSetRGB(cr, 255, 57, 225);
+            //CairoSetRGB(cr, 255, 57, 225);
+	    CairoSetRGB(cr, 239, 41, 159);
             break;
         case CR_CYAN:
-            CairoSetRGB(cr, 60, 208, 237);
+            //CairoSetRGB(cr, 60, 208, 237);
+	    CairoSetRGB(cr, 0, 195, 215);
             break;
         case CR_BRANCH1:
             CairoSetRGB(cr, 92, 160, 215);
