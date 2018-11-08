@@ -32,10 +32,9 @@
 #define EXPORT_BUTTON_WIDTH   (115)
 #define WINW_EXTENSION        (EXPORT_BUTTON_WIDTH + 3 * WIDGET_SPACING)
 
-#define ZOOMWIN_WIDTH         (150)
-#define ZOOMWIN_HEIGHT        (150)
-#define ZOOM_MAGNIFICATION    (4)
-#define MOUSEY_THRESHOLD      (75)
+#define ZOOM_WIDTH            (200)
+#define ZOOM_HEIGHT           (200)
+#define ZOOM_MAGNIFY          (3.0)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -196,10 +195,14 @@ private:
     int pixelWidth;
     bool userConflictAlerted;
     
-    bool zoomButtonDown;
+    cairo_surface_t *crZoomSurface;
+    cairo_t *crZoom;
+    bool zoomButtonDown, haveZoomBuffer;
+    int zx0, zy0, zx1, zy1, zw, zh;
     int initZoomX, initZoomY;
     int lastZoomX, lastZoomY;
     int handle(int flEvent);
+    void RedrawCairoZoomBuffer(cairo_t *curWinContext);
     void HandleUserZoomAction();
 
     void WarnUserDrawingConflict();

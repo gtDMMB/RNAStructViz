@@ -9,8 +9,8 @@ RNAStructViz* RNAStructViz::ms_instance = 0;
 RNAStructViz::RNAStructViz()
 {
     m_structureManager = new StructureManager();
-    Fl::visual(FL_DOUBLE|FL_RGB8);
-    Fl::gl_visual(FL_RGB|FL_DOUBLE|FL_ALPHA);
+    Fl::visual(FL_RGB8 | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
+    Fl::gl_visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_ALPHA | FL_MULTISAMPLE);
 }
 
 RNAStructViz::~RNAStructViz()

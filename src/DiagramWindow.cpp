@@ -34,6 +34,9 @@ const int DiagramWindow::ms_menu_width = 190;
 void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) {
 
     pixelWidth = 1; //2;
+    zoomButtonDown = false;
+    haveZoomBuffer = false;
+    zx0 = zy0 = zx1 = zy1 = zw = zh = 0;
 
     m_menus[0] = m_menus[1] = m_menus[2] = NULL;
     m_menuItems = 0;
@@ -47,25 +50,15 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
     size_range(w, h, w, h);
+    set_modal();
     box(FL_NO_BOX);
 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
     
-    //imageStride = cairo_format_stride_for_width( 
-    //		      CAIRO_FORMAT_ARGB32, IMAGE_WIDTH);
-    //imageData = new uchar[imageStride * IMAGE_HEIGHT];
-    //memset(imageData, 0, imageStride * IMAGE_HEIGHT);
-    //*crSurface = cairo_image_surface_create_for_data( 
-    //			imageData, CAIRO_FORMAT_ARGB32, 
-    //                    IMAGE_WIDTH, IMAGE_HEIGHT, imageStride);
-    //crDraw = cairo_create(crSurface);   
+    crZoomSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
+    		    ZOOM_WIDTH, ZOOM_HEIGHT);
     #ifdef __APPLE__
-         #define ROTATE
-         //fprintf(stderr, "Working on the __APPLE__ platform...\n");
-         //CGContextTranslateCTM(fl_gc, 0.0, this->h());
-	 //CGContextScaleCTM(fl_gc, 1.0, -1.0); 
-         //CGContextSaveGState(fl_gc);
 	 crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
 		     this->w(), this->h());
     #else
@@ -73,8 +66,17 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 		                fl_visual->visual, this->w(), this->h());
     #endif
     crDraw = cairo_create(crSurface);
+    crZoom = cairo_create(crZoomSurface);
+    cairo_set_source_rgb(crZoom, 
+		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
+    cairo_fill(crZoom);
+    cairo_save(crZoom);
+    
     Fl::cairo_cc(crDraw, false);
-    set_draw_cb(Draw); // cairo
+    set_draw_cb(Draw);
 }
 
 DiagramWindow::DiagramWindow(int w, int h, const char *label,
@@ -122,6 +124,7 @@ DiagramWindow::~DiagramWindow() {
     }
     if(crSurface != NULL) {
         cairo_surface_destroy(crSurface);
+	cairo_surface_destroy(crZoomSurface);
     }
 }
 
@@ -162,23 +165,17 @@ void DiagramWindow::checkBoxChangedStateCallback(Fl_Widget *, void *v) {
 void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
     Fl_Button *buttonPressed = (Fl_Button *) v;
     if (buttonPressed->changed()) {
-        
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
         char *exportFilePath = thisWindow->GetExportPNGFilePath();
         Fl::wait();
         thisWindow->m_redrawStructures = true;
         thisWindow->redraw();
- 
-        memset(thisWindow->imageData, 0, thisWindow->imageStride * 
-			                 IMAGE_HEIGHT);
         thisWindow->m_redrawStructures = true;
         thisWindow->cairoTranslate = true;
 	thisWindow->redraw();
-        cairo_surface_write_to_png(cairo_get_target(thisWindow->crDraw), 
+        cairo_surface_write_to_png(cairo_get_target(Fl::cairo_cc()), 
 			           exportFilePath);
-
         buttonPressed->clear_changed();
-    
     }
 }
 
@@ -194,15 +191,12 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
 	    m_menus[m]->redraw();
 	}
     }
-    //m_redrawStructures = true;
-
     if(fillWin) {
          Fl_Color priorColor = fl_color();
          fl_color(color());
-	 fl_rectf(0, 0, w(), h());
+    	 fl_rectf(0, 0, w(), h());
          fl_color(priorColor);
-	 //CGContextRestoreGState(fl_gc)
-	 Fl_Double_Window::draw();
+    	 Fl_Double_Window::draw();
     }
 
 }
@@ -308,9 +302,9 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     else if(numToDraw == 3) {
         thisWindow->DrawKey3();
     }
-    
+   
     if (thisWindow->m_redrawStructures) {
-            cairo_push_group(cr);
+	    cairo_push_group(cr);
             int drawParams[] = { numToDraw, keyA, keyB };
 	    if(thisWindow->cairoTranslate)
 	        cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
@@ -321,9 +315,12 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
             cairo_arc(cr, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
             cairo_clip(cr);
             cairo_paint(cr);
+	    cairo_reset_clip(cr);
 	    thisWindow->m_redrawStructures = false;
             thisWindow->cairoTranslate = true;
+	    thisWindow->RedrawCairoZoomBuffer(cr);
     }
+    //thisWindow->Fl_Double_Window::draw();
 
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
@@ -340,12 +337,13 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     fl_font(priorFont, 10);
     fl_line_style(0);
     
-    //cairo_scale(cr, this->w(), this->h());
     cairo_set_source_rgb(cr, 
 		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
-    //CairoRectangle(cr, 0, 0, this->w(), this->h());
+    int contextW = cairo_image_surface_get_width(cairo_get_target(cr));
+    int contextH = cairo_image_surface_get_height(cairo_get_target(cr));
+    cairo_rectangle(cr, 0, 0, contextW, contextH);
     cairo_fill(cr);
 
     int numStructures = structParams[0];
@@ -1160,23 +1158,10 @@ void DiagramWindow::MenuCallback(Fl_Widget *widget, void *userData) {
 
 int DiagramWindow::handle(int flEvent) {
 
-     /*if(m_menus != NULL) { 
-          Fl_Widget *firstResponders[] = {
-               exportButton,
-	       m_menus[0], 
-	       m_menus[1],
-	       m_menus[2]
-          };
-          int ehCode;
-          for(int w = 0; w < 4; w++) {
-               if(firstResponders[w] != NULL && (ehCode = firstResponders[w]->handle(flEvent))) {
-                    return 0;
-	       }
-          }
-     }*/
      switch(flEvent) { 
           case FL_PUSH: // mouse down
-               if(!zoomButtonDown && Fl::event_y() >= MOUSEY_THRESHOLD) {
+               if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
+	          Fl::event_y() >= GLWIN_TRANSLATEY) {
 	            zoomButtonDown = true;
 		    initZoomX = Fl::event_x();
 		    initZoomY = Fl::event_y();
@@ -1189,9 +1174,10 @@ int DiagramWindow::handle(int flEvent) {
 		    lastZoomX = Fl::event_x();
 		    lastZoomY = Fl::event_y();
 		    this->cursor(FL_CURSOR_DEFAULT);
+		    zoomButtonDown = false;
+		    haveZoomBuffer = true;
 		    HandleUserZoomAction();
-		    //fprintf(stderr, "Button up @ (X, Y) = (%d, %d)\n", lastZoomX, lastZoomY);
-		    return 1;
+		    fprintf(stderr, "Button up @ (X, Y) = (%d, %d)\n", lastZoomX, lastZoomY);
 	       }
 	  default:
                return Fl_Cairo_Window::handle(flEvent);
@@ -1199,9 +1185,89 @@ int DiagramWindow::handle(int flEvent) {
 
 }
 
+void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
+    
+    // draw the zomm buffer onto the lower right corner of the window:
+    int zoomBufXPos = this->w() - ZOOM_WIDTH;
+    int zoomBufYPos = this->h() - ZOOM_HEIGHT;
+    cairo_set_source_surface(curWinContext, crZoomSurface, 0, 0);
+    cairo_rectangle(curWinContext, zoomBufXPos, zoomBufYPos, 
+		    ZOOM_WIDTH, ZOOM_HEIGHT);    
+    cairo_fill(curWinContext);
+    
+    // now draw the frame around the zoom buffer:
+    cairo_identity_matrix(curWinContext);
+    SetCairoColor(curWinContext, CR_BLUE);
+    cairo_set_line_cap(curWinContext, CAIRO_LINE_CAP_ROUND);
+    cairo_set_line_width(curWinContext, 5);
+    cairo_set_line_join(curWinContext, CAIRO_LINE_JOIN_ROUND);
+    cairo_rectangle(curWinContext, zoomBufXPos, zoomBufYPos, 
+		    ZOOM_WIDTH, ZOOM_HEIGHT);
+    cairo_stroke(curWinContext);
+
+    SetCairoColor(curWinContext, CR_BLACK);
+    cairo_select_font_face(curWinContext, "Purisa", 
+		           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(curWinContext, 18);
+    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 14);
+    cairo_show_text(curWinContext, "Select to Zoom:");
+
+
+    // now draw the zoom selection area of the window:
+    if(haveZoomBuffer) {
+        SetCairoColor(curWinContext, CR_RED);
+	const double boxDashPattern[] = {1.0};
+	cairo_set_dash(curWinContext, boxDashPattern, 1, 0);
+	cairo_set_line_width(curWinContext, 2);
+	cairo_rectangle(curWinContext, zx0, zy0, zw, zh);
+        cairo_stroke(curWinContext);
+    }
+
+}
+
 void DiagramWindow::HandleUserZoomAction() {
-     // compute the zoom area and draw it to the lower right corner:
-     zoomButtonDown = false;
+     
+    zw = ABS(initZoomX - lastZoomX);
+    zh = ABS(initZoomY - lastZoomY);
+    zx0 = initZoomX; zx1 = lastZoomX; zy0 = initZoomY; zy1 = lastZoomY;
+    if(initZoomX <= lastZoomX && initZoomY > lastZoomY) { 
+        zx0 = initZoomX;
+	zy0 = lastZoomY;
+	zx1 = lastZoomX;
+	zy1 = initZoomY;
+    }
+    else if(initZoomX > lastZoomX && initZoomY > lastZoomY) {
+        zx0 = lastZoomX;
+	zy0 = lastZoomY;
+        zx1 = initZoomX;
+	zy1 = initZoomY;
+    }
+    else if(initZoomX > lastZoomX && initZoomY <= lastZoomY) {
+        zx0 = lastZoomX;
+	zy0 = initZoomY;
+        zx1 = initZoomX;
+        zy1 = lastZoomY;
+    }
+    
+    if(zx0 != zx1 && zy0 != zy1) { 
+        fprintf(stderr, "Resetting zoom buffer contents\n");
+	int copyWidth = MIN(ZOOM_WIDTH, zw);
+	int copyHeight = MIN(ZOOM_HEIGHT, zh);
+	Fl::cairo_make_current(this);
+	cairo_surface_t *curWinSurface = cairo_get_target(Fl::cairo_cc());
+	cairo_set_source_surface(crZoom, curWinSurface, 450, 450);
+        cairo_rectangle(crZoom, 0, 0, copyWidth, copyHeight);    
+	cairo_fill(crZoom);
+	double contextScaleX = ZOOM_MAGNIFY * ZOOM_WIDTH / copyWidth;
+	double contextScaleY = ZOOM_MAGNIFY * ZOOM_HEIGHT / copyHeight;
+	//cairo_scale(crZoom, contextScaleX, contextScaleY);
+    }
+    else {
+        // TODO: Set the zoom buffer to be blank
+    }
+    m_redrawStructures = cairoTranslate = true;
+    redraw();
+
 }
 
 void DiagramWindow::WarnUserDrawingConflict() {
