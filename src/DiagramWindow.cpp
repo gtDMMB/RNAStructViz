@@ -1,18 +1,23 @@
+#include <FL/fl_draw.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_File_Chooser.H>
+#include <FL/Enumerations.H>
+#include <FL/names.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+
+#include <algorithm>
+#include <iostream>
+#include <chrono>
+#include <thread>
+
 #include "DiagramWindow.h"
 #include "RNAStructViz.h"
 #include "BranchTypeIdentification.h"
 #include "ConfigOptions.h"
-#include <FL/fl_draw.H>
-#include <FL/Fl_Box.H>
-#include <FL/Fl_File_Chooser.H>
-#include <algorithm>
-#include <math.h>
-#include <iostream>
-#include <chrono>
-#include <thread>
-#include <string.h>
-#include <stdio.h>
-#include <time.h>
 
 #include "pixmaps/DiagramWindowIcon.xbm"
 
@@ -41,7 +46,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
-    size_range(w, h);
+    size_range(w, h, w, h);
     box(FL_NO_BOX);
 
     title = (char *) malloc(sizeof(char) * 64);
@@ -202,6 +207,85 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
 
 }
 
+bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDraw, int *keyA, int *keyB) {
+
+    if(numToDraw == NULL || keyA == NULL || keyB == NULL) {
+         return false;
+    }
+
+    // Get the structures. Be sure the reference structure is first.
+    //RNAStructure *sequences[3];
+    StructureManager *structureManager =
+            RNAStructViz::GetInstance()->GetStructureManager();
+    for (int j = 0; j < 3; ++j) {
+        if ((intptr_t) (m_menuItems[m_menus[j]->value()].user_data()) == -1) {
+            sequences[j] = 0;
+        } else {
+            sequences[j] = structureManager->GetStructure(
+                    (intptr_t) (m_menuItems[m_menus[j]->value()].user_data()));
+            if (sequences[j]->GetLength() > 1000) {
+                pixelWidth = 1;
+            } else if (sequences[j]->GetLength() <= 1000 && 
+                       sequences[j]->GetLength() >= 500) {
+                pixelWidth = 2;
+            } else {
+                pixelWidth = 3;
+            }
+        }
+    }
+
+    *numToDraw = 0, *keyA = 0, *keyB = 0;
+    if (sequences[0]) {
+        if (sequences[1]) {
+            if (sequences[2]) {
+                *numToDraw = 3;
+                ComputeNumPairs(sequences, 3);
+            } else {
+                *numToDraw = 2;
+                ComputeNumPairs(sequences, 2);
+                *keyA = 0; *keyB = 1;
+            }
+        } else {
+            if (sequences[2]) {
+                sequences[1] = sequences[2];
+                ComputeNumPairs(sequences, 2);
+                *keyA = 0; *keyB = 2;
+                *numToDraw = 2;
+            } else {
+                ComputeNumPairs(sequences, 1);
+                *keyA = 0;
+                *numToDraw = 1;
+            }
+        }
+    } else {
+        if (sequences[1]) {
+            if (sequences[2]) {
+                sequences[0] = sequences[1];
+                sequences[1] = sequences[2];
+                ComputeNumPairs(sequences, 2);
+                *keyA = 1; *keyB = 2;
+                *numToDraw = 2;
+            } else {
+                sequences[0] = sequences[1];
+                ComputeNumPairs(sequences, 1);
+                *keyA = 1;
+                *numToDraw = 1;
+            }
+        } else {
+            if (sequences[2]) {
+                sequences[0] = sequences[2];
+                ComputeNumPairs(sequences, 1);
+                *keyA = 2;
+                *numToDraw = 1;
+            } else {
+                *numToDraw = 0;
+            }
+        }
+    }
+    return true;
+
+}
+
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
@@ -211,87 +295,20 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     int priorFont = fl_font();
     int priorFontSize = fl_size();
     
-    // Get the structures. Be sure the reference structure is first.
     RNAStructure *sequences[3];
-    StructureManager *structureManager =
-            RNAStructViz::GetInstance()->GetStructureManager();
-    for (int j = 0; j < 3; ++j) {
-        if ((intptr_t) (thisWindow->m_menuItems[thisWindow->m_menus[j]->value()].user_data()) == -1) {
-            sequences[j] = 0;
-        } else {
-            sequences[j] = structureManager->GetStructure(
-                    (intptr_t) (thisWindow->m_menuItems[thisWindow->m_menus[j]->value()].user_data()));
-            if (sequences[j]->GetLength() > 1000) {
-                thisWindow->pixelWidth = 1;
-            } else if (sequences[j]->GetLength() <= 1000 && 
-                       sequences[j]->GetLength() >= 500) {
-                thisWindow->pixelWidth = 2;
-            } else {
-                thisWindow->pixelWidth = 3;
-            }
-        }
+    int numToDraw, keyA, keyB;
+    thisWindow->computeDrawKeyParams(sequences, &numToDraw, &keyA, &keyB);
+    
+    if(numToDraw == 1) {
+        thisWindow->DrawKey1(keyA);
     }
-
-    int numToDraw = 0, keyA = 0, keyB = 0;
-    if (sequences[0]) {
-        if (sequences[1]) {
-            if (sequences[2]) {
-                numToDraw = 3;
-                thisWindow->ComputeNumPairs(sequences, 3);
-                thisWindow->DrawKey3();
-            } else {
-                numToDraw = 2;
-                thisWindow->ComputeNumPairs(sequences, 2);
-                keyA = 0; keyB = 1;
-		thisWindow->DrawKey2(0, 1);
-            }
-        } else {
-            if (sequences[2]) {
-                sequences[1] = sequences[2];
-                thisWindow->ComputeNumPairs(sequences, 2);
-                keyA = 0; keyB = 2;
-		thisWindow->DrawKey2(0, 2);
-                numToDraw = 2;
-            } else {
-                thisWindow->ComputeNumPairs(sequences, 1);
-                keyA = 0;
-		thisWindow->DrawKey1(0);
-                numToDraw = 1;
-            }
-        }
-    } else {
-        if (sequences[1]) {
-            if (sequences[2]) {
-                sequences[0] = sequences[1];
-                sequences[1] = sequences[2];
-                thisWindow->ComputeNumPairs(sequences, 2);
-                keyA = 1; keyB = 2;
-		thisWindow->DrawKey2(1, 2);
-                numToDraw = 2;
-            } else {
-                sequences[0] = sequences[1];
-                thisWindow->ComputeNumPairs(sequences, 1);
-                keyA = 1;
-		thisWindow->DrawKey1(1);
-                numToDraw = 1;
-            }
-        } else {
-            if (sequences[2]) {
-                sequences[0] = sequences[2];
-                thisWindow->ComputeNumPairs(sequences, 1);
-                keyA = 2;
-		thisWindow->DrawKey1(2);
-                numToDraw = 1;
-            } else {
-                numToDraw = 0;
-            }
-        }
+    else if(numToDraw == 2) {
+        thisWindow->DrawKey2(keyA, keyB);
     }
-    //if(thisWindow->m_redrawStructures && numToDraw > 0) {
-    //    thisWindow->Fl_Double_Window::draw();
-    //}
-
-    //thisWindow->drawWidgets(false);
+    else if(numToDraw == 3) {
+        thisWindow->DrawKey3();
+    }
+    
     if (thisWindow->m_redrawStructures) {
             cairo_push_group(cr);
             int drawParams[] = { numToDraw, keyA, keyB };
@@ -1139,6 +1156,52 @@ void DiagramWindow::MenuCallback(Fl_Widget *widget, void *userData) {
     window->cairoTranslate = true;
     window->redraw();
     
+}
+
+int DiagramWindow::handle(int flEvent) {
+
+     /*if(m_menus != NULL) { 
+          Fl_Widget *firstResponders[] = {
+               exportButton,
+	       m_menus[0], 
+	       m_menus[1],
+	       m_menus[2]
+          };
+          int ehCode;
+          for(int w = 0; w < 4; w++) {
+               if(firstResponders[w] != NULL && (ehCode = firstResponders[w]->handle(flEvent))) {
+                    return 0;
+	       }
+          }
+     }*/
+     switch(flEvent) { 
+          case FL_PUSH: // mouse down
+               if(!zoomButtonDown && Fl::event_y() >= MOUSEY_THRESHOLD) {
+	            zoomButtonDown = true;
+		    initZoomX = Fl::event_x();
+		    initZoomY = Fl::event_y();
+		    this->cursor(FL_CURSOR_MOVE);
+		    //fprintf(stderr, "Buttom down @ (X, Y) = (%d, %d)\n", initZoomX, initZoomY);
+		    return 1;
+	       }
+	  case FL_RELEASE:
+	       if(zoomButtonDown) {
+		    lastZoomX = Fl::event_x();
+		    lastZoomY = Fl::event_y();
+		    this->cursor(FL_CURSOR_DEFAULT);
+		    HandleUserZoomAction();
+		    //fprintf(stderr, "Button up @ (X, Y) = (%d, %d)\n", lastZoomX, lastZoomY);
+		    return 1;
+	       }
+	  default:
+               return Fl_Cairo_Window::handle(flEvent);
+     }
+
+}
+
+void DiagramWindow::HandleUserZoomAction() {
+     // compute the zoom area and draw it to the lower right corner:
+     zoomButtonDown = false;
 }
 
 void DiagramWindow::WarnUserDrawingConflict() {

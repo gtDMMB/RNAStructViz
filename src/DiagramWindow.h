@@ -32,6 +32,11 @@
 #define EXPORT_BUTTON_WIDTH   (115)
 #define WINW_EXTENSION        (EXPORT_BUTTON_WIDTH + 3 * WIDGET_SPACING)
 
+#define ZOOMWIN_WIDTH         (150)
+#define ZOOMWIN_HEIGHT        (150)
+#define ZOOM_MAGNIFICATION    (4)
+#define MOUSEY_THRESHOLD      (75)
+
 typedef enum {
      CR_BLACK   = 0, 
      CR_RED     = 1, 
@@ -81,6 +86,7 @@ protected:
     /*
 	Draws the contents of the window.
     */
+    bool computeDrawKeyParams(RNAStructure **sequences, int *numToDraw, int *keyA, int *keyB);
     void drawWidgets(bool fillWin);
     static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
@@ -190,6 +196,12 @@ private:
     int pixelWidth;
     bool userConflictAlerted;
     
+    bool zoomButtonDown;
+    int initZoomX, initZoomY;
+    int lastZoomX, lastZoomY;
+    int handle(int flEvent);
+    void HandleUserZoomAction();
+
     void WarnUserDrawingConflict();
     void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, unsigned short B);
     char * GetExportPNGFilePath();
