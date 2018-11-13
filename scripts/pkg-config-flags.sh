@@ -12,7 +12,7 @@ done
 
 # Conditional library flags for Linux and Mac platform:
 if [[ "$(uname -s)" == "Linux" && "$1" == "--libs" ]]; then
-	PKGOUT+=" -L$(ls -d /usr/lib/$(uname -m)-linux-gnu)"
+	PKGOUT+=" -L$(echo $(ls -d /usr/lib/*-linux-gnu) | tr " " "\n" | head -n 1)"
 fi
 
 # Define the target OS (Linux or Mac or Unix)
