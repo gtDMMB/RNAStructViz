@@ -135,7 +135,7 @@ class MainWindow
         /*
 	    The main FLTK window.
         */
-        Fl_Window* m_mainWindow;
+        Fl_Double_Window* m_mainWindow;
 
         /*
 	    The scrolling group containing the sequence manager info, and the packed 

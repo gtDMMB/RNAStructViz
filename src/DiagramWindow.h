@@ -34,7 +34,7 @@
 
 #define ZOOM_WIDTH            (200)
 #define ZOOM_HEIGHT           (200)
-#define ZOOM_MAGNIFY          (3.0)
+#define ZOOM_MAGNIFY          (1.25)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -206,7 +206,8 @@ private:
     void HandleUserZoomAction();
 
     void WarnUserDrawingConflict();
-    void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, unsigned short B);
+    void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 
+		     unsigned short B, unsigned short A = 0x99);
     char * GetExportPNGFilePath();
 
 };

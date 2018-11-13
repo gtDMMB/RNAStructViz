@@ -49,23 +49,33 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
+    fl_rectf(0, 0, w, h);
+    color(GUI_WINDOW_BGCOLOR);
     size_range(w, h, w, h);
     set_modal();
     box(FL_NO_BOX);
 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
-    
+ 
+    crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
+   
     crZoomSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
     		    ZOOM_WIDTH, ZOOM_HEIGHT);
-    #ifdef __APPLE__
-	 crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
-		     this->w(), this->h());
-    #else
-         crSurface = cairo_xlib_surface_create(fl_display, fl_window,
-		                fl_visual->visual, this->w(), this->h());
-    #endif
+    //#ifdef __APPLE__
+    //	 crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
+    //		     w, h);
+    //#else
+    //     crSurface = cairo_xlib_surface_create(fl_display, fl_window,
+    //		                fl_visual->visual, w, h);
+    //#endif
     crDraw = cairo_create(crSurface);
+    cairo_set_source_rgb(crDraw, 
+		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    cairo_rectangle(crDraw, 0, 0, this->w(), this->h());
+    cairo_fill(crZoom);
     crZoom = cairo_create(crZoomSurface);
     cairo_set_source_rgb(crZoom, 
 		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
@@ -73,10 +83,9 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
     cairo_fill(crZoom);
-    cairo_save(crZoom);
-    
-    Fl::cairo_cc(crDraw, false);
+    //Fl::cairo_cc(crDraw, true);
     set_draw_cb(Draw);
+    redraw();
 }
 
 DiagramWindow::DiagramWindow(int w, int h, const char *label,
@@ -124,7 +133,9 @@ DiagramWindow::~DiagramWindow() {
     }
     if(crSurface != NULL) {
         cairo_surface_destroy(crSurface);
+	cairo_destroy(crDraw);
 	cairo_surface_destroy(crZoomSurface);
+        cairo_destroy(crZoom);
     }
 }
 
@@ -169,9 +180,7 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
         char *exportFilePath = thisWindow->GetExportPNGFilePath();
         Fl::wait();
         thisWindow->m_redrawStructures = true;
-        thisWindow->redraw();
-        thisWindow->m_redrawStructures = true;
-        thisWindow->cairoTranslate = true;
+        //thisWindow->cairoTranslate = true;
 	thisWindow->redraw();
         cairo_surface_write_to_png(cairo_get_target(Fl::cairo_cc()), 
 			           exportFilePath);
@@ -193,7 +202,8 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
     }
     if(fillWin) {
          Fl_Color priorColor = fl_color();
-         fl_color(color());
+         //fl_color(color());
+	 fl_color(GUI_WINDOW_BGCOLOR);
     	 fl_rectf(0, 0, w(), h());
          fl_color(priorColor);
     	 Fl_Double_Window::draw();
@@ -283,6 +293,12 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
+    cairo_set_source_rgb(cr, 
+		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    cairo_rectangle(cr, 0, 0, thisWindow->w(), thisWindow->h());
+    cairo_fill(cr);
     thisWindow->drawWidgets(true);
 
     Fl_Color priorColor = fl_color();
@@ -304,24 +320,39 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     }
    
     if (thisWindow->m_redrawStructures) {
-	    cairo_push_group(cr);
+	    cairo_identity_matrix(thisWindow->crDraw);
+	    cairo_set_source_rgb(thisWindow->crDraw, 
+		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+            cairo_rectangle(thisWindow->crDraw, 0, 0, thisWindow->w(), thisWindow->h());
+            cairo_fill(thisWindow->crDraw);
+	    cairo_push_group(thisWindow->crDraw);
             int drawParams[] = { numToDraw, keyA, keyB };
 	    if(thisWindow->cairoTranslate)
-	        cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-	    thisWindow->RedrawBuffer(cr, sequences, drawParams, IMAGE_WIDTH);
-	    cairo_pop_group_to_source(cr);
+	        cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+	    thisWindow->RedrawBuffer(thisWindow->crDraw, sequences, drawParams, IMAGE_WIDTH);
+	    cairo_pop_group_to_source(thisWindow->crDraw);
             if(thisWindow->cairoTranslate)            
-                 cairo_translate(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
-            cairo_arc(cr, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
-            cairo_clip(cr);
-            cairo_paint(cr);
-	    cairo_reset_clip(cr);
+                 cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+            cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
+		      IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
+            cairo_clip(thisWindow->crDraw);
+            cairo_paint(thisWindow->crDraw);
+	    cairo_reset_clip(thisWindow->crDraw);
+	    cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
+		      IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
+            thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
+	    cairo_stroke(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
-            thisWindow->cairoTranslate = true;
-	    thisWindow->RedrawCairoZoomBuffer(cr);
     }
-    //thisWindow->Fl_Double_Window::draw();
-
+    cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
+		             0, 0);
+    cairo_rectangle(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, 
+		    IMAGE_WIDTH, IMAGE_HEIGHT);    
+    cairo_fill(cr);
+    thisWindow->RedrawCairoZoomBuffer(cr);
+    
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
     fl_line_style(0);
@@ -341,9 +372,7 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
 		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
-    int contextW = cairo_image_surface_get_width(cairo_get_target(cr));
-    int contextH = cairo_image_surface_get_height(cairo_get_target(cr));
-    cairo_rectangle(cr, 0, 0, contextW, contextH);
+    cairo_rectangle(cr, 0, 0, this->w(), this->h());
     cairo_fill(cr);
 
     int numStructures = structParams[0];
@@ -1177,7 +1206,7 @@ int DiagramWindow::handle(int flEvent) {
 		    zoomButtonDown = false;
 		    haveZoomBuffer = true;
 		    HandleUserZoomAction();
-		    fprintf(stderr, "Button up @ (X, Y) = (%d, %d)\n", lastZoomX, lastZoomY);
+		    //fprintf(stderr, "Button up @ (X, Y) = (%d, %d)\n", lastZoomX, lastZoomY);
 	       }
 	  default:
                return Fl_Cairo_Window::handle(flEvent);
@@ -1190,13 +1219,12 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
     // draw the zomm buffer onto the lower right corner of the window:
     int zoomBufXPos = this->w() - ZOOM_WIDTH;
     int zoomBufYPos = this->h() - ZOOM_HEIGHT;
-    cairo_set_source_surface(curWinContext, crZoomSurface, 0, 0);
+    cairo_set_source_surface(curWinContext, cairo_get_target(crZoom), zoomBufXPos, zoomBufYPos);
     cairo_rectangle(curWinContext, zoomBufXPos, zoomBufYPos, 
 		    ZOOM_WIDTH, ZOOM_HEIGHT);    
     cairo_fill(curWinContext);
     
     // now draw the frame around the zoom buffer:
-    cairo_identity_matrix(curWinContext);
     SetCairoColor(curWinContext, CR_BLUE);
     cairo_set_line_cap(curWinContext, CAIRO_LINE_CAP_ROUND);
     cairo_set_line_width(curWinContext, 5);
@@ -1206,15 +1234,15 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
     cairo_stroke(curWinContext);
 
     SetCairoColor(curWinContext, CR_BLACK);
-    cairo_select_font_face(curWinContext, "Purisa", 
+    cairo_select_font_face(curWinContext, "Courier New", 
 		           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size(curWinContext, 18);
+    cairo_set_font_size(curWinContext, 17);
     cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 14);
-    cairo_show_text(curWinContext, "Select to Zoom:");
+    cairo_show_text(curWinContext, "Drag Mouse to Zoom:");
 
 
     // now draw the zoom selection area of the window:
-    if(haveZoomBuffer) {
+    if(haveZoomBuffer && zw > 0 && zh > 0) {
         SetCairoColor(curWinContext, CR_RED);
 	const double boxDashPattern[] = {1.0};
 	cairo_set_dash(curWinContext, boxDashPattern, 1, 0);
@@ -1250,22 +1278,25 @@ void DiagramWindow::HandleUserZoomAction() {
     }
     
     if(zx0 != zx1 && zy0 != zy1) { 
-        fprintf(stderr, "Resetting zoom buffer contents\n");
+        cairo_identity_matrix(crZoom);
 	int copyWidth = MIN(ZOOM_WIDTH, zw);
 	int copyHeight = MIN(ZOOM_HEIGHT, zh);
-	Fl::cairo_make_current(this);
-	cairo_surface_t *curWinSurface = cairo_get_target(Fl::cairo_cc());
-	cairo_set_source_surface(crZoom, curWinSurface, 450, 450);
+	double contextScaleX = (double) ZOOM_WIDTH / copyWidth;
+	double contextScaleY = (double) ZOOM_HEIGHT / copyHeight;
+	cairo_scale(crZoom, contextScaleX, contextScaleY);
+	cairo_surface_flush(cairo_get_target(crDraw));
+	cairo_set_source_surface(crZoom, cairo_get_target(crDraw), -1 * zx0, -1 * zy0);
         cairo_rectangle(crZoom, 0, 0, copyWidth, copyHeight);    
 	cairo_fill(crZoom);
-	double contextScaleX = ZOOM_MAGNIFY * ZOOM_WIDTH / copyWidth;
-	double contextScaleY = ZOOM_MAGNIFY * ZOOM_HEIGHT / copyHeight;
-	//cairo_scale(crZoom, contextScaleX, contextScaleY);
     }
     else {
-        // TODO: Set the zoom buffer to be blank
+        cairo_set_source_rgb(crZoom, 
+		             GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			     GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			     GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+        cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
+        cairo_fill(crZoom);
     }
-    m_redrawStructures = cairoTranslate = true;
     redraw();
 
 }
@@ -1282,8 +1313,10 @@ void DiagramWindow::WarnUserDrawingConflict() {
     }
 }
 
-void DiagramWindow::CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, unsigned short B) {
-    cairo_set_source_rgb(cr, R / 255.0, G / 255.0, B / 255.0);
+void DiagramWindow::CairoSetRGB(cairo_t *cr, 
+		    unsigned short R, unsigned short G, unsigned short B, 
+		    unsigned short A) {
+    cairo_set_source_rgba(cr, R / 255.0, G / 255.0, B / 255.0, A / 255.0);
 }
 
 char *DiagramWindow::GetExportPNGFilePath() {

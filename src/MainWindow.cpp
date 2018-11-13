@@ -23,7 +23,8 @@ MainWindow* MainWindow::ms_instance = 0;
 MainWindow::MainWindow(int argc, char **argv)
           : m_fileChooser(NULL), selectedFolderBtn(NULL)
 {
-    m_mainWindow = new Fl_Window(650, 450, RNASTRUCTVIZ_VSTRING);
+    m_mainWindow = new Fl_Double_Window(650, 450, RNASTRUCTVIZ_VSTRING);
+    m_mainWindow->size_range(650, 450, 650, 450);
     m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(GUI_WINDOW_BGCOLOR);
     m_mainWindow->begin();    

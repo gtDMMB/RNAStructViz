@@ -14,9 +14,9 @@
 
 class RNABranchType_t;
 
-#define MAX(x, y)         (x <= y ? y : x)
-#define MIN(x, y)         (x <= y ? x : y)
-#define ABS(x)            (x >= 0 ? x : -1 * x)
+#define MAX(x, y)         (x <= y ? (y) : (x))
+#define MIN(x, y)         (x <= y ? (x) : (y))
+#define ABS(x)            (x >= 0 ? (x) : -1 * (x))
 #define MIN3(x, y, z)     MIN(x, MIN(y, z))
 
 class RNAStructure

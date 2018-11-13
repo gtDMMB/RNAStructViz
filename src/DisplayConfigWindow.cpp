@@ -122,6 +122,7 @@ DisplayConfigWindow::DisplayConfigWindow() :
      label(CONFIG_WINDOW_TITLE);
      color(GUI_WINDOW_BGCOLOR); 
      size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
+     set_modal();
      set_draw_cb(Draw); 
      callback(WindowCloseCallback);
 
