@@ -182,8 +182,8 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
         thisWindow->m_redrawStructures = true;
         //thisWindow->cairoTranslate = true;
 	thisWindow->redraw();
-        cairo_surface_write_to_png(cairo_get_target(Fl::cairo_cc()), 
-			           exportFilePath);
+	cairo_surface_t *pngSource = cairo_get_target(thisWindow->crDraw);
+        cairo_surface_write_to_png(pngSource, exportFilePath);
         buttonPressed->clear_changed();
     }
 }
