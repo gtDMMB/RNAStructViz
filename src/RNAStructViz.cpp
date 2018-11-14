@@ -3,6 +3,7 @@
 #include "MainWindow.h"
 #include "FolderStructure.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 RNAStructViz* RNAStructViz::ms_instance = 0;
 
@@ -75,6 +76,8 @@ void RNAStructViz::AddDiagramWindow(int index)
             diagram->SetFolderIndex(index);
             diagram->ResetWindow(true);
             diagram->show();
+            //usleep(500000);
+            diagram->redraw();
             return;
         }
     }

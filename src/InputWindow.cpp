@@ -44,10 +44,10 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input->callback(InputCallback, (void*)0);
 	    input->labelcolor(GUI_TEXT_COLOR);
 	    callback(CloseCallback);
-            Fl_Box* message = new Fl_Box(50,4,300,40,"All structures with the same underlying RNA sequence will be put in this folder.");
-            message->box(FL_NO_BOX);
-	    message->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-	    message->labelcolor(GUI_TEXT_COLOR);
+            //Fl_Box* message = new Fl_Box(50,4,300,40,"All structures with the same underlying RNA sequence will be put in this folder.");
+            //message->box(FL_NO_BOX);
+	    //message->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+	    //message->labelcolor(GUI_TEXT_COLOR);
 	}
 	show();
 }
