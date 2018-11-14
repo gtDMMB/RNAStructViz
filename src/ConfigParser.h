@@ -38,6 +38,8 @@ class ConfigParser {
 		static bool fileExists(const char *filePath);
 		static bool directoryExists(const char *dirPath); 
 
+		static void WriteUserConfigFile(const char *fpath = USER_CONFIG_PATH);
+
 	private:
 		void setDefaults(); 
 		

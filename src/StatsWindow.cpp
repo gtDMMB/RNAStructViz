@@ -855,7 +855,9 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
     for (int i=0; i < window->comp_pack->children(); i++)
 	{
 		Fl_Check_Button* button = (Fl_Check_Button*)window->comp_pack->child(i);
-		button->labelcolor(GUI_TEXT_COLOR); 
+		button->color(GUI_WINDOW_BGCOLOR);
+		button->labelcolor(GUI_TEXT_COLOR);
+	        button->selection_color(GUI_WINDOW_BGCOLOR);	
 		if (!strcmp(button->label(),window->ref_menu->mvalue()->label()))
 		{
 			button->value(1);
@@ -899,7 +901,7 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
 			for (int i=0; i < window->comp_pack->children(); i++)
 			{
 				Fl_Check_Button* button = 
-                (Fl_Check_Button*)window->comp_pack->child(i);
+                                (Fl_Check_Button*)window->comp_pack->child(i);
 				
 			}
 			
@@ -997,8 +999,7 @@ void StatsWindow::ComputeStats()
 	
 	for (int i=0; i < comp_pack->children(); i++)
 	{
-		Fl_Check_Button* button = 
-        (Fl_Check_Button*)comp_pack->child(i);
+		Fl_Check_Button* button = (Fl_Check_Button*)comp_pack->child(i);
 		if (button->value() == 1)
 		{
 			numStats++;		
@@ -1029,7 +1030,7 @@ void StatsWindow::ComputeStats()
 	for (int i=0; i< comp_pack->children(); i++)
 	{
 		Fl_Check_Button* button = 
-        (Fl_Check_Button*)comp_pack->child(i);
+                (Fl_Check_Button*)comp_pack->child(i);
 		if (button->value() == 1)
 		{
 			// Find the corresponding structure
@@ -2034,6 +2035,9 @@ void StatsWindow::BuildCompMenu()
 				Fl_Check_Button* button = new Fl_Check_Button(comp_pack->x(),
                                                               comp_pack->y()+30, comp_pack->w(), 30, 
                                                               structure->GetFilename());
+				button->color(GUI_WINDOW_BGCOLOR);
+				button->labelcolor(GUI_TEXT_COLOR);
+				button->selection_color(GUI_WINDOW_BGCOLOR);
 				button->callback(MenuCallback);
 			}
 		}

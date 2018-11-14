@@ -758,7 +758,8 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
     }
 }
 
-void MainWindow::CloseCallback(Fl_Widget* widget, void* userData)
-{
+void MainWindow::CloseCallback(Fl_Widget* widget, void* userData) {
+    ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+    widget->hide();
     exit(0);
 }

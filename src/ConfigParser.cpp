@@ -226,6 +226,23 @@ bool ConfigParser::directoryExists(const char *dirPath) {
      return stat(dirPath, &dirInfo) == 0 && IS_DIR(dirInfo.st_mode);
 }
 
+void ConfigParser::WriteUserConfigFile(const char *fpath) {
+     bool writeCfgFile = true;
+     if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
+          int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	  if(dirCreateErr == -1) { 
+               fprintf(stderr, "Unable to create directory \"%s\" ... Aborting\n", 
+		       USER_CONFIG_DIR);
+	       perror("Directory Creation Error");
+	       writeCfgFile = false;
+	  }
+     }
+     if(writeCfgFile) {
+          ConfigParser cfgParser;
+          cfgParser.writeFile(fpath, false);
+     }
+}
+
 void ConfigParser::setDefaults() { 
      
      strncpy(ctFileSearchDirectory, CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1);

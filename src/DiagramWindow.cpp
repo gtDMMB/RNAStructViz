@@ -1377,6 +1377,8 @@ std::string DiagramWindow::GetExportPNGFilePath() {
 	     return NULL;
 	default:
 	     std::string outfilePath = string(fileChooser.filename());
+	     strncpy(PNG_OUTPUT_DIRECTORY, fileChooser.directory(), MAX_BUFFER_SIZE - 1);
+	     ConfigParser::nullTerminateString(PNG_OUTPUT_DIRECTORY);
 	     return outfilePath;
     }
 }

@@ -389,23 +389,9 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
 }
 
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
-     
-     bool writeCfgFile = true;
-     if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
-          int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	  if(dirCreateErr == -1) { 
-               fprintf(stderr, "Unable to create directory \"%s\" ... Aborting\n", USER_CONFIG_DIR);
-	       perror("Directory Creation Error");
-	       writeCfgFile = false;
-	  }
-     }
-     if(writeCfgFile) {
-          ConfigParser cfgParser;
-          cfgParser.writeFile(USER_CONFIG_PATH, false);
-     }
+     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      MainWindow::RethemeMainWindow();
      btn->parent()->hide();
-
 }
 
 void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
