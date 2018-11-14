@@ -79,7 +79,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_rectangle(crDraw, 0, 0, this->w(), this->h());
-    cairo_fill(crZoom);
+    cairo_fill(crDraw);
     crZoom = cairo_create(crZoomSurface);
     cairo_set_source_rgb(crZoom, 
 		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
@@ -87,7 +87,6 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
     cairo_fill(crZoom);
-    //Fl::cairo_cc(crDraw, true);
     set_draw_cb(Draw);
     redraw();
 }

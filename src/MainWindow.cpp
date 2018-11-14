@@ -125,10 +125,10 @@ MainWindow::MainWindow(int argc, char **argv)
     
     menu_collapse = new Fl_Button(300, 0, 15, 450, "@>");
     menu_collapse->callback(CollapseMainCallback);
-    menu_collapse->labelcolor(GUI_TEXT_COLOR);
+    menu_collapse->labelcolor(GUI_BTEXT_COLOR);
     folder_collapse = new Fl_Button(315, 0, 15, 450, "@<");
     folder_collapse->callback(CollapseFolderCallback);
-    folder_collapse->labelcolor(GUI_TEXT_COLOR);
+    folder_collapse->labelcolor(GUI_BTEXT_COLOR);
     
     folderWindowPane = new Fl_Group(330, 0, 320, 450, "");
     {
@@ -206,8 +206,8 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     label->callback(MainWindow::ShowFolderCallback);
     label->user_data((void*)foldername);
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
-    sprintf(folder->folderNameFileCount, "@+   %-.48s (%d Total)", 
-            folder->folderName, folder->structCount);
+    sprintf(folder->folderNameFileCount, "(+% 2d) %-.48s", 
+            folder->structCount, folder->folderName);
     label->label(folder->folderNameFileCount);
     label->labelcolor(GUI_BTEXT_COLOR);
     ms_instance->folderDataBtns.push_back(label);

@@ -404,6 +404,7 @@ void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
           cfgParser.writeFile(USER_CONFIG_PATH, false);
      }
      MainWindow::RethemeMainWindow();
+     btn->parent()->hide();
 
 }
 

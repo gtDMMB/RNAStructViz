@@ -97,7 +97,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
 
     this->resizable(folderScroll);
     this->color(GUI_WINDOW_BGCOLOR);
-    this->selection_color(GUI_BTEXT_COLOR);
+    //this->selection_color(GUI_BTEXT_COLOR);
     
     SetStructures(folderIndex);
 
