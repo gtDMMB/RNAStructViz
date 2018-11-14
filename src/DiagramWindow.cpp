@@ -1,6 +1,6 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Box.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Enumerations.H>
 #include <FL/names.h>
 
@@ -18,6 +18,7 @@
 #include "RNAStructViz.h"
 #include "BranchTypeIdentification.h"
 #include "ConfigOptions.h"
+#include "ConfigParser.h"
 
 #include "pixmaps/DiagramWindowIcon.xbm"
 
@@ -30,6 +31,9 @@
 
 const int DiagramWindow::ms_menu_minx[3] = {5, 205, 405};
 const int DiagramWindow::ms_menu_width = 190;
+
+volatile DiagramWindow * DiagramWindow::currentDiagramWindowInstance = NULL;
+bool DiagramWindow::redrawRefreshTimerSet = false;
 
 void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) {
 
@@ -46,6 +50,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     userConflictAlerted = false;
 
     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
+    default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
+    cursor(DIAGRAMWIN_DEFAULT_CURSOR);
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
@@ -54,6 +60,11 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     size_range(w, h, w, h);
     set_modal();
     box(FL_NO_BOX);
+    setAsCurrentDiagramWindow();
+    if(!redrawRefreshTimerSet) { 
+        Fl::add_timeout(DWIN_REDRAW_REFRESH, DiagramWindow::RedrawWidgetsTimerCallback);
+        redrawRefreshTimerSet = true;
+    }
 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
@@ -135,9 +146,13 @@ DiagramWindow::~DiagramWindow() {
 void DiagramWindow::SetFolderIndex(int index) {
     folderIndex = index;
 
-    sprintf(title, "Diagrams: %-.48s",
-            RNAStructViz::GetInstance()->GetStructureManager()->
-            GetFolderAt(index)->folderName);
+    char *structureNameFull = RNAStructViz::GetInstance()->GetStructureManager()->
+                              GetFolderAt(index)->folderName;
+    char *structureName = strchr(structureNameFull, '_') + 1;
+    if(!structureName) {
+        structureName = structureNameFull;
+    }
+    sprintf(title, "Comparison of Arc Diagrams: %-.48s", structureName);
     label(title);
 }
 
@@ -151,6 +166,16 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
         m_drawBranchesIndicator->clear();
         userConflictAlerted = false;
     }
+    if(haveZoomBuffer) {
+        cairo_set_source_rgb(crZoom, 
+		               GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			       GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			       GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+        cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
+        cairo_fill(crZoom);
+    }
+    zx0 = zx1 = zy0 = zy1 = zw = zh = 0;
+    zoomButtonDown = haveZoomBuffer = false;
     redraw();
 
 }
@@ -170,11 +195,20 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
     Fl_Button *buttonPressed = (Fl_Button *) v;
     if (buttonPressed->changed()) {
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
-        char *exportFilePath = thisWindow->GetExportPNGFilePath();
-        Fl::wait();
-	cairo_surface_t *pngSource = cairo_get_target(thisWindow->crDraw);
-        cairo_surface_write_to_png(pngSource, exportFilePath);
+	bool userImageSaved = false;
+	std::string exportFilePath = thisWindow->GetExportPNGFilePath();
+	if(exportFilePath.size() == 0) {
+	     fl_alert("NOT SAVING PNG IMAGE!");
+	     buttonPressed->clear_changed();     
+             return;
+	}
+        cairo_surface_t *pngSource = cairo_get_target(thisWindow->crDraw);
+        if(cairo_surface_write_to_png(pngSource, exportFilePath.c_str()) != 
+			              CAIRO_STATUS_SUCCESS) {
+             fl_alert("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));
+	}
         buttonPressed->clear_changed();
+        thisWindow->redraw();
     }
 }
 
@@ -186,18 +220,17 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
     
     exportButton->redraw();
     for(int m = 0; m < 3; m++) {
-        if(m_menus[m] != NULL) {
+        if(m_menus[m] != NULL && !m_menus[m]->active()) {
 	    m_menus[m]->redraw();
 	}
     }
     if(fillWin) {
          Fl_Color priorColor = fl_color();
-         //fl_color(color());
 	 fl_color(GUI_WINDOW_BGCOLOR);
     	 fl_rectf(0, 0, w(), h());
          fl_color(priorColor);
-    	 Fl_Double_Window::draw();
     }
+    Fl_Double_Window::draw();
 
 }
 
@@ -311,10 +344,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
    
     if (thisWindow->m_redrawStructures) {
 	    cairo_identity_matrix(thisWindow->crDraw);
-	    cairo_set_source_rgb(thisWindow->crDraw, 
-		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+	    cairo_set_source_rgba(thisWindow->crDraw, 1.0, 1.0, 1.0, 0.0);
             cairo_rectangle(thisWindow->crDraw, 0, 0, thisWindow->w(), thisWindow->h());
             cairo_fill(thisWindow->crDraw);
 	    cairo_push_group(thisWindow->crDraw);
@@ -1178,7 +1208,13 @@ void DiagramWindow::MenuCallback(Fl_Widget *widget, void *userData) {
 int DiagramWindow::handle(int flEvent) {
 
      switch(flEvent) { 
-          case FL_PUSH: // mouse down
+	  case FL_SHOW:
+	       //fprintf(stderr, "Window Shown ... Redrawing\n");
+	       m_redrawStructures = true;
+               redraw();
+	       Fl::flush();
+	       return 1;
+	  case FL_PUSH: // mouse down
                if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
 	          Fl::event_y() >= GLWIN_TRANSLATEY) {
 	            zoomButtonDown = true;
@@ -1192,7 +1228,7 @@ int DiagramWindow::handle(int flEvent) {
 	       if(zoomButtonDown) {
 		    lastZoomX = Fl::event_x();
 		    lastZoomY = Fl::event_y();
-		    this->cursor(FL_CURSOR_DEFAULT);
+		    this->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
 		    zoomButtonDown = false;
 		    haveZoomBuffer = true;
 		    HandleUserZoomAction();
@@ -1311,16 +1347,44 @@ void DiagramWindow::CairoSetRGB(cairo_t *cr,
     cairo_set_source_rgba(cr, R / 255.0, G / 255.0, B / 255.0, A / 255.0);
 }
 
-char *DiagramWindow::GetExportPNGFilePath() {
-    const char *chooserMsg = "Choose a file name for your PNG output image";
+std::string DiagramWindow::GetExportPNGFilePath() {
+    const char *chooserMsg = "Choose a file name for your PNG output image ...";
     const char *fileExtMask = "*.png";
     time_t currentTime = time(NULL);
     struct tm *tmCurrentTime = localtime(&currentTime);
     char defaultFilePath[MAX_BUFFER_SIZE];
-    char pngImagePath[MAX_BUFFER_SIZE]; 
-    snprintf(pngImagePath, MAX_BUFFER_SIZE - 1, "%s/%s", PNG_OUTPUT_DIRECTORY, PNG_OUTPUT_PATH);
-    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, pngImagePath, tmCurrentTime);
-    int pathNameType = 1; // 0 (absolute), otherise (relative)
-    return fl_file_chooser(chooserMsg, fileExtMask, defaultFilePath, pathNameType);
+    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, PNG_OUTPUT_PATH, tmCurrentTime);
+    Fl_Native_File_Chooser fileChooser;
+    fileChooser.title(chooserMsg);
+    //fileChooser.filter(fileExtMask);
+    fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+    fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
+		        Fl_Native_File_Chooser::SAVEAS_CONFIRM | 
+		        Fl_Native_File_Chooser::PREVIEW);
+    fileChooser.directory(PNG_OUTPUT_DIRECTORY);
+    fileChooser.preset_file(defaultFilePath);
+    switch(fileChooser.show()) {
+        case -1: // ERROR
+             fl_alert("Error selecting PNG save file path: %s\n", fileChooser.errmsg());
+	     return NULL;
+	case 1: // CANCEL
+	     return NULL;
+	default:
+	     std::string outfilePath = string(fileChooser.filename());
+	     return outfilePath;
+    }
+}
+
+void DiagramWindow::setAsCurrentDiagramWindow() const {
+     DiagramWindow::currentDiagramWindowInstance = (volatile DiagramWindow *) this;
+}
+
+void DiagramWindow::RedrawWidgetsTimerCallback(void *udata) {
+     DiagramWindow *dwin = (DiagramWindow *) DiagramWindow::currentDiagramWindowInstance;
+     if(dwin != NULL && dwin->visible() && dwin->shown()) {
+          dwin->drawWidgets(false);
+          dwin->redraw();
+     }
+     Fl::repeat_timeout(DWIN_REDRAW_REFRESH, DiagramWindow::RedrawWidgetsTimerCallback);
 }
 

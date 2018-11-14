@@ -6,6 +6,7 @@
 #define DIAGRAMWINDOW_H
 
 #include <FL/Fl.H>
+#include <FL/Enumerations.H>
 #include <cairo.h>
 #include <FL/Fl_Cairo.H>
 #include <FL/Fl_Cairo_Window.H>
@@ -20,21 +21,23 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_DIM             (550)
-#define IMAGE_WIDTH           (IMAGE_DIM)
-#define IMAGE_HEIGHT          (IMAGE_DIM)
-#define IMAGE_DEPTH           (3)
+#define IMAGE_DIM                    (550)
+#define IMAGE_WIDTH                  (IMAGE_DIM)
+#define IMAGE_HEIGHT                 (IMAGE_DIM)
+#define IMAGE_DEPTH                  (3)
 
-#define GLWIN_TRANSLATEX      (35)
-#define GLWIN_TRANSLATEY      (110)
+#define GLWIN_TRANSLATEX             (35)
+#define GLWIN_TRANSLATEY             (110)
 
-#define WIDGET_SPACING        (35)
-#define EXPORT_BUTTON_WIDTH   (115)
-#define WINW_EXTENSION        (EXPORT_BUTTON_WIDTH + 3 * WIDGET_SPACING)
+#define WIDGET_SPACING               (35)
+#define EXPORT_BUTTON_WIDTH          (115)
+#define WINW_EXTENSION               (EXPORT_BUTTON_WIDTH + 3 * WIDGET_SPACING)
 
-#define ZOOM_WIDTH            (200)
-#define ZOOM_HEIGHT           (200)
-#define ZOOM_MAGNIFY          (1.25)
+#define ZOOM_WIDTH                   (200)
+#define ZOOM_HEIGHT                  (200)
+
+#define DIAGRAMWIN_DEFAULT_CURSOR    (FL_CURSOR_CROSS)
+#define DWIN_REDRAW_REFRESH          (1.75)
 
 typedef enum {
      CR_BLACK   = 0, 
@@ -208,7 +211,14 @@ private:
     void WarnUserDrawingConflict();
     void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 
 		     unsigned short B, unsigned short A = 0x99);
-    char * GetExportPNGFilePath();
+    std::string GetExportPNGFilePath();
+
+    volatile static DiagramWindow *currentDiagramWindowInstance;
+    static bool redrawRefreshTimerSet;
+
+public:
+    void setAsCurrentDiagramWindow() const; 
+    static void RedrawWidgetsTimerCallback(void *);
 
 };
 

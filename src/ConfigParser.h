@@ -34,7 +34,8 @@ class ConfigParser {
 
 		static void nullTerminateString(char *str, 
 		            int nullCharPos = MAX_BUFFER_SIZE - 1); 
-	        static bool fileExists(const char *filePath);
+		
+		static bool fileExists(const char *filePath);
 		static bool directoryExists(const char *dirPath); 
 
 	private:

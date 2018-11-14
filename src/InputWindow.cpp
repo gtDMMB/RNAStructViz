@@ -37,17 +37,13 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    Fl_Box *box = new Fl_Box(50, 10, 300, 40, (const char*)string);
 	    box->box(FL_NO_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-	    box->color(FL_LIGHT1);
+	    box->color(GUI_TEXT_COLOR);
 	    Fl_Button *button = new Fl_Button(265, 50, 100, 30, "Add Folder @arrow");
 	    button->callback(ButtonCallback, (void*)0);
 	    button->labelcolor(GUI_BTEXT_COLOR);
 	    input->callback(InputCallback, (void*)0);
 	    input->labelcolor(GUI_TEXT_COLOR);
 	    callback(CloseCallback);
-            //Fl_Box* message = new Fl_Box(50,4,300,40,"All structures with the same underlying RNA sequence will be put in this folder.");
-            //message->box(FL_NO_BOX);
-	    //message->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-	    //message->labelcolor(GUI_TEXT_COLOR);
 	}
 	show();
 }

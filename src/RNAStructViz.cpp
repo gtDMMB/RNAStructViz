@@ -75,10 +75,9 @@ void RNAStructViz::AddDiagramWindow(int index)
             diagram->SetStructures(structures);
             diagram->SetFolderIndex(index);
             diagram->ResetWindow(true);
-            diagram->show();
-            //usleep(500000);
-            diagram->redraw();
-            return;
+	    diagram->setAsCurrentDiagramWindow();
+	    diagram->show();
+	    return;
         }
     }
     

@@ -39,7 +39,7 @@ static inline const char * GetUserHome() {
 #define DEFAULT_PNG_OUTPUT_DIRECTORY    (GetUserHome())
 #define DEFAULT_PNG_OUTPUT_PATH         ("RNAStructViz-GUIView-%F-%H%M%S.png") 
                                         /* As a strftime format string */
-#define DEFAULT_FLTK_THEME              ("base")
+#define DEFAULT_FLTK_THEME              ("gleam")
 #define FLTK_THEME_COUNT                (6)
 #define USER_CONFIG_DIR                 ((string(GetUserHome()) + string("/.RNAStructViz/")).c_str())
 #define USER_CONFIG_PATH                ((USER_CONFIG_DIR + string("config.cfg")).c_str())
@@ -70,9 +70,9 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define LOCAL_BGCOLOR                   (RGBColor(123, 77, 211))
 #define LOCAL_BUTTON_COLOR              (Lighter(RGBColor(210, 194, 240), 0.5f))
 #define LOCAL_TEXT_COLOR                (RGBColor(52, 25, 102))
-#define LOCAL_TEXT_SIZE                 (10)
-#define LOCAL_RMFONT                    (FL_SCREEN)
-#define LOCAL_BFFONT                    (FL_SCREEN_BOLD)
+#define LOCAL_TEXT_SIZE                 (8)
+#define LOCAL_RMFONT                    (FL_COURIER_BOLD_ITALIC)
+#define LOCAL_BFFONT                    (FL_COURIER_BOLD_ITALIC)
 
 extern Fl_Color GUI_WINDOW_BGCOLOR;
 extern Fl_Color GUI_BGCOLOR;
