@@ -58,17 +58,10 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     title = (char *) malloc(sizeof(char) * 64);
     SetStructures(structures);
  
-    crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, w, h);
-   
+    crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
+		                           IMAGE_WIDTH, IMAGE_HEIGHT);
     crZoomSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
     		    ZOOM_WIDTH, ZOOM_HEIGHT);
-    //#ifdef __APPLE__
-    //	 crSurface = cairo_quartz_surface_create_for_cg_context(fl_gc, 
-    //		     w, h);
-    //#else
-    //     crSurface = cairo_xlib_surface_create(fl_display, fl_window,
-    //		                fl_visual->visual, w, h);
-    //#endif
     crDraw = cairo_create(crSurface);
     cairo_set_source_rgb(crDraw, 
 		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
@@ -179,9 +172,8 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
         char *exportFilePath = thisWindow->GetExportPNGFilePath();
         Fl::wait();
-        thisWindow->m_redrawStructures = true;
-        //thisWindow->cairoTranslate = true;
-	thisWindow->redraw();
+        //thisWindow->m_redrawStructures = true;
+	//thisWindow->redraw();
 	cairo_surface_t *pngSource = cairo_get_target(thisWindow->crDraw);
         cairo_surface_write_to_png(pngSource, exportFilePath);
         buttonPressed->clear_changed();
@@ -329,12 +321,12 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
             cairo_fill(thisWindow->crDraw);
 	    cairo_push_group(thisWindow->crDraw);
             int drawParams[] = { numToDraw, keyA, keyB };
-	    if(thisWindow->cairoTranslate)
-	        cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+	    //if(thisWindow->cairoTranslate)
+	    //    cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
 	    thisWindow->RedrawBuffer(thisWindow->crDraw, sequences, drawParams, IMAGE_WIDTH);
 	    cairo_pop_group_to_source(thisWindow->crDraw);
-            if(thisWindow->cairoTranslate)            
-                 cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
+            //if(thisWindow->cairoTranslate)            
+            //     cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
             cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
 		      IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
             cairo_clip(thisWindow->crDraw);
@@ -347,7 +339,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    thisWindow->m_redrawStructures = false;
     }
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
-		             0, 0);
+		             GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_rectangle(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, 
 		    IMAGE_WIDTH, IMAGE_HEIGHT);    
     cairo_fill(cr);
@@ -1285,7 +1277,9 @@ void DiagramWindow::HandleUserZoomAction() {
 	double contextScaleY = (double) ZOOM_HEIGHT / copyHeight;
 	cairo_scale(crZoom, contextScaleX, contextScaleY);
 	cairo_surface_flush(cairo_get_target(crDraw));
-	cairo_set_source_surface(crZoom, cairo_get_target(crDraw), -1 * zx0, -1 * zy0);
+	cairo_set_source_surface(crZoom, cairo_get_target(crDraw), 
+			         -1 * (zx0 - GLWIN_TRANSLATEX), 
+				 -1 * (zy0 - GLWIN_TRANSLATEY));
         cairo_rectangle(crZoom, 0, 0, copyWidth, copyHeight);    
 	cairo_fill(crZoom);
     }
