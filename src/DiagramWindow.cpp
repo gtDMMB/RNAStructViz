@@ -56,7 +56,6 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
     fl_rectf(0, 0, w, h);
-    color(GUI_WINDOW_BGCOLOR);
     size_range(w, h, w, h);
     set_modal();
     box(FL_NO_BOX);
@@ -74,10 +73,11 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     crZoomSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
     		    ZOOM_WIDTH, ZOOM_HEIGHT);
     crDraw = cairo_create(crSurface);
-    cairo_set_source_rgb(crDraw, 
-		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    //cairo_set_source_rgb(crDraw, 
+    //		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+    //			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+    //			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    SetCairoColor(crDraw, CR_TRANSPARENT);
     cairo_rectangle(crDraw, 0, 0, this->w(), this->h());
     cairo_fill(crDraw);
     crZoom = cairo_create(crZoomSurface);
@@ -315,12 +315,12 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
-    cairo_set_source_rgb(cr, 
-		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
-    cairo_rectangle(cr, 0, 0, thisWindow->w(), thisWindow->h());
-    cairo_fill(cr);
+    //cairo_set_source_rgb(cr, 
+    //		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+    //			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+    //			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    //cairo_rectangle(cr, 0, 0, thisWindow->w(), thisWindow->h());
+    //cairo_fill(cr);
     thisWindow->drawWidgets(true);
 
     Fl_Color priorColor = fl_color();
@@ -343,8 +343,8 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
    
     if (thisWindow->m_redrawStructures) {
 	    cairo_identity_matrix(thisWindow->crDraw);
-	    cairo_set_source_rgba(thisWindow->crDraw, 1.0, 1.0, 1.0, 0.0);
-            cairo_rectangle(thisWindow->crDraw, 0, 0, thisWindow->w(), thisWindow->h());
+            thisWindow->SetCairoColor(thisWindow->crDraw, CR_TRANSPARENT);
+	    cairo_rectangle(thisWindow->crDraw, 0, 0, thisWindow->w(), thisWindow->h());
             cairo_fill(thisWindow->crDraw);
 	    cairo_push_group(thisWindow->crDraw);
             int drawParams[] = { numToDraw, keyA, keyB };
@@ -387,10 +387,11 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     fl_font(priorFont, 10);
     fl_line_style(0);
     
-    cairo_set_source_rgb(cr, 
-		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    //cairo_set_source_rgb(cr, 
+    //		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+    //			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+    //			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    SetCairoColor(cr, CR_WHITE);
     cairo_rectangle(cr, 0, 0, this->w(), this->h());
     cairo_fill(cr);
 
@@ -577,6 +578,12 @@ void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
         case CR_BRANCH4:
             CairoSetRGB(cr, 123, 204, 153);
             break;
+	case CR_WHITE:
+	    CairoSetRGB(cr, 255, 255, 255);
+	    break;
+	case CR_TRANSPARENT:
+	    CairoSetRGB(cr, 255, 255, 255, 0);
+	    break;
         default:
             break;
     }

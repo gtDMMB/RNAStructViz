@@ -40,17 +40,19 @@
 #define DWIN_REDRAW_REFRESH          (1.75)
 
 typedef enum {
-     CR_BLACK   = 0, 
-     CR_RED     = 1, 
-     CR_GREEN   = 2, 
-     CR_BLUE    = 3, 
-     CR_YELLOW  = 4, 
-     CR_MAGENTA = 5, 
-     CR_CYAN    = 6, 
-     CR_BRANCH1 = 7, 
-     CR_BRANCH2 = 8, 
-     CR_BRANCH3 = 9, 
-     CR_BRANCH4 = 10
+     CR_BLACK       = 0, 
+     CR_RED         = 1, 
+     CR_GREEN       = 2, 
+     CR_BLUE        = 3, 
+     CR_YELLOW      = 4, 
+     CR_MAGENTA     = 5, 
+     CR_CYAN        = 6, 
+     CR_BRANCH1     = 7, 
+     CR_BRANCH2     = 8, 
+     CR_BRANCH3     = 9, 
+     CR_BRANCH4     = 10, 
+     CR_WHITE       = 11,
+     CR_TRANSPARENT = 12
 } CairoColorSpec_t;
 
 class DiagramWindow : public Fl_Cairo_Window
