@@ -151,7 +151,15 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     label->user_data((void*)index);
     label->labelcolor(GUI_BTEXT_COLOR);
     char labelWithIcon[MAX_BUFFER_SIZE];
-    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew %s  @|>", filename);
+
+    std::string spaceBuffer = string("                                                    ");
+    int curLabelLen = 0;
+    char filePrefix[MAX_BUFFER_SIZE];
+    size_t numChars = snprintf(filePrefix, (int) (strchr(filename, '_') - filename + 1), 
+		               "%s", filename);
+    filePrefix[numChars] = '\0';
+    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s@|>", 
+	     filePrefix, spaceBuffer.substr(0, 28 - strlen(filePrefix)).c_str());
     label->copy_label(labelWithIcon); 
     
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);

@@ -11,7 +11,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Tabs.H>
-#include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
 
@@ -150,7 +150,7 @@ class MainWindow
         /*
 	    The file chooser dialog.
         */
-        Fl_File_Chooser* m_fileChooser;
+        Fl_Native_File_Chooser* m_fileChooser;
 
 	/* Other widgets that need to be updated when we change the theme settings */
 	Fl_Box *columnLabel, *actionsLabel;

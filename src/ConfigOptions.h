@@ -79,4 +79,6 @@ extern Fl_Color GUI_BGCOLOR;
 extern Fl_Color GUI_BTEXT_COLOR;
 extern Fl_Color GUI_TEXT_COLOR;
 
+extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
+
 #endif

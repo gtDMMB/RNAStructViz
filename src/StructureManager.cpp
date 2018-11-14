@@ -87,7 +87,7 @@ void StructureManager::AddFile(const char* filename)
 		if (strlen(filename) > 1000)
 		    fl_message("Unknown file type: <file name too long>");
 		else
-		    fl_message("Unknown file type: %s", filename);
+		    fl_message("Unknown file type: %s . %s [%s]", filename, extension, basename);
 		return;
     }
 
@@ -101,7 +101,7 @@ void StructureManager::AddFile(const char* filename)
             InputWindow* input_window = new InputWindow(400, 150, 
 			 "New Folder Added", folders[count]->folderName, 
 			 InputWindow::FOLDER_INPUT);
-            while (input_window->visible())
+            while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES)
             {
                 Fl::wait();
             }
@@ -123,14 +123,14 @@ void StructureManager::AddFile(const char* filename)
                 delete input_window;
                 input_window = new InputWindow(400, 150, "New Folder Added", 
 	            	               folders[count]->folderName, InputWindow::FOLDER_INPUT);
-                while (input_window->visible())
+                while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES)
                 {
                     Fl::wait();
                 }
                 same = false;
                 for(unsigned int ui = 0; ui < folders.size(); ui++)
             	{
-            		if (!strcmp(folders[ui]->folderName,input_window->getName()))
+            		if (!strcmp(folders[ui]->folderName, input_window->getName()))
 	            	{
     	        		same = true;
         	    		break;
@@ -139,10 +139,10 @@ void StructureManager::AddFile(const char* filename)
             }
                         
             if(strcmp(input_window->getName(), ""))
-            	strcpy(folders[count]->folderName,input_window->getName());
+            	strcpy(folders[count]->folderName, input_window->getName());
 
             MainWindow::AddFolder(folders[count]->folderName, count, false);
-            delete input_window;
+	    delete input_window;
         }
 
     }
@@ -187,8 +187,8 @@ void StructureManager::DecreaseStructCount(const int index)
         MainWindow::RemoveFolderByIndex(index);
     }
     else {
-        sprintf(folders[index]->folderNameFileCount, "%-.48s (%d)", 
-                folders[index]->folderName, folders[index]->structCount);
+        sprintf(folders[index]->folderNameFileCount, "(+% 2d) %-.48s", 
+                folders[index]->structCount, folders[index]->folderName);
     }
 }
 
@@ -230,7 +230,7 @@ void StructureManager::AddFolder(RNAStructure* structure, const int index)
     temp->folderStructs = (int*)malloc(sizeof(int)*128);
     temp->folderStructs[0] = index;
     temp->structCount = 1;
-    sprintf(temp->folderNameFileCount, "%-.48s (%d)", temp->folderName, temp->structCount);
+    sprintf(temp->folderNameFileCount, "(+% 2d) %-.48s", temp->structCount, temp->folderName);
     temp->selected = false;
     temp->folderWindow = 0;
     folders.push_back(temp);
@@ -300,8 +300,8 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
                 AddNewStructure(ui, index);
                 
                 if (folders[ui]->folderNameFileCount != NULL) {
-                    sprintf(folders[ui]->folderNameFileCount, "%-.48s (%d)", 
-                            folders[ui]->folderName, folders[ui]->structCount);
+                    sprintf(folders[ui]->folderNameFileCount, "(+% 2d) %-.48s", 
+                            folders[ui]->structCount, folders[ui]->folderName);
                 }
                 found = true;
                 break;

@@ -206,7 +206,7 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     label->callback(MainWindow::ShowFolderCallback);
     label->user_data((void*)foldername);
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
-    sprintf(folder->folderNameFileCount, "@+   %-.48s (%d)", 
+    sprintf(folder->folderNameFileCount, "@+   %-.48s (%d Total)", 
             folder->folderName, folder->structCount);
     label->label(folder->folderNameFileCount);
     label->labelcolor(GUI_BTEXT_COLOR);
@@ -238,10 +238,15 @@ void MainWindow::AddFolder(const char* foldername, const int index,
 void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 {
     ms_instance->CreateFileChooser();
-    ms_instance->m_fileChooser->show();
-    while (ms_instance->m_fileChooser->visible())
-        Fl::wait();
-    
+    int fileChooserReturnCode = ms_instance->m_fileChooser->show();
+    if(fileChooserReturnCode == -1 || fileChooserReturnCode == 1) { 
+        if(fileChooserReturnCode == -1) { // display weird exceptional error case:
+	    fl_alert("Unable to open new CT Files: %s\n", 
+		     ms_instance->m_fileChooser->errmsg());
+	}
+        return;
+    }
+
     const char *nextWorkingDir = ms_instance->m_fileChooser->directory();
     if(nextWorkingDir != NULL && strcmp(nextWorkingDir, CTFILE_SEARCH_DIRECTORY)) { 
 	// update the working directory:
@@ -251,8 +256,12 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 
     for (int i = 1; i <= ms_instance->m_fileChooser->count(); ++i)
     {
-    	RNAStructViz::GetInstance()->GetStructureManager()->
-                      AddFile(ms_instance->m_fileChooser->value(i));
+    	const char *nextFilename = ms_instance->m_fileChooser->filename(i);
+	if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
+	   !strcmp(nextFilename, "..")) { // invalid file to parser, so ignore it:
+	    continue;
+	}
+        RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilename);
     }
     
     ms_instance->m_packedInfo->redraw();
@@ -428,11 +437,12 @@ bool MainWindow::CreateFileChooser()
         return false;
     }
     
-    m_fileChooser = new Fl_File_Chooser(currentWD, "*.{ct,nopct,bpseq}", 
-                        Fl_File_Chooser::MULTI, "Select RNA Sequences");
-    m_fileChooser->show_label = "Loaded files will automatically be grouped into folders according to their underlying sequence.";
-    m_fileChooser->color(GUI_WINDOW_BGCOLOR);
-    m_fileChooser->textcolor(GUI_TEXT_COLOR);
+    m_fileChooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_MULTI_FILE);
+    m_fileChooser->title("Select RNA Sequences / Load New CT Files ...");
+    m_fileChooser->filter("*.{ct,nopct,bpseq}");
+    m_fileChooser->directory(currentWD);
+    m_fileChooser->options(Fl_Native_File_Chooser::NO_OPTIONS | 
+		           Fl_Native_File_Chooser::PREVIEW);
 
     return true;
 }

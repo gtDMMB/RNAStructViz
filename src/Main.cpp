@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     DisplayConfigWindow::SetupInitialConfig();
     RNAStructViz::Initialize(argc, argv);
    
-    Fl::option(Fl::OPTION_VISIBLE_FOCUS, true);
+    Fl::option(Fl::OPTION_VISIBLE_FOCUS, false);
     Fl::option(Fl::OPTION_SHOW_TOOLTIPS, true);
     Fl::option(Fl::OPTION_FNFC_USES_GTK, true);
 
