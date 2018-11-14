@@ -172,8 +172,6 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
         char *exportFilePath = thisWindow->GetExportPNGFilePath();
         Fl::wait();
-        //thisWindow->m_redrawStructures = true;
-	//thisWindow->redraw();
 	cairo_surface_t *pngSource = cairo_get_target(thisWindow->crDraw);
         cairo_surface_write_to_png(pngSource, exportFilePath);
         buttonPressed->clear_changed();

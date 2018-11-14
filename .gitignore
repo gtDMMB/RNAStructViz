@@ -13,4 +13,5 @@ src/RNAStructViz
 #cache#
 *.cache
 
-
+#generated at compile time, varies by platform#
+src/BuildTargetInfo.h
