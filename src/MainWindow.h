@@ -190,10 +190,10 @@ class MainWindow
 	     ms_instance->columnLabel->redraw();
 	     ms_instance->actionsLabel->labelcolor(GUI_TEXT_COLOR);
 	     ms_instance->actionsLabel->redraw();
-	     ms_instance->topTextDivider->labelcolor(GUI_TEXT_COLOR);
-	     ms_instance->topTextDivider->redraw();
-	     ms_instance->midTextDivider->labelcolor(GUI_TEXT_COLOR);
-	     ms_instance->midTextDivider->redraw();
+	     //ms_instance->topTextDivider->labelcolor(GUI_TEXT_COLOR);
+	     //ms_instance->topTextDivider->redraw();
+	     //ms_instance->midTextDivider->labelcolor(GUI_TEXT_COLOR);
+	     //ms_instance->midTextDivider->redraw();
 	     ms_instance->openButton->color(GUI_BGCOLOR);
 	     ms_instance->openButton->labelcolor(GUI_BTEXT_COLOR);
 	     ms_instance->openButton->redraw();

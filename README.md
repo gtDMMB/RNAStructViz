@@ -138,6 +138,11 @@ $ which fltk-config
 /usr/local/bin/fltk-config
 $ fltk-config --libs --use-cairo
 ```
+Next, we tell the ``RNAStructViz`` *Makefile* where it should look for 
+``fltk-config``:
+```
+$ export FLTKCONFIG=`which fltk-config`
+```
 Now we need to build ``RNAStructViz`` from source using 
 [these instructions](https://github.com/gtDMMB/RNAStructViz/tree/with-cairo#rnastructviz-from-source-install-instructions).
 
@@ -187,6 +192,7 @@ That's almost it!
 Next, to tell the ``RNAStructViz`` *Makefile* where to find your local install of FLTK, we need to 
 export the following variable:
 ```
+$ export FLTKCONFIG=$(readlink -f ./bin)
 $ export FLTK_INSTALL_DIR=$(readlink -f ./)
 ```
 Finally, continue on to the building ``RNAStructViz`` from source step 
