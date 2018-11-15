@@ -19,7 +19,7 @@
 
 #include "ConfigOptions.h"
 
-#define NAVBUTTONS_OFFSETX   (10)
+#define NAVBUTTONS_OFFSETX   (5)
 #define NAVBUTTONS_OFFSETY   (10) 
 #define NAVBUTTONS_BWIDTH    (135)
 #define NAVBUTTONS_BHEIGHT   (30)

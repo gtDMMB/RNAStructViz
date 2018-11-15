@@ -79,12 +79,14 @@ MainWindow::MainWindow(int argc, char **argv)
 	const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
     	int navButtonsLabelHeight = 2 * NAVBUTTONS_BHEIGHT;
         actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
-		                                  2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-	                                      navButtonsLabelHeight, navInstText); 	
+		                  2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+	                          navButtonsLabelHeight, navInstText); 	
         actionsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-        actionsLabel->labelcolor(GUI_TEXT_COLOR);
+        actionsLabel->color(GUI_BGCOLOR);
+	actionsLabel->labelcolor(GUI_BTEXT_COLOR);
 	actionsLabel->labelfont(LOCAL_BFFONT);
 	actionsLabel->labelsize(LOCAL_TEXT_SIZE);
+	actionsLabel->box(FL_RSHADOW_BOX);
 
         //Open button
         openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
@@ -160,14 +162,14 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->size_range(650, 450, 650, 0);
     m_mainWindow->end();
 
-    #ifndef __APPLE__
-    fl_open_display();
-    Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
-		        DefaultRootWindow(fl_display),
-                        RNAWindowIcon_bits, RNAWindowIcon_width, 
-			RNAWindowIcon_height);
-    m_mainWindow->icon((const void *) iconPixmap);
-    #endif
+    //#ifndef __APPLE__
+    //fl_open_display();
+    //Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
+    //		        DefaultRootWindow(fl_display),
+    //                    RNAWindowIcon_bits, RNAWindowIcon_width, 
+    //			RNAWindowIcon_height);
+    //m_mainWindow->icon((const void *) iconPixmap);
+    //#endif
 
     m_mainWindow->show(argc, argv);
     
