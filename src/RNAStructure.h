@@ -10,7 +10,10 @@
 #include <FL/Fl_Text_Buffer.H>
 
 #include <stdio.h>
+#include <math.h>
+
 #include <vector>
+#include <string>
 
 class RNABranchType_t;
 
@@ -18,6 +21,7 @@ class RNABranchType_t;
 #define MIN(x, y)         (x <= y ? (x) : (y))
 #define ABS(x)            (x >= 0 ? (x) : -1 * (x))
 #define MIN3(x, y, z)     MIN(x, MIN(y, z))
+#define LOGFLOOR(x)       ((int) floor(log10(x)))
 
 class RNAStructure
 {
@@ -180,11 +184,17 @@ class RNAStructure
         // Info for displaying the file contents
         Fl_Double_Window* m_contentWindow;
         Fl_Text_Display* m_textDisplay;
-        Fl_Text_Buffer* m_textBuffer;
+        Fl_Text_Buffer* m_textBuffer, m_styleBuffer;
+        static const Fl_Text_Display::Style_Table_Entry textBufferStyleTable[];
 
-        char* m_displayString;
-        char* charSeq;
+        char *m_displayString;
+        char *m_displayFormatString;
+	char *charSeq;
         unsigned int charSeqSize;
+
+    public:
+	static char GetBaseStringFormat(const char *baseStr);
+	static std::string GetRepeatedString(const char *str, int ntimes);
 
 };
 

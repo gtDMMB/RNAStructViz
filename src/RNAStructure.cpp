@@ -9,8 +9,21 @@
 
 const unsigned int RNAStructure::UNPAIRED = ~0x0;
 
+const Fl_Text_Display::Style_Table_Entry 
+      RNAStructure::textBufferStyleTable[] = {
+     {GUI_TEXT_COLOR,   FL_SCREEN_BOLD,        18}, // A -- default
+     {FL_GREEN,         FL_SCREEN_BOLD,        18}, // B -- pair A
+     {FL_MAGENTA,       FL_SCREEN_BOLD,        18}, // C -- pair C
+     {FL_YELLOW,        FL_SCREEN_BOLD,        18}, // D -- pair G
+     {FL_RED,           FL_SCREEN_BOLD,        18}, // E -- pair U
+     {FL_CYAN,          FL_SCREEN_BOLD,        18}, // F -- first pairing
+     {FL_BLUE,          FL_SCREEN_BOLD,        18}, // G -- second pairing
+     {0,                0,                     0},  // NULL end of array
+};
+
 RNAStructure::RNAStructure()
-    : m_sequenceLength(0), m_sequence(0), m_displayString(0)
+    : m_sequenceLength(0), m_sequence(0), 
+      m_displayString(0), m_displayFormatString(NULL) 
 {
      branchType = NULL; 
      m_contentWindow = NULL;
@@ -263,9 +276,6 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
 
     result->m_sequence = (BaseData*)realloc(result->m_sequence, 
                                             sizeof(BaseData)*result->m_sequenceLength);
-    //fprintf(stderr, "%d, %d, *= %g", sizeof(RNABranchType_t), 
-    //        result->m_sequenceLength, 
-    //	    sizeof(RNABranchType_t) * result->m_sequenceLength / 1024.0);
     if(PERFORM_BRANCH_TYPE_ID) {
         result->branchType = (RNABranchType_t*) malloc( 
 		sizeof(RNABranchType_t) * result->m_sequenceLength);
@@ -298,24 +308,42 @@ const char* RNAStructure::GetFilename() const
 
 void RNAStructure::DisplayFileContents()
 {
-    if (!m_displayString)
-	    GenerateString();
+    if (m_displayString && m_displayFormatString) {
+        free(m_displayString);
+	m_displayString = NULL;
+	free(m_displayFormatString);
+	m_displayFormatString = NULL;
+    }
+    GenerateString();
+    if(m_contentWindow) {
+        delete m_contentWindow;
+	m_contentWindow = NULL;
+    }
 
     if (!m_contentWindow)
     {
-		m_contentWindow = new Fl_Double_Window(220, 600, GetFilename());
-		Fl_Box* resizeBox = new Fl_Box(0, 0, 220, 600);
+		m_contentWindow = new Fl_Double_Window(275, 600, GetFilename());
+		Fl_Box* resizeBox = new Fl_Box(0, 0, 275, 600);
 		m_contentWindow->resizable(resizeBox);
-		m_contentWindow->size_range(220, 300);
+		m_contentWindow->size_range(275, 300);
 
-		m_textDisplay = new Fl_Text_Display(0, 0, 220, 600);	
-		Fl_Text_Buffer* textBuffer = 
+		m_textDisplay = new Fl_Text_Display(0, 0, 275, 600);	
+		Fl_Text_Buffer* m_textBuffer = 
 			new Fl_Text_Buffer(strlen(m_displayString));
-		textBuffer->text(m_displayString);
-		m_textDisplay->buffer(textBuffer);
+		Fl_Text_Buffer *m_styleBuffer = 
+			new Fl_Text_Buffer(strlen(m_displayFormatString));
+		m_textBuffer->text(m_displayString);
+		m_textDisplay->buffer(m_textBuffer);
 		m_textDisplay->textfont(LOCAL_BFFONT);
 		m_textDisplay->color(GUI_WINDOW_BGCOLOR);
 		m_textDisplay->labelcolor(GUI_BTEXT_COLOR);
+		m_textDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
+		m_textDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
+		m_styleBuffer->text(m_displayFormatString);
+		int stableSize = sizeof(textBufferStyleTable) / 
+			         sizeof(textBufferStyleTable[0]);
+		m_textDisplay->highlight_data(m_styleBuffer, 
+			       textBufferStyleTable, stableSize, 'A', 0, 0);
 
     }
     m_contentWindow->show();
@@ -324,20 +352,28 @@ void RNAStructure::DisplayFileContents()
 
 void RNAStructure::GenerateString()
 {
-    if (m_displayString)
-    {
-		free(m_displayString); //m_displayString = NULL;
-    }
-    
     /*
 	   <id> [ACGU] - [ACGU] <id>
     */
-    int size = m_sequenceLength * 22;
+    int size = (m_sequenceLength + 2) * 27;
     m_displayString = (char*)malloc(sizeof(char) * size + 1);
-
+    m_displayFormatString = (char*)malloc(sizeof(char) * size + 1);
+    
     int remainingSize = size;
     int charsWritten = 0;
-    char* currentPosn = m_displayString;
+    char *currentPosn = m_displayString;
+    char *formatPosn = m_displayFormatString;
+    
+    // table header labels:
+    charsWritten = snprintf(currentPosn, remainingSize, 
+		   "BaseIdx |  Pair  (PairIdx)\n--------------------------\n");
+    snprintf(formatPosn, remainingSize, "%s\n", 
+             GetRepeatedString("A", charsWritten + 1).c_str());
+    formatPosn[25] = '\n';
+    currentPosn += charsWritten;
+    formatPosn += charsWritten;
+    remainingSize -= charsWritten;
+    
     for (int i = 0; i < (int)m_sequenceLength; ++i)
     {
 		const char* baseStr = 0;
@@ -354,8 +390,11 @@ void RNAStructure::GenerateString()
 		}
 		if (m_sequence[i].m_pair == UNPAIRED)
 		{
-		    charsWritten = snprintf(currentPosn, remainingSize, "%6d  %s\n", 
-		    	                    i + 1, baseStr);
+		    charsWritten = snprintf(currentPosn, remainingSize, 
+				            "%6d  | %s\n", i + 1, baseStr);
+		    snprintf(formatPosn, remainingSize, "AAAAAAAAAA%c\n", 
+		             GetBaseStringFormat(baseStr));
+
 		}
 		else
 		{
@@ -379,19 +418,53 @@ void RNAStructure::GenerateString()
 		    charsWritten = snprintf(
 			    currentPosn,
 			    remainingSize,
-			    "%6d  %s - %s  %d\n",
+			    "%6d  | %s - %s  (%d)\n",
 			    i + 1,
 			    baseStr,
 			    pairStr,
 			    pairID + 1);
+		    volatile char *pairMarkerFmt = 
+			    (char *) ((i <= pairID) ? "F" : "G");
+		    snprintf(formatPosn, remainingSize, 
+		             "AAAAAAAAAA%cAAA%c  %s%s%s\n", 
+		             GetBaseStringFormat(baseStr), 
+			     GetBaseStringFormat(pairStr), 
+                             pairMarkerFmt, 
+			     GetRepeatedString((const char *) pairMarkerFmt, 
+				               1 + LOGFLOOR(pairID)).c_str(), 
+			     pairMarkerFmt);    
 		}
-		remainingSize -= charsWritten;
+                remainingSize -= charsWritten;
 		currentPosn += charsWritten;
-    
+		formatPosn += charsWritten;
+		if(remainingSize <= 0)
+		     fprintf(stderr, "Remaining Size = %d\n", remainingSize);
+
     }
-	
-    m_displayString = (char*)realloc(m_displayString, 
-                                     sizeof(char) * (size - remainingSize+1));
+    m_displayString = (char *) realloc(m_displayString, 
+                               sizeof(char) * (size - remainingSize+1));
+    m_displayFormatString = (char *) realloc(m_displayFormatString, 
+                             sizeof(char) * (size - remainingSize+1));
 
 }
 
+char RNAStructure::GetBaseStringFormat(const char *baseStr) {
+     if(!strcmp(baseStr, "A")) 
+          return 'B';
+     else if(!strcmp(baseStr, "C"))
+	  return 'C';
+     else if(!strcmp(baseStr, "G"))
+	  return 'D';
+     else if(!strcmp(baseStr, "U"))
+	  return 'E';
+     else 
+	  return 'A';
+}
+
+std::string RNAStructure::GetRepeatedString(const char *str, int ntimes) {
+     std::string rstr;
+     for(int n = 1; n <= ntimes; n++) {
+          rstr += string(str);
+     }
+     return rstr;
+}
