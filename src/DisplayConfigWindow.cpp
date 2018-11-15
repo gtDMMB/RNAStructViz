@@ -229,9 +229,8 @@ void DisplayConfigWindow::ConstructWindow() {
 	 }
 	 workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
-
      workingYOffset += CFGWIN_SPACING;
-
+     
      themesIcon = new Fl_RGB_Image(ConfigThemesIcon.pixel_data, 
 		  ConfigThemesIcon.width, ConfigThemesIcon.height, 
 		  ConfigThemesIcon.bytes_per_pixel);
@@ -240,6 +239,34 @@ void DisplayConfigWindow::ConstructWindow() {
      themesIconBox->image(themesIcon);
      windowWidgets.push_back(themesIconBox);
      workingYOffset += themesIcon->h() + CFGWIN_SPACING;
+
+     // now handle user customizable selections of the FLTK schemes:
+     int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+     Fl_Box *themeDescBox = new Fl_Box(offsetX, workingYOffset, 
+	 	        	       CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+	 		               "@->   Global FLTK Theme: ");
+     themeDescBox->labelcolor(GUI_TEXT_COLOR);
+     themeDescBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+     windowWidgets.push_back(themeDescBox);
+     offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_COLOR_WIDTH + 2 * CFGWIN_SPACING;
+     Fl_Choice *fltkThemeChoiceMenu = new Fl_Choice(offsetX, workingYOffset, 
+		                      CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
+     int choiceActiveIdx = 0;
+     for(int t = 0; t < FLTK_THEME_COUNT; t++) {
+	  if(!strcmp(ALL_FLTK_THEMES[t], FLTK_THEME)) {
+               choiceActiveIdx = t;
+	  }
+	  fltkThemeChoiceMenu->add(ALL_FLTK_THEMES[t], 0, 
+			           ThemeChoiceMenuCallback, 
+			           (void *) ((long int) t), 0);
+	  Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
+		                        fltkThemeChoiceMenu->find_item(ALL_FLTK_THEMES[t]);
+	  nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
+     }
+     fltkThemeChoiceMenu->value(choiceActiveIdx);
+     fltkThemeChoiceMenu->labelcolor(GUI_BTEXT_COLOR);
+     windowWidgets.push_back(fltkThemeChoiceMenu);
+     workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
 
      const char *colorFieldDesc[] = {
           "@->   GUI Window Background Color:", 
@@ -254,7 +281,7 @@ void DisplayConfigWindow::ConstructWindow() {
 	  &GUI_TEXT_COLOR
      };
      for(int c = 0; c < GUICOLORS; c++) { 
-	 int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+	 offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
          Fl_Box *descBox = new Fl_Box(offsetX, workingYOffset, 
 			   CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
 			   colorFieldDesc[c]);
@@ -285,8 +312,7 @@ void DisplayConfigWindow::ConstructWindow() {
      // draw bounding box for the two action buttons on the 
      // bottom right of the window:
      int boundingBoxWidth = 2 * CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING;
-     int offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth - 
-	           CFGWIN_SPACING / 2;
+     offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth - CFGWIN_SPACING / 2;
      int bdBoxHeight = (int) 1.5 * (CONFIG_WINDOW_HEIGHT - workingYOffset);
      int bdBoxYOffset = CONFIG_WINDOW_HEIGHT - bdBoxHeight - CFGWIN_SPACING;
      Fl_Box *btnBoundingBox = new Fl_Box(offsetX, bdBoxYOffset, 
@@ -388,6 +414,14 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
      parentWin->fpathsSettingBoxes[settingIdx]->copy_label(nextPNGPath);
      parentWin->fpathsSettingBoxes[settingIdx]->redraw();
 
+}
+
+void DisplayConfigWindow::ThemeChoiceMenuCallback(Fl_Widget *widget, void *udata) {
+     long int themeIndex = (long int) udata;
+     strncpy(FLTK_THEME, ALL_FLTK_THEMES[themeIndex], MAX_BUFFER_SIZE - 1);
+     ConfigParser::nullTerminateString(FLTK_THEME);
+     fl_alert("The FLTK theme \"%s\" corresponds to: %s.\nNote that this new widget scheme will not take effect until after RNAStructViz is restarted.", FLTK_THEME, 
+	      FLTK_THEME_HELP[themeIndex]);
 }
 
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {

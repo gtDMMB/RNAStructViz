@@ -209,6 +209,9 @@ class MainWindow
                   ms_instance->selectedFolderBtn->color(FL_LIGHT2);
 		  ms_instance->selectedFolderBtn->labelcolor(FL_DARK1);
 	     }
+	     Fl::scheme(FLTK_THEME);
+	     Fl::redraw();
+	     Fl::flush();
 	}
 
 };

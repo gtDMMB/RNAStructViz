@@ -19,7 +19,7 @@
 #include "ConfigOptions.h"
 
 #define CONFIG_WINDOW_WIDTH         (750)
-#define CONFIG_WINDOW_HEIGHT        (480)
+#define CONFIG_WINDOW_HEIGHT        (520)
 #define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Options")
 
 #define CFGWIN_WIDGET_OFFSETX       (10)
@@ -54,12 +54,13 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 	
 	        static void SelectDirectoryCallback(Fl_Widget *btn, void *ud);	
 		static void UpdatePNGPathCallback(Fl_Widget *btn, void *udata);
+		static void ThemeChoiceMenuCallback(Fl_Widget *menu, void *);
 		static void ChangeColorCallback(Fl_Widget *btn, void *udata); 
                 static void WriteConfigFileCallback(Fl_Widget *btn, void *);
 		static void RestoreDefaultsCallback(Fl_Widget *btn, void *);
 		static void WindowCloseCallback(Fl_Widget *win, void *udata);
 
-		bool finished; 
+		bool finished;
 
 		cairo_surface_t *crSurface;
 		cairo_t *crDraw;
