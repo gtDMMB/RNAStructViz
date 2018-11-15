@@ -188,7 +188,6 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 	bool userImageSaved = false;
 	std::string exportFilePath = thisWindow->GetExportPNGFilePath();
 	if(exportFilePath.size() == 0) {
-	     fl_alert("NOT SAVING PNG IMAGE!");
 	     buttonPressed->clear_changed();     
              return;
 	}
@@ -1376,9 +1375,9 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     switch(fileChooser.show()) {
         case -1: // ERROR
              fl_alert("Error selecting PNG save file path: %s\n", fileChooser.errmsg());
-	     return NULL;
+	     return string("");
 	case 1: // CANCEL
-	     return NULL;
+	     return string("");
 	default:
 	     std::string outfilePath = string(fileChooser.filename());
 	     strncpy(PNG_OUTPUT_DIRECTORY, fileChooser.directory(), MAX_BUFFER_SIZE - 1);

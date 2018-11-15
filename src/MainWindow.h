@@ -165,6 +165,8 @@ class MainWindow
 	Fl_Button *openButton, *configOptionsButton;
 	std::vector<Fl_Button *> folderDataBtns;
 
+	friend class DisplayConfigWindow;
+
     public:
 	/* Resets the color theme for the window */
 	static void RethemeMainWindow(); 

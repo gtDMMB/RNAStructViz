@@ -486,5 +486,6 @@ void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
      }
      thisWin->hide();
      thisWin->finished = true;
+     MainWindow::ms_instance->m_mainWindow->redraw();
      //MainWindow::RethemeMainWindow();
 }
