@@ -11,7 +11,10 @@
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_RGB_Image.H>
+
 #include <vector>
+
+#include "ConfigOptions.h"
 
 class FolderWindow : public Fl_Group
 {
@@ -63,6 +66,9 @@ class FolderWindow : public Fl_Group
 
         // Holds the title of the window
         char* title;
+    
+    public:
+        void RethemeFolderWindow(); 
 
 };
 

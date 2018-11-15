@@ -21,11 +21,13 @@
 
 MainWindow* MainWindow::ms_instance = 0;
 
-Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image(HelpIcon.pixel_data, 
-			   HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
+Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
+	       HelpIcon.pixel_data, 
+	       HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
 
 MainWindow::MainWindow(int argc, char **argv)
-          : m_fileChooser(NULL), selectedFolderBtn(NULL)
+          : m_fileChooser(NULL), selectedFolderBtn(NULL), 
+	    selectedFolderIndex(-1)
 {
     m_mainWindow = new Fl_Double_Window(650, 450, RNASTRUCTVIZ_VSTRING);
     m_mainWindow->size_range(650, 450, 650, 450);
@@ -62,18 +64,9 @@ MainWindow::MainWindow(int argc, char **argv)
 	    helpButton->callback(HelpButtonCallback);
             helpButton->redraw();
 
-	    // consistent alignment with the folder window display:
-	    int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
-            //const char *dividerText = "--------------------------------------------";
-	    int dividerTextHeight = 4;
-	    //topTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
-            //                                2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-	    //			            dividerTextHeight, dividerText);
-            //topTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-            //topTextDivider->labelcolor(GUI_TEXT_COLOR);
-	    //topTextDivider->labelfont(LOCAL_BFFONT);
-	    //topTextDivider->labelsize(LOCAL_TEXT_SIZE);
-	    //upperYOffset += 5;
+	// consistent alignment with the folder window display:
+	int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
+	int dividerTextHeight = 4;
 
     	// make it more user friendly by including some help text: 
 	const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
@@ -104,16 +97,6 @@ MainWindow::MainWindow(int argc, char **argv)
 		  "@menu   Config Options @>|");
 	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
-
-	//midTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
-	//	                     NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
-	//	                     NAVBUTTONS_BHEIGHT + 15, 
-	//                             2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-	//                             dividerTextHeight, dividerText); 	
-        //midTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-        //midTextDivider->labelcolor(GUI_TEXT_COLOR);
-    	//midTextDivider->labelfont(LOCAL_BFFONT);
-	//midTextDivider->labelsize(LOCAL_TEXT_SIZE);
 
 	const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
         columnLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 
@@ -510,7 +493,7 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
 {
     //Find the folderName label in the contentsButton widget's group
     Fl_Button* folderLabel = (Fl_Button*)(widget->parent()->child(0));
-    ms_instance->selectedFolderBtn = folderLabel;
+    ms_instance->selectedFolderBtn = (Fl_Button *) widget;
 
     Fl_Pack* pack = ms_instance->m_packedInfo;
     for (int i = 0; i < pack->children(); ++i) {
@@ -543,6 +526,7 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
         ms_instance->folderWindowPane->remove(0);
     }
 
+    ms_instance->selectedFolderIndex = index;
     ms_instance->folderWindowPane->add((Fl_Group*)fwindow);
 
     ExpandAlwaysFolderPane();

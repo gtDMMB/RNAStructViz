@@ -18,6 +18,8 @@
 #include <vector>
 
 #include "ConfigOptions.h"
+#include "RNAStructViz.h"
+#include "FolderWindow.h"
 
 #define NAVBUTTONS_OFFSETX   (5)
 #define NAVBUTTONS_OFFSETY   (10) 
@@ -148,6 +150,7 @@ class MainWindow
 	Fl_Scroll* m_structureInfo;
         Fl_Pack* m_packedInfo;
         Fl_Button *selectedFolderBtn;
+        int selectedFolderIndex;
 
         #define ExtractWidgetIndex(w)            ((long int) (w->user_data()));
 
@@ -166,20 +169,30 @@ class MainWindow
 	/* Resets the color theme for the window */
 	static inline void RethemeMainWindow() {
 
-	     Fl::foreground(GetRed(LOCAL_FGCOLOR), GetGreen(LOCAL_FGCOLOR), GetBlue(LOCAL_FGCOLOR));
-	     Fl::background(GetRed(GUI_BGCOLOR), GetGreen(GUI_BGCOLOR), GetBlue(GUI_BGCOLOR)); 
-             Fl::background2(GetRed(LOCAL_BG2COLOR), GetGreen(LOCAL_BG2COLOR), GetBlue(LOCAL_BG2COLOR));
+	     Fl::foreground(GetRed(LOCAL_FGCOLOR), 
+			    GetGreen(LOCAL_FGCOLOR), 
+			    GetBlue(LOCAL_FGCOLOR));
+	     Fl::background(GetRed(GUI_BGCOLOR), 
+			    GetGreen(GUI_BGCOLOR), 
+			    GetBlue(GUI_BGCOLOR)); 
+             Fl::background2(GetRed(LOCAL_BG2COLOR), 
+			     GetGreen(LOCAL_BG2COLOR), 
+			     GetBlue(LOCAL_BG2COLOR));
 	     
 	     if(ms_instance == NULL) {
 	          return;
 	     }
 	     ms_instance->m_mainWindow->color(GUI_WINDOW_BGCOLOR);
              ms_instance->m_mainWindow->redraw();
-             //ms_instance->m_packedInfo->color(GUI_WINDOW_BGCOLOR);
-	     ms_instance->m_packedInfo->redraw();
-	     //ms_instance->m_structureInfo->color(GUI_WINDOW_BGCOLOR);
-	     ms_instance->m_structureInfo->labelcolor(GUI_BTEXT_COLOR);
-	     ms_instance->m_structureInfo->redraw();
+             if(ms_instance->m_packedInfo) {
+	          ms_instance->m_packedInfo->color(GUI_WINDOW_BGCOLOR);
+	          ms_instance->m_packedInfo->redraw();
+	     }
+	     if(ms_instance->m_structureInfo) { 
+	          ms_instance->m_structureInfo->color(GUI_WINDOW_BGCOLOR);
+	          ms_instance->m_structureInfo->labelcolor(GUI_BTEXT_COLOR);
+	          ms_instance->m_structureInfo->redraw();
+	     }
 	     ms_instance->menu_collapse->color(GUI_BGCOLOR);
 	     ms_instance->menu_collapse->labelcolor(GUI_BTEXT_COLOR);
 	     ms_instance->menu_collapse->redraw();
@@ -190,10 +203,6 @@ class MainWindow
 	     ms_instance->columnLabel->redraw();
 	     ms_instance->actionsLabel->labelcolor(GUI_TEXT_COLOR);
 	     ms_instance->actionsLabel->redraw();
-	     //ms_instance->topTextDivider->labelcolor(GUI_TEXT_COLOR);
-	     //ms_instance->topTextDivider->redraw();
-	     //ms_instance->midTextDivider->labelcolor(GUI_TEXT_COLOR);
-	     //ms_instance->midTextDivider->redraw();
 	     ms_instance->openButton->color(GUI_BGCOLOR);
 	     ms_instance->openButton->labelcolor(GUI_BTEXT_COLOR);
 	     ms_instance->openButton->redraw();
@@ -208,6 +217,16 @@ class MainWindow
 	     if(ms_instance->selectedFolderBtn != NULL) {
                   ms_instance->selectedFolderBtn->color(FL_LIGHT2);
 		  ms_instance->selectedFolderBtn->labelcolor(FL_DARK1);
+	     }
+	     if(ms_instance->selectedFolderIndex >= 0) {
+                  FolderWindow *curFolderWin = (FolderWindow *) 
+			       RNAStructViz::GetInstance()->
+			       GetStructureManager()->
+			       GetFolders()[ms_instance->selectedFolderIndex];
+	          curFolderWin->RethemeFolderWindow();
+	          if(ms_instance->selectedFolderBtn != NULL) { 
+		       ShowFolderCallback(ms_instance->selectedFolderBtn, NULL);
+		  }
 	     }
 	     Fl::scheme(FLTK_THEME);
 	     Fl::redraw();

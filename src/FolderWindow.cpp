@@ -12,8 +12,10 @@
 
 void FolderWindow::Construct(int w, int h, int folderIndex) {}
 
-FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, int folderIndex): 
-	      Fl_Group(x, y, wid, hgt, label)
+FolderWindow::FolderWindow(int x, int y, int wid, int hgt, 
+		           const char *label, int folderIndex) : 
+	      Fl_Group(x, y, wid, hgt, label), 
+	      folderScroll(NULL), folderPack(NULL)
 {
 
     // label configuration:  
@@ -28,13 +30,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     Fl_Box *structIconBox = new Fl_Box(x - 14, y - 50, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     
-    //const char *dividerText = "----------------------------------------------";
     int dividerTextHeight = 0, spacingHeight = NAVBUTTONS_SPACING;
-    //Fl_Box *textDivider = new Fl_Box(x + 20, y + 36, 120, dividerTextHeight, 
-    //		                     dividerText); 
-    //textDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    //textDivider->labelcolor(GUI_TEXT_COLOR); 
-
     int fileOpsLabelHeight = 2 * NAVBUTTONS_BHEIGHT; 
     int fileOpsLabelWidth = 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING;
     const char *fileOpsLabelText = "@reload Structure Operations.\nEach operation opens a new window.";
@@ -64,14 +60,6 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(GUI_BTEXT_COLOR);
 
-    //int buttonDims = 26;
-    //int xOffset = x + wid - buttonDims - NAVBUTTONS_SPACING;
-    //Fl_Button* closeButton = new Fl_Button(xOffset, NAVBUTTONS_SPACING, 
-    //		             buttonDims, buttonDims, "");
-    //closeButton->callback(CloseFolderCallback);
-    //closeButton->label("@1+");
-    //closeButton->labelcolor(GUI_TEXT_COLOR);
-
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents in new window.";
     Fl_Box* fileLabel = new Fl_Box(x+NAVBUTTONS_SPACING,y+55 + 26 + dividerTextHeight + 
 		                   fileOpsLabelHeight + spacingHeight, 
@@ -100,11 +88,12 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     folderPack->type(Fl_Pack::VERTICAL);
     
     folderScroll->color(GUI_WINDOW_BGCOLOR);
+    folderScroll->labelcolor(GUI_BTEXT_COLOR);
     folderPack->color(GUI_WINDOW_BGCOLOR);
+    folderPack->labelcolor(GUI_BTEXT_COLOR);
 
     this->resizable(folderScroll);
     this->color(GUI_WINDOW_BGCOLOR);
-    //this->selection_color(GUI_BTEXT_COLOR);
     
     SetStructures(folderIndex);
 
@@ -130,7 +119,7 @@ void FolderWindow::SetStructures(int folderIndex)
         }
         int i = folder->folderStructs[(ui+shift)];
         RNAStructure *strct = structureManager->GetStructure(i);
-	    AddStructure(strct->GetFilename(), i);
+	AddStructure(strct->GetFilename(), i);
     }
     this->label(folder->folderName);
     char structLabel[MAX_BUFFER_SIZE];
@@ -266,4 +255,17 @@ void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
             break;
     }
     RNAStructViz::GetInstance()->AddStatsWindow(index);
+}
+
+void FolderWindow::RethemeFolderWindow() {
+     if(folderScroll != NULL) {
+          folderScroll->color(GUI_WINDOW_BGCOLOR);
+	  folderScroll->labelcolor(GUI_BTEXT_COLOR);
+          folderScroll->redraw();
+     }
+     if(folderPack != NULL) { 
+          folderPack->color(GUI_WINDOW_BGCOLOR);
+          folderPack->labelcolor(GUI_BTEXT_COLOR);
+          folderPack->redraw();
+     }
 }

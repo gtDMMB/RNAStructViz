@@ -425,9 +425,9 @@ void DisplayConfigWindow::ThemeChoiceMenuCallback(Fl_Widget *widget, void *udata
 }
 
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
+     btn->parent()->hide();
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      MainWindow::RethemeMainWindow();
-     btn->parent()->hide();
 }
 
 void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
