@@ -67,6 +67,7 @@ class InputWindow : public Fl_Window
     private:
         Fl_Input *input; // Text field where the user types in the input
         Fl_Check_Button *cbUseDefaultNames;
+	InputWindowType windowType;
 	char *name; // The input; if the user types nothing, is the empty string
 	char *string; // For displaying the default name
 	char *inputText;

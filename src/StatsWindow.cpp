@@ -665,7 +665,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
             }
 			text_display_group->end();
 			
-			exp_button = new Fl_Button(w-100,h-40,80,30,"@filesaveas Export @->");
+			exp_button = new Fl_Button(w-110,h-40,100,30, 
+				     "@filesaveas   Export @->");
 			exp_button->callback(ExportCallback);
 			exp_button->value(1);
                         exp_button->deactivate();
@@ -1922,8 +1923,11 @@ void StatsWindow::ExportTable()
         time_t currentTime = time(NULL);
         struct tm *tmCurrentTime = localtime(&currentTime);
         strftime(dateStamp, MAX_BUFFER_SIZE - 1, "%F-%H%M%S", tmCurrentTime);
-	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s/StatsTableOutput-%s.dat", 
-		 PNG_OUTPUT_DIRECTORY, dateStamp);
+	const char *sepChar = 
+		    PNG_OUTPUT_DIRECTORY[strlen(PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
+		     "" : "/";
+	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.dat", 
+		 PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
 	input_window = new InputWindow(400, 150, "Export Table To File ...",
                                    filename, InputWindow::FILE_INPUT);
 	exp_button->value(1);
@@ -1935,15 +1939,16 @@ void StatsWindow::ExportTable()
     
     if(input_window != NULL)
     {
-        
-        if(strcmp(input_window->getName(),""))
+        FILE * expFile;
+        if(strcmp(input_window->getName(), ""))
         {
             strncpy(filename, input_window->getName(), MAX_BUFFER_SIZE - 1);
-            strcat(filename, ".txt");
-        }
-        else {}
+	    expFile = fopen(filename, "a+");
+	}
+        else {
+	    expFile = NULL;
+	}
 
-	FILE * expFile = fopen(filename, "a+");
         if (expFile != NULL)
         {
             /* 	Check whether file is empty (i.e. whether it already existed. 
@@ -1993,7 +1998,7 @@ void StatsWindow::ExportTable()
         input_window = NULL;
     }
     
-	exp_button->value(0);
+    exp_button->value(0);
     exp_button->activate();
     
     menu_window->activate();

@@ -18,31 +18,49 @@ InputWindow::InputWindow(int w, int h, const char *label,
     string = (char*)malloc(sizeof(char)*90);
     color(GUI_WINDOW_BGCOLOR);
     set_modal();
-    
-    std::string actualStructName = ExtractStructureNameFromCTName(defaultName);
-    const char *actualStructNameCStr = actualStructName.c_str();
-    inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
-    strncpy(inputText, actualStructNameCStr, actualStructName.size() + 1);
-    ConfigParser::nullTerminateString(inputText, actualStructName.size());
+    windowType = type;
 
     if (type == InputWindow::FILE_INPUT)
     {
-    	    sprintf(string, "Current name: %s", defaultName);
-	    input = new Fl_Input(160, 50, 100, 30, "Export File Name:");
+    	    strncpy(inputText, defaultName, MAX_BUFFER_SIZE - 1);
+	    inputText[MAX_BUFFER_SIZE - 1] = '\0';
+	    char *extPtr = strrchr(inputText, '.');
+	    if(extPtr != NULL) {
+	         *extPtr = '\0';
+	    }
+	    char *filenameStartPtr = strrchr(inputText, '/');
+	    int fnameStartPos;
+	    if(filenameStartPtr != NULL) {
+	         fnameStartPos = filenameStartPtr - inputText;
+	    }
+	    else {
+		 fnameStartPos = 0;
+	    }
+	    char saveDirInfo[MAX_BUFFER_SIZE];
+	    snprintf(saveDirInfo, fnameStartPos + 1, "%s", inputText);
+	    sprintf(string, "Export to Directory: %s", saveDirInfo);
+	    input = new Fl_Input(25, 50, 235, 30);
 	    input->when(FL_WHEN_ENTER_KEY);
-	    input->value(inputText);
-	    Fl_Box *box = new Fl_Box(150, 20, 100, 30, (const char*)string);
+	    input->value(filenameStartPtr + 1);
+	    Fl_Box *box = new Fl_Box(95, 20, 100, 30, (const char*)string);
 	    box->box(FL_NO_BOX);
 	    box->align(FL_ALIGN_CENTER);
-	    new Fl_Box(260,50,30,30,".txt");
-	    Fl_Button *button = new Fl_Button(305, 50, 50, 30, "OK");
+	    new Fl_Box(260,50,30,30,".dat");
+	    Fl_Button *button = new Fl_Button(305, 50, 75, 30, "Export @->");
 	    button->callback(InputCallback, (void*)0);
 	    button->set_active();
 	    input->callback(InputCallback, (void*)0);
 	    callback(CloseCallback);
     }
     else
-    {
+    {    
+	    std::string actualStructName = 
+		        ExtractStructureNameFromCTName(defaultName);
+            const char *actualStructNameCStr = actualStructName.c_str();
+            inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
+            strncpy(inputText, actualStructNameCStr, actualStructName.size() + 1);
+            ConfigParser::nullTerminateString(inputText, actualStructName.size());
+
 	    sprintf(string, "Creating new folder for the structure %s", defaultName);
 	    input = new Fl_Input(160, 50, 100, 30, "@fileopen  New Folder Name:");
 	    input->when(FL_WHEN_ENTER_KEY);
@@ -70,7 +88,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    callback(CloseCallback);
 	}
-	if(!GUI_USE_DEFAULT_FOLDER_NAMES) {
+        if(type == InputWindow::FILE_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES) { 
             show();
 	}
 	else {
@@ -88,13 +106,25 @@ InputWindow::~InputWindow() {
 void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
 {
     InputWindow *window = (InputWindow*)widget->parent();
-    if(window->inputText != (char*)window->input->value()) {
-        strcpy(window->inputText, (char*)window->input->value());
+    if(window->windowType == InputWindow::FILE_INPUT) {
+         char exportSaveDir[MAX_BUFFER_SIZE];
+	 char *fileSepPtr = strrchr(window->inputText, '/');
+	 int dirTextLen = fileSepPtr - window->inputText + 1;
+	 snprintf(exportSaveDir, dirTextLen, "%s", window->inputText);
+	 snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s/%s.dat", 
+	          exportSaveDir, window->input->value());
+         window->name = window->inputText;
+	 fprintf(stderr, "%s\n", window->inputText);
     }
-    window->name = window->inputText;
-    if(window->cbUseDefaultNames->value()) {
-        GUI_USE_DEFAULT_FOLDER_NAMES = true;
-    }
+    else {
+        if(window->inputText != (char*)window->input->value()) {
+            strcpy(window->inputText, (char*)window->input->value());
+        }
+        window->name = window->inputText;
+        if(window->cbUseDefaultNames->value()) {
+            GUI_USE_DEFAULT_FOLDER_NAMES = true;
+        }
+    }    
     free(window->string);
     window->hide();
 }

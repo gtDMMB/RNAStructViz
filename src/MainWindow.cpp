@@ -121,9 +121,9 @@ MainWindow::MainWindow(int argc, char **argv)
         m_packedInfo->type(Fl_Pack::VERTICAL);
         
         m_packedInfo->end();
-        m_packedInfo->color(FL_TRANSPARENT);
+        m_packedInfo->color(GUI_WINDOW_BGCOLOR);
         m_structureInfo->end();
-        m_structureInfo->color(FL_TRANSPARENT);
+        m_structureInfo->color(GUI_WINDOW_BGCOLOR);
         
         mainMenuPane->resizable(m_structureInfo);
     
@@ -824,11 +824,11 @@ void MainWindow::RethemeMainWindow() {
 	     ms_instance->m_mainWindow->color(GUI_WINDOW_BGCOLOR);
              ms_instance->m_mainWindow->redraw();
              if(ms_instance->m_packedInfo) {
-	          ms_instance->m_packedInfo->color(FL_TRANSPARENT);
+	          ms_instance->m_packedInfo->color(GUI_WINDOW_BGCOLOR);
 	          ms_instance->m_packedInfo->redraw();
 	     }
 	     if(ms_instance->m_structureInfo) { 
-	          ms_instance->m_structureInfo->color(FL_TRANSPARENT);
+	          ms_instance->m_structureInfo->color(GUI_WINDOW_BGCOLOR);
 	          ms_instance->m_structureInfo->labelcolor(GUI_BTEXT_COLOR);
 	          ms_instance->m_structureInfo->redraw();
 	     }

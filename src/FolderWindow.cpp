@@ -257,7 +257,7 @@ void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
 
 void FolderWindow::RethemeFolderWindow() {
      if(folderScroll != NULL) {
-          folderScroll->color((Fl_Color) FL_TRANSPARENT);
+          folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
 	  folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
           folderScroll->redraw();
      }
