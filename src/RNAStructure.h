@@ -21,7 +21,7 @@ class RNABranchType_t;
 #define MIN(x, y)         (x <= y ? (x) : (y))
 #define ABS(x)            (x >= 0 ? (x) : -1 * (x))
 #define MIN3(x, y, z)     MIN(x, MIN(y, z))
-#define LOGFLOOR(x)       ((int) floor(log10(x)))
+#define LOGFLOOR(x)       ((int) floorf(log10f((float) x)))
 
 class RNAStructure
 {
@@ -195,6 +195,7 @@ class RNAStructure
     public:
 	static char GetBaseStringFormat(const char *baseStr);
 	static std::string GetRepeatedString(const char *str, int ntimes);
+        static int GetNumDigitsBase10(int x);
 
 };
 

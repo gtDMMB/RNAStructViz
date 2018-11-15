@@ -343,7 +343,7 @@ void RNAStructure::DisplayFileContents()
 		int stableSize = sizeof(textBufferStyleTable) / 
 			         sizeof(textBufferStyleTable[0]);
 		m_textDisplay->highlight_data(m_styleBuffer, 
-			       textBufferStyleTable, stableSize, 'A', 0, 0);
+			       textBufferStyleTable, stableSize - 1, 'A', 0, 0);
 
     }
     m_contentWindow->show();
@@ -392,7 +392,7 @@ void RNAStructure::GenerateString()
 		{
 		    charsWritten = snprintf(currentPosn, remainingSize, 
 				            "%6d  | %s\n", i + 1, baseStr);
-		    snprintf(formatPosn, remainingSize, "AAAAAAAAAA%c\n", 
+		    snprintf(formatPosn, remainingSize, "AAAAAA  | %c\n", 
 		             GetBaseStringFormat(baseStr));
 
 		}
@@ -423,48 +423,54 @@ void RNAStructure::GenerateString()
 			    baseStr,
 			    pairStr,
 			    pairID + 1);
-		    volatile char *pairMarkerFmt = 
-			    (char *) ((i <= pairID) ? "F" : "G");
+		    const char *pairMarkerFmt = ((i <= pairID) ? "F" : "G");
+		    int numDigits = GetNumDigitsBase10(pairID + 1);
+		    std::string numFmtStr = GetRepeatedString(pairMarkerFmt, 
+				                        numDigits);
 		    snprintf(formatPosn, remainingSize, 
-		             "AAAAAAAAAA%cAAA%c  %s%s%s\n", 
+		             "AAAAAA  | %c - %c  (%s)\n", 
 		             GetBaseStringFormat(baseStr), 
 			     GetBaseStringFormat(pairStr), 
-                             pairMarkerFmt, 
-			     GetRepeatedString((const char *) pairMarkerFmt, 
-				               1 + LOGFLOOR(pairID)).c_str(), 
-			     pairMarkerFmt);    
+			     numFmtStr.c_str());    
 		}
-                remainingSize -= charsWritten;
+                fprintf(stderr, "%s%s", currentPosn, formatPosn);
+		remainingSize -= charsWritten;
 		currentPosn += charsWritten;
 		formatPosn += charsWritten;
-		if(remainingSize <= 0)
-		     fprintf(stderr, "Remaining Size = %d\n", remainingSize);
 
     }
     m_displayString = (char *) realloc(m_displayString, 
                                sizeof(char) * (size - remainingSize+1));
+    m_displayString[size - remainingSize] = '\0';
     m_displayFormatString = (char *) realloc(m_displayFormatString, 
                              sizeof(char) * (size - remainingSize+1));
+    m_displayFormatString[size - remainingSize] = '\0';
 
 }
 
 char RNAStructure::GetBaseStringFormat(const char *baseStr) {
-     if(!strcmp(baseStr, "A")) 
+     if(!strcasecmp(baseStr, "A")) 
           return 'B';
      else if(!strcmp(baseStr, "C"))
 	  return 'C';
-     else if(!strcmp(baseStr, "G"))
+     else if(!strcasecmp(baseStr, "G"))
 	  return 'D';
-     else if(!strcmp(baseStr, "U"))
+     else if(!strcasecmp(baseStr, "U"))
 	  return 'E';
      else 
 	  return 'A';
 }
 
 std::string RNAStructure::GetRepeatedString(const char *str, int ntimes) {
-     std::string rstr;
-     for(int n = 1; n <= ntimes; n++) {
+     std::string rstr = string(str);
+     for(int n = 1; n < ntimes; n++) {
           rstr += string(str);
      }
      return rstr;
+}
+
+int RNAStructure::GetNumDigitsBase10(int x) {
+     char digitsBuffer[MAX_BUFFER_SIZE];
+     int numDigits = snprintf(digitsBuffer, MAX_BUFFER_SIZE - 1, "%d", x);
+     return numDigits;
 }
