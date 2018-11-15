@@ -312,7 +312,7 @@ void DisplayConfigWindow::ConstructWindow() {
 
      // draw bounding box for the two action buttons on the 
      // bottom right of the window:
-     int boundingBoxWidth = 2 * CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING;
+     int boundingBoxWidth = 3 * CFGWIN_BUTTON_WIDTH + 4 * CFGWIN_SPACING;
      offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth - CFGWIN_SPACING / 2;
      int bdBoxHeight = (int) 1.5 * (CONFIG_WINDOW_HEIGHT - workingYOffset);
      int bdBoxYOffset = CONFIG_WINDOW_HEIGHT - bdBoxHeight - CFGWIN_SPACING;
@@ -323,7 +323,7 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(btnBoundingBox);
 
      offsetX = CONFIG_WINDOW_WIDTH - 
-	       (CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING / 2);
+	       (CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING);
      Fl_Button *writeConfigBtn = new Fl_Button(offsetX, workingYOffset, 
 		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				 "@filenew   Save Settings");
@@ -340,6 +340,15 @@ void DisplayConfigWindow::ConstructWindow() {
      restoreDefaultsBtn->labelcolor(FL_DARK2);
      restoreDefaultsBtn->callback(RestoreDefaultsCallback);
      windowWidgets.push_back(restoreDefaultsBtn);
+     offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+
+     Fl_Button *cancelBtn = new Fl_Button(offsetX, workingYOffset, 
+		            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+			    "@1+   Cancel");
+     cancelBtn->color(FL_LIGHT2);
+     cancelBtn->labelcolor(FL_DARK2);
+     cancelBtn->callback(WindowCloseCallback);
+     windowWidgets.push_back(cancelBtn);
 
 } 
 
@@ -468,7 +477,13 @@ void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {
 }
 
 void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
-     DisplayConfigWindow *thisWin = (DisplayConfigWindow *) win;
+     DisplayConfigWindow *thisWin; 
+     if(win->as_window()) {
+          thisWin = (DisplayConfigWindow *) win;
+     }
+     else {
+          thisWin = (DisplayConfigWindow *) win->parent();
+     }
      thisWin->hide();
      thisWin->finished = true;
      //MainWindow::RethemeMainWindow();
