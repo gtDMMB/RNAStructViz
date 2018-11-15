@@ -53,7 +53,8 @@ typedef enum {
      CR_BRANCH3     = 9, 
      CR_BRANCH4     = 10, 
      CR_WHITE       = 11,
-     CR_TRANSPARENT = 12
+     CR_TRANSPARENT = 12,
+     CR_SOLID_BLACK = 14
 } CairoColorSpec_t;
 
 class DiagramWindow : public Fl_Cairo_Window

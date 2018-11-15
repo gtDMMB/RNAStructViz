@@ -575,6 +575,9 @@ void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
 	case CR_TRANSPARENT:
 	    CairoSetRGB(cr, 255, 255, 255, 0);
 	    break;
+	case CR_SOLID_BLACK:
+	    CairoSetRGB(cr, 0, 0, 0, 255);
+	    break;
         default:
             break;
     }
@@ -1196,8 +1199,8 @@ void DiagramWindow::RebuildMenus() {
 void DiagramWindow::MenuCallback(Fl_Widget *widget, void *userData) {
     // make sure the diagram is drawn right away:
     DiagramWindow *window = (DiagramWindow *) widget->parent();
+    window->ResetWindow(false);
     window->m_redrawStructures = true;
-    window->cairoTranslate = true;
     window->redraw();
 }
 
@@ -1205,7 +1208,6 @@ int DiagramWindow::handle(int flEvent) {
 
      switch(flEvent) { 
 	  case FL_SHOW:
-	       //fprintf(stderr, "Window Shown ... Redrawing\n");
 	       m_redrawStructures = true;
                redraw();
 	       Fl::flush();
@@ -1279,10 +1281,10 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
 
     // now draw the zoom selection area of the window:
     if(haveZoomBuffer && zw > 0 && zh > 0) {
-        SetCairoColor(curWinContext, CR_RED);
-	const double boxDashPattern[] = {1.0};
-	cairo_set_dash(curWinContext, boxDashPattern, 1, 0);
 	cairo_set_line_width(curWinContext, 2);
+        SetCairoColor(curWinContext, CR_SOLID_BLACK);
+	const double boxDashPattern[] = {6.0, 6.0};
+	cairo_set_dash(curWinContext, boxDashPattern, 2, 0.0);
 	cairo_rectangle(curWinContext, zx0, zy0, zw, zh);
         cairo_stroke(curWinContext);
     }
