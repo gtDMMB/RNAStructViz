@@ -314,6 +314,8 @@ void RNAStructure::DisplayFileContents()
 		textBuffer->text(m_displayString);
 		m_textDisplay->buffer(textBuffer);
 		m_textDisplay->textfont(LOCAL_BFFONT);
+		m_textDisplay->color(GUI_WINDOW_BGCOLOR);
+		m_textDisplay->labelcolor(GUI_BTEXT_COLOR);
 
     }
     m_contentWindow->show();

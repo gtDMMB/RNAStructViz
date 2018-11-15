@@ -66,7 +66,6 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->box(FL_PLASTIC_UP_BOX);
 	    cbUseDefaultNames->color(GUI_BGCOLOR);
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
-	    cbUseDefaultNames->selection_color(GUI_BTEXT_COLOR);
 	    cbUseDefaultNames->down_color(GUI_WINDOW_BGCOLOR);
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    callback(CloseCallback);

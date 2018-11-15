@@ -657,8 +657,10 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 buff->tab_distance(7);
                 text_display = new Fl_Text_Display(tdx+10,tdy+10,tdw-20,tdh-10);
                 text_display->buffer(buff);
+		text_display->color(GUI_WINDOW_BGCOLOR);
                 text_display->textfont(LOCAL_RMFONT);
 		text_display->textcolor(GUI_TEXT_COLOR);
+		text_display->labelcolor(GUI_TEXT_COLOR);
                 text_display_group->resizable(text_display);
             }
 			text_display_group->end();
