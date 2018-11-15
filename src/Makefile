@@ -9,7 +9,11 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
 else
-	FLTKCONFIG=fltk-config
+	ifneq "$(shell ls /usr/bin/fltk-config)" ""
+		FLTKCONFIG=/usr/bin/fltk-config
+        else
+		FLTKCONFIG=fltk-config
+	endif
 	READLINK=readlink
 endif
 
