@@ -81,14 +81,8 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 	       }
 	  }
 	  else if(!strcmp(parsedLine.cfgOption, "FLTK_THEME")) {
-               if(Fl::is_scheme(parsedLine.cfgValue)) { 
-	            strncpy(fltkTheme, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
-		    nullTerminateString(fltkTheme);
-		}
-		else {
-		     //fprintf(stderr, "No such FLTK theme \"%s\" ... skipping this.\b", 
-		     //        parsedLine.cfgValue);
-		}
+	       strncpy(fltkTheme, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
+	       nullTerminateString(fltkTheme);
           }
 	  else if(!strcmp(parsedLine.cfgOption, "GUI_WINDOW_BGCOLOR")) { 
                guiWindowBGColor = strtol(parsedLine.cfgValue, NULL, 16);

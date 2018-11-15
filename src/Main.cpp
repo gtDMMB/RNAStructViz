@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
     //Fl::get_system_colors();
     Fl_File_Icon::load_system_icons();
-    Fl::scheme(DEFAULT_FLTK_THEME);
+    Fl::scheme(FLTK_THEME);
 
     return Fl::run();
 

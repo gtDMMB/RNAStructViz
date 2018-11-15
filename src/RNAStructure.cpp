@@ -336,7 +336,7 @@ void RNAStructure::DisplayFileContents()
 		m_textDisplay->buffer(m_textBuffer);
 		m_textDisplay->textfont(LOCAL_BFFONT);
 		m_textDisplay->color(GUI_WINDOW_BGCOLOR);
-		m_textDisplay->labelcolor(GUI_BTEXT_COLOR);
+		m_textDisplay->textcolor(GUI_BTEXT_COLOR);
 		m_textDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
 		m_textDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
 		m_styleBuffer->text(m_displayFormatString);

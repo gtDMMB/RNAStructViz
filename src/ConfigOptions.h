@@ -14,6 +14,7 @@
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
 #include <FL/x.H>
+#include <FL/fl_draw.H>
 
 #include <string>
 using std::string;
@@ -61,6 +62,7 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define GetRed(flc)                     ((flc >> 24) & 0x000000ff)
 #define GetGreen(flc)                   ((flc >> 16) & 0x000000ff)
 #define GetBlue(flc)                    ((flc >> 8) & 0x000000ff)
+#define FL_TRANSPARENT                  (0xffffff00)
 
 /* Local "theme" defines for RNAStructViz: */
 #define LOCAL_WINDOW_BGCOLOR            (0xffffff00)
