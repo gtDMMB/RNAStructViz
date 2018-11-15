@@ -153,7 +153,7 @@ void StructureManager::AddFile(const char* filename)
 void StructureManager::RemoveStructure(const int index)
 {
     RNAStructure* structure = m_structures[index];
-    m_structures[index] = 0;
+    m_structures[index] = NULL;
 
     bool found = false;
     for(int i = 0; i < (int)folders.size(); i++)
@@ -181,7 +181,7 @@ void StructureManager::RemoveStructure(const int index)
 
 void StructureManager::DecreaseStructCount(const int index)
 {
-    folders[index]->structCount = folders[index]->structCount -1;
+    folders[index]->structCount = folders[index]->structCount - 1;
     if (folders[index]->structCount == 0) 
     {
         MainWindow::RemoveFolderByIndex(index);
@@ -189,6 +189,7 @@ void StructureManager::DecreaseStructCount(const int index)
     else {
         sprintf(folders[index]->folderNameFileCount, "(+% 2d) %-.48s", 
                 folders[index]->structCount, folders[index]->folderName);
+        Fl::redraw();
     }
 }
 
@@ -210,6 +211,7 @@ void StructureManager::RemoveFolder(const int folder, const int index)
     if(folders[index]->folderWindow)
     {
         delete folders[index]->folderWindow;
+        folders[index]->folderWindow = NULL;
     }
     folders[index]->structCount = 0;
     folders.erase(folders.begin() + index);

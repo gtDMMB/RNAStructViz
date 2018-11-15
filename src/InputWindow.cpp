@@ -117,7 +117,6 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
 	 snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s/%s.dat", 
 	          exportSaveDir, window->input->value());
          window->name = window->inputText;
-	 fprintf(stderr, "%s\n", window->inputText);
     }
     else {
         if(window->inputText != (char*)window->input->value()) {

@@ -511,7 +511,10 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
         if (!strcmp(folders[index]->folderName,(char*)(folderLabel->user_data())))
             break;
     }
-    
+    if(index == ms_instance->selectedFolderIndex) { // nothing to display:
+        return;
+    }
+
     FolderWindow* fwindow;
     if (folders[index]->folderWindow == NULL)
     {

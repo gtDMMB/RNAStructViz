@@ -301,8 +301,8 @@ const char* RNAStructure::GetFilename() const
     const char* basename = strrchr(m_pathname, '/');        
     if (!basename)
     {
-		return m_pathname;
-	}
+        return m_pathname;
+    }
     return ++basename;
 }
 

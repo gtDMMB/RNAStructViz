@@ -87,7 +87,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 			                 fileOpsLabelHeight - 2 * spacingHeight);
     folderPack->type(Fl_Pack::VERTICAL);
     
-    folderScroll->color((Fl_Color) FL_TRANSPARENT);
+    folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
 
     this->resizable(folderScroll);
