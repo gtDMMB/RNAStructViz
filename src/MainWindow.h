@@ -167,71 +167,7 @@ class MainWindow
 
     public:
 	/* Resets the color theme for the window */
-	static inline void RethemeMainWindow() {
-
-	     Fl::foreground(GetRed(LOCAL_FGCOLOR), 
-			    GetGreen(LOCAL_FGCOLOR), 
-			    GetBlue(LOCAL_FGCOLOR));
-	     Fl::background(GetRed(GUI_BGCOLOR), 
-			    GetGreen(GUI_BGCOLOR), 
-			    GetBlue(GUI_BGCOLOR)); 
-             Fl::background2(GetRed(LOCAL_BG2COLOR), 
-			     GetGreen(LOCAL_BG2COLOR), 
-			     GetBlue(LOCAL_BG2COLOR));
-	     
-	     if(ms_instance == NULL) {
-	          return;
-	     }
-	     ms_instance->m_mainWindow->color(GUI_WINDOW_BGCOLOR);
-             ms_instance->m_mainWindow->redraw();
-             if(ms_instance->m_packedInfo) {
-	          ms_instance->m_packedInfo->color(GUI_WINDOW_BGCOLOR);
-	          ms_instance->m_packedInfo->redraw();
-	     }
-	     if(ms_instance->m_structureInfo) { 
-	          ms_instance->m_structureInfo->color(GUI_WINDOW_BGCOLOR);
-	          ms_instance->m_structureInfo->labelcolor(GUI_BTEXT_COLOR);
-	          ms_instance->m_structureInfo->redraw();
-	     }
-	     ms_instance->menu_collapse->color(GUI_BGCOLOR);
-	     ms_instance->menu_collapse->labelcolor(GUI_BTEXT_COLOR);
-	     ms_instance->menu_collapse->redraw();
-	     ms_instance->folder_collapse->color(GUI_BGCOLOR);
-	     ms_instance->folder_collapse->labelcolor(GUI_BTEXT_COLOR);
-	     ms_instance->folder_collapse->redraw();
-	     ms_instance->columnLabel->labelcolor(GUI_TEXT_COLOR);
-	     ms_instance->columnLabel->redraw();
-	     ms_instance->actionsLabel->labelcolor(GUI_TEXT_COLOR);
-	     ms_instance->actionsLabel->redraw();
-	     ms_instance->openButton->color(GUI_BGCOLOR);
-	     ms_instance->openButton->labelcolor(GUI_BTEXT_COLOR);
-	     ms_instance->openButton->redraw();
-	     ms_instance->configOptionsButton->color(GUI_BGCOLOR);
-	     ms_instance->configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
-	     ms_instance->configOptionsButton->redraw();
-	     
-	     for(int b = 0; b < ms_instance->folderDataBtns.size(); b++) {
-	          ms_instance->folderDataBtns[b]->color(GUI_BGCOLOR);
-		  ms_instance->folderDataBtns[b]->labelcolor(GUI_BTEXT_COLOR);
-	     }
-	     if(ms_instance->selectedFolderBtn != NULL) {
-                  ms_instance->selectedFolderBtn->color(FL_LIGHT2);
-		  ms_instance->selectedFolderBtn->labelcolor(FL_DARK1);
-	     }
-	     if(ms_instance->selectedFolderIndex >= 0) {
-                  FolderWindow *curFolderWin = (FolderWindow *) 
-			       RNAStructViz::GetInstance()->
-			       GetStructureManager()->
-			       GetFolders()[ms_instance->selectedFolderIndex];
-	          curFolderWin->RethemeFolderWindow();
-	          if(ms_instance->selectedFolderBtn != NULL) { 
-		       ShowFolderCallback(ms_instance->selectedFolderBtn, NULL);
-		  }
-	     }
-	     Fl::scheme(FLTK_THEME);
-	     Fl::redraw();
-	     Fl::flush();
-	}
+	static void RethemeMainWindow(); 
 
 };
 

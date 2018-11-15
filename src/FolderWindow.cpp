@@ -87,10 +87,10 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 			                 fileOpsLabelHeight - 2 * spacingHeight);
     folderPack->type(Fl_Pack::VERTICAL);
     
-    folderScroll->color(GUI_WINDOW_BGCOLOR);
-    folderScroll->labelcolor(GUI_BTEXT_COLOR);
-    folderPack->color(GUI_WINDOW_BGCOLOR);
-    folderPack->labelcolor(GUI_BTEXT_COLOR);
+    folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
+    folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
+    //folderPack->color(GUI_WINDOW_BGCOLOR);
+    //folderPack->labelcolor(GUI_BTEXT_COLOR);
 
     this->resizable(folderScroll);
     this->color(GUI_WINDOW_BGCOLOR);
@@ -263,9 +263,9 @@ void FolderWindow::RethemeFolderWindow() {
 	  folderScroll->labelcolor(GUI_BTEXT_COLOR);
           folderScroll->redraw();
      }
-     if(folderPack != NULL) { 
-          folderPack->color(GUI_WINDOW_BGCOLOR);
-          folderPack->labelcolor(GUI_BTEXT_COLOR);
-          folderPack->redraw();
-     }
+     //if(folderPack != NULL) { 
+     //     folderPack->color(GUI_WINDOW_BGCOLOR);
+     //     folderPack->labelcolor(GUI_BTEXT_COLOR);
+     //     folderPack->redraw();
+     //}
 }

@@ -74,7 +74,7 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 	        Fl_Box *fpathsSettingBoxes[NUMSETTINGS];
 	        char *fpathsUpdateRefs[NUMSETTINGS];	
 		Fl_Box *colorDisplayBoxes[GUICOLORS];
-		Fl_Color *colorChangeRefs[GUICOLORS];
+		volatile Fl_Color *colorChangeRefs[GUICOLORS];
 		std::vector<Fl_Widget *> windowWidgets;
 };
 

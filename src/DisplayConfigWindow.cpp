@@ -8,6 +8,7 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include <FL/Enumerations.H>
 #include <FL/fl_draw.H>
@@ -57,10 +58,10 @@
 
      char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 
-     Fl_Color GUI_WINDOW_BGCOLOR;
-     Fl_Color GUI_BGCOLOR;
-     Fl_Color GUI_BTEXT_COLOR;
-     Fl_Color GUI_TEXT_COLOR;
+     volatile Fl_Color GUI_WINDOW_BGCOLOR;
+     volatile Fl_Color GUI_BGCOLOR;
+     volatile Fl_Color GUI_BTEXT_COLOR;
+     volatile Fl_Color GUI_TEXT_COLOR;
 
      bool GUI_USE_DEFAULT_FOLDER_NAMES;
 
@@ -274,7 +275,7 @@ void DisplayConfigWindow::ConstructWindow() {
 	  "@->   GUI Button Text Color:", 
 	  "@->   GUI Primary (Dark) Text Color:"
      };
-     Fl_Color *colorVarRefs[] = {
+     volatile Fl_Color *colorVarRefs[] = {
           &GUI_WINDOW_BGCOLOR, 
 	  &GUI_BGCOLOR, 
 	  &GUI_BTEXT_COLOR, 
@@ -470,5 +471,5 @@ void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
      DisplayConfigWindow *thisWin = (DisplayConfigWindow *) win;
      thisWin->hide();
      thisWin->finished = true;
-     MainWindow::RethemeMainWindow();
+     //MainWindow::RethemeMainWindow();
 }

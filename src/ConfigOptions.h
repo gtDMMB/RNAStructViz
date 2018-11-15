@@ -74,10 +74,10 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define LOCAL_RMFONT                    (FL_SCREEN_BOLD)
 #define LOCAL_BFFONT                    (FL_SCREEN_BOLD)
 
-extern Fl_Color GUI_WINDOW_BGCOLOR;
-extern Fl_Color GUI_BGCOLOR;
-extern Fl_Color GUI_BTEXT_COLOR;
-extern Fl_Color GUI_TEXT_COLOR;
+extern volatile Fl_Color GUI_WINDOW_BGCOLOR;
+extern volatile Fl_Color GUI_BGCOLOR;
+extern volatile Fl_Color GUI_BTEXT_COLOR;
+extern volatile Fl_Color GUI_TEXT_COLOR;
 
 extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
 
