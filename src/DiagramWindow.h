@@ -38,6 +38,7 @@
 
 #define DIAGRAMWIN_DEFAULT_CURSOR    (FL_CURSOR_CROSS)
 #define DWIN_REDRAW_REFRESH          (1.75)
+#define DWIN_DRAG_DX                 (3)
 
 typedef enum {
      CR_BLACK       = 0, 

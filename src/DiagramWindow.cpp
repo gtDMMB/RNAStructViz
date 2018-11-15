@@ -1106,6 +1106,7 @@ void DiagramWindow::RebuildMenus() {
 	    m_menus[m]->labelcolor(GUI_BTEXT_COLOR);
 	    m_menus[m]->textcolor(GUI_BTEXT_COLOR);
             m_menus[m]->selection_color(FL_LIGHT2);
+	    m_menus[m]->activate();
 	    activeMenuIndex[m] = -1;
             activeSet[m] = false;
 	}
@@ -1211,7 +1212,7 @@ int DiagramWindow::handle(int flEvent) {
 	       return 1;
 	  case FL_PUSH: // mouse down
                if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
-	          Fl::event_y() >= GLWIN_TRANSLATEY) {
+	          Fl::event_y() >= (int) 1.5 * GLWIN_TRANSLATEY) {
 	            zoomButtonDown = true;
 		    initZoomX = Fl::event_x();
 		    initZoomY = Fl::event_y();
@@ -1228,6 +1229,20 @@ int DiagramWindow::handle(int flEvent) {
 		    haveZoomBuffer = true;
 		    HandleUserZoomAction();
 		    //fprintf(stderr, "Button up @ (X, Y) = (%d, %d)\n", lastZoomX, lastZoomY);
+	       }
+	  case FL_DRAG:
+	       if(zoomButtonDown) {
+                    lastZoomX = Fl::event_x();
+		    lastZoomY = Fl::event_y();
+                    zx0 = initZoomX;
+		    zy0 = initZoomY;
+		    zx1 = lastZoomX;
+		    zy1 = lastZoomY;
+		    zw = ABS(initZoomX - lastZoomX);
+		    zh = ABS(initZoomY - lastZoomY);
+                    haveZoomBuffer = true;
+		    redraw();
+		    break;
 	       }
 	  default:
                return Fl_Cairo_Window::handle(flEvent);
