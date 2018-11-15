@@ -64,16 +64,16 @@ MainWindow::MainWindow(int argc, char **argv)
 
 	    // consistent alignment with the folder window display:
 	    int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
-            const char *dividerText = "--------------------------------------------";
+            //const char *dividerText = "--------------------------------------------";
 	    int dividerTextHeight = 4;
-	    topTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
-                                            2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-				            dividerTextHeight, dividerText);
-            topTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-            topTextDivider->labelcolor(GUI_TEXT_COLOR);
-	    topTextDivider->labelfont(LOCAL_BFFONT);
-	    topTextDivider->labelsize(LOCAL_TEXT_SIZE);
-	    upperYOffset += 5;
+	    //topTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
+            //                                2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+	    //			            dividerTextHeight, dividerText);
+            //topTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+            //topTextDivider->labelcolor(GUI_TEXT_COLOR);
+	    //topTextDivider->labelfont(LOCAL_BFFONT);
+	    //topTextDivider->labelsize(LOCAL_TEXT_SIZE);
+	    //upperYOffset += 5;
 
     	// make it more user friendly by including some help text: 
 	const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
@@ -105,24 +105,27 @@ MainWindow::MainWindow(int argc, char **argv)
 	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
 
-	midTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
-		                     NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
-		                     NAVBUTTONS_BHEIGHT + 15, 
-	                             2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-	                             dividerTextHeight, dividerText); 	
-        midTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-        midTextDivider->labelcolor(GUI_TEXT_COLOR);
-    	midTextDivider->labelfont(LOCAL_BFFONT);
-	midTextDivider->labelsize(LOCAL_TEXT_SIZE);
+	//midTextDivider = new Fl_Box(NAVBUTTONS_OFFSETX, 
+	//	                     NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
+	//	                     NAVBUTTONS_BHEIGHT + 15, 
+	//                             2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+	//                             dividerTextHeight, dividerText); 	
+        //midTextDivider->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+        //midTextDivider->labelcolor(GUI_TEXT_COLOR);
+    	//midTextDivider->labelfont(LOCAL_BFFONT);
+	//midTextDivider->labelsize(LOCAL_TEXT_SIZE);
 
 	const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
-        columnLabel = new Fl_Box(20, 50 + upperYOffset + navButtonsLabelHeight + 
-			                             dividerTextHeight, 120, 75,
-			                             foldersInstText);
+        columnLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 
+		      50 + upperYOffset + navButtonsLabelHeight + 
+	              dividerTextHeight, 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+		      navButtonsLabelHeight, foldersInstText);
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-        columnLabel->labelcolor(GUI_TEXT_COLOR);
+        columnLabel->color(GUI_BGCOLOR);
+	columnLabel->labelcolor(GUI_BTEXT_COLOR);
 	columnLabel->labelfont(LOCAL_BFFONT);
 	columnLabel->labelsize(LOCAL_TEXT_SIZE);
+	columnLabel->box(FL_RSHADOW_BOX);
 
         m_structureInfo = new Fl_Scroll(0, 105 + upperYOffset + navButtonsLabelHeight + 
 			              dividerTextHeight + 15, 290, 360 - 
@@ -629,7 +632,7 @@ void MainWindow::HideFolderByName(const char* foldername)
     
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if (!strcmp((char*)(childLabel->user_data()),foldername))
+        if (!strcmp((char*)(childLabel->user_data()), foldername + 5))
             childLabel->color(FL_BACKGROUND_COLOR);
 	    childLabel->labelcolor(GUI_BTEXT_COLOR);
     }
