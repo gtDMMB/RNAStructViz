@@ -46,7 +46,7 @@ class MainWindow
         static void AddFolder(const char* foldername, const int index, 
     	                      const bool isSelected);
     
-        static void RemoveFolderByIndex(const int index);
+        static void RemoveFolderByIndex(const int index, bool selectNext = true);
     
         /*
          Removes the folder contents group from the folder tabs pane.
@@ -89,6 +89,7 @@ class MainWindow
          Callback to show/hide a folder
          */
         static void ShowFolderCallback(Fl_Widget* widget, void* userData);
+        static void ShowFolderByIndex(int index); 
 
         /*
 	    Callback to remove a structure.

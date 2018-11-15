@@ -184,7 +184,7 @@ void StructureManager::DecreaseStructCount(const int index)
     folders[index]->structCount = folders[index]->structCount - 1;
     if (folders[index]->structCount == 0) 
     {
-        MainWindow::RemoveFolderByIndex(index);
+        MainWindow::RemoveFolderByIndex(index, true);
     }
     else {
         sprintf(folders[index]->folderNameFileCount, "(+% 2d) %-.48s", 
@@ -232,7 +232,8 @@ void StructureManager::AddFolder(RNAStructure* structure, const int index)
     temp->folderStructs = (int*)malloc(sizeof(int)*128);
     temp->folderStructs[0] = index;
     temp->structCount = 1;
-    sprintf(temp->folderNameFileCount, "(+% 2d) %-.48s", temp->structCount, temp->folderName);
+    sprintf(temp->folderNameFileCount, "(+% 2d) %-.48s", 
+	    temp->structCount, temp->folderName);
     temp->selected = false;
     temp->folderWindow = 0;
     folders.push_back(temp);
