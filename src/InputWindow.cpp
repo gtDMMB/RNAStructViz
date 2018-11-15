@@ -13,13 +13,15 @@
 #include "ConfigParser.h"
 
 InputWindow::InputWindow(int w, int h, const char *label, 
-	const char *defaultName, InputWindowType type) : Fl_Window(w, h, label)
+	const char *defaultName, InputWindowType type) : 
+	Fl_Window(w, h, label), cbUseDefaultNames(NULL) 
 {	
     string = (char*)malloc(sizeof(char)*90);
     color(GUI_WINDOW_BGCOLOR);
     set_modal();
     windowType = type;
-
+    inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
+    
     if (type == InputWindow::FILE_INPUT)
     {
     	    strncpy(inputText, defaultName, MAX_BUFFER_SIZE - 1);
@@ -45,7 +47,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    Fl_Box *box = new Fl_Box(95, 20, 100, 30, (const char*)string);
 	    box->box(FL_NO_BOX);
 	    box->align(FL_ALIGN_CENTER);
-	    new Fl_Box(260,50,30,30,".dat");
+	    Fl_Box *fileExtBox = new Fl_Box(260,50,30,30,".dat");
 	    Fl_Button *button = new Fl_Button(305, 50, 75, 30, "Export @->");
 	    button->callback(InputCallback, (void*)0);
 	    button->set_active();
@@ -57,7 +59,6 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    std::string actualStructName = 
 		        ExtractStructureNameFromCTName(defaultName);
             const char *actualStructNameCStr = actualStructName.c_str();
-            inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
             strncpy(inputText, actualStructNameCStr, actualStructName.size() + 1);
             ConfigParser::nullTerminateString(inputText, actualStructName.size());
 
@@ -99,7 +100,9 @@ InputWindow::InputWindow(int w, int h, const char *label,
 
 InputWindow::~InputWindow() {
     delete input;
-    delete cbUseDefaultNames;
+    if(cbUseDefaultNames != NULL) {
+        delete cbUseDefaultNames;
+    }
     free(inputText);
 }
 

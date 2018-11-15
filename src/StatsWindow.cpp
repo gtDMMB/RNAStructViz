@@ -1929,7 +1929,7 @@ void StatsWindow::ExportTable()
 	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.dat", 
 		 PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
 	input_window = new InputWindow(400, 150, "Export Table To File ...",
-                                   filename, InputWindow::FILE_INPUT);
+                                       filename, InputWindow::FILE_INPUT);
 	exp_button->value(1);
         exp_button->deactivate();
 	while (input_window != NULL && input_window->visible())
@@ -2000,7 +2000,6 @@ void StatsWindow::ExportTable()
     
     exp_button->value(0);
     exp_button->activate();
-    
     menu_window->activate();
     tab_window->activate();
 }
