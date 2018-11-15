@@ -17,8 +17,12 @@
 
 #include "pixmaps/RNAStructVizLogo.c"
 #include "pixmaps/RNAWindowIcon.xbm"
+#include "pixmaps/HelpIcon.c"
 
 MainWindow* MainWindow::ms_instance = 0;
+
+Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image(HelpIcon.pixel_data, 
+			   HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
 
 MainWindow::MainWindow(int argc, char **argv)
           : m_fileChooser(NULL), selectedFolderBtn(NULL)
@@ -41,6 +45,22 @@ MainWindow::MainWindow(int argc, char **argv)
 	    Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, 
 	           NAVBUTTONS_OFFSETY, appLogo->w(), appLogo->h());
 	    appLogoCont->image(appLogo);
+
+	    int helpButtonDims = 26;
+	    int helpButtonOffsetX = 300 - helpButtonDims - NAVBUTTONS_SPACING;
+	    Fl_Button *helpButton = new Fl_Button(helpButtonOffsetX, NAVBUTTONS_SPACING, 
+			                          helpButtonDims, helpButtonDims, "");
+	    helpButton->color(GUI_WINDOW_BGCOLOR);
+	    helpButton->labelcolor(GUI_BTEXT_COLOR);
+	    helpButton->labelsize(2 * LOCAL_TEXT_SIZE);
+	    helpButton->image(helpIconImage);
+	    helpButton->deimage(helpIconImage);
+	    helpButton->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	    helpButton->labeltype(FL_ICON_LABEL);
+	    helpButton->shortcut(FL_CTRL + 'h');
+	    helpButton->box(FL_NO_BOX);
+	    helpButton->callback(HelpButtonCallback);
+            helpButton->redraw();
 
 	    // consistent alignment with the folder window display:
 	    int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
@@ -254,7 +274,7 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 	ConfigParser::nullTerminateString(CTFILE_SEARCH_DIRECTORY);
     }
 
-    for (int i = 1; i <= ms_instance->m_fileChooser->count(); ++i)
+    for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i)
     {
     	const char *nextFilename = ms_instance->m_fileChooser->filename(i);
 	if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
@@ -282,6 +302,40 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
 void MainWindow::TestCallback(Fl_Widget* widget, void* userData)
 {
     RNAStructViz::GetInstance()->TestFolders();
+}
+
+void MainWindow::HelpButtonCallback(Fl_Widget *btn, void *udata) {
+     
+     const char *helpTextBuffer[6] = {
+          "A detailed user manual and explanation of core features ", 
+	  "of RNAStructViz is available on the project WIKI: \n", 
+	  "https://github.com/gtDMMB/RNAStructViz/wiki\n\n", 
+	  "Additional runtime diagnostic information can be obtained by ", 
+	  "running the application with the \"--about\" option from ", 
+	  "your terminal:\n$ RNAStructViz --about"
+     };
+     char fullHelpText[4 * MAX_BUFFER_SIZE];
+     fullHelpText[0] = '\0';
+     for(int bufline = 0; bufline < 6; bufline++) {
+          strcat(fullHelpText, helpTextBuffer[bufline]); 
+     }
+     fl_message_title("RNAStructViz Help ...");
+     fl_message_icon()->image(MainWindow::helpIconImage);
+     fl_message_icon()->label("");
+     fl_message_icon()->color(FL_LIGHT2);
+     fl_message_icon()->box(FL_NO_BOX);
+     fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+     int userHelpSelection = fl_choice(fullHelpText, "Copy WIKI Link", "OK", NULL);
+     switch(userHelpSelection) {
+          case 0: { // copy the WIKI link to the clipboard:
+               const char *wikiLink = "https://github.com/gtDMMB/RNAStructViz/wiki";
+               Fl::copy(wikiLink, strlen(wikiLink), 1, Fl::clipboard_plain_text);
+	       break;
+          }
+	  default:
+	       break;
+     }
+
 }
 
 void MainWindow::CollapseMainMenu()

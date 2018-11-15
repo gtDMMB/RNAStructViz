@@ -371,12 +371,14 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
           msgIconBox->image(parentWin->pngNewPathIcon);
           msgIconBox->label("");
 	  msgIconBox->type(FL_NO_BOX);
-	  msgIconBox->color(GUI_BGCOLOR);
-          msgIconBox->labelcolor(GUI_BTEXT_COLOR);
+	  msgIconBox->color(FL_LIGHT2);
+          msgIconBox->box(FL_NO_BOX);
+	  msgIconBox->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | 
+			    FL_ALIGN_CENTER);
 	  msgIconBox->redraw();
      }
 
-     const char *inputDialogMsg = "Choose the format of the PNG image paths saved by the diagram window. \nNote that C-style strftime-like modifiers such as %%F, %%H,%%M%%S, \nare supported in the format description entered below. \nSee \"man strftime\", or strftime(3), in your terminal for a complete \ndescription of supported timestamp modifiers.";
+     const char *inputDialogMsg = "Choose the format of the PNG image paths saved by the diagram window. \nNote that C-style strftime-like modifiers such as %%F, %%H%%M%%S, \nare supported in the format description entered below. \nSee \"man strftime\", or strftime(3), in your terminal for a complete \ndescription of supported timestamp modifiers.";
      const char *nextPNGPath = fl_input(inputDialogMsg, parentWin->fpathsUpdateRefs[settingIdx]);
      if(nextPNGPath == NULL) {
           return;

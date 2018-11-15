@@ -19,7 +19,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     // label configuration:  
     labelcolor(GUI_TEXT_COLOR);
     labelfont(LOCAL_BFFONT);
-    labelsize(2 * LOCAL_TEXT_SIZE);    
+    labelsize(LOCAL_TEXT_SIZE);    
 
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
@@ -63,7 +63,10 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt, const char *label, in
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(GUI_BTEXT_COLOR);
 
-    Fl_Button* closeButton = new Fl_Button(x+wid-18,y - 29,20,20,"");
+    int buttonDims = 26;
+    int xOffset = x + wid - buttonDims - NAVBUTTONS_SPACING;
+    Fl_Button* closeButton = new Fl_Button(xOffset, NAVBUTTONS_SPACING, 
+		             buttonDims, buttonDims, "");
     closeButton->callback(CloseFolderCallback);
     closeButton->label("@1+");
     closeButton->labelcolor(GUI_TEXT_COLOR);

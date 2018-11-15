@@ -103,7 +103,11 @@ class MainWindow
          */
         static void TestCallback(Fl_Widget *widget, void* userData);
     
-        /*
+	/* Callback for displaying the help dialog */
+        static void HelpButtonCallback(Fl_Widget *btn, void *userData);
+        static Fl_RGB_Image *helpIconImage;
+
+	/*
         Callbacks for collapsing the two sides of the window.
         */
         static void CollapseMainCallback(Fl_Widget *widget, void* userData);

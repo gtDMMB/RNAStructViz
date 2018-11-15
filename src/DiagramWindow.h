@@ -175,7 +175,7 @@ private:
 		float& angleDelta,
 		float& radius);
 
-    static void MenuCallback(Fl_Widget* widget, void* userData);
+    static void MenuCallback(Fl_Widget *widget, void *userData);
 
     // Holds the title of the window
     char* title; 

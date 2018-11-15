@@ -73,10 +73,6 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     crZoomSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
     		    ZOOM_WIDTH, ZOOM_HEIGHT);
     crDraw = cairo_create(crSurface);
-    //cairo_set_source_rgb(crDraw, 
-    //		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-    //			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-    //			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     SetCairoColor(crDraw, CR_TRANSPARENT);
     cairo_rectangle(crDraw, 0, 0, this->w(), this->h());
     cairo_fill(crDraw);
@@ -144,14 +140,9 @@ DiagramWindow::~DiagramWindow() {
 
 void DiagramWindow::SetFolderIndex(int index) {
     folderIndex = index;
-
     char *structureNameFull = RNAStructViz::GetInstance()->GetStructureManager()->
                               GetFolderAt(index)->folderName;
-    char *structureName = strchr(structureNameFull, '_') + 1;
-    if(!structureName) {
-        structureName = structureNameFull;
-    }
-    sprintf(title, "Comparison of Arc Diagrams: %-.48s", structureName);
+    sprintf(title, "Comparison of Arc Diagrams: %-.48s", structureNameFull);
     label(title);
 }
 
@@ -1202,13 +1193,11 @@ void DiagramWindow::RebuildMenus() {
 }
 
 void DiagramWindow::MenuCallback(Fl_Widget *widget, void *userData) {
-    
     // make sure the diagram is drawn right away:
     DiagramWindow *window = (DiagramWindow *) widget->parent();
     window->m_redrawStructures = true;
     window->cairoTranslate = true;
     window->redraw();
-    
 }
 
 int DiagramWindow::handle(int flEvent) {
@@ -1311,6 +1300,12 @@ void DiagramWindow::HandleUserZoomAction() {
     
     if(zx0 != zx1 && zy0 != zy1) { 
         cairo_identity_matrix(crZoom);
+	cairo_set_source_rgb(crZoom, 
+		             GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			     GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+			     GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+        cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
+        cairo_fill(crZoom);
 	int copyWidth = MIN(ZOOM_WIDTH, zw);
 	int copyHeight = MIN(ZOOM_HEIGHT, zh);
 	double contextScaleX = (double) ZOOM_WIDTH / copyWidth;
@@ -1322,14 +1317,6 @@ void DiagramWindow::HandleUserZoomAction() {
 				 -1 * (zy0 - GLWIN_TRANSLATEY));
         cairo_rectangle(crZoom, 0, 0, copyWidth, copyHeight);    
 	cairo_fill(crZoom);
-    }
-    else {
-        cairo_set_source_rgb(crZoom, 
-		             GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			     GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			     GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
-        cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
-        cairo_fill(crZoom);
     }
     redraw();
 
