@@ -48,6 +48,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input->when(FL_WHEN_ENTER_KEY);
             input->maximum_size(60);
 	    input->value(inputText);
+	    input->color(GUI_BGCOLOR);
+	    input->textcolor(GUI_BTEXT_COLOR);
 	    Fl_Box *box = new Fl_Box(50, 1, 300, 40, (const char*)string);
 	    box->box(FL_OSHADOW_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
@@ -65,7 +67,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->color(GUI_BGCOLOR);
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
 	    cbUseDefaultNames->selection_color(GUI_BTEXT_COLOR);
-	    cbUseDefaultNames->down_color(FL_LIGHT3);
+	    cbUseDefaultNames->down_color(GUI_WINDOW_BGCOLOR);
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    callback(CloseCallback);
 	}
