@@ -29,9 +29,9 @@
 /* This structure is similar to the one found in /usr/include/asm/ucontext.h */
 typedef struct {
      unsigned long     uc_flags;
-     struct ucontext   *uc_link;
+     struct ucontext  *uc_link;
      stack_t           uc_stack;
-     struct sigcontext uc_mcontext;
+     sigcontext        uc_mcontext;
      sigset_t          uc_sigmask;
 } SigContext_t;
 
@@ -45,7 +45,7 @@ inline void SegfaultSignalHandler(int signum, siginfo_t *sinfo, void *scontext) 
      #if defined(__i386__)                                         // gcc specific
           callerAddress = (void *) sc->uc_mcontext.eip;            // x86 specific
      #elif defined(__x86_64__)                                     // gcc specific
-          callerAddress = (void *) sc->uc_mcontext.rip;            //x86_64 specific
+          callerAddress = (void *) sc->uc_mcontext.rip;            // x86_64 specific
      #else
      #error Unsupported architecture. 
      #endif
