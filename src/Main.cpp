@@ -40,17 +40,7 @@ int main(int argc, char **argv) {
     Fl::option(Fl::OPTION_VISIBLE_FOCUS, false);
     Fl::option(Fl::OPTION_SHOW_TOOLTIPS, true);
     Fl::option(Fl::OPTION_FNFC_USES_GTK, true);
-
-    //Fl::own_colormap();
-    //uchar rc, bc, gc;
-    //Fl::get_color(GUI_BGCOLOR, rc, bc, gc); 
-    //Fl::background(rc, bc, gc);
-    //Fl::get_color(LOCAL_FGCOLOR, rc, bc, gc); 
-    //Fl::foreground(rc, bc, gc);
-    //Fl::get_color(LOCAL_BG2COLOR, rc, bc, gc); 
-    //Fl::background2(rc, bc, gc); 
-
-    //Fl::get_system_colors();
+    
     Fl_File_Icon::load_system_icons();
     Fl::scheme((char *) FLTK_THEME);
     MainWindow::ResetThemeColormaps();

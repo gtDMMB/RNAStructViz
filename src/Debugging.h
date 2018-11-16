@@ -57,7 +57,7 @@ inline void SegfaultSignalHandler(int signum, siginfo_t *sinfo, void *scontext) 
      fprintf(stderr, "========================================================\n\n");
      fprintf(stderr, "A critical error occurred that the application \n");
      fprintf(stderr, "cannot recover from. Terminating now with detailed logs.\n\n");
-     fprintf(stderr, "%s raised from address %P at caller address %p.\n", 
+     fprintf(stderr, "%s raised from address %p at caller address %p.\n", 
 		     strsignal(signum), sinfo->si_addr, 
 		     (void *) callerAddress);
      fprintf(stderr, "STACKTRACE:\n\n");
