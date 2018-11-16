@@ -82,7 +82,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input->labelcolor(GUI_TEXT_COLOR);
 	    const char *cbText = " Use only default names for structure folders";
 	    cbUseDefaultNames = new Fl_Check_Button(30, 100, 325, 30, cbText);
-	    cbUseDefaultNames->box(FL_PLASTIC_UP_BOX);
+	    cbUseDefaultNames->box(FL_ROUND_UP_BOX);
 	    cbUseDefaultNames->color(GUI_BGCOLOR);
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
 	    cbUseDefaultNames->down_color(GUI_WINDOW_BGCOLOR);

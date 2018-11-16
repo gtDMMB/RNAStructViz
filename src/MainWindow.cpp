@@ -258,10 +258,10 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     }
 
     const char *nextWorkingDir = ms_instance->m_fileChooser->directory();
-    if(nextWorkingDir != NULL && strcmp(nextWorkingDir, CTFILE_SEARCH_DIRECTORY)) { 
+    if(nextWorkingDir != NULL && strcmp(nextWorkingDir, (char *) CTFILE_SEARCH_DIRECTORY)) { 
 	// update the working directory:
-        strncpy(CTFILE_SEARCH_DIRECTORY, nextWorkingDir, MAX_BUFFER_SIZE - 1);
-	ConfigParser::nullTerminateString(CTFILE_SEARCH_DIRECTORY);
+        strncpy((char *) CTFILE_SEARCH_DIRECTORY, nextWorkingDir, MAX_BUFFER_SIZE - 1);
+	ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY);
     }
 
     for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i)
@@ -312,7 +312,7 @@ void MainWindow::HelpButtonCallback(Fl_Widget *btn, void *udata) {
      fl_message_title("RNAStructViz Help ...");
      fl_message_icon()->image(MainWindow::helpIconImage);
      fl_message_icon()->label("");
-     fl_message_icon()->color(FL_LIGHT2);
+     fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));
      fl_message_icon()->box(FL_NO_BOX);
      fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
      int userHelpSelection = fl_choice(fullHelpText, "Copy WIKI Link", "OK", NULL);
@@ -473,8 +473,8 @@ bool MainWindow::CreateFileChooser()
     
     // Get the current working directory.
     char currentWD[MAX_BUFFER_SIZE];
-    if(ConfigParser::directoryExists(CTFILE_SEARCH_DIRECTORY)) { 
-        strncpy(currentWD, CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1); 
+    if(ConfigParser::directoryExists((char *) CTFILE_SEARCH_DIRECTORY)) { 
+        strncpy(currentWD, (char *) CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1); 
     }
     else if (!getcwd(currentWD, MAX_BUFFER_SIZE)) {
         std::cerr << "Error: getcwd failed. Cannot create file chooser.\n";
@@ -502,8 +502,8 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         childLabel->color(FL_BACKGROUND_COLOR);
     }
-    folderLabel->color(FL_LIGHT2);
-    folderLabel->labelcolor(FL_DARK1);
+    folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+    folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
     
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
     int index;
@@ -556,7 +556,7 @@ void MainWindow::ShowFolderSelected()
     for (int i = 0; i < pack->children(); ++i) {
 
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if (childLabel->color() == FL_LIGHT2) {
+        if (childLabel->color() == Lighter(GUI_BGCOLOR, 0.5f)) {
             folderLabel = childLabel;
             break;
         }
@@ -745,8 +745,8 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
 		       }
 		  }
 		  Fl_Button *folderLabel = ms_instance->folderDataBtns[labelIndex];
-		  folderLabel->color(FL_LIGHT2);
-		  folderLabel->labelcolor(FL_DARK1);
+		  folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+		  folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 		  ms_instance->selectedFolderBtn = folderLabel;
 		  break;
 	     }
@@ -860,17 +860,16 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
 }
 
 void MainWindow::CloseCallback(Fl_Widget* widget, void* userData) {
-    ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     widget->hide();
     exit(0);
 }
 
 void MainWindow::ResetThemeColormaps() {
-     Fl::set_color(FL_BACKGROUND_COLOR, GUI_WINDOW_BGCOLOR);
-     Fl::set_color(FL_BACKGROUND2_COLOR, fl_darker(GUI_WINDOW_BGCOLOR));
+     Fl::set_color(FL_BACKGROUND_COLOR, GUI_BGCOLOR);
+     Fl::set_color(FL_BACKGROUND2_COLOR, GUI_BGCOLOR);
      Fl::set_color(FL_FOREGROUND_COLOR, GUI_BTEXT_COLOR);
-     Fl::set_color(FL_INACTIVE_COLOR, fl_darker(GUI_BTEXT_COLOR));
-     Fl::set_color(FL_SELECTION_COLOR, fl_lighter(GUI_BTEXT_COLOR));
+     Fl::set_color(FL_INACTIVE_COLOR, Darker(GUI_BTEXT_COLOR, 0.35f));
+     Fl::set_color(FL_SELECTION_COLOR, Lighter(GUI_BTEXT_COLOR, 0.4f));
 }
 
 void MainWindow::RethemeMainWindow() {
@@ -922,8 +921,8 @@ void MainWindow::RethemeMainWindow() {
 		  ms_instance->folderDataBtns[b]->labelcolor(GUI_BTEXT_COLOR);
 	     }
 	     if(ms_instance->selectedFolderBtn != NULL) {
-                  ms_instance->selectedFolderBtn->color(FL_LIGHT2);
-		  ms_instance->selectedFolderBtn->labelcolor(FL_DARK1);
+                  ms_instance->selectedFolderBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
+		  ms_instance->selectedFolderBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 	     }
 	     ms_instance->actionsLabel->color(GUI_BGCOLOR);
 	     ms_instance->actionsLabel->labelcolor(GUI_BTEXT_COLOR);
@@ -940,7 +939,7 @@ void MainWindow::RethemeMainWindow() {
 		  ShowFolderCallback(ms_instance->selectedFolderBtn, 
 		         (void *) ms_instance->selectedFolderBtn->user_data());
 	     }
-	     Fl::scheme(FLTK_THEME);
+	     Fl::scheme((char *) FLTK_THEME);
 	     Fl::redraw();
 	     Fl::flush();
 }

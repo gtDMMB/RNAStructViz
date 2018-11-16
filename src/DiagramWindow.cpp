@@ -1107,7 +1107,7 @@ void DiagramWindow::RebuildMenus() {
             m_menus[m]->callback(MenuCallback);
 	    m_menus[m]->labelcolor(GUI_BTEXT_COLOR);
 	    m_menus[m]->textcolor(GUI_BTEXT_COLOR);
-            m_menus[m]->selection_color(FL_LIGHT2);
+            m_menus[m]->selection_color(Lighter(GUI_BTEXT_COLOR, 0.5f));
 	    m_menus[m]->activate();
 	    activeMenuIndex[m] = -1;
             activeSet[m] = false;

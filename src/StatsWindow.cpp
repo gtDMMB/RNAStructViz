@@ -678,7 +678,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 	table_tab->labelcolor(GUI_BTEXT_COLOR);
 	}
 	tab_window->labeltype(FL_NO_LABEL);
-	tab_window->labelcolor(Darker(FL_LIGHT3, 0.95f));
+	tab_window->labelcolor(Darker(GUI_BTEXT_COLOR, 0.65f));
 	tab_window->end();
     
 	this->resizable(tab_window);
@@ -1923,8 +1923,8 @@ void StatsWindow::ExportTable()
         time_t currentTime = time(NULL);
         struct tm *tmCurrentTime = localtime(&currentTime);
         strftime(dateStamp, MAX_BUFFER_SIZE - 1, "%F-%H%M%S", tmCurrentTime);
-	const char *sepChar = 
-		    PNG_OUTPUT_DIRECTORY[strlen(PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
+	const char *sepChar = PNG_OUTPUT_DIRECTORY[
+		    strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
 		     "" : "/";
 	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.dat", 
 		 PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);

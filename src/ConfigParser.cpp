@@ -181,14 +181,14 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 
 void ConfigParser::storeVariables() const {
 
-     strncpy(CTFILE_SEARCH_DIRECTORY, ctFileSearchDirectory, MAX_BUFFER_SIZE - 1); 
-     nullTerminateString(CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1); 
-     strncpy(PNG_OUTPUT_DIRECTORY, pngOutputDirectory, MAX_BUFFER_SIZE - 1); 
-     nullTerminateString(PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1); 
-     strncpy(PNG_OUTPUT_PATH, pngOutputPath, MAX_BUFFER_SIZE - 1);
-     nullTerminateString(PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);  
-     strncpy(FLTK_THEME, fltkTheme, MAX_BUFFER_SIZE - 1); 
-     nullTerminateString(FLTK_THEME, MAX_BUFFER_SIZE - 1); 
+     strncpy((char *) CTFILE_SEARCH_DIRECTORY, ctFileSearchDirectory, MAX_BUFFER_SIZE - 1); 
+     nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1); 
+     strncpy((char *) PNG_OUTPUT_DIRECTORY, pngOutputDirectory, MAX_BUFFER_SIZE - 1); 
+     nullTerminateString((char *) PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1); 
+     strncpy((char *) PNG_OUTPUT_PATH, pngOutputPath, MAX_BUFFER_SIZE - 1);
+     nullTerminateString((char *) PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);  
+     strncpy((char *) FLTK_THEME, fltkTheme, MAX_BUFFER_SIZE - 1); 
+     nullTerminateString((char *) FLTK_THEME, MAX_BUFFER_SIZE - 1); 
 
      GUI_WINDOW_BGCOLOR = guiWindowBGColor;
      GUI_BGCOLOR = guiBGColor;
@@ -233,19 +233,20 @@ void ConfigParser::WriteUserConfigFile(const char *fpath) {
      }
      if(writeCfgFile) {
           ConfigParser cfgParser;
-          cfgParser.writeFile(fpath, !DEBUGGING_ON);
+          cfgParser.setDefaults();
+	  cfgParser.writeFile(fpath, !DEBUGGING_ON);
      }
 }
 
 void ConfigParser::setDefaults() { 
      
-     strncpy(ctFileSearchDirectory, CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1);
+     strncpy(ctFileSearchDirectory, (char *) CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1);
      nullTerminateString(ctFileSearchDirectory);
-     strncpy(pngOutputDirectory, PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1);
+     strncpy(pngOutputDirectory, (char *) PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1);
      nullTerminateString(pngOutputDirectory);
-     strncpy(pngOutputPath, PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
+     strncpy(pngOutputPath, (char *) PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
      nullTerminateString(pngOutputPath);
-     strncpy(fltkTheme, FLTK_THEME, MAX_BUFFER_SIZE - 1);
+     strncpy(fltkTheme, (char *) FLTK_THEME, MAX_BUFFER_SIZE - 1);
      nullTerminateString(fltkTheme);
      
      guiWindowBGColor = GUI_WINDOW_BGCOLOR;

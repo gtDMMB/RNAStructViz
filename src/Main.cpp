@@ -3,10 +3,12 @@
 #include <string.h>
 
 #include <FL/Fl.H>
+#include <FL/Enumerations.H>
 
 #include "MainWindow.h"
 #include "RNAStructViz.h"
 #include "ConfigOptions.h"
+#include "ConfigParser.h"
 #include "DisplayConfigWindow.h"
 
 int main(int argc, char **argv) {
@@ -27,7 +29,7 @@ int main(int argc, char **argv) {
     Fl::option(Fl::OPTION_SHOW_TOOLTIPS, true);
     Fl::option(Fl::OPTION_FNFC_USES_GTK, true);
 
-    Fl::own_colormap();
+    //Fl::own_colormap();
     //uchar rc, bc, gc;
     //Fl::get_color(GUI_BGCOLOR, rc, bc, gc); 
     //Fl::background(rc, bc, gc);
@@ -40,9 +42,11 @@ int main(int argc, char **argv) {
 
     //Fl::get_system_colors();
     Fl_File_Icon::load_system_icons();
-    Fl::scheme(FLTK_THEME);
+    Fl::scheme((char *) FLTK_THEME);
 
-    return Fl::run();
+    int flRunCode = Fl::run();
+    ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+    return flRunCode;
 
 }
 

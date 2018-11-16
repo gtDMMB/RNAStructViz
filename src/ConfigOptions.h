@@ -45,10 +45,10 @@ static inline const char * GetUserHome() {
 #define USER_CONFIG_DIR                 ((string(GetUserHome()) + string("/.RNAStructViz/")).c_str())
 #define USER_CONFIG_PATH                ((USER_CONFIG_DIR + string("config.cfg")).c_str())
 
-extern char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
-extern char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
-extern char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
-extern char FLTK_THEME[MAX_BUFFER_SIZE];
+extern volatile char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
+extern volatile char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
+extern volatile char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
+extern volatile char FLTK_THEME[MAX_BUFFER_SIZE];
 extern const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT];
 extern const char *FLTK_THEME_HELP[FLTK_THEME_COUNT];
 extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];

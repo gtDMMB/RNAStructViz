@@ -18,6 +18,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Color_Chooser.H>
+#include <FL/fl_show_colormap.H>
 
 #include "DisplayConfigWindow.h"
 #include "ConfigOptions.h"
@@ -33,10 +34,10 @@
 #ifndef _SETUP_GLOBAL_EXTERNS_
 #define _SETUP_GLOBAL_EXTERNS_
      
-     char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE]; 
-     char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
-     char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
-     char FLTK_THEME[MAX_BUFFER_SIZE]; 
+     volatile char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE]; 
+     volatile char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
+     volatile char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
+     volatile char FLTK_THEME[MAX_BUFFER_SIZE]; 
 
      const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT] = { 
      	     "local",
@@ -70,15 +71,15 @@
 
 bool DisplayConfigWindow::SetupInitialConfig() { 
 
-     strncpy(CTFILE_SEARCH_DIRECTORY, DEFAULT_CTFILE_SEARCH_DIRECTORY, 
+     strncpy((char *) CTFILE_SEARCH_DIRECTORY, DEFAULT_CTFILE_SEARCH_DIRECTORY, 
              MAX_BUFFER_SIZE - 1);
-     ConfigParser::nullTerminateString(CTFILE_SEARCH_DIRECTORY); 
-     strncpy(PNG_OUTPUT_DIRECTORY, DEFAULT_PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1); 
-     ConfigParser::nullTerminateString(PNG_OUTPUT_DIRECTORY);
-     strncpy(PNG_OUTPUT_PATH, DEFAULT_PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
-     ConfigParser::nullTerminateString(PNG_OUTPUT_PATH);
-     strncpy(FLTK_THEME, DEFAULT_FLTK_THEME, MAX_BUFFER_SIZE - 1); 
-     ConfigParser::nullTerminateString(FLTK_THEME); 
+     ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY); 
+     strncpy((char *) PNG_OUTPUT_DIRECTORY, DEFAULT_PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1); 
+     ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
+     strncpy((char *) PNG_OUTPUT_PATH, DEFAULT_PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
+     ConfigParser::nullTerminateString((char *) PNG_OUTPUT_PATH);
+     strncpy((char *) FLTK_THEME, DEFAULT_FLTK_THEME, MAX_BUFFER_SIZE - 1); 
+     ConfigParser::nullTerminateString((char *) FLTK_THEME); 
      snprintf(LIBFLTK_VERSION_STRING, MAX_BUFFER_SIZE - 1, 
               "%d.%d.%d (%g) - API %g", FL_MAJOR_VERSION, FL_MINOR_VERSION, 
 	      FL_PATCH_VERSION, FL_VERSION, FL_API_VERSION);
@@ -181,7 +182,7 @@ void DisplayConfigWindow::ConstructWindow() {
 	"@->   PNG Output Directory:", 
 	"@->   PNG Output File Name:"
      };
-     char (*fieldUpdateVars[])[MAX_BUFFER_SIZE] = {
+     volatile char (*fieldUpdateVars[])[MAX_BUFFER_SIZE] = {
          &CTFILE_SEARCH_DIRECTORY, 
 	 &PNG_OUTPUT_DIRECTORY, 
 	 &PNG_OUTPUT_PATH
@@ -202,13 +203,13 @@ void DisplayConfigWindow::ConstructWindow() {
 	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
          Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
 			      (int) (1.5 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
-                              *(fieldUpdateVars[f]));
-	 settingBox->copy_label(TrimFilePathDisplay(*(fieldUpdateVars[f])));
+                              (char *) *(fieldUpdateVars[f]));
+	 settingBox->copy_label(TrimFilePathDisplay((char *) *(fieldUpdateVars[f])));
 	 settingBox->color(GUI_BTEXT_COLOR);
 	 settingBox->labelcolor(GUI_TEXT_COLOR);
 	 settingBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
          fpathsSettingBoxes[f] = settingBox;
-	 fpathsUpdateRefs[f] = *(fieldUpdateVars[f]);
+	 fpathsUpdateRefs[f] = (char *) *(fieldUpdateVars[f]);
 	 windowWidgets.push_back(settingBox);
 	 offsetX += (int) (1.5 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
 	 if(needsDirChooser[f]) { 
@@ -257,7 +258,7 @@ void DisplayConfigWindow::ConstructWindow() {
 		                      CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
      int choiceActiveIdx = 0;
      for(int t = 0; t < FLTK_THEME_COUNT; t++) {
-	  if(!strcmp(ALL_FLTK_THEMES[t], FLTK_THEME)) {
+	  if(!strcmp(ALL_FLTK_THEMES[t], (char *) FLTK_THEME)) {
                choiceActiveIdx = t;
 	  }
 	  fltkThemeChoiceMenu->add(ALL_FLTK_THEMES[t], 0, 
@@ -308,7 +309,17 @@ void DisplayConfigWindow::ConstructWindow() {
 	 selectColorButton->color(GUI_BGCOLOR);
 	 selectColorButton->callback(ChangeColorCallback); 
 	 windowWidgets.push_back(selectColorButton);
-         workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+         offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+	 Fl_Button *selectColormapBtn = new Fl_Button(offsetX, workingYOffset, 
+			                CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+					"Select Colormap @|>");
+	 selectColormapBtn->user_data((void *) c);
+	 selectColormapBtn->labelcolor(GUI_BTEXT_COLOR);
+	 selectColormapBtn->color(GUI_BGCOLOR);
+	 selectColormapBtn->callback(SelectFromColormapCallback);
+	 windowWidgets.push_back(selectColormapBtn);
+	 
+	 workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
 
      workingYOffset += CFGWIN_SPACING;
@@ -330,8 +341,8 @@ void DisplayConfigWindow::ConstructWindow() {
      Fl_Button *writeConfigBtn = new Fl_Button(offsetX, workingYOffset, 
 		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				 "@filenew   Save Settings");
-     writeConfigBtn->color(FL_LIGHT2);
-     writeConfigBtn->labelcolor(FL_DARK2);
+     writeConfigBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
+     writeConfigBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      writeConfigBtn->callback(WriteConfigFileCallback);
      windowWidgets.push_back(writeConfigBtn);
      offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
@@ -339,8 +350,8 @@ void DisplayConfigWindow::ConstructWindow() {
      Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, workingYOffset, 
 		                     CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				     "@redo   Restore Previous");
-     restoreDefaultsBtn->color(FL_LIGHT2);
-     restoreDefaultsBtn->labelcolor(FL_DARK2);
+     restoreDefaultsBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
+     restoreDefaultsBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      restoreDefaultsBtn->callback(RestoreDefaultsCallback);
      windowWidgets.push_back(restoreDefaultsBtn);
      offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
@@ -348,8 +359,8 @@ void DisplayConfigWindow::ConstructWindow() {
      Fl_Button *cancelBtn = new Fl_Button(offsetX, workingYOffset, 
 		            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 			    "@1+   Cancel");
-     cancelBtn->color(FL_LIGHT2);
-     cancelBtn->labelcolor(FL_DARK2);
+     cancelBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
+     cancelBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      cancelBtn->callback(WindowCloseCallback);
      windowWidgets.push_back(cancelBtn);
 
@@ -410,7 +421,7 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
           msgIconBox->image(parentWin->pngNewPathIcon);
           msgIconBox->label("");
 	  msgIconBox->type(FL_NO_BOX);
-	  msgIconBox->color(FL_LIGHT2);
+	  msgIconBox->color(Lighter(GUI_BGCOLOR, 0.5f));
           msgIconBox->box(FL_NO_BOX);
 	  msgIconBox->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | 
 			    FL_ALIGN_CENTER);
@@ -431,8 +442,8 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
 
 void DisplayConfigWindow::ThemeChoiceMenuCallback(Fl_Widget *widget, void *udata) {
      long int themeIndex = (long int) udata;
-     strncpy(FLTK_THEME, ALL_FLTK_THEMES[themeIndex], MAX_BUFFER_SIZE - 1);
-     ConfigParser::nullTerminateString(FLTK_THEME);
+     strncpy((char *) FLTK_THEME, ALL_FLTK_THEMES[themeIndex], MAX_BUFFER_SIZE - 1);
+     ConfigParser::nullTerminateString((char *) FLTK_THEME);
      fl_alert("The FLTK theme \"%s\" corresponds to: %s.\nNote that this new widget scheme will not take effect until after RNAStructViz is restarted.", FLTK_THEME, 
 	      FLTK_THEME_HELP[themeIndex]);
 }
@@ -453,7 +464,7 @@ void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
      double currentB = GetBlue(currentColor) / 255.0;
      
      int colorSelectOK = fl_color_chooser("@search   Select New Theme Color ...", 
-		         currentR, currentG, currentB, 0);
+		         currentR, currentG, currentB, 2);
      if(colorSelectOK) { 
           int nextR = (int) (currentR * 255.0);
           int nextG = (int) (currentG * 255.0);
@@ -462,6 +473,18 @@ void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
           parentWin->colorDisplayBoxes[colorIdx]->labelcolor(RGBColor(nextR, nextG, nextB));
           parentWin->colorDisplayBoxes[colorIdx]->redraw();
      }
+
+}
+
+void DisplayConfigWindow::SelectFromColormapCallback(Fl_Widget *btn, void *udata) {
+
+     DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
+     long int colorIdx = (long int) ((int *) btn->user_data());
+     Fl_Color currentColor = *(parentWin->colorChangeRefs[colorIdx]);
+     Fl_Color nextColor = fl_show_colormap(currentColor);
+     *(parentWin->colorChangeRefs[colorIdx]) = Fl::get_color(nextColor);
+     parentWin->colorDisplayBoxes[colorIdx]->labelcolor(Fl::get_color(nextColor));
+     parentWin->colorDisplayBoxes[colorIdx]->redraw();
 
 }
 
