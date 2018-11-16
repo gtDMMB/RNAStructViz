@@ -285,7 +285,7 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
      cfgWindow->show();
      while(!cfgWindow->isDone() && cfgWindow->visible()) 
           Fl::wait();
-     RethemeMainWindow();
+     //RethemeMainWindow();
      delete cfgWindow;
 
 }
