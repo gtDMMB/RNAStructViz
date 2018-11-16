@@ -283,8 +283,9 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
     
      DisplayConfigWindow *cfgWindow = new DisplayConfigWindow(); 
      cfgWindow->show();
-     while(!cfgWindow->isDone()) 
+     while(!cfgWindow->isDone() && cfgWindow->visible()) 
           Fl::wait();
+     RethemeMainWindow();
      delete cfgWindow;
 
 }
@@ -942,8 +943,8 @@ void MainWindow::RethemeMainWindow() {
 			       GetStructureManager()->
 			       GetFolders()[ms_instance->selectedFolderIndex];
 	          curFolderWin->RethemeFolderWindow();
-		  ShowFolderCallback(ms_instance->selectedFolderBtn, 
-		         (void *) ms_instance->selectedFolderBtn->user_data());
+		  //ShowFolderCallback(ms_instance->selectedFolderBtn, 
+		  //       (void *) ms_instance->selectedFolderBtn->user_data());
 	     }
 	     Fl::scheme((char *) FLTK_THEME);
 	     Fl::redraw();

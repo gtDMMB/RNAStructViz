@@ -15,7 +15,8 @@ void FolderWindow::Construct(int w, int h, int folderIndex) {}
 FolderWindow::FolderWindow(int x, int y, int wid, int hgt, 
 		           const char *label, int folderIndex) : 
 	      Fl_Group(x, y, wid, hgt, label), 
-	      folderScroll(NULL), folderPack(NULL)
+	      folderScroll(NULL), folderPack(NULL), 
+	      fileOpsLabel(NULL), fileLabel(NULL)
 {
 
     // label configuration:  
@@ -34,7 +35,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     int fileOpsLabelHeight = 2 * NAVBUTTONS_BHEIGHT; 
     int fileOpsLabelWidth = 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING;
     const char *fileOpsLabelText = "@reload Structure Operations.\nEach operation opens a new window.";
-    Fl_Box *fileOpsLabel = new Fl_Box(x + NAVBUTTONS_SPACING, y + 36 + dividerTextHeight, 
+    fileOpsLabel = new Fl_Box(x + NAVBUTTONS_SPACING, y + 36 + dividerTextHeight, 
 		                              fileOpsLabelWidth, fileOpsLabelHeight, 
 				                      fileOpsLabelText);
     fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
@@ -61,7 +62,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     statsButton->labelcolor(GUI_BTEXT_COLOR);
 
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents in new window.";
-    Fl_Box* fileLabel = new Fl_Box(x+NAVBUTTONS_SPACING,y+55 + 26 + dividerTextHeight + 
+    fileLabel = new Fl_Box(x+NAVBUTTONS_SPACING,y+55 + 26 + dividerTextHeight + 
 		                   fileOpsLabelHeight + spacingHeight, 
 				   fileOpsLabelWidth, fileOpsLabelHeight, 
 		                   fileInstText);
@@ -256,9 +257,22 @@ void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
 }
 
 void FolderWindow::RethemeFolderWindow() {
+     Fl_Color nextBGColor = GUI_WINDOW_BGCOLOR;
+     Fl_Color nextLabelColor = GUI_BTEXT_COLOR;
      if(folderScroll != NULL) {
-          folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
-	  folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
-          folderScroll->redraw();
+	  folderScroll->color(nextBGColor);
+	  folderScroll->labelcolor(nextLabelColor);
+     }
+     if(folderPack != NULL) {
+          folderPack->color(nextBGColor);
+	  folderPack->labelcolor(nextLabelColor);
+     }
+     if(fileOpsLabel != NULL) {
+          fileOpsLabel->color(nextBGColor);
+	  fileOpsLabel->labelcolor(nextLabelColor);
+     }
+     if(fileLabel != NULL) {
+          fileLabel->color(nextBGColor);
+	  fileLabel->labelcolor(nextLabelColor);
      }
 }

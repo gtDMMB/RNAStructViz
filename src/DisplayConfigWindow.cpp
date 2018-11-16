@@ -484,12 +484,13 @@ void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *u
 			                 *(thisWin->colorChangeRefs[c]));
 	  thisWin->colorDisplayBoxes[c]->redraw();
      }
+     fl_alert("The selected theme will be applied the next time you restart the application.");
 }
 
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
-     btn->parent()->hide();
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
-     MainWindow::RethemeMainWindow();
+     btn->parent()->hide();
+     //MainWindow::RethemeMainWindow();
 }
 
 void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
@@ -537,7 +538,7 @@ void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {
           parentWin->colorDisplayBoxes[c]->labelcolor(*(parentWin->colorChangeRefs[c]));
 	  parentWin->colorDisplayBoxes[c]->redraw();
      }
-     MainWindow::RethemeMainWindow();
+     //MainWindow::RethemeMainWindow();
 }
 
 void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
@@ -550,6 +551,6 @@ void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
      }
      thisWin->hide();
      thisWin->finished = true;
-     MainWindow::ms_instance->m_mainWindow->redraw();
+     //MainWindow::ms_instance->m_mainWindow->redraw();
      //MainWindow::RethemeMainWindow();
 }
