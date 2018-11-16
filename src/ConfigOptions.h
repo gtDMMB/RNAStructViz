@@ -62,7 +62,6 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define GetRed(flc)                     ((flc >> 24) & 0x000000ff)
 #define GetGreen(flc)                   ((flc >> 16) & 0x000000ff)
 #define GetBlue(flc)                    ((flc >> 8) & 0x000000ff)
-#define FL_TRANSPARENT                  (0xffffff00)
 
 /* Local "theme" defines for RNAStructViz: */
 #define LOCAL_WINDOW_BGCOLOR            (0xffffff00)
@@ -72,7 +71,7 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define LOCAL_BGCOLOR                   (RGBColor(123, 77, 211))
 #define LOCAL_BUTTON_COLOR              (Lighter(RGBColor(210, 194, 240), 0.5f))
 #define LOCAL_TEXT_COLOR                (RGBColor(52, 25, 102))
-#define LOCAL_TEXT_SIZE                 (16)
+#define LOCAL_TEXT_SIZE                 (9)
 #define LOCAL_RMFONT                    (FL_SCREEN_BOLD)
 #define LOCAL_BFFONT                    (FL_SCREEN_BOLD)
 
@@ -82,5 +81,6 @@ extern volatile Fl_Color GUI_BTEXT_COLOR;
 extern volatile Fl_Color GUI_TEXT_COLOR;
 
 extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
+extern bool DEBUGGING_ON;
 
 #endif

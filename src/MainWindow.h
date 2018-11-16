@@ -169,7 +169,8 @@ class MainWindow
 	friend class DisplayConfigWindow;
 
     public:
-	/* Resets the color theme for the window */
+	/* Resets the color themes for the window */
+	static void ResetThemeColormaps();
 	static void RethemeMainWindow(); 
 
 };

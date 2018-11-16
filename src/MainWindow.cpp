@@ -865,17 +865,27 @@ void MainWindow::CloseCallback(Fl_Widget* widget, void* userData) {
     exit(0);
 }
 
+void MainWindow::ResetThemeColormaps() {
+     Fl::set_color(FL_BACKGROUND_COLOR, GUI_WINDOW_BGCOLOR);
+     Fl::set_color(FL_BACKGROUND2_COLOR, fl_darker(GUI_WINDOW_BGCOLOR));
+     Fl::set_color(FL_FOREGROUND_COLOR, GUI_BTEXT_COLOR);
+     Fl::set_color(FL_INACTIVE_COLOR, fl_darker(GUI_BTEXT_COLOR));
+     Fl::set_color(FL_SELECTION_COLOR, fl_lighter(GUI_BTEXT_COLOR));
+}
+
 void MainWindow::RethemeMainWindow() {
-	     Fl::foreground(GetRed(LOCAL_FGCOLOR), 
-			    GetGreen(LOCAL_FGCOLOR), 
-			    GetBlue(LOCAL_FGCOLOR));
-	     Fl::background(GetRed(GUI_BGCOLOR), 
-			    GetGreen(GUI_BGCOLOR), 
-			    GetBlue(GUI_BGCOLOR)); 
-             Fl::background2(GetRed(LOCAL_BG2COLOR), 
-			     GetGreen(LOCAL_BG2COLOR), 
-			     GetBlue(LOCAL_BG2COLOR));
 	     
+	     //Fl::foreground(GetRed(LOCAL_FGCOLOR), 
+	     //		    GetGreen(LOCAL_FGCOLOR), 
+	     //		    GetBlue(LOCAL_FGCOLOR));
+	     //Fl::background(GetRed(GUI_BGCOLOR), 
+	     //		    GetGreen(GUI_BGCOLOR), 
+	     //		    GetBlue(GUI_BGCOLOR)); 
+             //Fl::background2(GetRed(LOCAL_BG2COLOR), 
+	     //		     GetGreen(LOCAL_BG2COLOR), 
+	     //		     GetBlue(LOCAL_BG2COLOR));
+	     ResetThemeColormaps();
+
 	     if(ms_instance == NULL) {
 	          return;
 	     }

@@ -64,6 +64,7 @@
      volatile Fl_Color GUI_TEXT_COLOR;
 
      bool GUI_USE_DEFAULT_FOLDER_NAMES;
+     bool DEBUGGING_ON;
 
 #endif
 
@@ -87,9 +88,11 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      GUI_BGCOLOR = LOCAL_BGCOLOR;
      GUI_BTEXT_COLOR = LOCAL_BUTTON_COLOR;
      GUI_TEXT_COLOR = LOCAL_TEXT_COLOR;
+     
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
+     DEBUGGING_ON = false;
 
-     ConfigParser cfgParser(USER_CONFIG_PATH, true);
+     ConfigParser cfgParser(USER_CONFIG_PATH, !DEBUGGING_ON);
      cfgParser.storeVariables();      
      
      return true;

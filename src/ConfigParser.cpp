@@ -233,7 +233,7 @@ void ConfigParser::WriteUserConfigFile(const char *fpath) {
      }
      if(writeCfgFile) {
           ConfigParser cfgParser;
-          cfgParser.writeFile(fpath, false);
+          cfgParser.writeFile(fpath, !DEBUGGING_ON);
      }
 }
 

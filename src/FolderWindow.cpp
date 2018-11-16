@@ -173,7 +173,6 @@ void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData)
 {
     FolderWindow* fwindow = (FolderWindow*)(widget->parent());
     MainWindow::HideFolderByName(fwindow->label());
-    fprintf(stderr, "%s\n", fwindow->label());
 }
 
 void FolderWindow::ShowFileCallback(Fl_Widget* widget, void* userData)

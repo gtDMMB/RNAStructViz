@@ -11,13 +11,13 @@ const unsigned int RNAStructure::UNPAIRED = ~0x0;
 
 const Fl_Text_Display::Style_Table_Entry 
       RNAStructure::textBufferStyleTable[] = {
-     {GUI_TEXT_COLOR,   FL_SCREEN_BOLD,        18}, // A -- default
-     {FL_GREEN,         FL_SCREEN_BOLD,        18}, // B -- pair A
-     {FL_MAGENTA,       FL_SCREEN_BOLD,        18}, // C -- pair C
-     {FL_YELLOW,        FL_SCREEN_BOLD,        18}, // D -- pair G
-     {FL_RED,           FL_SCREEN_BOLD,        18}, // E -- pair U
-     {FL_CYAN,          FL_SCREEN_BOLD,        18}, // F -- first pairing
-     {FL_BLUE,          FL_SCREEN_BOLD,        18}, // G -- second pairing
+     {GUI_TEXT_COLOR,   FL_SCREEN_BOLD,        12}, // A -- default
+     {FL_GREEN,         FL_SCREEN_BOLD,        12}, // B -- pair A
+     {FL_MAGENTA,       FL_SCREEN_BOLD,        12}, // C -- pair C
+     {FL_YELLOW,        FL_SCREEN_BOLD,        12}, // D -- pair G
+     {FL_RED,           FL_SCREEN_BOLD,        12}, // E -- pair U
+     {FL_CYAN,          FL_SCREEN_BOLD,        12}, // F -- first pairing
+     {FL_BLUE,          FL_SCREEN_BOLD,        12}, // G -- second pairing
      {0,                0,                     0},  // NULL end of array
 };
 
@@ -433,7 +433,6 @@ void RNAStructure::GenerateString()
 			     GetBaseStringFormat(pairStr), 
 			     numFmtStr.c_str());    
 		}
-                fprintf(stderr, "%s%s", currentPosn, formatPosn);
 		remainingSize -= charsWritten;
 		currentPosn += charsWritten;
 		formatPosn += charsWritten;
