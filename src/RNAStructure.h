@@ -21,7 +21,6 @@ class RNABranchType_t;
 #define MIN(x, y)         (x <= y ? (x) : (y))
 #define ABS(x)            (x >= 0 ? (x) : -1 * (x))
 #define MIN3(x, y, z)     MIN(x, MIN(y, z))
-#define LOGFLOOR(x)       ((int) floorf(log10f((float) x)))
 
 class RNAStructure
 {
@@ -185,7 +184,6 @@ class RNAStructure
         Fl_Double_Window* m_contentWindow;
         Fl_Text_Display* m_textDisplay;
         Fl_Text_Buffer* m_textBuffer, m_styleBuffer;
-        static const Fl_Text_Display::Style_Table_Entry textBufferStyleTable[];
 
         char *m_displayString;
         char *m_displayFormatString;

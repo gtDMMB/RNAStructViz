@@ -1,6 +1,7 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 #include "ConfigOptions.h"
+#include "ThemesConfig.h"
 #include <FL/Fl_Box.H>
 #include <stdlib.h>
 #include <fstream>
@@ -8,18 +9,6 @@
 #include <vector>
 
 const unsigned int RNAStructure::UNPAIRED = ~0x0;
-
-const Fl_Text_Display::Style_Table_Entry 
-      RNAStructure::textBufferStyleTable[] = {
-     {GUI_TEXT_COLOR,   FL_SCREEN_BOLD,        12}, // A -- default
-     {FL_GREEN,         FL_SCREEN_BOLD,        12}, // B -- pair A
-     {FL_MAGENTA,       FL_SCREEN_BOLD,        12}, // C -- pair C
-     {FL_YELLOW,        FL_SCREEN_BOLD,        12}, // D -- pair G
-     {FL_RED,           FL_SCREEN_BOLD,        12}, // E -- pair U
-     {FL_CYAN,          FL_SCREEN_BOLD,        12}, // F -- first pairing
-     {FL_BLUE,          FL_SCREEN_BOLD,        12}, // G -- second pairing
-     {0,                0,                     0},  // NULL end of array
-};
 
 RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(0), 
@@ -340,10 +329,10 @@ void RNAStructure::DisplayFileContents()
 		m_textDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
 		m_textDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
 		m_styleBuffer->text(m_displayFormatString);
-		int stableSize = sizeof(textBufferStyleTable) / 
-			         sizeof(textBufferStyleTable[0]);
+		int stableSize = sizeof(TEXT_BUFFER_STYLE_TABLE) / 
+			         sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
 		m_textDisplay->highlight_data(m_styleBuffer, 
-			       textBufferStyleTable, stableSize - 1, 'A', 0, 0);
+			       TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
 
     }
     m_contentWindow->show();

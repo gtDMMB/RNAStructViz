@@ -6,8 +6,44 @@
 #ifndef __THEMES_CONFIG_H__
 #define __THEMES_CONFIG_H__
 
+#include <FL/Enumerations.H>
+#include <FL/Fl_Text_Display.H>
 
+/*
+ * See the following link for the built-in FLTK indexed colors:
+ * http://www.fltk.org/doc-1.3/drawing.html#drawing_colors
+ */
+static const Fl_Text_Display::Style_Table_Entry TEXT_BUFFER_STYLE_TABLE[] = {
+     
+     {36,               FL_SCREEN_BOLD,        12}, // A -- default
+     {60,               FL_SCREEN_BOLD,        12}, // B -- pair A
+     {160,              FL_SCREEN_BOLD,        12}, // C -- pair C
+     {93,               FL_SCREEN_BOLD,        12}, // D -- pair G
+     {80,               FL_SCREEN_BOLD,        12}, // E -- pair U
+     {223,              FL_SCREEN_BOLD,        12}, // F -- first pairing
+     {219,              FL_SCREEN_BOLD,        12}, // G -- second pairing
+     {0,                0,                     0},  // NULL end of array
 
+};
 
+typedef struct {
+     Fl_Color windowBGColor;
+     Fl_Color widgetBGColor;
+     Fl_Color widgetTextColor;
+     Fl_Color printTextColor;
+     Fl_Color ctFileDisplayColor;
+     const char *themeName;
+} ColorTheme_t;
+
+static const ColorTheme_t PRESET_COLOR_THEMES[] = {
+     {
+	  Fl::get_color(90), 
+	  Fl::get_color(62), 
+	  Fl::get_color(58), 
+	  Fl::get_color(18), 
+	  Fl::get_color(132), 
+	  "Green On Orange"
+     }, 
+};
 
 #endif

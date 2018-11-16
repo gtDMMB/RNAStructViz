@@ -1362,15 +1362,15 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     time_t currentTime = time(NULL);
     struct tm *tmCurrentTime = localtime(&currentTime);
     char defaultFilePath[MAX_BUFFER_SIZE];
-    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, PNG_OUTPUT_PATH, tmCurrentTime);
+    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, (char *) PNG_OUTPUT_PATH, 
+		              tmCurrentTime);
     Fl_Native_File_Chooser fileChooser;
     fileChooser.title(chooserMsg);
-    //fileChooser.filter(fileExtMask);
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
     fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
 		        Fl_Native_File_Chooser::SAVEAS_CONFIRM | 
 		        Fl_Native_File_Chooser::PREVIEW);
-    fileChooser.directory(PNG_OUTPUT_DIRECTORY);
+    fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
     fileChooser.preset_file(defaultFilePath);
     switch(fileChooser.show()) {
         case -1: // ERROR
@@ -1380,8 +1380,9 @@ std::string DiagramWindow::GetExportPNGFilePath() {
 	     return string("");
 	default:
 	     std::string outfilePath = string(fileChooser.filename());
-	     strncpy(PNG_OUTPUT_DIRECTORY, fileChooser.directory(), MAX_BUFFER_SIZE - 1);
-	     ConfigParser::nullTerminateString(PNG_OUTPUT_DIRECTORY);
+	     strncpy((char *) PNG_OUTPUT_DIRECTORY, fileChooser.directory(), 
+			      MAX_BUFFER_SIZE - 1);
+	     ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
 	     return outfilePath;
     }
 }
