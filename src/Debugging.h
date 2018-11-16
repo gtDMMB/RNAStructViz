@@ -26,54 +26,83 @@
 #define STRUCTVIZ_DEBUGGING         (true)
 #define BACKTRACE_DEPTH             (64)
 
-/* This structure is similar to the one found in /usr/include/asm/ucontext.h */
-typedef struct {
-     unsigned long     uc_flags;
-     struct ucontext  *uc_link;
-     stack_t           uc_stack;
-     sigcontext        uc_mcontext;
-     sigset_t          uc_sigmask;
-} SigContext_t;
+extern char *EXEPATH;
 
-inline void SegfaultSignalHandler(int signum, siginfo_t *sinfo, void *scontext) {
+#ifdef __APPLE__
+     #define ADDR2LINE              ("/usr/local/bin/gaddr2line")
+#else
+     #define ADDR2LINE              ("/usr/bin/addr2line")
+#endif
 
-     SigContext_t *sc = (SigContext_t *) scontext;
+const char *ADDR2LINE_FORMAT = "%s --exe=%s --inlines --pretty-print --functions --demangle %p";
+
+const char * SegfaultCode2String(int scode) {
+     switch(scode) {
+	  case SEGV_MAPERR:
+	       return "SEGV_MAPERR: address not mapped to object";
+	  case SEGV_ACCERR:
+	       return "SEGV_ACCERR: invalid permissions for mapped to object";
+	  default:
+               return "SEGV_NOOP: if only I knew...";
+     }
+}
+
+bool PrintStackTraceString(void *staddr) {
+     
+     if(EXEPATH == NULL || staddr == NULL) {
+          return false;
+     }
+     char runCmd[MAX_BUFFER_SIZE];
+     snprintf(runCmd, MAX_BUFFER_SIZE - 1, ADDR2LINE_FORMAT, 
+		      ADDR2LINE, EXEPATH, staddr);
+     if(system(runCmd)) {
+          return false;
+     }
+     return true;
+}
+
+void SegfaultSignalHandler(int signum, siginfo_t *sinfo, void *scontext) {
+
      void *callerAddress = NULL;
      void *backtraceArr[BACKTRACE_DEPTH];
      char **stacktraceMsgs = NULL;
      
-     #if defined(__i386__)                                         // gcc specific
-          callerAddress = (void *) sc->uc_mcontext.eip;            // x86 specific
-     #elif defined(__x86_64__)                                     // gcc specific
-          callerAddress = (void *) sc->uc_mcontext.rip;            // x86_64 specific
-     #else
-     #error Unsupported architecture. 
-     #endif
-
+     // TODO get the user callback address on Linux:
+     
+     fprintf(stderr, "\n\n========================================================\n\n");
+     
      int btSize = backtrace(backtraceArr, BACKTRACE_DEPTH);
-     backtraceArr[1] = callerAddress;
+     if(callerAddress != NULL) { 
+          backtraceArr[1] = callerAddress;
+     }
      stacktraceMsgs = backtrace_symbols(backtraceArr, btSize);
 
-     fprintf(stderr, "========================================================\n\n");
-     fprintf(stderr, "A critical error occurred that the application \n");
-     fprintf(stderr, "cannot recover from. Terminating now with detailed logs.\n\n");
+     fprintf(stderr, "A critical error occurred that the application cannot recover from.\n");
+     fprintf(stderr, "Terminating now with detailed debugging information.\n");
+     fprintf(stderr, "Consider submitting a bug report if the problem persists.\n\n");
      fprintf(stderr, "%s raised from address %p at caller address %p.\n", 
-		     strsignal(signum), sinfo->si_addr, 
-		     (void *) callerAddress);
-     fprintf(stderr, "STACKTRACE:\n\n");
-
+		     strsignal(signum), sinfo->si_addr, (void *) callerAddress);
+     fprintf(stderr, "SIGNAL CODE: %s\n", SegfaultCode2String(sinfo->si_code));
+     fprintf(stderr, "ERRNO CODE RECEIVED: %s\n", strerror(sinfo->si_errno));
+     #ifndef __APPLE__
+          fprintf(stderr, "ADDITIONAL SIGNAL INFO RECEIVED:\n");
+	  psiginfo(sinfo, NULL);
+     #endif
+     
+     fprintf(stderr, "\nSTACKTRACE:\n\n");
      for(int st = 1; st < btSize; st++) {
           if(stacktraceMsgs == NULL) {
                break;
 	  }
-	  fprintf(stderr, "   => (% 2d) %s\n", st, stacktraceMsgs[st]);
+          PrintStackTraceString(backtraceArr[st]);
+          fprintf(stderr, "[% 2d] %s\n", st, stacktraceMsgs[st]);
      }
+     free(stacktraceMsgs);
+     
      fprintf(stderr, "\n");
      ApplicationBuildInfo::PrintAboutListing(stderr);
-     fprintf(stderr, "\n");
-     fprintf(stderr, "========================================================\n\n");
-
-     free(stacktraceMsgs);
+     
+     fprintf(stderr, "\n\n========================================================\n\n");
      exit(EXIT_FAILURE);
 
 }

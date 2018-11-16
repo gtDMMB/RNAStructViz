@@ -12,8 +12,11 @@
 #include "DisplayConfigWindow.h"
 #include "Debugging.h"
 
+char *EXEPATH = NULL;
+
 int main(int argc, char **argv) {
 
+    EXEPATH = argv[0];
     if(STRUCTVIZ_DEBUGGING) {
         struct sigaction sigact;
 	sigact.sa_sigaction = SegfaultSignalHandler;
