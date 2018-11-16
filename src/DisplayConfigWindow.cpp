@@ -24,6 +24,7 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "MainWindow.h"
+#include "ThemesConfig.h"
 
 #include "pixmaps/ConfigPathsIcon.c"
 #include "pixmaps/ConfigThemesIcon.c"
@@ -249,7 +250,7 @@ void DisplayConfigWindow::ConstructWindow() {
      int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
      Fl_Box *themeDescBox = new Fl_Box(offsetX, workingYOffset, 
 	 	        	       CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-	 		               "@->   Global FLTK Theme: ");
+	 		               "@->   Global FLTK and Preset Themes: ");
      themeDescBox->labelcolor(GUI_TEXT_COLOR);
      themeDescBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
      windowWidgets.push_back(themeDescBox);
@@ -262,7 +263,7 @@ void DisplayConfigWindow::ConstructWindow() {
                choiceActiveIdx = t;
 	  }
 	  fltkThemeChoiceMenu->add(ALL_FLTK_THEMES[t], 0, 
-			           ThemeChoiceMenuCallback, 
+			           FLTKThemeChoiceMenuCallback, 
 			           (void *) ((long int) t), 0);
 	  Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
 		                        fltkThemeChoiceMenu->find_item(ALL_FLTK_THEMES[t]);
@@ -271,6 +272,22 @@ void DisplayConfigWindow::ConstructWindow() {
      fltkThemeChoiceMenu->value(choiceActiveIdx);
      fltkThemeChoiceMenu->labelcolor(GUI_BTEXT_COLOR);
      windowWidgets.push_back(fltkThemeChoiceMenu);
+     
+     offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+     Fl_Choice *presetThemesChooser = new Fl_Choice(offsetX, workingYOffset, 
+		                      CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
+     int numThemes = sizeof(PRESET_COLOR_THEMES) / sizeof(PRESET_COLOR_THEMES[0]);
+     for(int t = numThemes - 1; t >= 0; t--) {
+          presetThemesChooser->add(PRESET_COLOR_THEMES[t].themeName, 0, 
+			           PresetThemeChooserMenuCallback, 
+			           (void *) ((long int) t), 0);
+	  Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
+		  presetThemesChooser->find_item(PRESET_COLOR_THEMES[t].themeName);
+	  nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
+     }
+     presetThemesChooser->labelcolor(GUI_BTEXT_COLOR);
+     presetThemesChooser->value(0);
+     windowWidgets.push_back(presetThemesChooser);
      workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
 
      const char *colorFieldDesc[] = {
@@ -440,12 +457,30 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
 
 }
 
-void DisplayConfigWindow::ThemeChoiceMenuCallback(Fl_Widget *widget, void *udata) {
-     long int themeIndex = (long int) udata;
+void DisplayConfigWindow::FLTKThemeChoiceMenuCallback(Fl_Widget *widget, void *ud) {
+     long int themeIndex = (long int) ud;
      strncpy((char *) FLTK_THEME, ALL_FLTK_THEMES[themeIndex], MAX_BUFFER_SIZE - 1);
      ConfigParser::nullTerminateString((char *) FLTK_THEME);
      fl_alert("The FLTK theme \"%s\" corresponds to: %s.\nNote that this new widget scheme will not take effect until after RNAStructViz is restarted.", FLTK_THEME, 
 	      FLTK_THEME_HELP[themeIndex]);
+}
+
+void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *ud) {
+     DisplayConfigWindow *thisWin = (DisplayConfigWindow *) btn->parent();
+     long int themeIndex = (long int) ud;
+     ColorTheme_t nextTheme = PRESET_COLOR_THEMES[themeIndex];
+     if(!nextTheme.isValid) {
+          return;
+     }
+     GUI_WINDOW_BGCOLOR = nextTheme.windowBGColor;
+     GUI_BGCOLOR = nextTheme.widgetBGColor;
+     GUI_BTEXT_COLOR = nextTheme.widgetTextColor;
+     GUI_TEXT_COLOR = nextTheme.printTextColor;
+     for(int c = 0; c < GUICOLORS; c++) {
+          thisWin->colorDisplayBoxes[c]->color((Fl_Color) 
+			                 *(thisWin->colorChangeRefs[c]));
+	  thisWin->colorDisplayBoxes[c]->redraw();
+     }
 }
 
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {

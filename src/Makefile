@@ -96,7 +96,7 @@ DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
 	pixmaps/ConfigPathsIcon.c pixmaps/ConfigThemesIcon.c\
 	pixmaps/PNGNewPathIcon.c pixmaps/ConfigWindowIcon.xbm\
-	DisplayConfigWindow.cpp
+	ThemesConfig.h DisplayConfigWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
 
 StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
@@ -123,7 +123,8 @@ MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
 
 RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
-	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c RNAStructure.cpp
+	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c\
+	ThemesConfig.h RNAStructure.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
 
 RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\

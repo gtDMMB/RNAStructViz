@@ -9,6 +9,8 @@
 #include <FL/Enumerations.H>
 #include <FL/Fl_Text_Display.H>
 
+#include "ConfigOptions.h"
+
 /*
  * See the following link for the built-in FLTK indexed colors:
  * http://www.fltk.org/doc-1.3/drawing.html#drawing_colors
@@ -33,17 +35,28 @@ typedef struct {
      Fl_Color printTextColor;
      Fl_Color ctFileDisplayColor;
      const char *themeName;
+     bool isValid;
 } ColorTheme_t;
 
 static const ColorTheme_t PRESET_COLOR_THEMES[] = {
      {
-	  Fl::get_color(90), 
+	  Lighter(Fl::get_color(91), 0.95f), 
 	  Fl::get_color(62), 
 	  Fl::get_color(58), 
 	  Fl::get_color(18), 
 	  Fl::get_color(132), 
-	  "Green On Orange"
-     }, 
+	  "Green On Orange",
+	  true
+     },
+     {
+          0, 
+	  0, 
+	  0, 
+	  0, 
+	  0, 
+	  "-- Select Theme--", 
+	  false
+     }
 };
 
 #endif

@@ -54,7 +54,8 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 	
 	        static void SelectDirectoryCallback(Fl_Widget *btn, void *ud);	
 		static void UpdatePNGPathCallback(Fl_Widget *btn, void *udata);
-		static void ThemeChoiceMenuCallback(Fl_Widget *menu, void *);
+		static void FLTKThemeChoiceMenuCallback(Fl_Widget *menu, void *);
+		static void PresetThemeChooserMenuCallback(Fl_Widget *, void *);
 		static void ChangeColorCallback(Fl_Widget *btn, void *udata); 
                 static void SelectFromColormapCallback(Fl_Widget *btn, void *);
 		static void WriteConfigFileCallback(Fl_Widget *btn, void *);
