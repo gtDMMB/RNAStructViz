@@ -10,8 +10,16 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "DisplayConfigWindow.h"
+#include "Debugging.h"
 
 int main(int argc, char **argv) {
+
+    if(STRUCTVIZ_DEBUGGING) {
+        struct sigaction sigact;
+	sigact.sa_sigaction = SegfaultSignalHandler;
+	sigact.sa_flags = SA_SIGINFO | SA_RESTART;
+	sigaction(SIGSEGV, &sigact, (struct sigaction *) NULL);
+    }
 
     DisplayConfigWindow::SetupInitialConfig();
     if(argc > 1 && 

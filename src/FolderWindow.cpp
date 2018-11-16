@@ -20,7 +20,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 {
 
     // label configuration:  
-    labelcolor(GUI_TEXT_COLOR);
+    //labelcolor(GUI_TEXT_COLOR);
     labelfont(LOCAL_BFFONT);
     labelsize(LOCAL_TEXT_SIZE);    
 
@@ -262,17 +262,22 @@ void FolderWindow::RethemeFolderWindow() {
      if(folderScroll != NULL) {
 	  folderScroll->color(nextBGColor);
 	  folderScroll->labelcolor(nextLabelColor);
+          //folderScroll->redraw();
      }
-     if(folderPack != NULL) {
-          folderPack->color(nextBGColor);
-	  folderPack->labelcolor(nextLabelColor);
-     }
+     //if(folderPack != NULL) {
+     //     folderPack->color(nextBGColor);
+     //	  folderPack->labelcolor(nextLabelColor);
+     //     folderPack->damage(FL_DAMAGE_ALL | FL_DAMAGE_USER1);
+     //	  folderPack->redraw();
+     //}
      if(fileOpsLabel != NULL) {
           fileOpsLabel->color(nextBGColor);
 	  fileOpsLabel->labelcolor(nextLabelColor);
+          fileOpsLabel->redraw();
      }
      if(fileLabel != NULL) {
           fileLabel->color(nextBGColor);
 	  fileLabel->labelcolor(nextLabelColor);
+          fileLabel->redraw();
      }
 }
