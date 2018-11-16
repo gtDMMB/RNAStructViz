@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <FL/Fl.H>
+#include <FL/Enumerations.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Round_Button.H>
@@ -58,7 +59,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	    helpButton->image(helpIconImage);
 	    helpButton->deimage(helpIconImage);
 	    helpButton->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	    helpButton->labeltype(FL_ICON_LABEL);
+	    helpButton->labeltype(_FL_ICON_LABEL);
 	    helpButton->shortcut(FL_CTRL + 'h');
 	    helpButton->box(FL_NO_BOX);
 	    helpButton->callback(HelpButtonCallback);
