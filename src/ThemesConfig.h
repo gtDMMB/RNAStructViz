@@ -90,7 +90,7 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0, 
 	  0, 
 	  0, 
-	  "-- Select Theme--", 
+	  "-- Select Theme --", 
 	  false
      }
 };

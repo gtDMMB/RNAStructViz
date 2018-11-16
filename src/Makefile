@@ -119,7 +119,7 @@ Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
-	pixmaps/RNAWindowIcon.xbm MainWindow.cpp
+	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
 
 RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \

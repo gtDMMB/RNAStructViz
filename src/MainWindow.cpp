@@ -50,8 +50,8 @@ MainWindow::MainWindow(int argc, char **argv)
 	    appLogoCont->image(appLogo);
 
 	    int helpButtonDims = 26;
-	    int helpButtonOffsetX = 300 - helpButtonDims - NAVBUTTONS_SPACING;
-	    Fl_Button *helpButton = new Fl_Button(helpButtonOffsetX, NAVBUTTONS_SPACING, 
+	    int helpButtonOffsetX = 300 - helpButtonDims - NAVBUTTONS_SPACING / 2;
+	    Fl_Button *helpButton = new Fl_Button(helpButtonOffsetX, NAVBUTTONS_SPACING / 2, 
 			                          helpButtonDims, helpButtonDims, "");
 	    helpButton->color(GUI_WINDOW_BGCOLOR);
 	    helpButton->labelcolor(GUI_BTEXT_COLOR);
