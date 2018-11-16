@@ -19,7 +19,7 @@ fi
 if [[ "$(uname -s)" == "Linux" ]]; then
 	PKGOUT+=" -DTARGETOS_LINUX"
 elif [[ "$(uname -s)" == "Darwin" ]]; then
-	PKGOUT+=" -DTARGETOS_APPLE -mmacosx-version-min=10.6"
+	PKGOUT+=" -DTARGETOS_APPLE" #-mmacosx-version-min=10.6"
 else 
 	PKGOUT+=" -DTARGETOS_GENERIC_UNIX"
 fi
