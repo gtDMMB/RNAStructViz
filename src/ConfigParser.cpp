@@ -96,6 +96,9 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 	  else if(!strcmp(parsedLine.cfgOption, "GUI_TEXT_COLOR")) { 
                guiTextColor = strtol(parsedLine.cfgValue, NULL, 16);
 	  }
+	  else if(!strcmp(parsedLine.cfgOption, "GUI_CTFILEVIEW_COLOR")) { 
+               guiCTFileViewColor = strtol(parsedLine.cfgValue, NULL, 16);
+	  }
 	  else {
 	       fprintf(stderr, "Unknown config option \"%s\" ... skipping.\n", 
 	               parsedLine.cfgOption);
@@ -129,13 +132,15 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
           "GUI_WINDOW_BGCOLOR", 
 	  "GUI_BGCOLOR", 
 	  "GUI_BTEXT_COLOR", 
-	  "GUI_TEXT_COLOR"
+	  "GUI_TEXT_COLOR", 
+	  "GUI_CTFILEVIEW_COLOR"
      };
      const Fl_Color cfgColorValues[] = {
           guiWindowBGColor, 
 	  guiBGColor, 
 	  guiBTextColor, 
-          guiTextColor
+          guiTextColor,
+	  guiCTFileViewColor
      };
 
      FILE *fpCfgFile = fopen(userCfgFile, "w+"); 
@@ -161,6 +166,7 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 	       return errno;
 	  }
      }
+     NUM_OPTIONS = 5;
      for(int line = 0; line < NUM_OPTIONS; line++) {
 	  char nextOutputLine[MAX_BUFFER_SIZE];
 	  int lineLength = snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=0x%08x\n", 
@@ -194,6 +200,7 @@ void ConfigParser::storeVariables() const {
      GUI_BGCOLOR = guiBGColor;
      GUI_BTEXT_COLOR = guiBTextColor;
      GUI_TEXT_COLOR = guiTextColor;
+     GUI_CTFILEVIEW_COLOR = guiCTFileViewColor;
 
 } 
 
@@ -253,6 +260,7 @@ void ConfigParser::setDefaults() {
      guiBGColor = GUI_BGCOLOR;
      guiBTextColor = GUI_BTEXT_COLOR;
      guiTextColor = GUI_TEXT_COLOR;
+     guiCTFileViewColor = GUI_CTFILEVIEW_COLOR;
 
 }
 

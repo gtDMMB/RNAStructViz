@@ -64,6 +64,7 @@
      volatile Fl_Color GUI_BGCOLOR;
      volatile Fl_Color GUI_BTEXT_COLOR;
      volatile Fl_Color GUI_TEXT_COLOR;
+     volatile Fl_Color GUI_CTFILEVIEW_COLOR;
 
      bool GUI_USE_DEFAULT_FOLDER_NAMES;
      bool DEBUGGING_ON;
@@ -90,7 +91,8 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      GUI_BGCOLOR = LOCAL_BGCOLOR;
      GUI_BTEXT_COLOR = LOCAL_BUTTON_COLOR;
      GUI_TEXT_COLOR = LOCAL_TEXT_COLOR;
-     
+     GUI_CTFILEVIEW_COLOR = Darker(LOCAL_WINDOW_BGCOLOR, 0.385f);
+
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
      DEBUGGING_ON = false;
 
@@ -476,6 +478,7 @@ void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *u
      GUI_BGCOLOR = nextTheme.widgetBGColor;
      GUI_BTEXT_COLOR = nextTheme.widgetTextColor;
      GUI_TEXT_COLOR = nextTheme.printTextColor;
+     GUI_CTFILEVIEW_COLOR = nextTheme.ctFileDisplayColor;
      for(int c = 0; c < GUICOLORS; c++) {
           thisWin->colorDisplayBoxes[c]->color((Fl_Color) 
 			                 *(thisWin->colorChangeRefs[c]));

@@ -79,6 +79,7 @@ extern volatile Fl_Color GUI_WINDOW_BGCOLOR;
 extern volatile Fl_Color GUI_BGCOLOR;
 extern volatile Fl_Color GUI_BTEXT_COLOR;
 extern volatile Fl_Color GUI_TEXT_COLOR;
+extern volatile Fl_Color GUI_CTFILEVIEW_COLOR;
 
 extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
 extern bool DEBUGGING_ON;
