@@ -49,6 +49,15 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  true
      },
      {
+          0x16161600, 
+	  0x39393900, 
+	  0x00da0000, 
+	  0xd3d3b200,
+          0x16161600, 
+	  "Green On Black", 
+	  true
+     }, 
+     {
           0, 
 	  0, 
 	  0, 

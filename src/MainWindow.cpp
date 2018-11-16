@@ -865,11 +865,17 @@ void MainWindow::CloseCallback(Fl_Widget* widget, void* userData) {
 }
 
 void MainWindow::ResetThemeColormaps() {
-     Fl::set_color(FL_BACKGROUND_COLOR, GUI_BGCOLOR);
      Fl::set_color(FL_BACKGROUND2_COLOR, GUI_BGCOLOR);
+     Fl::set_color(FL_BACKGROUND_COLOR, GUI_BGCOLOR);
      Fl::set_color(FL_FOREGROUND_COLOR, GUI_BTEXT_COLOR);
      Fl::set_color(FL_INACTIVE_COLOR, Darker(GUI_BTEXT_COLOR, 0.35f));
      Fl::set_color(FL_SELECTION_COLOR, Lighter(GUI_BTEXT_COLOR, 0.4f));
+     
+     // the following two options respectively get rid of the red label 
+     // ugliness present in the shadow box types and the Fl_Scroll 
+     // scrollbar bases colors when using dark backgrounds:
+     Fl::set_color(FL_DARK3, Lighter(GUI_BGCOLOR, 0.85f));
+     Fl::set_color(FL_DARK2, Lighter(GUI_BGCOLOR, 0.7f));
 }
 
 void MainWindow::RethemeMainWindow() {
