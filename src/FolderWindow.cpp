@@ -218,7 +218,8 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             Fl::delete_widget(toRemove);
             
             appInstance->GetStructureManager()->RemoveStructure((intptr_t)userData);
-            appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
+            appInstance->GetStructureManager()->DecreaseStructCount( 
+			                        fwindow->m_folderIndex);
             
             break;
         }
