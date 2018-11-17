@@ -10,19 +10,8 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "DisplayConfigWindow.h"
-#include "Debugging.h"
-
-char *EXEPATH = NULL;
 
 int main(int argc, char **argv) {
-
-    EXEPATH = argv[0];
-    if(STRUCTVIZ_DEBUGGING) {
-        struct sigaction sigact;
-	sigact.sa_sigaction = SegfaultSignalHandler;
-	sigact.sa_flags = SA_SIGINFO | SA_RESTART;
-	sigaction(SIGSEGV, &sigact, (struct sigaction *) NULL);
-    }
 
     DisplayConfigWindow::SetupInitialConfig();
     if(argc > 1 && 
@@ -40,11 +29,6 @@ int main(int argc, char **argv) {
 	argv[1] = argv[0]; // remove our custom option before parsing 
 	++argv; --argc;
     }	
-    else if(argc > 1 && !strcmp(argv[1], "--test-handler")) {
-        int *nullPtr = NULL;
-	*nullPtr = 10000;
-	// this *WILL* cause a SEGFAULT that terminates the application ... 
-    }
     RNAStructViz::Initialize(argc, argv);
    
     Fl::option(Fl::OPTION_VISIBLE_FOCUS, false);
