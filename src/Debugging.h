@@ -21,6 +21,13 @@
 #include <signal.h>
 #include <unistd.h>
 
+#ifndef __APPLE__
+     #include <inttypes.h>
+#endif
+
+#include <string>
+#include <regex>
+
 #include "ConfigOptions.h"
 
 #define STRUCTVIZ_DEBUGGING         (true)
@@ -34,7 +41,33 @@ extern char *EXEPATH;
      #define ADDR2LINE              ("/usr/bin/addr2line")
 #endif
 
-const char *ADDR2LINE_FORMAT = "%s --exe=%s --inlines --pretty-print --functions --demangle %p";
+const char *ADDR2LINE_FORMAT = "%s --exe=%s --inlines --pretty-print --functions --demangle %s";
+
+#ifndef __APPLE__
+/* Solution for finding the *physical* address of a pointer taken from:
+ * https://stackoverflow.com/questions/2440385/how-to-find-the-physical-address-of-a-variable-from-user-space-in-linux/28987409#28987409
+ */
+uintptr_t vtop(uintptr_t vaddr) {
+    FILE *pagemap;
+    intptr_t paddr = 0;
+    int offset = (vaddr / sysconf(_SC_PAGESIZE)) * sizeof(uint64_t);
+    uint64_t e[1];
+    // https://www.kernel.org/doc/Documentation/vm/pagemap.txt
+    if ((pagemap = fopen("/proc/self/pagemap", "r"))) {
+        if (lseek(fileno(pagemap), offset, SEEK_SET) == offset) {
+            if (fread(&e[0], sizeof(uint64_t), 1, pagemap)) {
+                if (e[0] & (1ULL << 63)) { // page present ?
+                    paddr = e[0] & ((1ULL << 54) - 1); // pfn mask
+                    paddr = paddr * sysconf(_SC_PAGESIZE);
+                    paddr = paddr | (vaddr & (sysconf(_SC_PAGESIZE) - 1));
+                }   
+            }   
+        }   
+        fclose(pagemap);
+    }   
+    return paddr;
+}
+#endif
 
 const char * SegfaultCode2String(int scode) {
      switch(scode) {
@@ -47,14 +80,14 @@ const char * SegfaultCode2String(int scode) {
      }
 }
 
-bool PrintStackTraceString(void *staddr) {
+bool PrintStackTraceString(const char *offsetAddr) {
      
-     if(EXEPATH == NULL || staddr == NULL) {
+     if(EXEPATH == NULL || offsetAddr == NULL) {
           return false;
      }
      char runCmd[MAX_BUFFER_SIZE];
      snprintf(runCmd, MAX_BUFFER_SIZE - 1, ADDR2LINE_FORMAT, 
-		      ADDR2LINE, EXEPATH, staddr);
+		      ADDR2LINE, EXEPATH, offsetAddr);
      if(system(runCmd)) {
           return false;
      }
@@ -94,7 +127,21 @@ void SegfaultSignalHandler(int signum, siginfo_t *sinfo, void *scontext) {
           if(stacktraceMsgs == NULL) {
                break;
 	  }
-          PrintStackTraceString(backtraceArr[st]);
+	  std::string offsetAddr(stacktraceMsgs[st]);
+	  std::regex offsetAddrRegex(R"(0[xX][[:xdigit:]][[:xdigit:]]*)");
+	  std::smatch matchingAddr;
+	  regex_search(offsetAddr, matchingAddr, offsetAddrRegex);
+	  std::sregex_token_iterator addrMatchesIter( 
+	       offsetAddr.begin(), offsetAddr.end(), offsetAddrRegex, -1);
+	  offsetAddr = matchingAddr.str();
+          #ifndef __APPLE__
+	       uintptr_t physAddr = vtop((uintptr_t) backtraceArr[st]);
+               char phyAddrStr[MAX_BUFFER_SIZE];
+	       snprintf(phyAddrStr, MAX_BUFFER_SIZE - 1, "%p", physAddr);
+	       if(physAddr != NULL) 
+	            offsetAddr = string(phyAddrStr);
+          #endif
+	  PrintStackTraceString(offsetAddr.c_str());
           fprintf(stderr, "[% 2d] %s\n", st, stacktraceMsgs[st]);
      }
      free(stacktraceMsgs);

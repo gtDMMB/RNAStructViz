@@ -40,7 +40,7 @@ static inline const char * GetUserHome() {
 #define DEFAULT_PNG_OUTPUT_DIRECTORY    (GetUserHome())
 #define DEFAULT_PNG_OUTPUT_PATH         ("RNAStructViz-GUIView-%F-%H%M%S.png") 
                                         /* As a strftime format string */
-#define DEFAULT_FLTK_THEME              ("gleam")
+#define DEFAULT_FLTK_THEME              ("gtk+")
 #define FLTK_THEME_COUNT                (6)
 #define USER_CONFIG_DIR                 ((string(GetUserHome()) + string("/.RNAStructViz/")).c_str())
 #define USER_CONFIG_PATH                ((USER_CONFIG_DIR + string("config.cfg")).c_str())

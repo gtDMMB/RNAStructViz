@@ -115,7 +115,8 @@ FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 	FolderWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
-Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h Main.cpp
+Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
+	Debugging.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\

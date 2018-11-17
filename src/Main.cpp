@@ -37,7 +37,14 @@ int main(int argc, char **argv) {
 	fprintf(stderr, "THEME WIDGET COLOR:   0x%08x\n", GUI_BGCOLOR);
 	fprintf(stderr, "THEME BTEXT COLOR:    0x%08x\n", GUI_BTEXT_COLOR);
 	fprintf(stderr, "THEME TEXT COLOR:     0x%08x\n", GUI_TEXT_COLOR);
+	argv[1] = argv[0]; // remove our custom option before parsing 
+	++argv; --argc;
     }	
+    else if(argc > 1 && !strcmp(argv[1], "--test-handler")) {
+        int *nullPtr = NULL;
+	*nullPtr = 10000;
+	// this *WILL* cause a SEGFAULT that terminates the application ... 
+    }
     RNAStructViz::Initialize(argc, argv);
    
     Fl::option(Fl::OPTION_VISIBLE_FOCUS, false);
