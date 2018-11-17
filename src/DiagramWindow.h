@@ -25,6 +25,7 @@
 #define IMAGE_WIDTH                  (IMAGE_DIM)
 #define IMAGE_HEIGHT                 (IMAGE_DIM)
 #define IMAGE_DEPTH                  (3)
+#define PNG_FOOTER_HEIGHT            (100)
 
 #define GLWIN_TRANSLATEX             (35)
 #define GLWIN_TRANSLATEY             (110)
@@ -54,7 +55,8 @@ typedef enum {
      CR_BRANCH4     = 10, 
      CR_WHITE       = 11,
      CR_TRANSPARENT = 12,
-     CR_SOLID_BLACK = 14
+     CR_SOLID_BLACK = 14,
+     CR_SOLID_WHITE = 15
 } CairoColorSpec_t;
 
 class DiagramWindow : public Fl_Cairo_Window

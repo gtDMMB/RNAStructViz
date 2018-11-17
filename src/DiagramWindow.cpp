@@ -191,8 +191,48 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 	     buttonPressed->clear_changed();     
              return;
 	}
-        cairo_surface_t *pngSource = cairo_get_target(thisWindow->crDraw);
-        if(cairo_surface_write_to_png(pngSource, exportFilePath.c_str()) != 
+	cairo_surface_t *pngInitSource = cairo_get_target(thisWindow->crDraw);
+        cairo_surface_t *pngSource = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
+		                     IMAGE_WIDTH, IMAGE_HEIGHT + PNG_FOOTER_HEIGHT);
+	cairo_t *crImageOutput = cairo_create(pngSource);
+        thisWindow->SetCairoColor(crImageOutput, CR_TRANSPARENT);
+	cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT + PNG_FOOTER_HEIGHT);
+	cairo_fill(crImageOutput);
+	// now draw the footer data:
+        thisWindow->SetCairoColor(crImageOutput, CR_SOLID_WHITE);
+	cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT, 
+			IMAGE_WIDTH, PNG_FOOTER_HEIGHT);
+	cairo_fill(crImageOutput);
+	thisWindow->SetCairoColor(crImageOutput, CR_SOLID_BLACK);
+	cairo_set_line_width(crImageOutput, 2);
+	cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT); 
+	cairo_line_to(crImageOutput, IMAGE_WIDTH, IMAGE_HEIGHT);
+	cairo_stroke(crImageOutput);
+	cairo_select_font_face(crImageOutput, "Courier New", 
+		               CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+        cairo_set_font_size(crImageOutput, 12);
+	int offsetY = IMAGE_HEIGHT + 25;
+	for(int s = 0; s < 3; s++) {
+             char curStructLabel[MAX_BUFFER_SIZE];
+	     int menuChoiceIdx = thisWindow->m_menus[s]->value();
+	     const char *curStructName = thisWindow->m_menus[s]->menu()[menuChoiceIdx].label();
+	     snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, " * Structure %d: %s", 
+		      s + 1, curStructName);
+	     cairo_move_to(crImageOutput, 12, offsetY);
+	     cairo_show_text(crImageOutput, curStructLabel);
+             offsetY += 22;
+	}
+	time_t currentTime = time(NULL);
+        struct tm *tmCurrentTime = localtime(&currentTime);
+	char imageTimeStamp[MAX_BUFFER_SIZE];
+	strftime(imageTimeStamp, MAX_BUFFER_SIZE - 1, " * Image Generated: %c %Z", tmCurrentTime);
+        cairo_move_to(crImageOutput, 12, offsetY);
+	cairo_show_text(crImageOutput, imageTimeStamp);
+	// draw the source diagram image onto the PNG output image:
+	cairo_set_source_surface(crImageOutput, pngInitSource, 0, 0);
+        cairo_rectangle(crImageOutput, 0, 0, IMAGE_HEIGHT, IMAGE_WIDTH);
+        cairo_fill(crImageOutput);
+	if(cairo_surface_write_to_png(pngSource, exportFilePath.c_str()) != 
 			              CAIRO_STATUS_SUCCESS) {
              fl_alert("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));
 	}
@@ -574,10 +614,13 @@ void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
 	case CR_TRANSPARENT:
 	    CairoSetRGB(cr, 255, 255, 255, 0);
 	    break;
-	case CR_SOLID_BLACK:
+        case CR_SOLID_BLACK:
 	    CairoSetRGB(cr, 0, 0, 0, 255);
 	    break;
-        default:
+        case CR_SOLID_WHITE:
+	    CairoSetRGB(cr, 255, 255, 255, 255);
+	    break;
+	default:
             break;
     }
 
