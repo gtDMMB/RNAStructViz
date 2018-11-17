@@ -58,15 +58,6 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  true
      }, 
      {
-          0xd5008600,
-	  0xad33c000,
-	  0x23222400,
-	  0x7c052700,
-	  Darker(0xd5008600, 0.7f), 
-	  "Chicky", // very pink, also one of my favorite Android phone themes
-	  true
-     },
-     {
           0xeeb50000,
 	  0xff6d0000,
 	  0x3e3c4000,
@@ -82,6 +73,33 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0x24241f00,
 	  Darker(0x98a8a800, 0.65f), 
 	  "Redmond", // old school Windows 2000 era color scheme
+	  true
+     },
+     {
+          0xffffff00,
+	  RGBColor(123, 77, 211),
+	  Lighter(RGBColor(201, 194, 240), 0.5f),
+	  RGBColor(52, 25, 102),
+	  0xaaaaaa00, 
+	  "Vanilla Purple", 
+	  true
+     },
+     {
+          0xffffff00,
+	  0x1f780d00,
+	  Lighter(0x1f780d00, 0.5f),
+	  0x13480900,
+	  0xaaaaaa00, 
+	  "Vanilla Green", 
+	  true
+     },
+     {
+          0xd3d7cf00,
+	  0x6ba5e700,
+	  0x00194000,
+	  0x2e343600,
+	  0x888a8500, 
+	  "Structviz Default", 
 	  true
      },
      {

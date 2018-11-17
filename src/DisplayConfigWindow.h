@@ -19,16 +19,16 @@
 #include "ConfigOptions.h"
 
 #define CONFIG_WINDOW_WIDTH         (750)
-#define CONFIG_WINDOW_HEIGHT        (520)
+#define CONFIG_WINDOW_HEIGHT        (550)
 #define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Options")
 
 #define CFGWIN_WIDGET_OFFSETX       (10)
 #define CFGWIN_WIDGET_OFFSETY       (10)
 #define CFGWIN_LABEL_HEIGHT         (20)
 #define CFGWIN_LABEL_WIDTH          (200)
-#define CFGWIN_BUTTON_WIDTH         (130)
+#define CFGWIN_BUTTON_WIDTH         (135)
 #define CFGWIN_COLOR_WIDTH          (25)
-#define CFGWIN_SPACING              (15)
+#define CFGWIN_SPACING              (18)
 #define CFGWIN_CDIALOG_X            (100)
 #define CFGWIN_CDIALOG_Y            (100)
 #define CFGWIN_CDIALOG_WIDTH        (250)

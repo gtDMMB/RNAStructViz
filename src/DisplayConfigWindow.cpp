@@ -345,7 +345,7 @@ void DisplayConfigWindow::ConstructWindow() {
 
      // draw bounding box for the two action buttons on the 
      // bottom right of the window:
-     int boundingBoxWidth = 3 * CFGWIN_BUTTON_WIDTH + 4 * CFGWIN_SPACING;
+     int boundingBoxWidth = 3 * CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING;
      offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth - CFGWIN_SPACING / 2;
      int bdBoxHeight = (int) 1.5 * (CONFIG_WINDOW_HEIGHT - workingYOffset);
      int bdBoxYOffset = CONFIG_WINDOW_HEIGHT - bdBoxHeight - CFGWIN_SPACING;
@@ -354,9 +354,10 @@ void DisplayConfigWindow::ConstructWindow() {
      btnBoundingBox->box(FL_RSHADOW_BOX);
      btnBoundingBox->color(GUI_BGCOLOR);
      windowWidgets.push_back(btnBoundingBox);
+     workingYOffset -= CFGWIN_SPACING / 3;
 
      offsetX = CONFIG_WINDOW_WIDTH - 
-	       (CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING);
+	       (CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING);
      Fl_Button *writeConfigBtn = new Fl_Button(offsetX, workingYOffset, 
 		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				 "@filenew   Save Settings");

@@ -216,7 +216,8 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
              char curStructLabel[MAX_BUFFER_SIZE];
 	     int menuChoiceIdx = thisWindow->m_menus[s]->value();
 	     const char *curStructName = thisWindow->m_menus[s]->menu()[menuChoiceIdx].label();
-	     snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, " * Structure %d: %s", 
+	     snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, 
+		      " * Structure %d:     %s", 
 		      s + 1, curStructName);
 	     cairo_move_to(crImageOutput, 12, offsetY);
 	     cairo_show_text(crImageOutput, curStructLabel);
