@@ -113,25 +113,36 @@ That's it! Now on to building [RNAStructViz from source](https://github.com/gtDM
 
 First install the Mesa/GL libs with apt if you do not already have them on your system:
 ```
-$ sudo apt-get install libmesa-dev mesa-common-dev libxinerama-dev
+$ sudo apt-get install libglu1-mesa-dev mesa-common-dev libxinerama-dev
 ```
-If you are running an older version, of say Ubuntu 14.xx, the install of the package ``libmesa-dev`` may fail. If this happens, try installing the required packages in the above line by running:
+If problems with the package names arise, you can try searching for the correct package to install by issuing the following command:
 ```
-$ sudo apt-get install libglu1-mesa-dev
-```
-If problems with the package names still arise, you can try searching for the correct ``mesa-dev`` package to install by issuing the following command:
-```
-apt-cache search mesa-dev
+apt-cache search package-name
 ```
 Once these libraries are installed make sure that you have the development packages for 
 Cairo installed by running:
 ```
 $ sudo apt-get install libcairo2-dev
 ```
-Finally, install the ``apt`` packages for FLTK *with cairo support*:
+
+We fetch and extract a recent stable version of the FLTK library source (v1.3.x) and extract it 
+to our local home directory:
 ```
-$ sudo apt-get install libfltk1.3 libfltk1.3-dev libfltk-cairo1.3 libfltk-gl1.3
+$ cd ~
+$ wget http://fltk.org/pub/fltk/1.3.4/fltk-1.3.4-2-source.tar.bz2 
+$ if [[ "$(echo $(sha256sum < fltk-1.3.4-2-source.tar.bz2) | sed -e 's/[[:blank:]-]*$//')" == "8cfe7690d70f9a3db5cd88748a82aa7958a9dc7ec3d7e94eef9063e107864150" ]]; then echo "SHA256 SUM OK"; else echo "SHA256 SUM IS MALFORMED ... ABORT!"; fi
+$ tar xjf fltk-1.3.4-2-source.tar.bz2
+$ cd fltk-1.3.4-2
 ```
+Now we need to enable the configure-time options which will enable Cairo support by default in 
+our FLTK build: 
+```
+$ ./configure --enable-cairo --enable-threads
+$ make
+$ sudo make install 
+```
+
+
 You can verify that the install was successful by verifying that the following output is sane:
 ```
 $ which fltk-config
