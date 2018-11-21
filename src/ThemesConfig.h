@@ -76,29 +76,29 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  true
      },
      {
-          0xffffff00,
-	  RGBColor(123, 77, 211),
-	  Lighter(RGBColor(201, 194, 240), 0.5f),
-	  RGBColor(52, 25, 102),
-	  0xaaaaaa00, 
-	  "Vanilla Purple", 
+          0xf7efd400,
+	  0xefda8d00,
+	  0x0f0f0e00,
+          0x0f0f0e00,
+	  0xf7efd400, 
+	  "Parchment",  // black and off white to gold 
 	  true
      },
      {
-          0xffffff00,
-	  0x1f780d00,
-	  Lighter(0x1f780d00, 0.5f),
-	  0x13480900,
-	  0xaaaaaa00, 
-	  "Vanilla Green", 
+          0xeff2f200,
+	  0xd1d0d800,
+	  0x0e014400,
+          0x0e0144,
+	  0xeff2f200, 
+	  "Navy on grey", 
 	  true
      },
      {
-          0xd3d7cf00,
-	  0x6ba5e700,
-	  0x00194000,
-	  0x2e343600,
-	  0x888a8500, 
+          0xf7f7f900,
+	  0xcfd2d600,
+	  0x00000000,
+	  0x00000000,
+	  0xf7f7f900, 
 	  "Structviz Default", 
 	  true
      },
