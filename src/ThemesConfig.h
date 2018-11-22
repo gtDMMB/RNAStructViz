@@ -40,15 +40,6 @@ typedef struct {
 
 static const ColorTheme_t PRESET_COLOR_THEMES[] = {
      {
-	  Lighter(Fl::get_color(91), 0.95f), 
-	  Fl::get_color(62), 
-	  Fl::get_color(58), 
-	  Fl::get_color(18), 
-	  Fl::get_color(132), 
-	  "Green On Orange", // a good color combination
-	  true
-     },
-     {
           0x16161600, 
 	  0x39393900, 
 	  0x00da0000, 
