@@ -49,6 +49,15 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  true
      }, 
      {
+          0xc3b68900, 
+	  0x00305700, 
+	  0xffffee00, 
+	  0x0f0f0e00,
+          Darker(0xc3b68900, 0.5f), 
+	  "Blue on Gold", 
+	  true
+     }, 
+     {
           0xeeb50000,
 	  0xff6d0000,
 	  0x3e3c4000,

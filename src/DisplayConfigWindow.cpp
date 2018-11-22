@@ -508,10 +508,14 @@ void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
      if(colorSelectOK) { 
           int nextR = (int) (currentR * 255.0);
           int nextG = (int) (currentG * 255.0);
-          int nextB = (int) (currentB * 255.0);
-          *(parentWin->colorChangeRefs[colorIdx]) = RGBColor(nextR, nextG, nextB);
-          parentWin->colorDisplayBoxes[colorIdx]->labelcolor(RGBColor(nextR, nextG, nextB));
+          int nextB = (int) (currentB * 255.0); 
+          Fl_Color nextBGColor = RGBColor(nextR, nextG, nextB);
+	  *(parentWin->colorChangeRefs[colorIdx]) = nextBGColor;
+          parentWin->colorDisplayBoxes[colorIdx]->labelcolor(nextBGColor);
           parentWin->colorDisplayBoxes[colorIdx]->redraw();
+	  if(!colorIdx) {
+               GUI_CTFILEVIEW_COLOR = Darker(nextBGColor, 0.5f);
+	  }
      }
 
 }
