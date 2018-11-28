@@ -379,12 +379,8 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
             cairo_fill(thisWindow->crDraw);
 	    cairo_push_group(thisWindow->crDraw);
             int drawParams[] = { numToDraw, keyA, keyB };
-	    //if(thisWindow->cairoTranslate)
-	    //    cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
 	    thisWindow->RedrawBuffer(thisWindow->crDraw, sequences, drawParams, IMAGE_WIDTH);
 	    cairo_pop_group_to_source(thisWindow->crDraw);
-            //if(thisWindow->cairoTranslate)            
-            //     cairo_translate(thisWindow->crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
             cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
 		      IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
             cairo_clip(thisWindow->crDraw);
@@ -418,11 +414,7 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     fl_font(priorFont, 10);
     fl_line_style(0);
     
-    //cairo_set_source_rgb(cr, 
-    //		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-    //			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-    //			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
-    SetCairoColor(cr, CR_WHITE);
+    SetCairoColor(cr, CR_SOLID_WHITE);
     cairo_rectangle(cr, 0, 0, this->w(), this->h());
     cairo_fill(cr);
 
