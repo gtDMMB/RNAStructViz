@@ -1292,8 +1292,15 @@ void StatsWindow::ComputeStats()
 		buff->append(tempc);
 	}
 	
-	int colors[7] = {FL_BLUE, FL_GREEN, FL_RED, FL_YELLOW, FL_CYAN, FL_MAGENTA,
-		         FL_WHITE};
+	int colors[7] = {
+		Lighter(RGBColor(32, 74, 135), 0.61f), // FL_BLUE, 
+		Lighter(RGBColor(115, 210, 22), 0.61f),  // FL_GREEN, 
+		Lighter(RGBColor(164, 0, 0), 0.61f), // FL_RED, 
+		Lighter(RGBColor(196, 160, 0), 0.61f), // FL_YELLOW, 
+		Lighter(RGBColor(0, 195, 215), 0.61f), // FL_CYAN, 
+		Lighter(RGBColor(239, 41, 159), 0.61f), // FL_MAGENTA,         
+		Lighter(RGBColor(0xff, 0xff, 0xff), 0.61f), // FL_WHITE
+	};
     
 	for (unsigned int ui = 0; ui < numStats; ui++)
 	{
