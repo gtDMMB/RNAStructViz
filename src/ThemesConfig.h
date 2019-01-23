@@ -85,24 +85,24 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  true
      },
      {
-          0xeff2f200,
-	  0xd1d0d800,
-	  0x0e014400,
-          0x0e0144,
-	  0xeff2f200, 
-	  "Navy on grey", 
-	  true
-     },
-     {
           0xf7f7f900,
 	  0xcfd2d600,
 	  0x00000000,
 	  0x00000000,
 	  0xf7f7f900, 
-	  "Structviz Default", 
+	  "Gray on white", 
 	  true
      },
      {
+          0xeff2f200,
+	  0xd1d0d800,
+	  0x0e014400,
+          0x0e0144,
+	  0xeff2f200, 
+	  "Structviz default", 
+	  true
+     },
+    {
           0, 
 	  0, 
 	  0, 
