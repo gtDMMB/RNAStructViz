@@ -61,6 +61,7 @@ class RNABranchType_t {
                  RNAStructure * &rnaStructBase, bool removeTopFour);
 
      public: 
+          RNABranchType_t();
           RNABranchType_t(BranchID_t bid, class RNAStructure::BaseData *bparent); 
  
           RNABranchType_t & operator=(const BranchID_t &rhs); 

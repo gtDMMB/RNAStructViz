@@ -1,0 +1,146 @@
+CXX=g++
+LD=g++
+
+.DEFAULT: default
+
+# OSX-specific locations and utility names:
+TARGET_PLATFORM=$(shell uname -s)
+ifeq "$(TARGET_PLATFORM)" "Darwin"
+	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
+	READLINK=greadlink
+else
+	#ifneq "$(shell ls /usr/bin/fltk-config)" ""
+	#	FLTKCONFIG=/usr/bin/fltk-config
+        #else
+	FLTKCONFIG=fltk-config
+	#endif
+	READLINK=readlink
+endif
+
+.EXPORT_ALL_VARIABLES:
+# option to build FLTK without sudo on Linux:
+CFLAGS_FLTK_OVERRIDES=
+BUILD_FLTK_LOCAL=$(shell env | grep FLTK_INSTALL_DIR | sed -e 's/^.*=//')
+ifneq "$(BUILD_FLTK_LOCAL)" ""
+	BUILD_FLTK_LOCAL_ABS=$(shell $(READLINK) -f $(BUILD_FLTK_LOCAL))
+	FLTKCONFIG=$(BUILD_FLTK_LOCAL_ABS)/fltk-config
+        CFLAGS_FLTK_OVERRIDES=-isystem $(BUILD_FLTK_LOCAL_ABS)
+	CPLUS_INCLUDE_PATH=$(BUILD_FLTK_LOCAL_ABS)
+	LIBRARY_PATH=$(BUILD_FLTK_LOCAL_ABS)/lib
+endif
+
+BINARY_OUTPUT=RNAStructViz
+OBJEXT=o
+
+CXXFLAGS= -g -rdynamic -Wall -Wextra #-O2
+CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
+CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
+CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -funsigned-char -Wno-c++11-narrowing 
+CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
+
+LDFLAGS=-Wall -Wextra -rdynamic -g1
+LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
+LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
+LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
+LDFLAGS_FULL=$(LDFLAGS) $(LDFLAGS_EXTRA)
+
+RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)\
+	DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
+	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
+	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
+	RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
+	StructureManager.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT)\
+	rocbox.$(OBJEXT) 
+
+default: prelims $(RNASTRUCTVIZ_OBJECTS)
+	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
+
+prelims:
+	/bin/bash `$(READLINK) -f ../scripts/build-platform-header.sh` \
+		`$(READLINK) -f ./BuildTargetInfo.h`\
+		`$(READLINK) -f $(FLTKCONFIG)`
+
+diagnostic:
+	echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
+	echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
+	$(CXX) --version -v $(CXXFLAGS_FULL)
+
+run: default
+	./RNAStructViz --about
+
+clean:
+	rm -f *.o *.code BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
+
+install: default
+	if test -z "$$INSTALL_PREFIX"; then INSTALL_PREFIX=/usr/local/; fi;\
+	echo "Install Prefix: $$INSTALL_PREFIX";\
+	mkdir -p $(INSTALL_PREFIX)/bin;\
+	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz;\
+	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures;\
+	cp -ap $(BINARY_OUTPUT) $(INSTALL_PREFIX)/bin/;\
+	cp -ap ../sample_structures/* \
+		$(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
+
+BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
+	BranchTypeIdentification.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c BranchTypeIdentification.cpp
+
+ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h ConfigParser.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
+
+DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
+	BranchTypeIdentification.h RNAStructure.h\
+	pixmaps/DiagramWindowIcon.xbm DiagramWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
+
+DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
+	pixmaps/ConfigPathsIcon.c pixmaps/ConfigThemesIcon.c\
+	pixmaps/PNGNewPathIcon.c pixmaps/ConfigWindowIcon.xbm\
+	ThemesConfig.h DisplayConfigWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
+
+StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
+	RNAStructViz.h RNAStructure.h InputWindow.h \
+	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm StatsWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
+
+GLWindow.$(OBJEXT): GLWindow.h
+	$(CXX) $(CXXFLAGS_FULL) -c GLWindow.cpp
+
+InputWindow.$(OBJEXT): InputWindow.h InputWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
+
+FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
+	ConfigOptions.h MainWindow.h pixmaps/StructureOperationIcon.c\
+	FolderWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
+
+Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
+	Debugging.h Main.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
+
+MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
+	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
+
+RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
+	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c\
+	ThemesConfig.h RNAStructure.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
+
+RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
+	MainWindow.h FolderStructure.h DiagramWindow.h\
+	StatsWindow.h RNAStructViz.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c RNAStructViz.cpp
+
+StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
+	FolderWindow.h MainWindow.h RNAStructViz.h InputWindow.h\
+	RNAStructure.h StructureManager.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp
+
+Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c Fl_Rotated_Text.cpp
+
+rocbox.$(OBJEXT): rocbox.h rocbox.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c rocbox.cpp
+

@@ -11,11 +11,7 @@
 #include <stdio.h>
 
 StructureManager::StructureManager()
-    : m_structureCount(0)
-    , m_structures(0)
-    //, selectedFolder(-1)
-{
-}
+    : m_structureCount(0), m_structures(0) {}
 
 StructureManager::~StructureManager()
 {
@@ -34,7 +30,7 @@ StructureManager::~StructureManager()
 void StructureManager::AddFile(const char* filename)
 {
     if (!filename)
-	return;
+	    return;
 
     char* localCopy = strdup(filename);
     if (!localCopy)
@@ -42,7 +38,8 @@ void StructureManager::AddFile(const char* filename)
 		return;
     }
 
-    // Strip any trailing directory markers. Maybe we could load all files in the directory in this case,
+    // Strip any trailing directory markers. 
+    // Maybe we could load all files in the directory in this case,
     // but it hardly seems worth the effort.
     while (strlen(localCopy) > 0 && localCopy[strlen(localCopy) - 1] == '/')
     	localCopy[strlen(localCopy) - 1] = 0;
@@ -62,8 +59,10 @@ void StructureManager::AddFile(const char* filename)
         {
             if (!strcmp(m_structures[i]->GetFilename(), basename))
             {
-            	fl_message("Already have a structure loaded with the filename: %s", basename);
-            	return;
+            	fl_message("Already have a structure loaded with filename: %s", 
+			   basename);
+            	free(localCopy);
+		return;
             }
         }
     }
@@ -88,27 +87,26 @@ void StructureManager::AddFile(const char* filename)
 		if (strlen(filename) > 1000)
 		    fl_message("Unknown file type: <file name too long>");
 		else
-		    fl_message("Unknown file type: %s", filename);
+		    fl_message("Unknown file type: %s . %s [%s]", filename, extension, basename);
 		return;
     }
 
     if (structure)
     {
-	// TODO: Check for duplicates.
-
+    	// TODO: Check for duplicates.
     	int count = (int)folders.size();
-		AddFirstEmpty(structure);
+	AddFirstEmpty(structure);
         if(count == (int) folders.size()-1)
         {
-            InputWindow* input_window = new InputWindow(400, 150, "New Folder Added", 
-            	folders[count]->folderName, InputWindow::FOLDER_INPUT);
-            while (input_window->visible())
+            InputWindow* input_window = new InputWindow(400, 150, 
+			 "New Folder Added", folders[count]->folderName, 
+			 InputWindow::FOLDER_INPUT);
+            while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES)
             {
                 Fl::wait();
             }
             
             bool same = false;
-            
             for(unsigned int ui = 0; ui < folders.size(); ui++)
             {
             	if (!strcmp(folders[ui]->folderName,input_window->getName())
@@ -120,18 +118,19 @@ void StructureManager::AddFile(const char* filename)
             }
             
             while (same) {
-                fl_message("Already have a folder with the name: %s, please choose another name.", input_window->getName());
+                fl_message("Already have a folder with the name: %s, please choose another name.", 
+                           input_window->getName());
                 delete input_window;
                 input_window = new InputWindow(400, 150, "New Folder Added", 
-	            	folders[count]->folderName, InputWindow::FOLDER_INPUT);
-                while (input_window->visible())
+	            	               folders[count]->folderName, InputWindow::FOLDER_INPUT);
+                while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES)
                 {
                     Fl::wait();
                 }
                 same = false;
                 for(unsigned int ui = 0; ui < folders.size(); ui++)
             	{
-            		if (!strcmp(folders[ui]->folderName,input_window->getName()))
+            		if (!strcmp(folders[ui]->folderName, input_window->getName()))
 	            	{
     	        		same = true;
         	    		break;
@@ -140,21 +139,21 @@ void StructureManager::AddFile(const char* filename)
             }
                         
             if(strcmp(input_window->getName(), ""))
-            	strcpy(folders[count]->folderName,input_window->getName());
+            	strcpy(folders[count]->folderName, input_window->getName());
 
             MainWindow::AddFolder(folders[count]->folderName, count, false);
-            delete input_window;
+	    delete input_window;
         }
-	//MainWindow::AddStructure(structure->GetFilename(), index, false);
-    }
 
+    }
     free(localCopy); localCopy = NULL;
+
 }
 
 void StructureManager::RemoveStructure(const int index)
 {
     RNAStructure* structure = m_structures[index];
-    m_structures[index] = 0;
+    m_structures[index] = NULL;
 
     bool found = false;
     for(int i = 0; i < (int)folders.size(); i++)
@@ -166,13 +165,9 @@ void StructureManager::RemoveStructure(const int index)
             {
                 shift++;
             }
-
             if(folders[i]->folderStructs[(j+shift)] == index)
             {
-
-                folders[i]->folderStructs[(j+shift)] = -1;
-                
-                
+                folders[i]->folderStructs[(j+shift)] = -1;                
                 found = true;
                 break;
             }
@@ -180,27 +175,26 @@ void StructureManager::RemoveStructure(const int index)
         if(found)
             break;
     }
-    
     delete structure;
     
 }
 
 void StructureManager::DecreaseStructCount(const int index)
 {
-    folders[index]->structCount = folders[index]->structCount -1;
+    folders[index]->structCount = folders[index]->structCount - 1;
     if (folders[index]->structCount == 0) 
     {
-        MainWindow::RemoveFolderByIndex(index);
+        MainWindow::RemoveFolderByIndex(index, true);
     }
     else {
-        sprintf(folders[index]->folderNameFileCount, "%-.48s (%d)", folders[index]->folderName, folders[index]->structCount);
+        sprintf(folders[index]->folderNameFileCount, "(+% 2d) %-.48s", 
+                folders[index]->structCount, folders[index]->folderName);
+        Fl::redraw();
     }
 }
 
 void StructureManager::RemoveFolder(const int folder, const int index)
 {
-    
-    
     if (folders[index]->folderName != NULL) {
         free(folders[index]->folderName); 
         folders[index]->folderName = "";
@@ -217,22 +211,11 @@ void StructureManager::RemoveFolder(const int folder, const int index)
     if(folders[index]->folderWindow)
     {
         delete folders[index]->folderWindow;
+        folders[index]->folderWindow = NULL;
     }
     folders[index]->structCount = 0;
-    //free(folders[index]);
-
     folders.erase(folders.begin() + index);
-    
-    // RESET FOLDER INDICES???
 }
-
-/*void StructureManager::SetSelectFolder(const int index)
-{
-    if(index != selectedFolder)
-    {
-        selectedFolder = index;
-    }
-}*/
 
 void StructureManager::AddFolder(RNAStructure* structure, const int index)
 {
@@ -249,12 +232,13 @@ void StructureManager::AddFolder(RNAStructure* structure, const int index)
     temp->folderStructs = (int*)malloc(sizeof(int)*128);
     temp->folderStructs[0] = index;
     temp->structCount = 1;
-    sprintf(temp->folderNameFileCount, "%-.48s (%d)", temp->folderName, temp->structCount);
+    sprintf(temp->folderNameFileCount, "(+% 2d) %-.48s", 
+	    temp->structCount, temp->folderName);
     temp->selected = false;
     temp->folderWindow = 0;
     folders.push_back(temp);
     
-    }
+}
 
 int StructureManager::AddFirstEmpty(RNAStructure* structure)
 {
@@ -299,8 +283,11 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
             {
 
                 folders[ui]->structCount++;
-                if(folders[ui]->structCount >=128)
-                    folders[ui]->folderStructs = (int*)realloc(folders[ui]->folderStructs, sizeof(int) * folders[ui]->structCount);
+                if(folders[ui]->structCount >= 128) {
+                    folders[ui]->folderStructs = (int*) realloc(folders[ui]->folderStructs, 
+                                                  sizeof(int) * folders[ui]->structCount);
+                }
+                
                 bool emptySlot = false;
                 for(int i = 0; i < folders[ui]->structCount-1; i++)
                 {
@@ -315,9 +302,10 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
                     folders[ui]->folderStructs[folders[ui]->structCount - 1] = index;
                 AddNewStructure(ui, index);
                 
-                if (folders[ui]->folderNameFileCount != NULL)
-                    sprintf(folders[ui]->folderNameFileCount, "%-.48s (%d)", folders[ui]->folderName, folders[ui]->structCount);
-                
+                if (folders[ui]->folderNameFileCount != NULL) {
+                    sprintf(folders[ui]->folderNameFileCount, "(+% 2d) %-.48s", 
+                            folders[ui]->structCount, folders[ui]->folderName);
+                }
                 found = true;
                 break;
             }
@@ -330,6 +318,7 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
         AddFolder(structure, index);
     }
     return index;
+
 }
 
 void StructureManager::AddNewStructure(const int folderIndex, const int index)
@@ -342,20 +331,12 @@ void StructureManager::AddNewStructure(const int folderIndex, const int index)
             diagrams[ui]->AddStructure(index);
     }
     
-    const std::vector<StatsWindow*>& stats = 
-    	RNAStructViz::GetInstance()->GetStatsWindows();
+    const std::vector<StatsWindow*>& stats = RNAStructViz::GetInstance()->GetStatsWindows();
     for(unsigned int ui = 0; ui < stats.size(); ui++)
     {
         if(stats[ui]->GetFolderIndex() == folderIndex)
             stats[ui]->AddStructure(index);
     }
-    
-    /*if(folders[folderIndex]->folderWindow)
-    {
-        RNAStructure *strct = GetStructure(index);
-        folders[folderIndex]->folderWindow->AddStructure(strct->GetFilename(), index);
-        
-    }*/
     MainWindow::ShowFolderSelected();
 }
 
@@ -380,7 +361,6 @@ void StructureManager::DisplayFileContents(const int index)
 
 void StructureManager::PrintFolders()
 {
-
     for(int i = 0; i < (int)folders.size(); i++)
     {
         int shift = 0;

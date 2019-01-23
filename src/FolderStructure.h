@@ -10,6 +10,6 @@ struct Folder{
     int structCount;
     bool selected;
     FolderWindow* folderWindow;
-    };
+};
 
 #endif

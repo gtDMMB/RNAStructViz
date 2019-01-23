@@ -5,38 +5,61 @@
 #ifndef DIAGRAMWINDOW_H
 #define DIAGRAMWINDOW_H
 
-#include <FL/Fl_Window.H>
+#include <FL/Fl.H>
+#include <FL/Enumerations.H>
+#include <cairo.h>
+#include <FL/Fl_Cairo.H>
+#include <FL/Fl_Cairo_Window.H>
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/x.H>
-#include <cairo.h>
 #include <vector>
 
-#include "GLWindow.h"
+#include "ConfigOptions.h"
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_WIDTH        (2048)
-#define IMAGE_HEIGHT       (2048)
-#define IMAGE_DEPTH        (3)
+#define IMAGE_DIM                    (550)
+#define IMAGE_WIDTH                  (IMAGE_DIM)
+#define IMAGE_HEIGHT                 (IMAGE_DIM)
+#define IMAGE_DEPTH                  (3)
+#define PNG_FOOTER_HEIGHT            (100)
+
+#define GLWIN_TRANSLATEX             (35)
+#define GLWIN_TRANSLATEY             (110)
+
+#define WIDGET_SPACING               (35)
+#define EXPORT_BUTTON_WIDTH          (115)
+#define WINW_EXTENSION               (EXPORT_BUTTON_WIDTH + 3 * WIDGET_SPACING)
+
+#define ZOOM_WIDTH                   (200)
+#define ZOOM_HEIGHT                  (200)
+
+#define DIAGRAMWIN_DEFAULT_CURSOR    (FL_CURSOR_CROSS)
+#define DWIN_REDRAW_REFRESH          (1.75)
+#define DWIN_DRAG_DX                 (3)
 
 typedef enum {
-     CR_BLACK   = 0, 
-     CR_RED     = 1, 
-     CR_GREEN   = 2, 
-     CR_BLUE    = 3, 
-     CR_YELLOW  = 4, 
-     CR_MAGENTA = 5, 
-     CR_CYAN    = 6, 
-     CR_BRANCH1 = 7, 
-     CR_BRANCH2 = 8, 
-     CR_BRANCH3 = 9, 
-     CR_BRANCH4 = 10
+     CR_BLACK       = 0, 
+     CR_RED         = 1, 
+     CR_GREEN       = 2, 
+     CR_BLUE        = 3, 
+     CR_YELLOW      = 4, 
+     CR_MAGENTA     = 5, 
+     CR_CYAN        = 6, 
+     CR_BRANCH1     = 7, 
+     CR_BRANCH2     = 8, 
+     CR_BRANCH3     = 9, 
+     CR_BRANCH4     = 10, 
+     CR_WHITE       = 11,
+     CR_TRANSPARENT = 12,
+     CR_SOLID_BLACK = 14,
+     CR_SOLID_WHITE = 15
 } CairoColorSpec_t;
 
-class DiagramWindow : public Fl_Window
+class DiagramWindow : public Fl_Cairo_Window
 {
 public:
     // Constructors
@@ -71,18 +94,22 @@ protected:
     /*
 	Draws the contents of the window.
     */
-    void draw();
+    bool computeDrawKeyParams(RNAStructure **sequences, int *numToDraw, int *keyA, int *keyB);
+    void drawWidgets(bool fillWin);
+    static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
     void resize(int x, int y, int w, int h);
 
-private:
+public:
     static const int ms_menu_minx[3];
     static const int ms_menu_width;
 
+private:
     void RebuildMenus();
 
-    void RedrawBuffer(RNAStructure** structures, const int numStructures, 
-    	const int resolution);
+    void RedrawBuffer(cairo_t *cr, RNAStructure** structures, 
+		      const int *structDrawParams, 
+    	              const int resolution);
 
 	/* Draws the color legend for the arcs. Input a and b correspond to the
 	   index of the relevant structures*/
@@ -90,16 +117,24 @@ private:
     void DrawKey2(const int a, const int b); // if 2 selected structures
     void DrawKey1(const int a); // if 1 selected structure
     
-    void CairoPrepareDisplay();
-    void CairoBufferFinishingTouches();
-    void CairoDrawBufferToScreen(); 
-    void SetCairoBranchColor(const BranchID_t &branchType, int enabled, CairoColorSpec_t fallbackColorFlag);
+    void SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, 
+		             int enabled, 
+                             CairoColorSpec_t fallbackColorFlag);
+    void SetCairoColor(cairo_t *cr, int colorFlag); 
 
-	/* Draws the arcs for all the base pairs, colored according to their 
-	   corresponding structures */
-    void Draw3(RNAStructure** structures, const int resolution); // 3 structures
-    void Draw2(RNAStructure** structures, const int resolution); // 2 structures
-    void Draw1(RNAStructure** structures, const int resolution); // 1 structure
+    inline void CairoRectangle(cairo_t *cr, int x, int y, int w, int h) {
+         double rectX = (double) x / this->w();
+	 double rectY = (double) y / this->h();
+	 double rectW = (double) w / this->w();
+	 double rectH = (double) h / this->h();
+	 cairo_rectangle(cr, rectX, rectY, rectW, rectH);
+    }
+
+    /* Draws the arcs for all the base pairs, colored according to their 
+       corresponding structures */
+    void Draw3(cairo_t *cr, RNAStructure** structures, const int resolution); // 3 structures
+    void Draw2(cairo_t *cr, RNAStructure** structures, const int resolution); // 2 structures
+    void Draw1(cairo_t *cr, RNAStructure** structures, const int resolution); // 1 structure
     
     /* Computes the numbers for the base pairs, updates the counters in the 
        legend */
@@ -117,7 +152,8 @@ private:
 		double& r);
 
     void DrawArc(
-		const unsigned int b1,
+		cairo_t *cr, 
+                const unsigned int b1,
 		const unsigned int b2,
 		const float centerX,
 		const float centerY,
@@ -143,9 +179,9 @@ private:
 		float& angleDelta,
 		float& radius);
 
-    static void MenuCallback(Fl_Widget* widget, void* userData);
+    static void MenuCallback(Fl_Widget *widget, void *userData);
 
-	// Holds the title of the window
+    // Holds the title of the window
     char* title; 
 
     std::vector<int> m_structures;
@@ -156,22 +192,39 @@ private:
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
 
-    GLWindow* m_glWindow;
-    Fl_Offscreen m_offscreenImage[2];
-    uchar* m_imageData[2];
+    int imageStride;
     cairo_surface_t *crSurface;
     cairo_t *crDraw;
-    cairo_pattern_t *circleMask;
-
+    uchar *imageData;
+    bool cairoTranslate;
     bool m_redrawStructures;
+    
     int numPairs[7];
     int folderIndex;
     int pixelWidth;
     bool userConflictAlerted;
     
+    cairo_surface_t *crZoomSurface;
+    cairo_t *crZoom;
+    bool zoomButtonDown, haveZoomBuffer;
+    int zx0, zy0, zx1, zy1, zw, zh;
+    int initZoomX, initZoomY;
+    int lastZoomX, lastZoomY;
+    int handle(int flEvent);
+    void RedrawCairoZoomBuffer(cairo_t *curWinContext);
+    void HandleUserZoomAction();
+
     void WarnUserDrawingConflict();
-    void CairoSetRGB(unsigned short R, unsigned short G, unsigned short B);
-    char * GetExportPNGFilePath();
+    void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 
+		     unsigned short B, unsigned short A = 0x99);
+    std::string GetExportPNGFilePath();
+
+    volatile static DiagramWindow *currentDiagramWindowInstance;
+    static bool redrawRefreshTimerSet;
+
+public:
+    void setAsCurrentDiagramWindow() const; 
+    static void RedrawWidgetsTimerCallback(void *);
 
 };
 

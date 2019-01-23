@@ -47,7 +47,12 @@ vector<RNAStructure::BaseData *> RNABranchType_t::getEnclosingArcs(
      return rBaseDataVec;
 }
 
-RNABranchType_t::RNABranchType_t(BranchID_t bid = BRANCH_UNDEFINED, class RNAStructure::BaseData *bparent = NULL) {
+RNABranchType_t::RNABranchType_t() {
+     branchID = BRANCH_UNDEFINED;
+     branchParent = NULL;
+}
+
+RNABranchType_t::RNABranchType_t(BranchID_t bid, class RNAStructure::BaseData *bparent = NULL) {
      branchID = bid;
      branchParent = bparent;
 } 
@@ -113,13 +118,11 @@ bool RNABranchType_t::PerformBranchClassification(class RNAStructure * &rnaStruc
      RNAStructure::BaseData* mostEnclosingArcs[4] = {NULL, NULL, NULL, NULL};
      unsigned int mostEnclosingArcsSize = 0;
      for(int rs = 0; rs < alength; rs++) {
-          //fprintf(stderr, "[1] rs=%d\n", rs); 
           RNAStructure::BaseData* rnaStruct = rnaStructBase->GetBaseAt(rs);
           if(rnaStruct->m_pair == RNAStructure::UNPAIRED) 
                continue;
           else if(mostEnclosingArcsSize == 0) {
                mostEnclosingArcs[0] = rnaStructBase->GetBaseAt(rs);
-               //fprintf(stderr, "mostEnclosingArcs[0]=%p\n", mostEnclosingArcs[0]);
                mostEnclosingArcsSize++;
                continue;
           }
@@ -127,8 +130,6 @@ bool RNABranchType_t::PerformBranchClassification(class RNAStructure * &rnaStruc
           for(int mea = 0; mea < mostEnclosingArcsSize; mea++) {
                if(rnaStruct->isContainedIn(*(mostEnclosingArcs[mea]))) {
                     isEnclosedInLargerBranch = true;
-                    //rnaStructBase->GetBranchTypeAt(rs).setBranchID((BranchID_t) (mea + 1));
-                    //rnaStructBase->GetBranchTypeAt(rs).setBranchParent(mostEnclosingArcs[mea]);
                     break;
                }
           }
@@ -143,14 +144,12 @@ bool RNABranchType_t::PerformBranchClassification(class RNAStructure * &rnaStruc
                                                   MIN(meaBaseData->m_pair, meaBaseData->m_index)); 
                bool needToResort = false;
                if(meaPairDistance < pairDistance && meaBaseData->m_pair > meaBaseData->m_index) {
-                    //fprintf(stderr, "[2] meaPD=%d, PD=%d\n", meaPairDistance, pairDistance);
                     if(mostEnclosingArcsSize < 4) {
                          mostEnclosingArcs[mostEnclosingArcsSize] = mostEnclosingArcs[mea];
                          mostEnclosingArcsSize++;
                          needToResort = true;
                     }
                     mostEnclosingArcs[mea] = rnaStructBase->GetBaseAt(rs);
-                    //rnaStructBase->GetBranchTypeAt(rs)->setBranchID((BranchID_t) (mea + 1));
                     if(needToResort) {
                          qsort(&mostEnclosingArcs[0], mostEnclosingArcsSize, 
                                sizeof(RNAStructure::BaseData*), compareMostEnclosingArcs);
@@ -177,11 +176,10 @@ bool RNABranchType_t::PerformBranchClassification(class RNAStructure * &rnaStruc
      // we reset the branch types by number on all (except for the nubbins, 
      // see below) entries in the array: 
      vector<RNAStructure::BaseData *> enclosingArcs = getEnclosingArcs(rnaStructBase, false);
-     sort(enclosingArcs.begin(), enclosingArcs.begin() + 4, RNAStructureBaseDataIndexSort());
      if(enclosingArcs.size() < 7 || mostEnclosingArcsSize < 4) {
-          fprintf(stderr, "HUGE LOGISTICAL ERROR: There are not 7 / 4 main arcs / branches to classify!\n");
           return false;
      }
+     sort(enclosingArcs.begin(), enclosingArcs.begin() + 4, RNAStructureBaseDataIndexSort());
      // handle labeling of the arc nubbins (and contained pairs) to the sides of the big arcs: 
      vector<RNAStructure::BaseData *> enclosingArcsNubbins(enclosingArcs.begin() + 4, enclosingArcs.begin() + 7);
      sort(enclosingArcsNubbins.begin(), enclosingArcsNubbins.end(), RNAStructureBaseDataIndexSort());

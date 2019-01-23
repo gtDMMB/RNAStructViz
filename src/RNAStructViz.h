@@ -12,50 +12,44 @@
 
 class RNAStructViz
 {
-public:
+    public:
+        RNAStructViz();
+        ~RNAStructViz();
 
-    RNAStructViz();
+        static bool Initialize(int argc, char** argv);
+        static void Shutdown();
 
-    ~RNAStructViz();
+        inline static RNAStructViz* GetInstance()
+        {
+	        return ms_instance;
+        }
 
-    static bool Initialize(int argc, char** argv);
+        inline StructureManager* GetStructureManager()
+        {
+	        return m_structureManager;
+        }
 
-    static void Shutdown();
+        inline const std::vector<DiagramWindow*>& GetDiagramWindows() const
+        {
+	        return m_diagramWindows;
+        }
 
-    inline static RNAStructViz* GetInstance()
-    {
-	return ms_instance;
-    }
+        void AddDiagramWindow(int index);
 
-    inline StructureManager* GetStructureManager()
-    {
-	return m_structureManager;
-    }
+        inline const std::vector<StatsWindow*>& GetStatsWindows() const
+        {
+            return m_statsWindows;
+        }
 
-    inline const std::vector<DiagramWindow*>& GetDiagramWindows() const
-    {
-	return m_diagramWindows;
-    }
+        void AddStatsWindow(int index);
+        void TestFolders();
 
-    void AddDiagramWindow(int index);
-    
-    inline const std::vector<StatsWindow*>& GetStatsWindows() const
-    {
-    return m_statsWindows;
-    }
-    
-    void AddStatsWindow(int index);
-    
-    void TestFolders();
+    private:
+        static RNAStructViz* ms_instance;
+        StructureManager* m_structureManager;
+        std::vector<DiagramWindow*> m_diagramWindows;
+        std::vector<StatsWindow*> m_statsWindows;
 
-private:
-    static RNAStructViz* ms_instance;
-
-    StructureManager* m_structureManager;
-
-    std::vector<DiagramWindow*> m_diagramWindows;
-    
-    std::vector<StatsWindow*> m_statsWindows;
 };
 
 #endif //RNASTRUCTVIZ_H

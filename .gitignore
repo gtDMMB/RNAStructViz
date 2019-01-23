@@ -1,2 +1,17 @@
 # Compiled source #
 *.o
+
+#logs#
+*.log
+
+#compiled dependencies#
+src/.deps/*
+
+#executable#
+src/RNAStructViz
+
+#cache#
+*.cache
+
+#generated at compile time, varies by platform#
+src/BuildTargetInfo.h

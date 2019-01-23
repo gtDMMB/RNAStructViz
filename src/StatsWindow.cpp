@@ -22,22 +22,23 @@
 #include "rocbox.h"
 #include "InputWindow.h"
 #include <algorithm>
+#include "ConfigOptions.h"
+#include <time.h>
+
+#include "pixmaps/StatsFormula.c"
+#include "pixmaps/StatsWindowIcon.xbm"
 
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
-	/* Refer to DiagramWindow.cpp */
-	//SetStructures();
-	
-	/* look into creating an offscreen version of the graph if calculation/
-     creation makes it do odd things. May only work the openGL*/
+
+	/* TODO: look into creating an offscreen version of the graph if calculation/
+     creation makes it do odd things. May only work the openGL */
 	
 	folderIndex = -1;
 	referenceIndex = -1;
-	
 	numStats = 0;
 	statistics = NULL;
-    
-    color(FL_WHITE);
+    color(GUI_WINDOW_BGCOLOR);
 	
 	/* Create the menu section on the left */
 	menu_window = new Fl_Group(0,0,300,h,"Menu Group");
@@ -46,33 +47,39 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         int mwy = menu_window->y();
         int mww = menu_window->w();
         int mwh = menu_window->h();
-		/*Fl_Box* ref_menu_label = new Fl_Box(20, 30, 300-40, 30, 
-         "Reference Structure");
-         ref_menu_label->labelcolor(FL_BLACK);*/
-		ref_menu = new Fl_Choice(mwx+20,mwy+ 60, mww-40, 30, "Reference Structure");
-		ref_menu->labelcolor(FL_BLACK);
+		ref_menu = new Fl_Choice(mwx+20,mwy+ 60, mww-40, 30, 
+		           "Select Reference Structure:");
+		ref_menu->labelcolor(GUI_TEXT_COLOR);
+		ref_menu->textcolor(GUI_BTEXT_COLOR);
 		ref_menu->align(FL_ALIGN_TOP);    
 		
-		/*Fl_Box* comp_menu_label = new Fl_Box(20, 90, 300-40, 30, 
-         "Comparison Structures");
-         comp_menu_label->labelcolor(FL_BLACK);*/
-		comp_menu = new Fl_Scroll(mwx+20,mwy+ 120, mww-40, mwh-120-90,"Comparison Structures");
+		const char *dividerText = "--------------------------------------------";
+		dividerTextBox = new Fl_Box(mwx + 20, mwy + 95, mww - 40, 
+				 5, dividerText);
+		dividerTextBox->labelcolor(GUI_TEXT_COLOR);
+		dividerTextBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | 
+				      FL_ALIGN_CENTER);
+
+		comp_menu = new Fl_Scroll(mwx+20,mwy+ 120, mww-40, 
+			    mwh-120-90, 
+			    "Select Comparison Structures:");
 		{	
 			comp_pack = new Fl_Pack(mwx+20,mwy+120,mww-60,150);
 			comp_pack->type(Fl_Pack::VERTICAL);
 			comp_pack->end();
-            comp_pack->color(FL_WHITE);
+                        comp_pack->color(GUI_WINDOW_BGCOLOR);
 		}
 		comp_menu->type(Fl_Scroll::VERTICAL);
 		comp_menu->box(FL_FLAT_BOX);
-		comp_menu->labelcolor(FL_BLACK);
+		comp_menu->labelcolor(GUI_TEXT_COLOR);
 		comp_menu->align(FL_ALIGN_TOP);
+                comp_menu->color(GUI_WINDOW_BGCOLOR);
 		comp_menu->end();
-        comp_menu->color(FL_WHITE);
 		
 		calc_button = new Fl_Toggle_Button(mwx+20,mwy+ mwh-60, mww-40, 
-                                           30, "Calculate");
+                                           30, "@refresh Calculate");
 		calc_button->callback(CalcCallback);
+		calc_button->labelcolor(GUI_BTEXT_COLOR); 
 		
 		menu_window->resizable(comp_menu);
 	}
@@ -82,7 +89,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 	/* Create the tabs section on the right */
 	tab_window = new Fl_Tabs(300,0,w-300,h,"Tabs Container");
 	{
-		overview_tab = new Fl_Group(300,20,w-300,h-20,"Overview"); 
+		overview_tab = new Fl_Group(300,20,w-300,h-20,"@filenew Overview"); 
 		{
 			Fl_Group *ov_charts_group = new Fl_Group(310,30,w-520,h-40,"");
 			{
@@ -93,29 +100,29 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 				bp_chart = new Fl_Group(ovcx+10,ovcy+10,(ovcw-60)/2,(ovch-60)/2, "Base Pairs");
 				bp_chart->box(FL_BORDER_BOX);
 				bp_chart->align(FL_ALIGN_BOTTOM);
-				bp_chart->labelcolor(FL_BLACK);
-                bp_chart->color(FL_WHITE);
+				bp_chart->labelcolor(GUI_TEXT_COLOR);
+                                bp_chart->color(GUI_WINDOW_BGCOLOR);
 				bp_chart->end();
 				
 				tp_chart = new Fl_Group(ovcx+50+(ovcw-60)/2,ovcy+10,(ovcw-60)/2,(ovch-60)/2,"True Positives");
 				tp_chart->box(FL_BORDER_BOX);
 				tp_chart->align(FL_ALIGN_BOTTOM);
-				tp_chart->labelcolor(FL_BLACK);
-                tp_chart->color(FL_WHITE);
+				tp_chart->labelcolor(GUI_TEXT_COLOR);
+                                tp_chart->color(GUI_WINDOW_BGCOLOR);
 				tp_chart->end();
 				
 				fp_chart = new Fl_Group(ovcx+10,ovcy+40+(ovch-60)/2,(ovcw-60)/2,(ovch-60)/2,"False Positives");
 				fp_chart->box(FL_BORDER_BOX);
 				fp_chart->align(FL_ALIGN_BOTTOM);
-				fp_chart->labelcolor(FL_BLACK);
-                fp_chart->color(FL_WHITE);
+				fp_chart->labelcolor(GUI_TEXT_COLOR);
+                                fp_chart->color(GUI_WINDOW_BGCOLOR);
 				fp_chart->end();
 				
 				fn_chart = new Fl_Group(ovcx+50+(ovcw-60)/2,ovcy+40+(ovch-60)/2,(ovcw-60)/2,(ovch-60)/2, "False Negatives");
 				fn_chart->box(FL_BORDER_BOX);
 				fn_chart->align(FL_ALIGN_BOTTOM);
-				fn_chart->labelcolor(FL_BLACK);
-                fn_chart->color(FL_WHITE);
+				fn_chart->labelcolor(GUI_TEXT_COLOR);
+                                fn_chart->color(GUI_WINDOW_BGCOLOR);
 				fn_chart->end();
                 
 			}
@@ -131,31 +138,31 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 
 				Fl_Box* leg_label = new Fl_Box(leg1x+10,leg1y+ 10, leg1w-15, 30, 
                                                "Legend");
-				leg_label->labelcolor(FL_BLACK);
+				leg_label->labelcolor(GUI_TEXT_COLOR);
 				
 				leg_label = new Fl_Box(leg1x+10,leg1y+ 60, leg1w-15, 30, "Reference Structure");
-				leg_label->labelcolor(FL_BLACK);
+				leg_label->labelcolor(GUI_TEXT_COLOR);
 				
 				leg1_ref = new Fl_Box(FL_FLAT_BOX,leg1x+10,leg1y+90, leg1w-15, 20,"");
-				leg1_ref->color(FL_BLACK);
-				leg1_ref->labelcolor(FL_WHITE);
+				leg1_ref->color(GUI_TEXT_COLOR);
+				leg1_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 				leg1_ref->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
 				leg1_ref->hide();
 				
 				leg_label = new Fl_Box(leg1x+10,leg1y+ 120, leg1w-15, 30, "Predicted Structures");
-				leg_label->labelcolor(FL_BLACK);
+				leg_label->labelcolor(GUI_TEXT_COLOR);
 				
 				leg1_scroll = new Fl_Scroll(leg1x+10,leg1y+ 150, leg1w-15, leg1h-200);
 				{	
 					leg1_pack = new Fl_Pack(leg1x+10,leg1y+150,leg1w-15,leg1h-200);
 					leg1_pack->type(Fl_Pack::VERTICAL);
 					leg1_pack->end();
-                    leg1_pack->color(FL_WHITE);
+                    leg1_pack->color(GUI_WINDOW_BGCOLOR);
 				}
 				leg1_scroll->type(Fl_Scroll::VERTICAL);
 				leg1_scroll->box(FL_FLAT_BOX);
 				leg1_scroll->end();
-                leg1_scroll->color(FL_WHITE);
+                leg1_scroll->color(GUI_WINDOW_BGCOLOR);
                 
 			}
 			leg1_group->end();
@@ -163,10 +170,11 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			overview_tab->resizable(ov_charts_group);	
 		}
 		overview_tab->end();
-        overview_tab->color(FL_WHITE);
+        overview_tab->color(GUI_WINDOW_BGCOLOR);
+	overview_tab->labelcolor(GUI_BTEXT_COLOR);
 		
 		perc_tab = new Fl_Group(300,20,w-300,h-20,
-                                "Percentage Values");
+                                "@+ Percentage Values");
 		{
 			Fl_Group *perc_charts_group = new Fl_Group(310,30,w-520,h-40,""); // DOUBLEWINDOW
 		    {
@@ -178,37 +186,44 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 		    	sens_chart = new Fl_Group(percx+10,percy+10,(percw-60)/2,(perch-60)/2, "Sensitivity");
 				sens_chart->box(FL_BORDER_BOX);
 				sens_chart->align(FL_ALIGN_BOTTOM);
-				sens_chart->labelcolor(FL_BLACK);
-                sens_chart->color(FL_WHITE);
+				sens_chart->labelcolor(GUI_TEXT_COLOR);
+                sens_chart->color(GUI_WINDOW_BGCOLOR);
 				sens_chart->end();
 				
 				sel_chart = new Fl_Group(percx+50+(percw-60)/2,percy+10,(percw-60)/2,(perch-60)/2,"Selectivity");
 				sel_chart->box(FL_BORDER_BOX);
 				sel_chart->align(FL_ALIGN_BOTTOM);
-				sel_chart->labelcolor(FL_BLACK);
-                sel_chart->color(FL_WHITE);
+				sel_chart->labelcolor(GUI_TEXT_COLOR);
+                sel_chart->color(GUI_WINDOW_BGCOLOR);
 				sel_chart->end();
 				
 				// Display formulas for the different percentage value statistics
                 int vgap = 20;
                 int hgap = 10; // Should be between 0 and 40
-				tp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap,(percw-60)/2+40-hgap,20,"TP: true positive");
-				fp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+30,(percw-60)/2+40-hgap,20,"FP: false positive");
-				fp_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+80,(percw-60)/2+40-hgap,20,"FP = conflict + contradict + compatible");
-                fp_equ_label->align(FL_ALIGN_WRAP);
-				sens_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+130,(percw-60)/2+40-hgap,20,"sensitivity = TP / (TP + FN)");
-                sens_label->align(FL_ALIGN_WRAP);
-				sel_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+170,(percw-60)/2+40-hgap,20,"selectivity = TP / (TP + FP - compatible)");
-                sel_label->align(FL_ALIGN_WRAP);
-				ppv_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+210,(percw-60)/2+40-hgap,20,"PPV: positive predictive value");
-				ppv_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+240,(percw-60)/2+40-hgap,20,"PPV = TP / (TP + FP)");
-                ppv_equ_label->align(FL_ALIGN_WRAP);
+                //fprintf(stderr, "%d; %d\n", percx+50+(percw-60)/2,percy+40+(perch-60)/2);
+		statsFormulasImage = new Fl_RGB_Image(StatsFormula.pixel_data, 
+		                     StatsFormula.width, StatsFormula.height, 
+		                     StatsFormula.bytes_per_pixel);
+                statsFormulasBox = new Fl_Box(percx+30+(percw-60)/2,percy+75+(perch-60)/2, 
+				   statsFormulasImage->w(), statsFormulasImage->h());
+		statsFormulasBox->image(statsFormulasImage);
+		//tp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap,(percw-60)/2+40-hgap,20,"TP: true positive");
+		//fp_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+30,(percw-60)/2+40-hgap,20,"FP: false positive");
+		//fp_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+80,(percw-60)/2+40-hgap,20,"FP = conflict + contradict + compatible");
+                //fp_equ_label->align(FL_ALIGN_WRAP);
+		//sens_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+130,(percw-60)/2+40-hgap,20,"sensitivity = TP / (TP + FN)");
+                //sens_label->align(FL_ALIGN_WRAP);
+		//sel_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+170,(percw-60)/2+40-hgap,20,"selectivity = TP / (TP + FP - compatible)");
+                //sel_label->align(FL_ALIGN_WRAP);
+		//ppv_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+210,(percw-60)/2+40-hgap,20,"PPV: positive predictive value");
+		//ppv_equ_label = new Fl_Box(percx+10+hgap+(percw-60)/2,percy+40+(perch-60)/2+vgap+240,(percw-60)/2+40-hgap,20,"PPV = TP / (TP + FP)");
+                //ppv_equ_label->align(FL_ALIGN_WRAP);
                 
 				ppv_chart = new Fl_Group(percx+10,percy+40+(perch-60)/2,(percw-60)/2,(perch-60)/2,"Positive Predictive Value");
 				ppv_chart->box(FL_BORDER_BOX);
 				ppv_chart->align(FL_ALIGN_BOTTOM);
-				ppv_chart->labelcolor(FL_BLACK);
-                ppv_chart->color(FL_WHITE);
+				ppv_chart->labelcolor(GUI_TEXT_COLOR);
+                ppv_chart->color(GUI_WINDOW_BGCOLOR);
 				ppv_chart->end();
 				
 		    }
@@ -224,10 +239,10 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 
                 Fl_Box* leg_label = new Fl_Box(leg2x+10,leg2y+10,leg2w-15, 30, 
                                                "Legend");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg_label = new Fl_Box(leg2x+10,leg2y+ 60, leg2w-15, 30, "Reference Structure");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg2_ref = new Fl_Box(FL_FLAT_BOX,
                                       leg2x+10, 
@@ -235,24 +250,24 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                                       leg2w-15, 
                                       20,
                                       "");
-                leg2_ref->color(FL_BLACK);
-                leg2_ref->labelcolor(FL_WHITE);
+                leg2_ref->color(GUI_TEXT_COLOR);
+                leg2_ref->labelcolor(GUI_WINDOW_BGCOLOR);
                 leg2_ref->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
                 leg2_ref->hide();
                 
                 leg_label = new Fl_Box(leg2x+10,leg2y+ 120,leg2w-15, 30, "Predicted Structures");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg2_scroll = new Fl_Scroll(leg2x+10,leg2y+ 150,leg2w-15, leg2h-200);
                 {	
                     leg2_pack = new Fl_Pack(leg2x+10,leg2y+150,leg2w-15,leg2h-200);
                     leg2_pack->type(Fl_Pack::VERTICAL);
-                    leg2_pack->color(FL_WHITE);
+                    leg2_pack->color(GUI_WINDOW_BGCOLOR);
                     leg2_pack->end();
                 }
                 leg2_scroll->type(Fl_Scroll::VERTICAL);
                 leg2_scroll->box(FL_FLAT_BOX);
-                leg2_scroll->color(FL_WHITE);
+                leg2_scroll->color(GUI_WINDOW_BGCOLOR);
                 leg2_scroll->end();
                 
             }
@@ -261,9 +276,10 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			perc_tab->resizable(perc_charts_group);
 		}
 		perc_tab->end();
-		perc_tab->color(FL_WHITE);
-        
-		pair_tab = new Fl_Group(300,20,w-300,h-20,"Base Pairings");
+		perc_tab->color(GUI_WINDOW_BGCOLOR);
+                perc_tab->labelcolor(GUI_BTEXT_COLOR);
+
+		pair_tab = new Fl_Group(300,20,w-300,h-20,"@menu Base Pairings");
 		{
 			Fl_Group *pair_charts_group = new Fl_Group(310,30,w-520,h-40,""); // DOUBLEWINDOW
 			{
@@ -276,8 +292,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                                         (pairh-60)/2,"G-C Base Pairs");
 				gc_chart->box(FL_BORDER_BOX);
 				gc_chart->align(FL_ALIGN_BOTTOM);
-				gc_chart->labelcolor(FL_BLACK);
-                gc_chart->color(FL_WHITE);
+				gc_chart->labelcolor(GUI_TEXT_COLOR);
+                gc_chart->color(GUI_WINDOW_BGCOLOR);
 				gc_chart->end();
 				
 				au_chart = new Fl_Group(pairx+50+(pairw-60)/2,pairy+10,
@@ -285,8 +301,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                                         "A-U Base Pairs");
 				au_chart->box(FL_BORDER_BOX);
 				au_chart->align(FL_ALIGN_BOTTOM);
-				au_chart->labelcolor(FL_BLACK);
-                au_chart->color(FL_WHITE);
+				au_chart->labelcolor(GUI_TEXT_COLOR);
+                au_chart->color(GUI_WINDOW_BGCOLOR);
 				au_chart->end();
 				
 				gu_chart = new Fl_Group(pairx+10,pairy+40+(pairh-60)/2,
@@ -294,8 +310,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                                         "G-U Base Pairs");
 				gu_chart->box(FL_BORDER_BOX);
 				gu_chart->align(FL_ALIGN_BOTTOM);
-				gu_chart->labelcolor(FL_BLACK);
-                gu_chart->color(FL_WHITE);
+				gu_chart->labelcolor(GUI_TEXT_COLOR);
+                gu_chart->color(GUI_WINDOW_BGCOLOR);
 				gu_chart->end();
 				
 				non_canon_chart = new Fl_Group(pairx+50+(pairw-60)/2,
@@ -303,8 +319,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                                                (pairh-60)/2, "Non-Canonical Base Pairs");
 				non_canon_chart->box(FL_BORDER_BOX);
 				non_canon_chart->align(FL_ALIGN_BOTTOM);
-				non_canon_chart->labelcolor(FL_BLACK);
-                non_canon_chart->color(FL_WHITE);
+				non_canon_chart->labelcolor(GUI_TEXT_COLOR);
+                non_canon_chart->color(GUI_WINDOW_BGCOLOR);
 				non_canon_chart->end();
                 
 			}
@@ -320,22 +336,22 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 
                 Fl_Box* leg_label = new Fl_Box(leg3x+10,leg3y+ 10, leg3w-15, 30, 
                                                "Legend");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg_label = new Fl_Box(leg3x+10,leg3y+ 60,leg3w-15, 30, "Reference Structure");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg3_ref = new Fl_Box(FL_FLAT_BOX,
                                       leg3x+10, 
                                       leg3y+90,leg3w-15, 20,
                                       "");
-                leg3_ref->color(FL_BLACK);
-                leg3_ref->labelcolor(FL_WHITE);
+                leg3_ref->color(GUI_TEXT_COLOR);
+                leg3_ref->labelcolor(GUI_WINDOW_BGCOLOR);
                 leg3_ref->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
                 leg3_ref->hide();
                 
                 leg_label = new Fl_Box(leg3x+10,leg3y+ 120, leg3w-15, 30, "Predicted Structures");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg3_scroll = new Fl_Scroll(leg3x+10,leg3y+ 150,leg3w-15, leg3h-200);
                 {	
@@ -345,7 +361,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 }
                 leg3_scroll->type(Fl_Scroll::VERTICAL);
                 leg3_scroll->box(FL_FLAT_BOX);
-                leg3_scroll->color(FL_WHITE);
+                leg3_scroll->color(GUI_WINDOW_BGCOLOR);
                 leg3_scroll->end();
                 
             }
@@ -354,9 +370,10 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			pair_tab->resizable(pair_charts_group);	
 		}
 		pair_tab->end();
-        pair_tab->color(FL_WHITE);
+        pair_tab->color(GUI_WINDOW_BGCOLOR);
+	pair_tab->labelcolor(GUI_BTEXT_COLOR);
 		
-		roc_tab = new Fl_Group(300,20,w-300,h-20,"ROC Plot");
+		roc_tab = new Fl_Group(300,20,w-300,h-20,"@<-> ROC Plot");
 		{
 			Fl_Group *roc_plot_group = new Fl_Group(310,30,w-520,h-40,""); // DOUBLEWINDOW
 			{
@@ -371,8 +388,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 				roc_box_init();
 				roc_plot->box(ROC_BOX);
 				roc_plot->align(FL_ALIGN_TOP);
-				roc_plot->labelcolor(FL_BLACK);
-                roc_plot->color(FL_WHITE);
+				roc_plot->labelcolor(GUI_TEXT_COLOR);
+                roc_plot->color(GUI_WINDOW_BGCOLOR);
 				roc_plot->end();
 				
 				/* Draw the labels for the y-axis */
@@ -385,189 +402,189 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 				Fl_Box* label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                            rpy+15,10,10,"100");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(9*roc_plot->h()/10.0),10,10,"90");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(9*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(8*roc_plot->h()/10.0),10,10,"80");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(8*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(7*roc_plot->h()/10.0),10,10,"70");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(7*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(6*roc_plot->h()/10.0),10,10,"60");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(6*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(5*roc_plot->h()/10.0),10,10,"50");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(5*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(4*roc_plot->h()/10.0),10,10,"40");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(4*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(3*roc_plot->h()/10.0),10,10,"30");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(3*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(2*roc_plot->h()/10.0),10,10,"20");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(2*roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5-(int)(roc_plot->h()/10.0),10,10,"10");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-15,
                                    roc_plot->y()+roc_plot->h()-5-(int)(roc_plot->h()/10.0),10,10,"@-9line");
 				label->align(FL_ALIGN_RIGHT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
                                    roc_plot->y()+roc_plot->h()-5,10,10,"0");
 				label->align(FL_ALIGN_LEFT);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				// Draw the labels for the x-axis
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x(),rpy+rph-20,
                                    roc_plot->w(),20,"Selectivity (%)");
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5,
                                    roc_plot->y()-10+roc_plot->h(),10,10,"0");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"10");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(2*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"20");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(2*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(3*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"30");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(3*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(4*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"40");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(4*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(5*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"50");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(5*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(6*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"60");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(6*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(7*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"70");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(7*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(8*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"80");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(8*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(9*roc_plot->w()/10.0),
                                    roc_plot->y()-10+roc_plot->h(),10,10,"90");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+(int)(9*roc_plot->w()/10.0),
                                    roc_plot->y()+3+roc_plot->h(),10,10,"@-98line");
 				label->align(FL_ALIGN_TOP);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
 				
 				label = new Fl_Box(FL_NO_BOX,roc_plot->x()-5+roc_plot->w()-6,
                                    roc_plot->y()-10+roc_plot->h(),10,10,"100");
 				label->align(FL_ALIGN_BOTTOM);
-				label->labelcolor(FL_BLACK);
+				label->labelcolor(GUI_TEXT_COLOR);
                 
 			}
 			roc_plot_group->end();
@@ -582,28 +599,28 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 
                 Fl_Box* leg_label = new Fl_Box(leg4x+20,leg4y+ 10, leg4w-25, 30, 
                                                "Legend");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg_label = new Fl_Box(leg4x+20,leg4y+ 60, leg4w-25, 30, "Reference Structure");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg4_ref = new Fl_Box(FL_FLAT_BOX,
                                       leg4x+20, 
                                       leg4y+90,leg4x-25, 20,
                                       "");
-                leg4_ref->color(FL_BLACK);
-                leg4_ref->labelcolor(FL_WHITE);
+                leg4_ref->color(GUI_TEXT_COLOR);
+                leg4_ref->labelcolor(GUI_WINDOW_BGCOLOR);
                 leg4_ref->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
                 leg4_ref->hide();
                 leg4_ref_symbol = new Fl_Box(FL_NO_BOX,
                                              leg4x, 
                                              leg4y+90, 20, 20,
                                              "");
-                leg4_ref_symbol->labelcolor(FL_BLACK);
+                leg4_ref_symbol->labelcolor(GUI_TEXT_COLOR);
                 leg4_ref_symbol->hide();
                 
                 leg_label = new Fl_Box(leg4x+20,leg4y+ 120,leg4w-25, 30, "Predicted Structures");
-                leg_label->labelcolor(FL_BLACK);
+                leg_label->labelcolor(GUI_TEXT_COLOR);
                 
                 leg4_scroll = new Fl_Scroll(leg4x,leg4y+ 150,leg4w-5, leg4h-200);
                 {	
@@ -613,7 +630,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 }
                 leg4_scroll->type(Fl_Scroll::VERTICAL);
                 leg4_scroll->box(FL_FLAT_BOX);
-                leg4_scroll->color(FL_WHITE);
+                leg4_scroll->color(GUI_WINDOW_BGCOLOR);
                 leg4_scroll->end();
                 
             }
@@ -622,9 +639,10 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			roc_tab->resizable(roc_plot_group);
 		}
 		roc_tab->end();
-		roc_tab->color(FL_WHITE);
+		roc_tab->color(GUI_WINDOW_BGCOLOR);
+		roc_tab->labelcolor(GUI_BTEXT_COLOR);
         
-		table_tab = new Fl_Group(300,20,w-300,h-20,"Table");
+		table_tab = new Fl_Group(300,20,w-300,h-20,"@line Table");
 		{
             // *** Is the text_display_group group necessary? *** //
             
@@ -639,24 +657,29 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 buff->tab_distance(7);
                 text_display = new Fl_Text_Display(tdx+10,tdy+10,tdw-20,tdh-10);
                 text_display->buffer(buff);
-                text_display->textfont(FL_COURIER);
+		text_display->color(GUI_WINDOW_BGCOLOR);
+                text_display->textfont(LOCAL_RMFONT);
+		text_display->textcolor(GUI_TEXT_COLOR);
+		text_display->labelcolor(GUI_TEXT_COLOR);
                 text_display_group->resizable(text_display);
             }
 			text_display_group->end();
 			
-			exp_button = new Fl_Button(w-100,h-40,80,30,"Export");
+			exp_button = new Fl_Button(w-110,h-40,100,30, 
+				     "@filesaveas   Export @->");
 			exp_button->callback(ExportCallback);
 			exp_button->value(1);
-            exp_button->deactivate();
+                        exp_button->deactivate();
 			
 			table_tab->resizable(text_display_group);
 		}
 		table_tab->end();
-        table_tab->color(FL_WHITE);
+        table_tab->color(GUI_WINDOW_BGCOLOR);
+	table_tab->labelcolor(GUI_BTEXT_COLOR);
 	}
 	tab_window->labeltype(FL_NO_LABEL);
+	tab_window->labelcolor(Darker(GUI_BTEXT_COLOR, 0.65f));
 	tab_window->end();
-	//tab_window->color(FL_WHITE);
     
 	this->resizable(tab_window);
 	this->size_range(800,600);
@@ -670,14 +693,24 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 
 StatsWindow::StatsWindow(int w, int h, const char *label, 
                          const std::vector<int>& structures)
-: Fl_Window(w, h, label)
+: Fl_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL)
 {
+    
+    //#ifndef __APPLE__	
+    //fl_open_display();
+    //Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
+    //		        DefaultRootWindow(fl_display),
+    //                    StatsWindowIcon_bits, StatsWindowIcon_width, 
+    //			StatsWindowIcon_height);
+    //this->icon((const void *) iconPixmap);
+    //#endif
+    
     Construct(w, h, structures);
 }
 
 StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label, 
                          const std::vector<int>& structures)
-: Fl_Window(x, y, w, h, label)
+: Fl_Window(x, y, w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL)
 {
     Construct(w, h, structures);
 }
@@ -685,8 +718,14 @@ StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label,
 StatsWindow::~StatsWindow()
 {
 	/* memory management */
-	free (title); //title = NULL;
+	free (title); 
 	delete[] statistics;
+	if(statsFormulasImage != NULL) {
+             delete statsFormulasImage;
+	}
+	if(statsFormulasBox != NULL) {
+	     delete statsFormulasBox;
+	}
 }
 
 void StatsWindow::ResetWindow()
@@ -819,6 +858,9 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
     for (int i=0; i < window->comp_pack->children(); i++)
 	{
 		Fl_Check_Button* button = (Fl_Check_Button*)window->comp_pack->child(i);
+		button->color(GUI_WINDOW_BGCOLOR);
+		button->labelcolor(GUI_TEXT_COLOR);
+	        button->selection_color(GUI_WINDOW_BGCOLOR);	
 		if (!strcmp(button->label(),window->ref_menu->mvalue()->label()))
 		{
 			button->value(1);
@@ -862,7 +904,7 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
 			for (int i=0; i < window->comp_pack->children(); i++)
 			{
 				Fl_Check_Button* button = 
-                (Fl_Check_Button*)window->comp_pack->child(i);
+                                (Fl_Check_Button*)window->comp_pack->child(i);
 				
 			}
 			
@@ -912,11 +954,11 @@ void StatsWindow::resize(int x, int y, int w, int h)
         non_canon_chart->label("Non-Canonical Base Pairs");
     }
     
-    if (ppv_label->w() < 175) {
-        ppv_label->label("PPV: pos. pred. value");
-    } else {
-        ppv_label->label("PPV: positive predictive value");
-    }
+    //if (ppv_label->w() < 175) {
+    //    ppv_label->label("PPV: pos. pred. value");
+    //} else {
+    //    ppv_label->label("PPV: positive predictive value");
+    //}
     
 }
 
@@ -960,8 +1002,7 @@ void StatsWindow::ComputeStats()
 	
 	for (int i=0; i < comp_pack->children(); i++)
 	{
-		Fl_Check_Button* button = 
-        (Fl_Check_Button*)comp_pack->child(i);
+		Fl_Check_Button* button = (Fl_Check_Button*)comp_pack->child(i);
 		if (button->value() == 1)
 		{
 			numStats++;		
@@ -992,7 +1033,7 @@ void StatsWindow::ComputeStats()
 	for (int i=0; i< comp_pack->children(); i++)
 	{
 		Fl_Check_Button* button = 
-        (Fl_Check_Button*)comp_pack->child(i);
+                (Fl_Check_Button*)comp_pack->child(i);
 		if (button->value() == 1)
 		{
 			// Find the corresponding structure
@@ -1251,14 +1292,21 @@ void StatsWindow::ComputeStats()
 		buff->append(tempc);
 	}
 	
-	int colors [7] = {FL_BLUE, FL_GREEN, FL_RED, FL_YELLOW, FL_CYAN, FL_MAGENTA,
-		FL_WHITE};
+	int colors[7] = {
+		Lighter(RGBColor(32, 74, 135), 0.61f), // FL_BLUE, 
+		Lighter(RGBColor(115, 210, 22), 0.61f),  // FL_GREEN, 
+		Lighter(RGBColor(164, 0, 0), 0.61f), // FL_RED, 
+		Lighter(RGBColor(196, 160, 0), 0.61f), // FL_YELLOW, 
+		Lighter(RGBColor(0, 195, 215), 0.61f), // FL_CYAN, 
+		Lighter(RGBColor(239, 41, 159), 0.61f), // FL_MAGENTA,         
+		Lighter(RGBColor(0xff, 0xff, 0xff), 0.61f), // FL_WHITE
+	};
     
 	for (unsigned int ui = 0; ui < numStats; ui++)
 	{
 		if (statistics[ui].ref) 
 		{
-			statistics[ui].color = FL_BLACK;
+			statistics[ui].color = GUI_TEXT_COLOR;
 		}
 		else
 		{
@@ -1734,7 +1782,7 @@ void StatsWindow::DrawLegend()
                                            20,
                                            statistics[ui].filename);
 				entry->color(statistics[ui].color);
-				entry->labelcolor(FL_BLACK);
+				entry->labelcolor(GUI_TEXT_COLOR);
 				entry->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
 				k++;
 			}
@@ -1761,7 +1809,7 @@ void StatsWindow::DrawLegend()
                                            20,
                                            statistics[ui].filename);
                 entry->color(statistics[ui].color);
-                entry->labelcolor(FL_BLACK);
+                entry->labelcolor(GUI_TEXT_COLOR);
                 entry->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
                 k++;
             }
@@ -1788,7 +1836,7 @@ void StatsWindow::DrawLegend()
                                            20,
                                            statistics[ui].filename);
                 entry->color(statistics[ui].color);
-                entry->labelcolor(FL_BLACK);
+                entry->labelcolor(GUI_TEXT_COLOR);
                 entry->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
                 k++;
             }
@@ -1836,8 +1884,8 @@ void StatsWindow::DrawLegend()
                                                20,
                                                statistics[ui].filename);
                     entry->color(statistics[ui].color);
-                    entry->labelcolor(FL_BLACK);
-                    entry->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
+                    entry->labelcolor(GUI_TEXT_COLOR);
+                    entry->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
                     // Add symbol label in color
                     entry = new Fl_Box(FL_NO_BOX,leg4_pack->x(),leg4_pack->y()+k*20,
                                        20,20,"");
@@ -1877,11 +1925,20 @@ void StatsWindow::ExportTable()
     menu_window->deactivate();
     tab_window->deactivate();
     
-	char* filename = "table_output"; // Change to be a better name
-	input_window = new InputWindow(400,150,"Export To File",
-                                   filename, InputWindow::FILE_INPUT);
+	char filename[MAX_BUFFER_SIZE];
+        char dateStamp[MAX_BUFFER_SIZE];
+        time_t currentTime = time(NULL);
+        struct tm *tmCurrentTime = localtime(&currentTime);
+        strftime(dateStamp, MAX_BUFFER_SIZE - 1, "%F-%H%M%S", tmCurrentTime);
+	const char *sepChar = PNG_OUTPUT_DIRECTORY[
+		    strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
+		     "" : "/";
+	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.dat", 
+		 PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
+	input_window = new InputWindow(400, 150, "Export Table To File ...",
+                                       filename, InputWindow::FILE_INPUT);
 	exp_button->value(1);
-    exp_button->deactivate();
+        exp_button->deactivate();
 	while (input_window != NULL && input_window->visible())
 	{
 		Fl::wait();
@@ -1889,17 +1946,16 @@ void StatsWindow::ExportTable()
     
     if(input_window != NULL)
     {
-        
-        if(strcmp(input_window->getName(),""))
+        FILE * expFile;
+        if(strcmp(input_window->getName(), ""))
         {
-            filename = input_window->getName();
-            strcat(filename, ".txt");
-        }
-        else
-        {
-            filename = "table_output.txt";
-        }
-        FILE * expFile = fopen(filename,"a+");
+            strncpy(filename, input_window->getName(), MAX_BUFFER_SIZE - 1);
+	    expFile = fopen(filename, "a+");
+	}
+        else {
+	    expFile = NULL;
+	}
+
         if (expFile != NULL)
         {
             /* 	Check whether file is empty (i.e. whether it already existed. 
@@ -1949,9 +2005,8 @@ void StatsWindow::ExportTable()
         input_window = NULL;
     }
     
-	exp_button->value(0);
+    exp_button->value(0);
     exp_button->activate();
-    
     menu_window->activate();
     tab_window->activate();
 }
@@ -1993,6 +2048,9 @@ void StatsWindow::BuildCompMenu()
 				Fl_Check_Button* button = new Fl_Check_Button(comp_pack->x(),
                                                               comp_pack->y()+30, comp_pack->w(), 30, 
                                                               structure->GetFilename());
+				button->color(GUI_WINDOW_BGCOLOR);
+				button->labelcolor(GUI_TEXT_COLOR);
+				button->selection_color(GUI_WINDOW_BGCOLOR);
 				button->callback(MenuCallback);
 			}
 		}
