@@ -43,10 +43,10 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 	/* Create the menu section on the left */
 	menu_window = new Fl_Group(0,0,300,h,"Menu Group");
 	{
-        int mwx = menu_window->x();
-        int mwy = menu_window->y();
-        int mww = menu_window->w();
-        int mwh = menu_window->h();
+        mwx = menu_window->x();
+        mwy = menu_window->y();
+        mww = menu_window->w();
+        mwh = menu_window->h();
 		ref_menu = new Fl_Choice(mwx+20,mwy+ 60, mww-40, 30, 
 		           "Select Reference Structure:");
 		ref_menu->labelcolor(GUI_TEXT_COLOR);
@@ -665,8 +665,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
             }
 			text_display_group->end();
 			
-			exp_button = new Fl_Button(w-110,h-40,100,30, 
-				     "@filesaveas   Export @->");
+			exp_button = new Fl_Button(w-150,h-40,140,30, 
+				     "@filesaveas   Export to CSV @->");
 			exp_button->callback(ExportCallback);
 			exp_button->value(1);
                         exp_button->deactivate();
@@ -717,7 +717,6 @@ StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label,
 
 StatsWindow::~StatsWindow()
 {
-	/* memory management */
 	free (title); 
 	delete[] statistics;
 	if(statsFormulasImage != NULL) {
@@ -870,7 +869,8 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
 		{
 			button->activate();
 		}
-	}	
+	}
+    
 }
 
 void StatsWindow::MenuCallback(Fl_Widget* widget, void* userData)
@@ -901,7 +901,7 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
 		{
 			
 			
-			for (int i=0; i < window->comp_pack->children(); i++)
+			for (int i=0; i < window->comp_pack->children() - 1; i++)
 			{
 				Fl_Check_Button* button = 
                                 (Fl_Check_Button*)window->comp_pack->child(i);
@@ -929,6 +929,20 @@ void StatsWindow::ExportCallback(Fl_Widget* widget, void* userData)
 		window->ExportTable();
 	}
 }
+
+void StatsWindow::SelectAllButtonCallback(Fl_Widget *saBtn, void *udata) { 
+    Fl_Widget *curParentWin = (Fl_Widget *) saBtn->parent();
+    while(curParentWin && !curParentWin->as_window()) {
+        curParentWin = curParentWin->parent();
+    }
+    StatsWindow *window = (StatsWindow *) curParentWin; 
+    for(int cbidx = 0; cbidx < window->comp_pack->children() - 1; cbidx++) { 
+        Fl_Check_Button *cb = (Fl_Check_Button *) window->comp_pack->child(cbidx); 
+        if(cbidx != window->referenceIndex) { 
+            cb->value(1);
+	} 
+    }
+} 
 
 void StatsWindow::SetReferenceStructure(const int index)
 {
@@ -1933,9 +1947,9 @@ void StatsWindow::ExportTable()
 	const char *sepChar = PNG_OUTPUT_DIRECTORY[
 		    strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
 		     "" : "/";
-	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.dat", 
+	snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.csv", 
 		 PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
-	input_window = new InputWindow(400, 150, "Export Table To File ...",
+	input_window = new InputWindow(425, 150, "Export Table To CSV-Fomatted Plaintext File ...",
                                        filename, InputWindow::FILE_INPUT);
 	exp_button->value(1);
         exp_button->deactivate();
@@ -1969,19 +1983,19 @@ void StatsWindow::ExportTable()
             
             // print the column header
             fprintf(expFile,
-                    "Filename\tReference\tBase_Pairs\tTrue_Positive\tFalse_Positive\t");
+                    "Filename,Reference,Base_Pairs,True_Positive,False_Positive,");
             fprintf(expFile,
-                    "False_Negative\tConflict\tContradict\tCompatible\tSensitivity\t");
+                    "False_Negative,Conflict,Contradict,Compatible,Sensitivity,");
             fprintf(expFile,
-                    "Selectivity\tPositive_Predictive_Value\t");
+                    "Selectivity,Positive_Predictive_Value,");
             fprintf(expFile,
-                    "G-C_Pairs\tA-U_Pairs\tG-U_Pairs\tNon-Canonical_Pairs\n"); 
+                    "G-C_Pairs,A-U_Pairs,G-U_Pairs,Non-Canonical_Pairs\n"); 
             
             for (unsigned int ui=0; ui<numStats; ui++)
             {
                 // print the row of statistics for each structure
                 fprintf(expFile,
-                        "%s\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.10f\t%.10f\t%.10f\t%d\t%d\t%d\t%d\n",
+                        "%s,%d,%d,%d,%d,%d,%d,%d,%d,%.10f,%.10f,%.10f,%d,%d,%d,%d\n",
                         statistics[ui].filename,
                         statistics[ui].ref,
                         statistics[ui].base_pair_count,
@@ -2039,6 +2053,7 @@ void StatsWindow::BuildCompMenu()
 	comp_pack->clear();
 	comp_pack->begin();
 	{
+		int lastBtnX = 0, lastBtnY = 0;
 		for (unsigned int ui=0; ui < m_structures.size(); ui++)
 		{
 			RNAStructure* structure = 
@@ -2052,8 +2067,18 @@ void StatsWindow::BuildCompMenu()
 				button->labelcolor(GUI_TEXT_COLOR);
 				button->selection_color(GUI_WINDOW_BGCOLOR);
 				button->callback(MenuCallback);
+				if(button->y() >= lastBtnY) { 
+				    lastBtnX = button->x();
+				    lastBtnY = button->y();
+				}
 			}
 		}
+	    selectAllCompsBtn = new Fl_Button(lastBtnX + 20, lastBtnY + 120, 
+	                        mww - 40, 35, 
+	                        "Compare All Structures (Select All) @redo");
+            selectAllCompsBtn->callback(SelectAllButtonCallback);
+	    selectAllCompsBtn->color(GUI_BGCOLOR);
+	    selectAllCompsBtn->labelcolor(GUI_BTEXT_COLOR);
 	}
 	comp_pack->end();
 }

@@ -143,13 +143,17 @@ private:
     // calback for the comparison structure check buttons 
     static void MenuCallback(Fl_Widget* widget, void* userData);
     
-	// Callback for the calculate button
+    // Callback for the calculate button
     static void CalcCallback(Fl_Widget* widget, void* userData);
     
     // Callback for the export button
     static void ExportCallback(Fl_Widget* widget, void* userData);
     
-	// Holds the title of the window
+    // Callback to select all checkboxes for the comparison vs. reference 
+    // structures: 
+    static void SelectAllButtonCallback(Fl_Widget *widget, void *userData);
+
+    // Holds the title of the window
     char* title; 
     
     /* The tabs sections for the statistics */
@@ -162,7 +166,10 @@ private:
     
     /* Holds the set of structures being compared */
     std::vector<int> m_structures;
-        
+    
+    // global position data storage for the LHS selection widgets:
+    int mwx, mwy, mww, mwh;    
+
     // Index of the folder
     int folderIndex;
     
@@ -181,8 +188,9 @@ private:
     // Contains the check buttons for each comparison structure as children
     Fl_Pack* comp_pack;
     
-    // "Calculate" button
+    // "Calculate" and "Select All" buttons
     Fl_Toggle_Button* calc_button;
+    Fl_Button *selectAllCompsBtn;
     
     // GUI divider:
     Fl_Box *dividerTextBox;

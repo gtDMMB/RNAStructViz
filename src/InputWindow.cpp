@@ -44,11 +44,11 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input = new Fl_Input(25, 50, 235, 30);
 	    input->when(FL_WHEN_ENTER_KEY);
 	    input->value(filenameStartPtr + 1);
-	    Fl_Box *box = new Fl_Box(95, 20, 100, 30, (const char*)string);
+	    Fl_Box *box = new Fl_Box(110, 20, 100, 30, (const char*)string);
 	    box->box(FL_NO_BOX);
 	    box->align(FL_ALIGN_CENTER);
-	    Fl_Box *fileExtBox = new Fl_Box(260,50,30,30,".dat");
-	    Fl_Button *button = new Fl_Button(305, 50, 75, 30, "Export @->");
+	    Fl_Box *fileExtBox = new Fl_Box(260,50,30,30,".csv");
+	    Fl_Button *button = new Fl_Button(305, 50, 110, 30, "Export to CSV @->");
 	    button->callback(InputCallback, (void*)0);
 	    button->set_active();
 	    input->callback(InputCallback, (void*)0);
@@ -114,7 +114,7 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
 	 char *fileSepPtr = strrchr(window->inputText, '/');
 	 int dirTextLen = fileSepPtr - window->inputText + 1;
 	 snprintf(exportSaveDir, dirTextLen, "%s", window->inputText);
-	 snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s/%s.dat", 
+	 snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s/%s.csv", 
 	          exportSaveDir, window->input->value());
          window->name = window->inputText;
     }
