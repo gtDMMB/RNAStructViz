@@ -8,6 +8,8 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <Fl/Fl_Box.H>
+#include <FL/Fl_Button.H>
 
 #include <stdio.h>
 #include <math.h>
@@ -21,6 +23,8 @@ class RNABranchType_t;
 #define MIN(x, y)         (x <= y ? (x) : (y))
 #define ABS(x)            (x >= 0 ? (x) : -1 * (x))
 #define MIN3(x, y, z)     MIN(x, MIN(y, z))
+
+#define DEFAULT_BUFFER_SIZE    2048
 
 class RNAStructure
 {
@@ -137,6 +141,7 @@ class RNAStructure
 	    Get the file name for this sequence.
         */
         const char* GetFilename() const;
+        const char* GetFilenameNoExtension();
 
         /*
 	     Display the contents of the file in a window (or bring it to the top if already existing).
@@ -172,28 +177,49 @@ class RNAStructure
 	     Generate the string used for text display of the structure.
         */
         void GenerateString();
+	size_t GenerateSequenceString(char *strBuf, size_t maxChars, 
+			              size_t clusterSize = 8) const; 
+	size_t GenerateFASTAFormatString(char *strBuf, size_t maxChars) const;
+	size_t GenerateDotBracketFormatString(char *strBuf, size_t maxChars) const; 
+
+	/* Callbacks for the export buttons: */
+        static void ExportFASTAFileCallback(Fl_Widget *btn, void *udata);
+	static void ExportDotBracketFileCallback(Fl_Widget *btn, void *udata);
 
         // The structure data
         unsigned int m_sequenceLength;
         BaseData* m_sequence;
 
         // The full path name of the file from which this sequence came.
-        char* m_pathname;
+        char *m_pathname, *m_pathname_noext;
 
         // Info for displaying the file contents
-        Fl_Double_Window* m_contentWindow;
-        Fl_Text_Display* m_textDisplay;
-        Fl_Text_Buffer* m_textBuffer, m_styleBuffer;
+        Fl_Double_Window *m_contentWindow;
+        Fl_Text_Display *m_ctTextDisplay, *m_seqTextDisplay;
+        Fl_Text_Buffer *m_ctTextBuffer, *m_ctStyleBuffer;
+	Fl_Text_Buffer *m_seqTextBuffer, *m_seqStyleBuffer;
+	Fl_Box *m_exportExtFilesBox, *m_seqSubwindowBox, *m_ctSubwindowBox;
+	Fl_Button *m_exportFASTABtn, *m_exportDBBtn;
 
-        char *m_displayString;
-        char *m_displayFormatString;
-	char *charSeq;
+        char *m_ctDisplayString, *m_seqDisplayString;
+        char *m_ctDisplayFormatString, *m_seqDisplayFormatString;
+	char *charSeq, *dotFormatCharSeq;
         unsigned int charSeqSize;
 
     public:
-	static char GetBaseStringFormat(const char *baseStr);
-	static std::string GetRepeatedString(const char *str, int ntimes);
-        static int GetNumDigitsBase10(int x);
+	class Util { 
+	     public:
+	          static char GetBaseStringFormat(const char *baseStr);
+	          static std::string GetRepeatedString(const char *str, int ntimes);
+                  static int GetNumDigitsBase10(int x);
+
+		  static bool ExportStringToPlaintextFile(
+		       const char *baseOutPath, 
+		       const char *srcData, 
+		       size_t srcDataLength, 
+		       const char *fileExtText = ""
+		  );
+	};
 
 };
 
