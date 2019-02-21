@@ -9,8 +9,11 @@
 #include <string>
 
 #include "InputWindow.h"
+#include "MainWindow.h"
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
+
+int InputWindow::distinctStructureCount = 0;
 
 InputWindow::InputWindow(int w, int h, const char *label, 
 	const char *defaultName, InputWindowType type) : 
@@ -62,7 +65,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
             strncpy(inputText, actualStructNameCStr, actualStructName.size() + 1);
             ConfigParser::nullTerminateString(inputText, actualStructName.size());
 
-	    sprintf(string, "Creating new folder for the structure %s", defaultName);
+	    sprintf(string, "Creating new folder for the CT structure %s", defaultName);
 	    input = new Fl_Input(160, 50, 100, 30, "@fileopen  New Folder Name:");
 	    input->when(FL_WHEN_ENTER_KEY);
             input->maximum_size(60);
@@ -80,22 +83,23 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    button->set_active();
 	    input->callback(InputCallback, (void*)0);
 	    input->labelcolor(GUI_TEXT_COLOR);
-	    const char *cbText = " Use only default names for structure folders";
+	    /*const char *cbText = " Use only default names for structure folders";
 	    cbUseDefaultNames = new Fl_Check_Button(30, 100, 325, 30, cbText);
 	    cbUseDefaultNames->box(FL_ROUND_UP_BOX);
 	    cbUseDefaultNames->color(GUI_BGCOLOR);
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
 	    cbUseDefaultNames->down_color(GUI_WINDOW_BGCOLOR);
-	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);*/
 	    callback(CloseCallback);
 	}
-        if(type == InputWindow::FILE_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES) { 
+        show();
+        /*if(type == InputWindow::FILE_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES) { 
             show();
 	}
 	else {
 	    show();
 	    InputCallback((Fl_Widget *) cbUseDefaultNames, (void *) NULL);
-	}
+	}*/
 }
 
 InputWindow::~InputWindow() {
@@ -122,10 +126,14 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
         if(window->inputText != (char*)window->input->value()) {
             strcpy(window->inputText, (char*)window->input->value());
         }
-        window->name = window->inputText;
-        if(window->cbUseDefaultNames->value()) {
-            GUI_USE_DEFAULT_FOLDER_NAMES = true;
-        }
+        if(!MainWindow::CheckDistinctFolderName(window->inputText)) {
+	    fl_alert("The folder name for the structure \"%s\" already exists!", window->inputText);
+	    return;
+	}
+	window->name = window->inputText;
+        //if(window->cbUseDefaultNames->value()) {
+        //    GUI_USE_DEFAULT_FOLDER_NAMES = true;
+        //}
     }    
     free(window->string);
     window->hide();
@@ -140,7 +148,10 @@ void InputWindow::CloseCallback(Fl_Widget* widget, void* userData)
 }
 
 std::string InputWindow::ExtractStructureNameFromCTName(const char *ctPath) {
-    std::string structName(ctPath);
+    char suggestedShortName[MAX_BUFFER_SIZE];
+    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "Structure #% 2d\0", ++InputWindow::distinctStructureCount);
+    return std::string(suggestedShortName);
+    /*std::string structName(ctPath);
     int structureNameNoPrefix = structName.find_first_of('_');
     if(structureNameNoPrefix >= 0) {
         structName = structName.substr(structureNameNoPrefix + 1);;
@@ -149,5 +160,6 @@ std::string InputWindow::ExtractStructureNameFromCTName(const char *ctPath) {
     if(dotIndexPtr >= 0) {
         structName = structName.substr(0, dotIndexPtr);
     }
-    return structName; 
+    return structName;*/ 
 }
+

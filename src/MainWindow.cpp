@@ -149,15 +149,6 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->size_range(650, 450, 650, 0);
     m_mainWindow->end();
 
-    //#ifndef __APPLE__
-    //fl_open_display();
-    //Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
-    //		        DefaultRootWindow(fl_display),
-    //                    RNAWindowIcon_bits, RNAWindowIcon_width, 
-    //			RNAWindowIcon_height);
-    //m_mainWindow->icon((const void *) iconPixmap);
-    //#endif
-
     m_mainWindow->show(argc, argv);
     
 }
@@ -225,18 +216,15 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     Fl_Button* moveUpButton = new Fl_Button(pack->x()+pack->w() - 60, vertPosn + 5, 20, 20, "@8>");
     moveUpButton->callback(MainWindow::MoveFolderUp);
     moveUpButton->labelcolor(GUI_BTEXT_COLOR);
-    //ms_instance->folderDataBtns.push_back(moveUpButton);
 
     Fl_Button* moveDownButton = new Fl_Button(pack->x()+pack->w() - 40, vertPosn + 5, 20, 20, "@2>");
     moveDownButton->callback(MainWindow::MoveFolderDown);
     moveDownButton->labelcolor(GUI_BTEXT_COLOR);
-    //ms_instance->folderDataBtns.push_back(moveDownButton);
 
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
     removeButton->callback(MainWindow::RemoveFolderCallback);
     removeButton->label("@1+");
     removeButton->labelcolor(GUI_BTEXT_COLOR);
-    //ms_instance->folderDataBtns.push_back(removeButton);
 
     group->resizable(label);
     pack->end();
@@ -597,6 +585,15 @@ void MainWindow::ShowFolderSelected()
     }
 }
 
+bool MainWindow::CheckDistinctFolderName(const char *nextFolderName) {
+    for(int btn = 0; btn < ms_instance->folderDataBtns.size(); btn++) {
+        if(!strcmp(nextFolderName, ms_instance->folderDataBtns[btn]->label())) {
+	    return false;
+	}
+    }
+    return true;
+}
+
 void MainWindow::HideFolderByIndex(const int index)
 {
     RNAStructViz* appInstance = RNAStructViz::GetInstance();
@@ -613,10 +610,12 @@ void MainWindow::HideFolderByIndex(const int index)
     
     if (pane->children() > 0)
     {
-        Fl_Group* childGroup = (Fl_Group*)(pane->child(0));
-        if (!strcmp(childGroup->label(),folder->folderName)) {
-	    pane->remove(0);
-        }
+        //Fl_Group* childGroup = (Fl_Group*)(pane->child(0));
+        //if (!strcmp(childGroup->label(),folder->folderName)) {
+	//    pane->remove(0);
+        //}
+	pane->remove(0);
+	pane->redraw();
     }
     
     pane->hide();
@@ -733,26 +732,21 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         pane->hide();
 	pane->show();
         int nextIndex = (index + 1) % folders.size();	
-	while(nextIndex != index) { 
-             if(folders[nextIndex]->structCount > 0) { 
-                  ShowFolderByIndex(nextIndex);
-                  int labelIndex = 0;
-		  for(int lbl = 0; lbl < ms_instance->folderDataBtns.size(); lbl++) {
-                       Fl_Button *folderLabel = ms_instance->folderDataBtns[lbl];
-	               if(!strcmp(folders[nextIndex]->folderName, 
-			          (char*) (folderLabel->user_data()))) {
-		            labelIndex = lbl;
-			    break;
-		       }
-		  }
-		  Fl_Button *folderLabel = ms_instance->folderDataBtns[labelIndex];
-		  folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-		  folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
-		  ms_instance->selectedFolderBtn = folderLabel;
-		  break;
-	     }
-             nextIndex = (nextIndex + 1) % folders.size();
-	}
+        if(folders[nextIndex]->structCount > 0) { 
+             ShowFolderByIndex(nextIndex);
+             int labelIndex = 0;
+             for(int lbl = 0; lbl < ms_instance->folderDataBtns.size(); lbl++) {
+                  Fl_Button *folderLabel = ms_instance->folderDataBtns[lbl];
+	          if(!strcmp(folders[nextIndex]->folderName, (char*) (folderLabel->user_data()))) {
+	               labelIndex = lbl;
+	               break;
+                  }
+             }
+             Fl_Button *folderLabel = ms_instance->folderDataBtns[labelIndex];
+             folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+             folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
+             ms_instance->selectedFolderBtn = folderLabel;
+        }
     }
 }
 

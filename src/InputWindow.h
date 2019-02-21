@@ -54,6 +54,8 @@ class InputWindow : public Fl_Window
             return name;
         }
         
+	static int distinctStructureCount;
+    
     protected:
 
 	    /* 	Callbacks for whether the user presses enter, pushes the button,

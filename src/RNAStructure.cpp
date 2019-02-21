@@ -67,18 +67,18 @@ RNAStructure::~RNAStructure()
          branchType = NULL;
     }
     if(m_contentWindow) { 
-	delete m_contentWindow; m_contentWindow = NULL;
-    	delete m_ctTextDisplay; m_ctTextDisplay = NULL;
-	delete m_seqTextDisplay; m_seqTextDisplay = NULL;
-	delete m_ctTextBuffer; m_ctTextBuffer = NULL;
-	delete m_ctStyleBuffer; m_ctStyleBuffer = NULL;
-	delete m_seqTextDisplay; m_seqTextDisplay = NULL;
-        delete m_seqStyleBuffer; m_seqStyleBuffer = NULL;
-	delete m_exportExtFilesBox; m_exportExtFilesBox = NULL;
-	delete m_seqSubwindowBox; m_seqSubwindowBox = NULL;
-	delete m_ctSubwindowBox; m_ctSubwindowBox = NULL;
-	delete m_exportFASTABtn; m_exportFASTABtn = NULL;
-	delete m_exportDBBtn; m_exportDBBtn = NULL;
+	Delete(m_contentWindow); m_contentWindow = NULL;
+    	Delete(m_ctTextDisplay); m_ctTextDisplay = NULL;
+	Delete(m_seqTextDisplay); m_seqTextDisplay = NULL;
+	Delete(m_ctTextBuffer); m_ctTextBuffer = NULL;
+	Delete(m_ctStyleBuffer); m_ctStyleBuffer = NULL;
+	Delete(m_seqTextDisplay); m_seqTextDisplay = NULL;
+        Delete(m_seqStyleBuffer); m_seqStyleBuffer = NULL;
+	Delete(m_exportExtFilesBox); m_exportExtFilesBox = NULL;
+	Delete(m_seqSubwindowBox); m_seqSubwindowBox = NULL;
+	Delete(m_ctSubwindowBox); m_ctSubwindowBox = NULL;
+	Delete(m_exportFASTABtn); m_exportFASTABtn = NULL;
+	Delete(m_exportDBBtn); m_exportDBBtn = NULL;
     }
 }
 

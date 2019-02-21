@@ -65,6 +65,7 @@ class MainWindow
         Fl_Button* folder_collapse;
     
         static void ShowFolderSelected();
+        static bool CheckDistinctFolderName(const char *nextFolderName);
 
     protected:
         /*

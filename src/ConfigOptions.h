@@ -24,6 +24,12 @@ using std::string;
 #define PERFORM_BRANCH_TYPE_ID          (false)
 #define MAX_BUFFER_SIZE                 (256)
 
+inline void Delete(void *ptr) {
+     if(ptr != NULL) {
+          delete ptr;
+     }
+}
+
 static inline const char * GetUserHome() {
      const char *userHomeDir = getenv("HOME");
      if(userHomeDir == NULL) {
