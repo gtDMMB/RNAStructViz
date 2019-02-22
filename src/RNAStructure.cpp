@@ -485,7 +485,7 @@ void RNAStructure::GenerateString()
     /*
 	   <id> [ACGU] - [ACGU] <id>
     */
-    int size = (m_sequenceLength + 2) * 27;
+    int size = (m_sequenceLength + 2) * 30;
     m_ctDisplayString = (char*)malloc(sizeof(char) * (size + 1));
     m_ctDisplayFormatString = (char*)malloc(sizeof(char) * (size + 1));
     
@@ -521,8 +521,8 @@ void RNAStructure::GenerateString()
 		if (m_sequence[i].m_pair == UNPAIRED)
 		{
 		    charsWritten = snprintf(currentPosn, remainingSize, 
-				            "%6d  | %s\n", i + 1, baseStr);
-		    snprintf(formatPosn, remainingSize, "AAAAAA  | %c\n", 
+				            "   %6d  | %s\n", i + 1, baseStr);
+		    snprintf(formatPosn, remainingSize, "   AAAAAA  | %c\n", 
 		             Util::GetBaseStringFormat(baseStr));
 
 		}
@@ -548,7 +548,8 @@ void RNAStructure::GenerateString()
 		    charsWritten = snprintf(
 			    currentPosn,
 			    remainingSize,
-			    "%6d  | %s - %s  (%d)\n",
+			    " %c %6d  | %s - %s  (%d)\n",
+			    (i <= pairID) ? '*' : ' ', 
 			    i + 1,
 			    baseStr,
 			    pairStr,
@@ -558,7 +559,7 @@ void RNAStructure::GenerateString()
 		    std::string numFmtStr = Util::GetRepeatedString(
 				            pairMarkerFmt, numDigits);
 		    snprintf(formatPosn, remainingSize, 
-		             "AAAAAA  | %c - %c  (%s)\n", 
+		             "   AAAAAA  | %c - %c  (%s)\n", 
 		             Util::GetBaseStringFormat(baseStr), 
 			     Util::GetBaseStringFormat(pairStr), 
 			     numFmtStr.c_str());    
