@@ -496,7 +496,7 @@ void RNAStructure::GenerateString()
     
     // table header labels:
     charsWritten = snprintf(currentPosn, remainingSize, 
-		   "BaseIdx |  Pair  (PairIdx)\n--------------------------\n");
+		   "   BaseIdx |  Pair  (PairIdx)\n-----------------------------\n");
     snprintf(formatPosn, remainingSize, "%s\n", 
              Util::GetRepeatedString("A", charsWritten + 1).c_str());
     formatPosn[25] = '\n';
