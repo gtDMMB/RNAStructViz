@@ -727,7 +727,8 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
          ms_instance->selectedFolderIndex = -1;
     }
 
-    if(selectNext) { // select the next folder in line:
+    if(selectNext && folders.size() > 0) { 
+	// select the next folder in line:
         Fl_Group* pane = ms_instance->folderWindowPane;
         pane->hide();
 	pane->show();
@@ -747,6 +748,11 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
              folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
              ms_instance->selectedFolderBtn = folderLabel;
         }
+    }
+    else {
+        Fl_Group* pane = ms_instance->folderWindowPane;
+	pane->hide();
+	pane->show();
     }
 }
 

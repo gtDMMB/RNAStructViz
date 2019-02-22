@@ -150,11 +150,8 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     std::string spaceBuffer = string("                                                    ");
     int curLabelLen = 0;
     char filePrefix[MAX_BUFFER_SIZE];
-    //size_t numChars = snprintf(filePrefix, (int) (strchr(filename, '_') - filename + 1), 
-    //		               "%s", filename);
-    //filePrefix[numChars] = '\0';
     size_t fileNameBytes = strlen(filename);
-    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.35s%s", filename, 
+    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.20s%s", filename, 
 	     fileNameBytes > MAX_FOLDER_LABEL_CHARS ? "..." : "");
     snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s@|>", 
 	     filePrefix, spaceBuffer.substr(0, MAX_FOLDER_LABEL_CHARS - strlen(filePrefix)).c_str());
@@ -220,9 +217,9 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             fwindow->folderScroll->redraw();
             Fl::delete_widget(toRemove);
             
-            appInstance->GetStructureManager()->RemoveStructure((intptr_t)userData);
             appInstance->GetStructureManager()->DecreaseStructCount( 
 			                        fwindow->m_folderIndex);
+            appInstance->GetStructureManager()->RemoveStructure((intptr_t)userData);
             
             break;
         }
