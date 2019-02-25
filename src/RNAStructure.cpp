@@ -23,7 +23,7 @@ RNAStructure::RNAStructure()
       m_ctTextDisplay(NULL), m_ctStyleBuffer(NULL), 
       m_seqTextDisplay(NULL), m_seqStyleBuffer(NULL), 
       m_exportExtFilesBox(NULL), m_seqSubwindowBox(NULL), 
-      m_ctSubwindowBox(NULL), 
+      m_ctSubwindowBox(NULL), m_ctViewerNotationBox(NULL), 
       m_exportFASTABtn(NULL), m_exportDBBtn(NULL) 	
 {
      branchType = NULL; 
@@ -77,6 +77,7 @@ RNAStructure::~RNAStructure()
 	Delete(m_exportExtFilesBox); m_exportExtFilesBox = NULL;
 	Delete(m_seqSubwindowBox); m_seqSubwindowBox = NULL;
 	Delete(m_ctSubwindowBox); m_ctSubwindowBox = NULL;
+	Delete(m_ctViewerNotationBox); m_ctViewerNotationBox = NULL;
 	Delete(m_exportFASTABtn); m_exportFASTABtn = NULL;
 	Delete(m_exportDBBtn); m_exportDBBtn = NULL;
     }
@@ -387,15 +388,22 @@ void RNAStructure::DisplayFileContents()
 
     if (!m_contentWindow)
     {
-        int subwinWidth = 325, curYOffset = 0, windowSpacing = 10;
+        int subwinWidth = 325, subwinTotalHeight = 700, 
+	    subwinResizeSpacing = 24;
+	int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
 	int labelHeight = 25, btnHeight = 25, btnWidth = 145;
-	
-	m_contentWindow = new Fl_Double_Window(subwinWidth, 650, GetFilename());
-	Fl_Box* resizeBox = new Fl_Box(0, 0, subwinWidth, 600);
-	m_contentWindow->resizable(resizeBox);
-	m_contentWindow->size_range(subwinWidth, 300);
+	Fl_Boxtype labelBoxType = FL_ROUND_DOWN_BOX;
+	Fl_Boxtype noteBoxType = FL_DOWN_BOX;
 
-	m_exportExtFilesBox = new Fl_Box(0, curYOffset, subwinWidth, 
+	m_contentWindow = new Fl_Double_Window(subwinWidth, 
+			      subwinTotalHeight, GetFilename());
+	Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
+			               subwinTotalHeight - subwinResizeSpacing);
+	m_contentWindow->resizable(resizeBox);
+	m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
+        subwinWidth -= subwinResizeSpacing;
+
+	m_exportExtFilesBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 				         labelHeight, 
 				         "   >> Export to External Formats:");
 	m_exportExtFilesBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -403,7 +411,7 @@ void RNAStructure::DisplayFileContents()
 	m_exportExtFilesBox->labelcolor(GUI_BTEXT_COLOR);
 	m_exportExtFilesBox->labelfont(LOCAL_BFFONT);
 	m_exportExtFilesBox->labelsize(LOCAL_TEXT_SIZE);
-	m_exportExtFilesBox->box(FL_RSHADOW_BOX);
+	m_exportExtFilesBox->box(labelBoxType);
 	curYOffset += labelHeight + windowSpacing;
 
 	m_exportFASTABtn = new Fl_Button(windowSpacing, curYOffset, 
@@ -420,7 +428,7 @@ void RNAStructure::DisplayFileContents()
 	m_exportDBBtn->labelcolor(GUI_BTEXT_COLOR);
 	curYOffset += btnHeight + windowSpacing;
 
-	m_seqSubwindowBox = new Fl_Box(0, curYOffset, subwinWidth, 
+	m_seqSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 		                       labelHeight, 
 			               "   >> Raw Sequence Data:");
         m_seqSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -428,10 +436,10 @@ void RNAStructure::DisplayFileContents()
 	m_seqSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
 	m_seqSubwindowBox->labelfont(LOCAL_BFFONT);
 	m_seqSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
-	m_seqSubwindowBox->box(FL_RSHADOW_BOX);
+	m_seqSubwindowBox->box(labelBoxType);
 	curYOffset += labelHeight + windowSpacing;
 
-	m_seqTextDisplay = new Fl_Text_Display(0, curYOffset, 
+	m_seqTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, 
 		                               subwinWidth, 135);	
 	m_seqTextBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
 	m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
@@ -446,11 +454,9 @@ void RNAStructure::DisplayFileContents()
 	m_seqStyleBuffer->text(m_seqDisplayString);
 	int stableSize = sizeof(TEXT_BUFFER_STYLE_TABLE) / 
 		         sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
-	//m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
-	//	       TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
 	curYOffset += 135 + windowSpacing;
 
-	m_ctSubwindowBox = new Fl_Box(0, curYOffset, subwinWidth, 
+	m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 			              labelHeight, 
 				      "   >> CT Style Pairing Data:");
 	m_ctSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -458,10 +464,10 @@ void RNAStructure::DisplayFileContents()
 	m_ctSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
 	m_ctSubwindowBox->labelfont(LOCAL_BFFONT);
 	m_ctSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
-	m_ctSubwindowBox->box(FL_RSHADOW_BOX);
+	m_ctSubwindowBox->box(labelBoxType);
 	curYOffset += labelHeight + windowSpacing;
                 
-	m_ctTextDisplay = new Fl_Text_Display(0, curYOffset, subwinWidth, 350);	
+	m_ctTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, subwinWidth, 300);	
 	m_ctTextBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayString));
 	m_ctStyleBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayFormatString));
 	m_ctTextBuffer->text(m_ctDisplayString);
@@ -474,6 +480,19 @@ void RNAStructure::DisplayFileContents()
 	m_ctStyleBuffer->text(m_ctDisplayFormatString);
 	m_ctTextDisplay->highlight_data(m_ctStyleBuffer, 
 		       TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
+        curYOffset += 300 + windowSpacing;
+
+	int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
+	const char *notationStr = "Note: An asterisk (*) to the left of a sequence\nentry in the CT viewer above denotes that the\nentry is the first in its pair. The pair\nindices to the right of the paired sequence\nentries are also color coded in shades of blue\nto denote this distinction.";
+        m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+			                   pairNoteSubwinHeight, notationStr);
+        m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+	m_ctViewerNotationBox->color(GUI_BGCOLOR);
+	m_ctViewerNotationBox->labelcolor(GUI_BTEXT_COLOR);
+	m_ctViewerNotationBox->labelfont(LOCAL_BFFONT);
+	m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE / 2);
+	m_ctViewerNotationBox->box(noteBoxType);
+	//m_ctViewerNotationBox->measure_label(subwinWidth, pairNoteSubwinHeight);
 
     }
     m_contentWindow->show();

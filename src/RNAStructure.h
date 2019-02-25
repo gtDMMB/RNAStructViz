@@ -198,7 +198,8 @@ class RNAStructure
         Fl_Text_Display *m_ctTextDisplay, *m_seqTextDisplay;
         Fl_Text_Buffer *m_ctTextBuffer, *m_ctStyleBuffer;
 	Fl_Text_Buffer *m_seqTextBuffer, *m_seqStyleBuffer;
-	Fl_Box *m_exportExtFilesBox, *m_seqSubwindowBox, *m_ctSubwindowBox;
+	Fl_Box *m_exportExtFilesBox, *m_seqSubwindowBox; 
+	Fl_Box *m_ctSubwindowBox, *m_ctViewerNotationBox;
 	Fl_Button *m_exportFASTABtn, *m_exportDBBtn;
 
         char *m_ctDisplayString, *m_seqDisplayString;
