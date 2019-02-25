@@ -382,13 +382,18 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    cairo_stroke(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
 	    // give the 5' | 3' distinction note below the diagram:
-            thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
+	    const char *noteMarkerStr = "5' | 3'";
+	    thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
             cairo_select_font_face(thisWindow->crDraw, "Courier New", 
 		                   CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-            cairo_set_font_size(thisWindow->crDraw, 11);
-            cairo_move_to(thisWindow->crDraw, IMAGE_WIDTH / 2 - 15.f - 10, 
+            cairo_set_font_size(thisWindow->crDraw, 10);
+            cairo_text_extents_t cairoNoteMarkerDims;
+	    cairo_text_extents(thisWindow->crDraw, noteMarkerStr, &cairoNoteMarkerDims);
+	    double noteMarkerStrOffset = (cairoNoteMarkerDims.width - 15.f) / 2.0;
+	    cairo_move_to(thisWindow->crDraw, 
+			  IMAGE_WIDTH / 2 - noteMarkerStrOffset, 
 			  IMAGE_HEIGHT);
-            cairo_show_text(thisWindow->crDraw, "5' | 3'");
+            cairo_show_text(thisWindow->crDraw, noteMarkerStr);
     }
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
 		             GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
