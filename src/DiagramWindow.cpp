@@ -112,15 +112,6 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
     copy_label(label);
     resize(x, y, w + WINW_EXTENSION, h);
     
-    //#ifndef __APPLE__
-    //fl_open_display();
-    //Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
-    //		        DefaultRootWindow(fl_display),
-    //                    DiagramWindowIcon_bits, DiagramWindowIcon_width, 
-    //			DiagramWindowIcon_height);
-    //this->icon((const void *) iconPixmap);
-    //#endif
-
     Construct(w + WINW_EXTENSION, h, structures);
 }
 
@@ -148,7 +139,6 @@ void DiagramWindow::SetFolderIndex(int index) {
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
     
-    //this->size(IMAGE_WIDTH + 150, IMAGE_HEIGHT + 150);
     if (resetMenus) {
         m_menus[0]->value(0);
         m_menus[1]->value(0);
@@ -391,6 +381,14 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
             thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
 	    cairo_stroke(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
+	    // give the 5' | 3' distinction note below the diagram:
+            thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
+            cairo_select_font_face(thisWindow->crDraw, "Courier New", 
+		                   CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+            cairo_set_font_size(thisWindow->crDraw, 11);
+            cairo_move_to(thisWindow->crDraw, IMAGE_WIDTH / 2 - 15.f - 10, 
+			  IMAGE_HEIGHT);
+            cairo_show_text(thisWindow->crDraw, "5' | 3'");
     }
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
 		             GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
