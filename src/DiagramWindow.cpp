@@ -386,7 +386,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
             cairo_select_font_face(thisWindow->crDraw, "Courier New", 
 		                   CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-            cairo_set_font_size(thisWindow->crDraw, 10);
+            cairo_set_font_size(thisWindow->crDraw, 12);
             cairo_text_extents_t cairoNoteMarkerDims;
 	    cairo_text_extents(thisWindow->crDraw, noteMarkerStr, &cairoNoteMarkerDims);
 	    double noteMarkerStrOffset = (cairoNoteMarkerDims.width - 15.f) / 2.0;

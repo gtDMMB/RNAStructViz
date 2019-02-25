@@ -490,7 +490,7 @@ void RNAStructure::DisplayFileContents()
 	m_ctViewerNotationBox->color(GUI_BGCOLOR);
 	m_ctViewerNotationBox->labelcolor(GUI_BTEXT_COLOR);
 	m_ctViewerNotationBox->labelfont(LOCAL_BFFONT);
-	m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE / 2);
+	m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE);
 	m_ctViewerNotationBox->box(noteBoxType);
 	//m_ctViewerNotationBox->measure_label(subwinWidth, pairNoteSubwinHeight);
 
