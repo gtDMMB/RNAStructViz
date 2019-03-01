@@ -239,7 +239,7 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     int fileChooserReturnCode = ms_instance->m_fileChooser->show();
     if(fileChooserReturnCode == -1 || fileChooserReturnCode == 1) { 
         if(fileChooserReturnCode == -1) { // display weird exceptional error case:
-	    fl_alert("Unable to open new CT Files: %s\n", 
+	    fl_alert("Unable to open new RNA sequence files: %s\n", 
 		     ms_instance->m_fileChooser->errmsg());
 	}
         return;
@@ -256,7 +256,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     {
     	const char *nextFilename = ms_instance->m_fileChooser->filename(i);
 	if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
-	   !strcmp(nextFilename, "..")) { // invalid file to parser, so ignore it:
+	   !strcmp(nextFilename, "..") || 
+	   ConfigParser::directoryExists(nextFilename)) { // invalid file to parser, so ignore it:
 	    continue;
 	}
         RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilename);
@@ -471,11 +472,22 @@ bool MainWindow::CreateFileChooser()
     }
     
     m_fileChooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_MULTI_FILE);
-    m_fileChooser->title("Select RNA Sequences / Load New CT Files ...");
-    m_fileChooser->filter("*.{ct,nopct,bpseq}");
+    m_fileChooser->title("Select RNA Sequences From File(s) ...");
+    m_fileChooser->filter(
+		        "CT File\t*.ct\n"
+		        "CT File\t*.nopct\n"
+		        "SEQ File\t*.bpseq\n"
+			"DOT File\t*.dot\n"
+			"DOT File\t*.db\n"
+			"CT Files -- All Formats\t*.{ct,nopct}\n"
+			"DOT Files -- All Formats\t*.{dot,db,DOT}"
+		    );
     m_fileChooser->directory(currentWD);
     m_fileChooser->options(Fl_Native_File_Chooser::NO_OPTIONS | 
-		           Fl_Native_File_Chooser::PREVIEW);
+		           Fl_Native_File_Chooser::PREVIEW | 
+			   Fl_Native_File_Chooser::NEW_FOLDER | 
+			   Fl_Native_File_Chooser::USE_FILTER_EXT | 
+			   Fl_Native_File_Chooser::SAVEAS_CONFIRM);
 
     return true;
 }

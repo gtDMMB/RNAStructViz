@@ -18,6 +18,7 @@ RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(NULL), 
       charSeq(NULL), dotFormatCharSeq(NULL), charSeqSize(0), 
       m_pathname(NULL), m_pathname_noext(NULL), 
+      m_fileCommentLine(NULL), m_suggestedFolderName(NULL), 
       m_ctDisplayString(NULL), m_ctDisplayFormatString(NULL), 
       m_seqDisplayString(NULL), m_seqDisplayFormatString(NULL), 
       m_ctTextDisplay(NULL), m_ctStyleBuffer(NULL), 
@@ -81,6 +82,8 @@ RNAStructure::~RNAStructure()
 	Delete(m_exportFASTABtn); m_exportFASTABtn = NULL;
 	Delete(m_exportDBBtn); m_exportDBBtn = NULL;
     }
+    Delete(m_fileCommentLine); m_fileCommentLine = NULL;
+    Delete(m_suggestedFolderName); m_suggestedFolderName = NULL;
 }
 
 RNAStructure::BaseData* RNAStructure::GetBaseAt(unsigned int position)
@@ -360,6 +363,27 @@ const char* RNAStructure::GetFilenameNoExtension() {
      return m_pathname_noext;
 }
 
+const char* RNAStructure::GetInitialFileComment() const {
+     return m_fileCommentLine;
+}
+const char* RNAStructure::GetSuggestedStructureFolderName() {
+     if(m_suggestedFolderName) { // we have already computed this data:
+          return m_suggestedFolderName;
+     }
+     else if(m_fileCommentLine == NULL) { // file we loaded contained no comment:
+        const char *fileNamePath = strrchr(GetFilenameNoExtension(), '/');
+	fileNamePath = fileNamePath ? fileNamePath : GetFilenameNoExtension();
+        strcpy(m_suggestedFolderName, fileNamePath);
+	char filePathReplaceChars[][2] = {
+	     {'_', '-'}, 
+	     {'.', ' '}, 
+	     {'-', ' '}
+	};
+
+     }
+     return m_suggestedFolderName;
+}
+
 void RNAStructure::DisplayFileContents()
 {
     if (m_ctDisplayString && m_ctDisplayFormatString && 
@@ -388,7 +412,7 @@ void RNAStructure::DisplayFileContents()
 
     if (!m_contentWindow)
     {
-        int subwinWidth = 325, subwinTotalHeight = 700, 
+        int subwinWidth = 325, subwinTotalHeight = 675, 
 	    subwinResizeSpacing = 24;
 	int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
 	int labelHeight = 25, btnHeight = 25, btnWidth = 145;
@@ -442,7 +466,7 @@ void RNAStructure::DisplayFileContents()
 	m_seqTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, 
 		                               subwinWidth, 135);	
 	m_seqTextBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
-	m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
+	m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayFormatString));
 	m_seqTextBuffer->text(m_seqDisplayString);
 	m_seqTextDisplay->buffer(m_seqTextBuffer);
 	m_seqTextDisplay->textfont(LOCAL_BFFONT);
@@ -451,9 +475,11 @@ void RNAStructure::DisplayFileContents()
 	m_seqTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
 	m_seqTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
 	m_seqTextDisplay->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-	m_seqStyleBuffer->text(m_seqDisplayString);
+	m_seqStyleBuffer->text(m_seqDisplayFormatString);
 	int stableSize = sizeof(TEXT_BUFFER_STYLE_TABLE) / 
 		         sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
+	m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
+		          TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
 	curYOffset += 135 + windowSpacing;
 
 	m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
@@ -483,7 +509,7 @@ void RNAStructure::DisplayFileContents()
         curYOffset += 300 + windowSpacing;
 
 	int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
-	const char *notationStr = "Note: An asterisk (*) to the left of a sequence\nentry in the CT viewer above denotes that the\nentry is the first in its pair. The pair\nindices to the right of the paired sequence\nentries are also color coded in shades of blue\nto denote this distinction.";
+	const char *notationStr = "Note: An asterisk (*) to the left of a sequence\nentry in the CT viewer above denotes that the\nentry is the first in its pair.";
         m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 			                   pairNoteSubwinHeight, notationStr);
         m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -492,7 +518,6 @@ void RNAStructure::DisplayFileContents()
 	m_ctViewerNotationBox->labelfont(LOCAL_BFFONT);
 	m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE);
 	m_ctViewerNotationBox->box(noteBoxType);
-	//m_ctViewerNotationBox->measure_label(subwinWidth, pairNoteSubwinHeight);
 
     }
     m_contentWindow->show();
@@ -517,7 +542,8 @@ void RNAStructure::GenerateString()
     charsWritten = snprintf(currentPosn, remainingSize, 
 		   "   BaseIdx |  Pair  (PairIdx)\n-----------------------------\n");
     snprintf(formatPosn, remainingSize, "%s\n", 
-             Util::GetRepeatedString("A", charsWritten + 1).c_str());
+             Util::GetRepeatedString(TBUFSTYLE_DEFAULT_STRFMT, 
+		                     charsWritten + 1).c_str());
     formatPosn[25] = '\n';
     currentPosn += charsWritten;
     formatPosn += charsWritten;
@@ -525,7 +551,7 @@ void RNAStructure::GenerateString()
     
     for (int i = 0; i < (int)m_sequenceLength; ++i)
     {
-		const char* baseStr = 0;
+		const char* baseStr = NULL;
 		switch (m_sequence[i].m_base)
 		{
 		    case A: baseStr = "A";
@@ -573,13 +599,16 @@ void RNAStructure::GenerateString()
 			    baseStr,
 			    pairStr,
 			    pairID + 1);
-		    const char *pairMarkerFmt = ((i <= pairID) ? "F" : "G");
+		    const char *pairMarkerFmt = ((i <= pairID) ? 
+				TBUFSTYLE_BPAIR_START_STRFMT : 
+				TBUFSTYLE_BPAIR_END_STRFMT);
 		    int numDigits = Util::GetNumDigitsBase10(pairID + 1);
 		    std::string numFmtStr = Util::GetRepeatedString(
 				            pairMarkerFmt, numDigits);
 		    snprintf(formatPosn, remainingSize, 
-		             "   AAAAAA  | %c - %c  (%s)\n", 
-		             Util::GetBaseStringFormat(baseStr), 
+		             " %c AAAAAA  | %c - %c  (%s)\n", 
+		             (i <= pairID) ? TBUFSTYLE_BPAIR_END : ' ', 
+			     Util::GetBaseStringFormat(baseStr), 
 			     Util::GetBaseStringFormat(pairStr), 
 			     numFmtStr.c_str());    
 		}
@@ -598,8 +627,15 @@ void RNAStructure::GenerateString()
     m_seqDisplayString = (char *) malloc(DEFAULT_BUFFER_SIZE * sizeof(char));
     size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, 
 		                             DEFAULT_BUFFER_SIZE);
-    m_seqDisplayFormatString = (char *) malloc((seqDSLen + 1) * sizeof(char));
-    strcpy(m_seqDisplayFormatString, m_seqDisplayFormatString);
+
+    size_t rawSeqStrLen = strlen(m_seqDisplayString);
+    m_seqDisplayFormatString = (char *) malloc((rawSeqStrLen + 1) * sizeof(char));
+    strcpy(m_seqDisplayFormatString, m_seqDisplayString);
+    StringToUppercase(m_seqDisplayFormatString);
+    StringMapCharacter(m_seqDisplayFormatString, 'A', TBUFSTYLE_SEQPAIR_A);
+    StringMapCharacter(m_seqDisplayFormatString, 'C', TBUFSTYLE_SEQPAIR_C);
+    StringMapCharacter(m_seqDisplayFormatString, 'G', TBUFSTYLE_SEQPAIR_G);
+    StringMapCharacter(m_seqDisplayFormatString, 'U', TBUFSTYLE_SEQPAIR_U);
 
 }
 
@@ -711,15 +747,15 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
 
 char RNAStructure::Util::GetBaseStringFormat(const char *baseStr) {
      if(!strcasecmp(baseStr, "A")) 
-          return 'B';
-     else if(!strcmp(baseStr, "C"))
-	  return 'C';
+          return TBUFSTYLE_SEQPAIR_A;
+     else if(!strcasecmp(baseStr, "C"))
+	  return TBUFSTYLE_SEQPAIR_C;
      else if(!strcasecmp(baseStr, "G"))
-	  return 'D';
+	  return TBUFSTYLE_SEQPAIR_G;
      else if(!strcasecmp(baseStr, "U"))
-	  return 'E';
+	  return TBUFSTYLE_SEQPAIR_U;
      else 
-	  return 'A';
+	  return TBUFSTYLE_DEFAULT;
 }
 
 std::string RNAStructure::Util::GetRepeatedString(const char *str, int ntimes) {

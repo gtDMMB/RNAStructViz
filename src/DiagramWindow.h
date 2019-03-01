@@ -25,6 +25,7 @@
 #define IMAGE_WIDTH                  (IMAGE_DIM)
 #define IMAGE_HEIGHT                 (IMAGE_DIM)
 #define IMAGE_DEPTH                  (3)
+#define STRAND_MARKER_IMAGE_HEIGHT   (25)
 #define PNG_FOOTER_HEIGHT            (100)
 
 #define GLWIN_TRANSLATEX             (35)

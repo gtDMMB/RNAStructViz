@@ -142,6 +142,9 @@ class RNAStructure
         */
         const char* GetFilename() const;
         const char* GetFilenameNoExtension();
+	const char* GetInitialFileComment() const;
+	const char* GetSuggestedStructureFolderName();
+	const char* GetSuggestedStructureFolderName(const char* structFileNames[], unsigned int numFiles);
 
         /*
 	     Display the contents of the file in a window (or bring it to the top if already existing).
@@ -153,14 +156,6 @@ class RNAStructure
         */
         inline BaseData* & getSequence() {
             return m_sequence;
-        }
-
-        inline void print() {
-            fprintf(stderr, "Printing RNAStructure of length = %u\n", GetLength());
-            for(int i = 0; i < GetLength(); i++) {
-                 BaseData *bdp = GetBaseAt(i);
-                 fprintf(stderr, "   => %u -> %u [%s]\n", bdp->m_index, bdp->m_pair, (bdp->m_pair == UNPAIRED) ? "UNPAIRED" : "PAIRED");
-            }
         }
 
     private:
@@ -192,6 +187,7 @@ class RNAStructure
 
         // The full path name of the file from which this sequence came.
         char *m_pathname, *m_pathname_noext;
+	char *m_fileCommentLine, *m_suggestedFolderName;
 
         // Info for displaying the file contents
         Fl_Double_Window *m_contentWindow;

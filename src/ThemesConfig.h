@@ -15,18 +15,34 @@
  * See the following link for the built-in FLTK indexed colors:
  * http://www.fltk.org/doc-1.3/drawing.html#drawing_colors
  */
-static const Fl_Text_Display::Style_Table_Entry TEXT_BUFFER_STYLE_TABLE[] = {
-     
-     {36,               FL_SCREEN_BOLD,        12}, // A -- default
-     {60,               FL_SCREEN_BOLD,        12}, // B -- pair A
-     {160,              FL_SCREEN_BOLD,        12}, // C -- pair C
-     {93,               FL_SCREEN_BOLD,        12}, // D -- pair G
-     {80,               FL_SCREEN_BOLD,        12}, // E -- pair U
-     {223,              FL_SCREEN_BOLD,        12}, // F -- first pairing
-     {219,              FL_SCREEN_BOLD,        12}, // G -- second pairing
-     {0,                0,                     0},  // NULL end of array
+#define FL_LOCAL_DARK_GRAY                     (36)
+#define FL_LOCAL_MEDIUM_GREEN                  (60)
+#define FL_LOCAL_DARK_RED                      (88)
+#define FL_LOCAL_BRIGHT_YELLOW                 (93)
+#define FL_LOCAL_LIGHT_PURPLE                  (192)
+#define FL_LOCAL_DEEP_BLUE                     (219)
 
+static const Fl_Text_Display::Style_Table_Entry TEXT_BUFFER_STYLE_TABLE[] = {
+     {FL_LOCAL_DARK_GRAY,        FL_SCREEN,             12},    // A -- default
+     {FL_LOCAL_MEDIUM_GREEN,     FL_SCREEN,             12},    // B -- pair A
+     {FL_LOCAL_DARK_RED,         FL_SCREEN,             12},    // C -- pair C
+     {FL_LOCAL_LIGHT_PURPLE,     FL_SCREEN,             12},    // D -- pair G
+     {FL_LOCAL_BRIGHT_YELLOW,    FL_SCREEN,             12},    // E -- pair U
+     {FL_LOCAL_DEEP_BLUE,        FL_SCREEN_BOLD,        12},    // F -- first pairing
+     {FL_LOCAL_DEEP_BLUE,        FL_SCREEN_BOLD,        12},    // G -- second pairing
+     {NULL,                      NULL,                  NULL},  // NULL end of array
 };
+
+#define TBUFSTYLE_DEFAULT                     ('A')
+#define TBUFSTYLE_DEFAULT_STRFMT              ("A")
+#define TBUFSTYLE_SEQPAIR_A                   ('B')
+#define TBUFSTYLE_SEQPAIR_C                   ('C')
+#define TBUFSTYLE_SEQPAIR_G                   ('D')
+#define TBUFSTYLE_SEQPAIR_U                   ('E')
+#define TBUFSTYLE_BPAIR_START                 ('F')
+#define TBUFSTYLE_BPAIR_END                   ('G')
+#define TBUFSTYLE_BPAIR_START_STRFMT          ("F")
+#define TBUFSTYLE_BPAIR_END_STRFMT            ("G")
 
 typedef struct {
      Fl_Color windowBGColor;

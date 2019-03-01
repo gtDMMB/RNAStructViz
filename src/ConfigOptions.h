@@ -8,6 +8,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
+#include <string.h>
 #include <pwd.h>
 #include <unistd.h>
 
@@ -23,24 +25,6 @@ using std::string;
 
 #define PERFORM_BRANCH_TYPE_ID          (false)
 #define MAX_BUFFER_SIZE                 (256)
-
-inline void Delete(void *ptr) {
-     if(ptr != NULL) {
-          delete ptr;
-     }
-}
-
-static inline const char * GetUserHome() {
-     const char *userHomeDir = getenv("HOME");
-     if(userHomeDir == NULL) {
-          struct passwd *uhdPasswd = getpwuid(getuid());
-	  if(uhdPasswd) 
-               userHomeDir = uhdPasswd->pw_dir;
-	  else
-	       userHomeDir = "";
-     }
-     return userHomeDir;
-}
 
 #define DEFAULT_CTFILE_SEARCH_DIRECTORY (GetUserHome())
 #define DEFAULT_PNG_OUTPUT_DIRECTORY    (GetUserHome())
@@ -89,5 +73,8 @@ extern volatile Fl_Color GUI_CTFILEVIEW_COLOR;
 
 extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
 extern bool DEBUGGING_ON;
+
+/* Helper functions and inline utilities we do not place elsewhere: */
+#include "RNACUtils.cpp"
 
 #endif
