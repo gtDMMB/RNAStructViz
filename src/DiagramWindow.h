@@ -21,7 +21,7 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_DIM                    (550)
+#define IMAGE_DIM                    (485)
 #define IMAGE_WIDTH                  (IMAGE_DIM)
 #define IMAGE_HEIGHT                 (IMAGE_DIM)
 #define IMAGE_DEPTH                  (3)
@@ -29,7 +29,7 @@
 #define PNG_FOOTER_HEIGHT            (100)
 
 #define GLWIN_TRANSLATEX             (35)
-#define GLWIN_TRANSLATEY             (90)
+#define GLWIN_TRANSLATEY             (110)
 
 #define WIDGET_SPACING               (35)
 #define EXPORT_BUTTON_WIDTH          (115)

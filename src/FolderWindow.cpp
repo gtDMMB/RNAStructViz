@@ -153,8 +153,10 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     size_t fileNameBytes = strlen(filename);
     snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.20s%s", filename, 
 	     fileNameBytes > MAX_FOLDER_LABEL_CHARS ? "..." : "");
-    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s@|>", 
-	     filePrefix, spaceBuffer.substr(0, MAX_FOLDER_LABEL_CHARS - strlen(filePrefix)).c_str());
+    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s", 
+	     filePrefix, spaceBuffer.substr(0, 
+             MAX(0, MAX_FOLDER_LABEL_CHARS - ((int ) strlen(filePrefix)))).c_str());
+    strcat(labelWithIcon, "   @|>");
     label->copy_label(labelWithIcon); 
     
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
