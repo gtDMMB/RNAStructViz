@@ -29,7 +29,7 @@
 #define PNG_FOOTER_HEIGHT            (100)
 
 #define GLWIN_TRANSLATEX             (35)
-#define GLWIN_TRANSLATEY             (110)
+#define GLWIN_TRANSLATEY             (90)
 
 #define WIDGET_SPACING               (35)
 #define EXPORT_BUTTON_WIDTH          (115)
@@ -214,6 +214,8 @@ private:
     int handle(int flEvent);
     void RedrawCairoZoomBuffer(cairo_t *curWinContext);
     void HandleUserZoomAction();
+
+    void RedrawStrandEdgeMarker(cairo_t *curWinContext);
 
     void WarnUserDrawingConflict();
     void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 

@@ -20,7 +20,6 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 
-#include "pixmaps/DiagramWindowIcon.xbm"
 #include "pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c"
 
 #include <FL/x.H>
@@ -94,15 +93,6 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
     
-    //#ifndef __APPLE__ 
-    //fl_open_display();
-    //Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
-    //		        DefaultRootWindow(fl_display),
-    //                    DiagramWindowIcon_bits, DiagramWindowIcon_width, 
-    //			DiagramWindowIcon_height);
-    //this->icon((const void *) iconPixmap);
-    //#endif
-
     Construct(w + WINW_EXTENSION, h, structures);
 }
 
@@ -191,20 +181,21 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 	cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT + 
 			STRAND_MARKER_IMAGE_HEIGHT + PNG_FOOTER_HEIGHT);
 	cairo_fill(crImageOutput);
+	thisWindow->RedrawStrandEdgeMarker(crImageOutput);
 	// now draw the footer data:
         thisWindow->SetCairoColor(crImageOutput, CR_SOLID_WHITE);
-	cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT, 
-			IMAGE_WIDTH + STRAND_MARKER_IMAGE_HEIGHT, PNG_FOOTER_HEIGHT);
+	cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT, 
+			IMAGE_WIDTH, PNG_FOOTER_HEIGHT);
 	cairo_fill(crImageOutput);
 	thisWindow->SetCairoColor(crImageOutput, CR_SOLID_BLACK);
 	cairo_set_line_width(crImageOutput, 2);
-	cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT); 
+	cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT); 
 	cairo_line_to(crImageOutput, IMAGE_WIDTH, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT);
 	cairo_stroke(crImageOutput);
 	cairo_select_font_face(crImageOutput, "Courier New", 
 		               CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
         cairo_set_font_size(crImageOutput, 12);
-	int offsetY = IMAGE_HEIGHT + 25;
+	int offsetY = IMAGE_HEIGHT  + STRAND_MARKER_IMAGE_HEIGHT + 25;
 	for(int s = 0; s < 3; s++) {
              char curStructLabel[MAX_BUFFER_SIZE];
 	     int menuChoiceIdx = thisWindow->m_menus[s]->value();
@@ -340,12 +331,6 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
-    //cairo_set_source_rgb(cr, 
-    //		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-    //			 GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-    //			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
-    //cairo_rectangle(cr, 0, 0, thisWindow->w(), thisWindow->h());
-    //cairo_fill(cr);
     thisWindow->drawWidgets(true);
 
     Fl_Color priorColor = fl_color();
@@ -387,41 +372,13 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
             thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
 	    cairo_stroke(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
-	    
-	    // __Give the 5' | 3' distinction note below the diagram:__
-            // NOTE: to mark this distinction and avoid "ugly" artifacts 
-	    // around the curvature of the circle drawing with pure cairo, 
-	    // we have just constructed the raw bits for a custom 
-	    // image we have constructed to distinguish this marker. 
-	    // Here, we just load up these C-struct-style formatted bits 
-	    // (with transparency) and copy them over top of the image:
-	    unsigned int markerImageWidth = FivePrimeThreePrimeEdgeMarker.width;
-	    unsigned int markerImageHeight = FivePrimeThreePrimeEdgeMarker.height;
-	    int markerImageStride = cairo_format_stride_for_width(
-			                 CAIRO_FORMAT_ARGB32, 
-			                 markerImageWidth
-			            );
-            cairo_surface_t *strandEdgeMarkerSurface = cairo_image_surface_create_for_data(
-			          FivePrimeThreePrimeEdgeMarker.pixel_data, 
-			          CAIRO_FORMAT_ARGB32, 
-			          markerImageWidth, 
-			          markerImageHeight, 
-			          markerImageStride
-			     );
-	    unsigned int markerImageDrawX = 0; //IMAGE_WIDTH / 2 - (markerImageWidth - 15.0f)/ 2;
-	    unsigned int markerImageDrawY = 0; //IMAGE_HEIGHT;
-            cairo_set_source_surface(thisWindow->crDraw, strandEdgeMarkerSurface, 
-			             markerImageDrawX + GLWIN_TRANSLATEX, 
-				     markerImageDrawY + GLWIN_TRANSLATEY);
-            cairo_rectangle(thisWindow->crDraw, 0, 0, markerImageWidth, markerImageHeight);
-	    cairo_fill(thisWindow->crDraw);
-	    cairo_surface_destroy(strandEdgeMarkerSurface); strandEdgeMarkerSurface = NULL;
     }
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
 		             GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_rectangle(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, 
 		    IMAGE_WIDTH, IMAGE_HEIGHT);    
     cairo_fill(cr);
+    thisWindow->RedrawStrandEdgeMarker(cr);
     thisWindow->RedrawCairoZoomBuffer(cr);
     
     fl_color(priorColor);
@@ -1396,6 +1353,45 @@ void DiagramWindow::HandleUserZoomAction() {
 	cairo_fill(crZoom);
     }
     redraw();
+
+}
+
+void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) { 
+     
+     if(curWinContext == NULL) {
+          return;
+     }
+     // __Give the 5' | 3' distinction note below the diagram:__
+     // NOTE: to mark this distinction and avoid "ugly" artifacts 
+     // around the curvature of the circle drawing with pure cairo, 
+     // we have just constructed the raw bits for a custom 
+     // image we have constructed to distinguish this marker. 
+     // Here, we just load up these C-struct-style formatted bits 
+     // (with transparency) and copy them over top of the image:
+     unsigned int markerImageWidth = FivePrimeThreePrimeEdgeMarker.width;
+     unsigned int markerImageHeight = FivePrimeThreePrimeEdgeMarker.height;
+     int markerImageStride = cairo_format_stride_for_width(
+   		                 CAIRO_FORMAT_ARGB32, 
+		                 markerImageWidth
+ 		             );
+     cairo_surface_t *strandEdgeMarkerSurface = cairo_image_surface_create_for_data(
+		          FivePrimeThreePrimeEdgeMarker.pixel_data, 
+		          CAIRO_FORMAT_ARGB32, 
+		          markerImageWidth, 
+		          markerImageHeight, 
+		          markerImageStride
+		      );
+     unsigned int markerImageDrawX = (IMAGE_WIDTH - markerImageWidth) / 2;
+     unsigned int markerImageDrawY = IMAGE_HEIGHT - 14.f;
+     cairo_reset_clip(curWinContext);
+     SetCairoColor(curWinContext, CR_TRANSPARENT);
+     cairo_set_source_surface(curWinContext, strandEdgeMarkerSurface, 
+ 		             GLWIN_TRANSLATEX + markerImageDrawX, 
+ 			     GLWIN_TRANSLATEY + markerImageDrawY);
+     cairo_paint_with_alpha(curWinContext, 0.67f);
+     cairo_surface_flush(strandEdgeMarkerSurface);
+     cairo_surface_flush(cairo_get_target(curWinContext));
+     cairo_surface_destroy(strandEdgeMarkerSurface); strandEdgeMarkerSurface = NULL;
 
 }
 
