@@ -1,12 +1,14 @@
-#include "StatsWindow.h"
-#include "StructureManager.h"
-#include "RNAStructViz.h"
-#include "RNAStructure.h"
-#include <FL/Fl_Box.H>
-#include <unistd.h>
-#include <iostream>
+
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <math.h>
+#include <time.h>
+
+#include <iostream>
+#include <algorithm>
+
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Round_Button.H>
 #include <FL/Fl_Check_Button.H> 
@@ -17,13 +19,15 @@
 #include <FL/Fl_Chart.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Group.H>
+
 #include "Fl_Rotated_Text.H"
-#include <math.h>
-#include "rocbox.h"
+#include "StatsWindow.h"
+#include "StructureManager.h"
+#include "RNAStructViz.h"
+#include "RNAStructure.h"
 #include "InputWindow.h"
-#include <algorithm>
+#include "rocbox.h"
 #include "ConfigOptions.h"
-#include <time.h>
 
 #include "pixmaps/StatsFormula.c"
 #include "pixmaps/StatsWindowIcon.xbm"

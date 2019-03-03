@@ -35,10 +35,10 @@ OBJEXT=o
 CXXFLAGS= -g -rdynamic -Wall -Wextra #-O2
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
-CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) -std=c++11 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -funsigned-char -Wno-c++11-narrowing 
+CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -funsigned-char -Wno-c++11-narrowing 
 CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
 
-LDFLAGS=-Wall -Wextra -rdynamic -g1
+LDFLAGS=-Wall -Wextra -rdynamic -g1 -lm
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
@@ -88,9 +88,13 @@ BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h ConfigParser.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
 
+#CustomFLTKSymbols.$(OBJEXT): CustomFLTKSymbols.h ConfigOptions.h\
+#	pixmaps/FLTKSymbolFolder.c CustomFLTKSymbols.cpp
+#	$(CXX) $(CXXFLAGS_FULL) -c CustomFLTKSymbols.cpp
+
 DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 	BranchTypeIdentification.h RNAStructure.h\
-	pixmaps/DiagramWindowIcon.xbm DiagramWindow.cpp
+	pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c DiagramWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
 
 DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
@@ -109,6 +113,9 @@ GLWindow.$(OBJEXT): GLWindow.h
 
 InputWindow.$(OBJEXT): InputWindow.h InputWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
+
+Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c Fl_Rotated_Text.cpp
 
 FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 	ConfigOptions.h MainWindow.h pixmaps/StructureOperationIcon.c\
@@ -137,9 +144,6 @@ StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
 	FolderWindow.h MainWindow.h RNAStructViz.h InputWindow.h\
 	RNAStructure.h StructureManager.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp
-
-Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c Fl_Rotated_Text.cpp
 
 rocbox.$(OBJEXT): rocbox.h rocbox.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c rocbox.cpp
