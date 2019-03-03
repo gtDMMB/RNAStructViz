@@ -398,7 +398,9 @@ void RNAStructure::DisplayFileContents()
     
     if(m_contentWindow) {
         if(this == m_currentOpenCTViewer) { 
+	     Fl::lock();
 	     m_currentOpenCTViewer = NULL;
+	     Fl::unlock();
 	}
 	delete m_contentWindow; m_contentWindow = NULL;
     	delete m_ctTextDisplay; m_ctTextDisplay = NULL;

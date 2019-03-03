@@ -40,7 +40,9 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     pixelWidth = 1; //2;
     zoomButtonDown = false;
     haveZoomBuffer = false;
+    zoomBufferContainsArc = false;
     zx0 = zy0 = zx1 = zy1 = zw = zh = 0;
+    zoomBufferMinArcIndex = zoomBufferMaxArcIndex = 0;
 
     m_menus[0] = m_menus[1] = m_menus[2] = NULL;
     m_menuItems = 0;
@@ -1266,7 +1268,6 @@ int DiagramWindow::handle(int flEvent) {
 		    initZoomX = Fl::event_x();
 		    initZoomY = Fl::event_y();
 		    this->cursor(FL_CURSOR_MOVE);
-		    //fprintf(stderr, "Buttom down @ (X, Y) = (%d, %d)\n", initZoomX, initZoomY);
 		    return 1;
 	       }
 	  case FL_RELEASE:
@@ -1277,7 +1278,6 @@ int DiagramWindow::handle(int flEvent) {
 		    zoomButtonDown = false;
 		    haveZoomBuffer = true;
 		    HandleUserZoomAction();
-		    //fprintf(stderr, "Button up @ (X, Y) = (%d, %d)\n", lastZoomX, lastZoomY);
 	       }
 	  case FL_DRAG:
 	       if(zoomButtonDown) {
@@ -1293,9 +1293,50 @@ int DiagramWindow::handle(int flEvent) {
 		    redraw();
 		    break;
 	       }
+	  case FL_FOCUS:
+	       return 1;
+	  case FL_UNFOCUS:
+	       return 1;
+	  case FL_KEYDOWN:
+	       {
+	            if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
+		         if(!haveZoomBuffer || !zoomBufferContainsArc) { 
+		              //fl_alert("Select a zoom area containing a displayed arc "
+			      //	 "before trying to view the structure's "
+			      //	 "CT file contents!");
+			      return 1;
+			 }
+			 else if(!RNAStructure::HaveOpenCTFileViewerWindow()) {
+			      //fl_alert("Open an active CT file viewer window before trying to scroll to "
+			      //       "CT file contents for the active structure!");
+			      return 1;
+			 }
+			 int minArcPairIndex = MIN(zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
+			 if(minArcPairIndex <= 0) {
+			      //fl_alert("Invalid arc index bounds selected! Try zooming again.");
+			      return 1;
+			 }
+			 else if(!RNAStructure::ScrollOpenCTFileViewerWindow(minArcPairIndex)) { 
+			      //fl_alert("CT view operation failed. Try zooming again?");
+			      return 1;
+			 }
+		    }
+	       }
 	  default:
                return Fl_Cairo_Window::handle(flEvent);
      }
+
+}
+
+bool DiagramWindow::ParseZoomSelectionArcIndices() {
+     
+     if(!haveZoomBuffer || zh <= 0 || zw <= 0) {
+          return false;
+     }
+
+
+
+     return true;
 
 }
 
@@ -1322,8 +1363,11 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
     cairo_select_font_face(curWinContext, "Courier New", 
 		           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
     cairo_set_font_size(curWinContext, 17);
-    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 14);
+    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 20);
     cairo_show_text(curWinContext, "Drag Mouse to Zoom:");
+    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 7);
+    cairo_set_font_size(curWinContext, 14);
+    cairo_show_text(curWinContext, "(<SHIFT+G> for CT View)");
 
 
     // now draw the zoom selection area of the window:
@@ -1363,7 +1407,8 @@ void DiagramWindow::HandleUserZoomAction() {
     }
     
     if(zx0 != zx1 && zy0 != zy1) { 
-        cairo_identity_matrix(crZoom);
+        ParseZoomSelectionArcIndices();
+	cairo_identity_matrix(crZoom);
 	cairo_set_source_rgb(crZoom, 
 		             GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
 			     GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 

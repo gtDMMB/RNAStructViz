@@ -214,10 +214,13 @@ private:
     cairo_surface_t *crZoomSurface;
     cairo_t *crZoom;
     bool zoomButtonDown, haveZoomBuffer;
+    bool zoomBufferContainsArc;
     int zx0, zy0, zx1, zy1, zw, zh;
+    int zoomBufferMinArcIndex, zoomBufferMaxArcIndex;
     int initZoomX, initZoomY;
     int lastZoomX, lastZoomY;
     int handle(int flEvent);
+    bool ParseZoomSelectionArcIndices();
     void RedrawCairoZoomBuffer(cairo_t *curWinContext);
     void HandleUserZoomAction();
 
