@@ -223,8 +223,6 @@ private:
 
     void RedrawStrandEdgeMarker(cairo_t *curWinContext);
     
-    static double GetTextRotationAngle(double theta, double x, double y, 
-		                       double rx, double ry);
     static double TranslateAngleFromUserAxes(double theta);
     static void TranslateUTMCoordinates(double *xcoord, double *ycoord, 
 		                        double *xcenter, double *ycenter);

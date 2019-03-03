@@ -1425,28 +1425,7 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
 
 }
 
-double DiagramWindow::GetTextRotationAngle(double theta, double x, double y, double rx, double ry) { 
-     while(theta < 0) { 
-          theta += 2.0 * M_PI;
-     }
-     while(theta >= 2.0 * M_PI) { 
-	  theta -= 2.0 * M_PI;
-     }
-     // solution: use calculus to build a triangle with hypotenuse the 
-     // tangent line to a circle (see my phone notes):
-     double circRadius = sqrt(Square(x - rx) + Square(y - ry));
-     double trianglePointX = x + 1;
-     double trianglePointY = 2.0 * trianglePointX / sqrt(abs(circRadius - Square(trianglePointX))) + y;
-     double triangleXSide = 1.0, triangleYSide = trianglePointY - y;
-     double rotationAngle = atan2(triangleYSide, triangleXSide);
-     return -1 * rotationAngle;
-}
-
 double DiagramWindow::TranslateAngleFromUserAxes(double theta) { 
-     // Cairo rotates according to the user coordinate axes from +x->+y, 
-     // where the user coordinate axes are oriented from TopLeft->BottomRight 
-     // in our setting. Therefore we can just flip the angle and get the 
-     // usual (expected) geometry out of our code-based formulas:
      return theta - M_PI_2;
 }
 
@@ -1510,27 +1489,21 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
 	       cairo_text_extents_t textDims;
 	       cairo_text_extents(curWinContext, numericLabelStr, &textDims);
 	       if(rotationAngle2 >= 0 && rotationAngle2 < M_PI_2) { 
-	            fprintf(stderr, "Q1: %d\n", numericLabel);
 		    nextFinishX += 1 + textDims.width;
 		    nextFinishY += 1 + textDims.height;
 	       }
 	       else if(rotationAngle2 >= M_PI_2 && rotationAngle2 < M_PI) { 
-		    fprintf(stderr, "Q2: %d\n", numericLabel);
 		    nextFinishX -= 1 + textDims.width;
 		    nextFinishY -= textDims.height;
 	       }
 	       else if(rotationAngle2 >= M_PI && rotationAngle2 < 3.0 * M_PI_2) {
-		    fprintf(stderr, "Q3: %d\n", numericLabel);
 		    nextFinishX -= 2 + textDims.width;
 		    nextFinishY += 1 + textDims.height;
 	       }
 	       else {
-		    fprintf(stderr, "Q4: %d\n", numericLabel);
 		    nextFinishX += textDims.width / 3;
 		    nextFinishY += textDims.height;
 	       }
-               //double textRotationAngle = GetTextRotationAngle(rotationAngle2, nextFinishX, nextFinishY, 
-	       //	                                       arcOriginX, arcOriginY);
 	       cairo_move_to(curWinContext, nextFinishX, nextFinishY);
 	       //cairo_rotate(curWinContext, textRotationAngle);
 	       cairo_show_text(curWinContext, numericLabelStr);
