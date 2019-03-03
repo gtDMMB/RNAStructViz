@@ -27,7 +27,7 @@ class RNABranchType_t;
 #define RadiansToDegrees(theta)      (theta * 180.0 / M_PI)
 #define Square(x)                    ((x) * (x))
 
-#define DEFAULT_BUFFER_SIZE          2048
+#define DEFAULT_BUFFER_SIZE          1024
 
 class RNAStructure
 {

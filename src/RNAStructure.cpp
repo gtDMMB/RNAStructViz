@@ -636,9 +636,14 @@ void RNAStructure::GenerateString()
     m_seqDisplayString = (char *) malloc(DEFAULT_BUFFER_SIZE * sizeof(char));
     size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, 
 		                             DEFAULT_BUFFER_SIZE);
-
-    size_t rawSeqStrLen = strlen(m_seqDisplayString);
-    m_seqDisplayFormatString = (char *) malloc((rawSeqStrLen + 1) * sizeof(char));
+    if(seqDSLen + 1 < DEFAULT_BUFFER_SIZE) { 
+        m_seqDisplayString = (char *) realloc(m_seqDisplayString, 
+			              sizeof(char) * (DEFAULT_BUFFER_SIZE - 1 - seqDSLen));
+    }
+    else {
+         strcat(m_seqDisplayString, " ...");
+    }
+    m_seqDisplayFormatString = (char *) malloc((seqDSLen + 1) * sizeof(char));
     strcpy(m_seqDisplayFormatString, m_seqDisplayString);
     StringToUppercase(m_seqDisplayFormatString);
     StringMapCharacter(m_seqDisplayFormatString, 'A', TBUFSTYLE_SEQPAIR_A);
@@ -657,12 +662,12 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
      if(clusterSize > 0) { 
           numSpaces = MAX(0, charSeqSize / clusterSize - 1);
      }
-     if(charSeqSize + numSpaces + 1 > maxChars) { 
-          return 0;
-     }
+     //if(charSeqSize + numSpaces + 1 > maxChars) { 
+     //     return 0;
+     //}
      char *strBufActivePtr = strBuf, *destPos = NULL;
      size_t charsCopied = 0, csize = 0;
-     for(int strpos = 0; strpos < charSeqSize; strpos += clusterSize) { 
+     for(int strpos = 0; strpos < MIN(charSeqSize, maxChars); strpos += clusterSize) { 
           strncpy(strBufActivePtr, charSeq + strpos, clusterSize);
 	  csize = (strpos / clusterSize <= numSpaces) ? clusterSize : 
 		  charSeqSize % clusterSize;

@@ -1298,30 +1298,34 @@ int DiagramWindow::handle(int flEvent) {
 		    break;
 	       }
 	  case FL_FOCUS:
+	       Fl_Cairo_Window::handle(flEvent);
 	       return 1;
 	  case FL_UNFOCUS:
+	       Fl_Cairo_Window::handle(flEvent);
 	       return 1;
 	  case FL_KEYDOWN:
 	       {
 	            if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
 		         if(!haveZoomBuffer || !zoomBufferContainsArc) { 
-		              //fl_alert("Select a zoom area containing a displayed arc "
-			      //	 "before trying to view the structure's "
-			      //	 "CT file contents!");
+		              fprintf(stderr, 
+				      "Select a zoom area containing a displayed arc "
+			      	      "before trying to view the structure's "
+			      	      "CT file contents!\n");
 			      return 1;
 			 }
 			 else if(!RNAStructure::HaveOpenCTFileViewerWindow()) {
-			      //fl_alert("Open an active CT file viewer window before trying to scroll to "
-			      //       "CT file contents for the active structure!");
+			      fprintf(stderr, 
+				      "Open an active CT file viewer window before trying to scroll to "
+			              "CT file contents for the active structure!\n");
 			      return 1;
 			 }
 			 int minArcPairIndex = MIN(zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
 			 if(minArcPairIndex <= 0) {
-			      //fl_alert("Invalid arc index bounds selected! Try zooming again.");
+			      fprintf(stderr, "Invalid arc index bounds selected! Try zooming again.\n");
 			      return 1;
 			 }
 			 else if(!RNAStructure::ScrollOpenCTFileViewerWindow(minArcPairIndex)) { 
-			      //fl_alert("CT view operation failed. Try zooming again?");
+			      fprintf(stderr, "CT view operation failed. Try zooming again?\n");
 			      return 1;
 			 }
 		    }
@@ -1377,7 +1381,7 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
 	       pointStruct.y = hlineC;
 	       matchingArcPoints.push_back(pointStruct);
 	  }
-	  else if((term = x0 + hlineSqrtTerm) >= 0 && term >= zx0 && term <= zx0 + zw) { 
+	  if((term = x0 + hlineSqrtTerm) >= 0 && term >= zx0 && term <= zx0 + zw) { 
                pointStruct.x = term;
 	       pointStruct.y = hlineC;
 	       matchingArcPoints.push_back(pointStruct);
@@ -1389,7 +1393,7 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
                pointStruct.y = term;
 	       matchingArcPoints.push_back(pointStruct);
 	  }
-	  else if((term = y0 + vlineSqrtTerm) >= 0 && term >= zy0 && term <= zy0 + zh) { 
+	  if((term = y0 + vlineSqrtTerm) >= 0 && term >= zy0 && term <= zy0 + zh) { 
 	       pointStruct.x = vlineD;
                pointStruct.y = term;
 	       matchingArcPoints.push_back(pointStruct);
