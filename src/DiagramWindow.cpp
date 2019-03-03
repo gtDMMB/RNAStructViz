@@ -1147,7 +1147,7 @@ void DiagramWindow::RebuildMenus() {
 	    activeMenuIndex[m] = -1;
             activeSet[m] = false;
 	}
-        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + WIDGET_SPACING;
+        int horizCheckBoxPos = ms_menu_minx[2] + ms_menu_width + 2 * WIDGET_SPACING;
         m_drawBranchesIndicator = new Fl_Check_Button(horizCheckBoxPos, 5, 
 			          20, 20,"Draw (16S) Domains");
         m_drawBranchesIndicator->callback(checkBoxChangedStateCallback, 
