@@ -102,3 +102,11 @@ static inline const char * GetUserHome() {
      }
      return userHomeDir;
 }
+
+#define WithinError(x, y, eps)              (abs(x - y) <= eps)
+
+typedef struct {
+     int x; 
+     int y;
+} Point_t;
+

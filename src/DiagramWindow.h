@@ -5,9 +5,17 @@
 #ifndef DIAGRAMWINDOW_H
 #define DIAGRAMWINDOW_H
 
+#include <vector>
+#include <algorithm>
+
+using std::vector;
+using std::min_element;
+using std::max_element;
+
+#include <cairo.h>
+
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
-#include <cairo.h>
 #include <FL/Fl_Cairo.H>
 #include <FL/Fl_Cairo_Window.H>
 #include <FL/Fl_Widget.H>
@@ -15,7 +23,6 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
 #include <FL/x.H>
-#include <vector>
 
 #include "ConfigOptions.h"
 #include "RNAStructure.h"
@@ -208,6 +215,7 @@ private:
     
     int numPairs[7];
     int folderIndex;
+    int sequenceLength;
     int pixelWidth;
     bool userConflictAlerted;
     

@@ -48,6 +48,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     m_menuItems = 0;
     m_menuItemsSize = 0;
     folderIndex = -1;
+    sequenceLength = 0;
     m_drawBranchesIndicator = NULL;
     m_cbShowTicks = NULL;
     userConflictAlerted = false;
@@ -136,6 +137,7 @@ void DiagramWindow::SetFolderIndex(int index) {
     sprintf(title, "Comparison of Arc Diagrams: %-.48s  -- % 5d Base Pairs", 
 	    structureNameFull, basePairCount);
     label(title);
+    sequenceLength = basePairCount;
 }
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
@@ -155,8 +157,10 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
         cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
         cairo_fill(crZoom);
     }
-    zx0 = zx1 = zy0 = zy1 = zw = zh = 0;
     zoomButtonDown = haveZoomBuffer = false;
+    zoomBufferContainsArc = false;
+    zx0 = zx1 = zy0 = zy1 = zw = zh = 0;
+    zoomBufferMinArcIndex = zoomBufferMaxArcIndex = 0;
     redraw();
 
 }
@@ -1333,10 +1337,80 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
      if(!haveZoomBuffer || zh <= 0 || zw <= 0) {
           return false;
      }
+     
+     int bddCircCenterX = GLWIN_TRANSLATEX + IMAGE_WIDTH / 2;
+     int bddCircCenterY = GLWIN_TRANSLATEY + IMAGE_HEIGHT / 2;
+     int bddCircRadius = IMAGE_WIDTH / 2 - 20.f;
 
+     // first, check to see if the bounding circle arc 
+     // intersects the zoom rectangle:
+     int bddCircDistX = abs(bddCircCenterX - (zx0 - zw / 2));
+     int bddCircDistY = abs(bddCircCenterY - (zy0 - zh / 2));
+     int cornerDist = Square(bddCircDistX - zw / 2) + Square(bddCircDistY - zh / 2);
+     if(bddCircDistX > (zw / 2 + bddCircRadius)) { 
+          return false;
+     }
+     else if(bddCircDistY > (zh / 2 + bddCircRadius)) {
+	  return false;
+     }
+     else if(cornerDist > Square(bddCircRadius)) {
+          return false;
+     }
 
+     // now find the points of intersection so we can determine which 
+     // pair indices they correspond to:
+     // (1) Intersection with lower horizontal box line;
+     // (2) Intersection with LHS vertical box line;
+     // (3) Intersection with upper horizontal box line;
+     // (4) Intersection with RHS vertical box line.
+     int horizLineConsts[2] = { zy0 + zh, zy0 };
+     int vertLineConsts[2] = { zx0, zx0 + zw };
+     int x0 = bddCircCenterX, y0 = bddCircCenterY, term;
+     vector<Point_t> matchingArcPoints;
+     Point_t pointStruct;
+     for(int idx = 0; idx < 2; idx++) { 
 
-     return true;
+	  int hlineC = horizLineConsts[idx];
+          int hlineSqrtTerm = (int) sqrt(abs(hlineC - Square(hlineC - y0)));
+	  if((term = x0 - hlineSqrtTerm) >= 0 && term >= zx0 && term <= zx0 + zw) { 
+               pointStruct.x = term;
+	       pointStruct.y = hlineC;
+	       matchingArcPoints.push_back(pointStruct);
+	  }
+	  else if((term = x0 + hlineSqrtTerm) >= 0 && term >= zx0 && term <= zx0 + zw) { 
+               pointStruct.x = term;
+	       pointStruct.y = hlineC;
+	       matchingArcPoints.push_back(pointStruct);
+	  }
+	  int vlineD = vertLineConsts[idx];
+	  int vlineSqrtTerm = (int) sqrt(abs(vlineD - Square(vlineD - x0)));
+          if((term = y0 - vlineSqrtTerm) >= 0 && term >= zy0 && term <= zy0 + zh) { 
+	       pointStruct.x = vlineD;
+               pointStruct.y = term;
+	       matchingArcPoints.push_back(pointStruct);
+	  }
+	  else if((term = y0 + vlineSqrtTerm) >= 0 && term >= zy0 && term <= zy0 + zh) { 
+	       pointStruct.x = vlineD;
+               pointStruct.y = term;
+	       matchingArcPoints.push_back(pointStruct);
+	  }
+
+     }
+     if(matchingArcPoints.size() == 0) {
+          return false;
+     }
+
+     vector<int> matchingBasePairs;
+     for(int vidx = 0; vidx < matchingArcPoints.size(); vidx++) { 
+          double pointTheta = atan2(matchingArcPoints[vidx].y, matchingArcPoints[vidx].x);
+	  double pairIdxPct = abs(pointTheta / 2.0 / M_PI);
+	  int closestIndex = (int) pairIdxPct * sequenceLength;
+	  matchingBasePairs.push_back(closestIndex);
+     }
+     zoomBufferMinArcIndex = *min_element(matchingBasePairs.begin(), matchingBasePairs.end());
+     zoomBufferMaxArcIndex = *max_element(matchingBasePairs.begin(), matchingBasePairs.end());
+
+     return (zoomBufferMinArcIndex > 0) && (zoomBufferMaxArcIndex > 0);
 
 }
 
@@ -1407,7 +1481,7 @@ void DiagramWindow::HandleUserZoomAction() {
     }
     
     if(zx0 != zx1 && zy0 != zy1) { 
-        ParseZoomSelectionArcIndices();
+        zoomBufferContainsArc = ParseZoomSelectionArcIndices();
 	cairo_identity_matrix(crZoom);
 	cairo_set_source_rgb(crZoom, 
 		             GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
