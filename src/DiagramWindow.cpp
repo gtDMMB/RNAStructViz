@@ -1348,18 +1348,19 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
 
      // first, check to see if the bounding circle arc 
      // intersects the zoom rectangle:
+     /*int FPEpsilon = 4;
      int bddCircDistX = abs(bddCircCenterX - (zx0 - zw / 2));
      int bddCircDistY = abs(bddCircCenterY - (zy0 - zh / 2));
      int cornerDist = Square(bddCircDistX - zw / 2) + Square(bddCircDistY - zh / 2);
-     if(bddCircDistX > (zw / 2 + bddCircRadius)) { 
+     if(!WithinError(bddCircDistX, (zw / 2 + bddCircRadius), FPEpsilon)) { 
           return false;
      }
-     else if(bddCircDistY > (zh / 2 + bddCircRadius)) {
+     else if(!WithinError(bddCircDistY, (zh / 2 + bddCircRadius), FPEpsilon)) {
 	  return false;
      }
-     else if(cornerDist > Square(bddCircRadius)) {
+     else if(!WithinError(cornerDist, Square(bddCircRadius), FPEpsilon)) {
           return false;
-     }
+     }*/
 
      // now find the points of intersection so we can determine which 
      // pair indices they correspond to:
@@ -1372,34 +1373,44 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
      int x0 = bddCircCenterX, y0 = bddCircCenterY, term;
      vector<Point_t> matchingArcPoints;
      Point_t pointStruct;
+     fprintf(stderr, "[h,w]=[%d,%d]; %d, %d, %d, %d\n", zh, zw, zx0, zy0, zx1, zy1);
      for(int idx = 0; idx < 2; idx++) { 
 
 	  int hlineC = horizLineConsts[idx];
           int hlineSqrtTerm = (int) sqrt(abs(hlineC - Square(hlineC - y0)));
-	  if((term = x0 - hlineSqrtTerm) >= 0 && term >= zx0 && term <= zx0 + zw) { 
+	  fprintf(stderr, "%d <= %d <= %d\n", zx0, x0 - hlineSqrtTerm, zx0+zw);
+	  term = x0 - hlineSqrtTerm;
+	  if(term >= 0 && term >= zx0 && term <= zx0 + zw) { 
                pointStruct.x = term;
 	       pointStruct.y = hlineC;
 	       matchingArcPoints.push_back(pointStruct);
 	  }
-	  if((term = x0 + hlineSqrtTerm) >= 0 && term >= zx0 && term <= zx0 + zw) { 
+	  fprintf(stderr, "%d <= %d <= %d\n", zx0, x0 + hlineSqrtTerm, zx0+zw);
+	  term = x0 + hlineSqrtTerm;
+	  if(term >= zx0 && term <= zx0 + zw) { 
                pointStruct.x = term;
 	       pointStruct.y = hlineC;
 	       matchingArcPoints.push_back(pointStruct);
 	  }
 	  int vlineD = vertLineConsts[idx];
 	  int vlineSqrtTerm = (int) sqrt(abs(vlineD - Square(vlineD - x0)));
-          if((term = y0 - vlineSqrtTerm) >= 0 && term >= zy0 && term <= zy0 + zh) { 
+          fprintf(stderr, "%d <= %d <= %d\n", zy0, y0 - vlineSqrtTerm, zy0+zh);
+	  term = y0 - vlineSqrtTerm;
+	  if(term >= 0 && term >= zy0 && term <= zy0 + zh) { 
 	       pointStruct.x = vlineD;
                pointStruct.y = term;
 	       matchingArcPoints.push_back(pointStruct);
 	  }
-	  if((term = y0 + vlineSqrtTerm) >= 0 && term >= zy0 && term <= zy0 + zh) { 
+	  fprintf(stderr, "%d <= %d <= %d\n", zy0, y0 + vlineSqrtTerm, zy0+zh);
+	  term = y0 + vlineSqrtTerm;
+	  if(term >= zy0 && term <= zy0 + zh) { 
 	       pointStruct.x = vlineD;
                pointStruct.y = term;
 	       matchingArcPoints.push_back(pointStruct);
 	  }
 
      }
+     fprintf(stderr, "\n");
      if(matchingArcPoints.size() == 0) {
           return false;
      }
@@ -1414,6 +1425,7 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
      zoomBufferMinArcIndex = *min_element(matchingBasePairs.begin(), matchingBasePairs.end());
      zoomBufferMaxArcIndex = *max_element(matchingBasePairs.begin(), matchingBasePairs.end());
 
+     fprintf(stderr, "MIN, MAX = %d, %d\n", zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
      return (zoomBufferMinArcIndex > 0) && (zoomBufferMaxArcIndex > 0);
 
 }
