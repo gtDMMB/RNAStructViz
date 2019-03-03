@@ -1425,29 +1425,21 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
 
 }
 
-double DiagramWindow::GetTextRotationAngle(double theta, int *rotatedXMult, int *rotatedYMult) { 
-     if(rotatedXMult == NULL || rotatedYMult == NULL) {
-          return theta;
-     }
+double DiagramWindow::GetTextRotationAngle(double theta, double x, double y, double rx, double ry) { 
      while(theta < 0) { 
           theta += 2.0 * M_PI;
      }
-     if(theta >= 0.0 && theta < M_PI_2) { // QI (in UTM): 
-          *rotatedXMult = 0; *rotatedYMult = 1;
-	  return theta;
+     while(theta >= 2.0 * M_PI) { 
+	  theta -= 2.0 * M_PI;
      }
-     else if(theta >= M_PI_2 && theta < M_PI) { // QII: 
-	  *rotatedXMult = -1; *rotatedYMult = 0;
-          return theta + M_PI;
-     }
-     else if(theta >= M_PI && theta < 3.0 * M_PI_2) { // QIII: 
-	  *rotatedXMult = -1; *rotatedYMult = 1;
-          return theta + M_PI;
-     }
-     else { // QIV: 
-	  *rotatedXMult = 0; *rotatedYMult = 1;
-          return theta;
-     }
+     // solution: use calculus to build a triangle with hypotenuse the 
+     // tangent line to a circle (see my phone notes):
+     double circRadius = sqrt(Square(x - rx) + Square(y - ry));
+     double trianglePointX = x + 1;
+     double trianglePointY = 2.0 * trianglePointX / sqrt(abs(circRadius - Square(trianglePointX))) + y;
+     double triangleXSide = 1.0, triangleYSide = trianglePointY - y;
+     double rotationAngle = atan2(triangleYSide, triangleXSide);
+     return -1 * rotationAngle;
 }
 
 double DiagramWindow::TranslateAngleFromUserAxes(double theta) { 
@@ -1475,7 +1467,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      size_t totalNumTicks = RNAStructViz::GetInstance()->GetStructureManager()->
 	                                  GetStructure(firstStructIndex)->GetLength();
      size_t numTicks = MIN(totalNumTicks, DWINARC_MAX_TICKS) + 1;
-     int tickLabelMod = MAX((int) (numTicks * DWINARC_LABEL_PCT), 1), numTickLabels = 0;
+     int tickLabelMod = MAX((int) (numTicks - 1) * DWINARC_LABEL_PCT, 1), numTickLabels = 0;
      double arcOriginX = IMAGE_WIDTH / 2, arcOriginY = IMAGE_HEIGHT / 2; 
      double arcRadius = IMAGE_WIDTH / 2 - 20.f + 2;
      double tickInsetLength = 1;
@@ -1488,7 +1480,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      cairo_translate(curWinContext, arcOriginX, arcOriginY);
      cairo_select_font_face(curWinContext, "Courier New", CAIRO_FONT_SLANT_NORMAL, 
 		            CAIRO_FONT_WEIGHT_BOLD);
-     cairo_set_font_size(curWinContext, 8);
+     cairo_set_font_size(curWinContext, 9);
      SetCairoColor(curWinContext, CR_LIGHT_GRAY);
      
      for(int t = 1; t <= numTicks; t++) { 
@@ -1506,22 +1498,40 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
 	  cairo_stroke(curWinContext);
 	  if(t % tickLabelMod == 0) { // draw rotated numeric label:
 
+	       cairo_save(curWinContext);
+	       while(rotationAngle2 < 0) { 
+                    rotationAngle2 += 2.0 * M_PI;
+               }
+               while(rotationAngle2 >= 2.0 * M_PI) { 
+                    rotationAngle2 -= 2.0 * M_PI;
+               }
 	       int numericLabel = (int) (totalNumTicks * ++numTickLabels * DWINARC_LABEL_PCT);
-               cairo_save(curWinContext);
                snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d \0", numericLabel);
-	       fprintf(stderr, "#%d :: %d(%d:%d:%d)\n", numTickLabels, numericLabel, 
-	              numTickLabels, tickLabelMod, (int) (360 + rotationAngle * 180 / M_PI) % 360);
-	       int rotatedXOffset, rotatedYOffset;
-	       double textRotationAngle = GetTextRotationAngle(rotationAngle2, 
-			                                       &rotatedXOffset, &rotatedYOffset);
-	       cairo_text_extents_t crNumericLabelDims;
-	       cairo_text_extents(curWinContext, numericLabelStr, &crNumericLabelDims);
-	       double textStartX = 3.0 * cos(rotationAngle2);
-	       double textStartY = 3.0 * sin(rotationAngle2);
-	       TranslateUTMCoordinates(&textStartX, &textStartY, &arcOriginX, &arcOriginY);
-	       textStartX += rotatedXOffset * crNumericLabelDims.width;
-	       textStartY += rotatedYOffset * crNumericLabelDims.height;
-	       cairo_move_to(curWinContext, nextFinishX + textStartX, nextFinishY + textStartY);
+	       cairo_text_extents_t textDims;
+	       cairo_text_extents(curWinContext, numericLabelStr, &textDims);
+	       if(rotationAngle2 >= 0 && rotationAngle2 < M_PI_2) { 
+	            fprintf(stderr, "Q1: %d\n", numericLabel);
+		    nextFinishX += 1 + textDims.width;
+		    nextFinishY += 1 + textDims.height;
+	       }
+	       else if(rotationAngle2 >= M_PI_2 && rotationAngle2 < M_PI) { 
+		    fprintf(stderr, "Q2: %d\n", numericLabel);
+		    nextFinishX -= 1 + textDims.width;
+		    nextFinishY -= textDims.height;
+	       }
+	       else if(rotationAngle2 >= M_PI && rotationAngle2 < 3.0 * M_PI_2) {
+		    fprintf(stderr, "Q3: %d\n", numericLabel);
+		    nextFinishX -= 2 + textDims.width;
+		    nextFinishY += 1 + textDims.height;
+	       }
+	       else {
+		    fprintf(stderr, "Q4: %d\n", numericLabel);
+		    nextFinishX += textDims.width / 3;
+		    nextFinishY += textDims.height;
+	       }
+               //double textRotationAngle = GetTextRotationAngle(rotationAngle2, nextFinishX, nextFinishY, 
+	       //	                                       arcOriginX, arcOriginY);
+	       cairo_move_to(curWinContext, nextFinishX, nextFinishY);
 	       //cairo_rotate(curWinContext, textRotationAngle);
 	       cairo_show_text(curWinContext, numericLabelStr);
 	       cairo_restore(curWinContext);
@@ -1530,7 +1540,6 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
 
      }
      cairo_restore(curWinContext);
-
 }
 
 void DiagramWindow::ShowTickMarksCallback(Fl_Widget *cbw, void *udata) { 

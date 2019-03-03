@@ -25,6 +25,7 @@ class RNABranchType_t;
 #define ABS(x)                       (x >= 0 ? (x) : -1 * (x))
 
 #define RadiansToDegrees(theta)      (theta * 180.0 / M_PI)
+#define Square(x)                    ((x) * (x))
 
 #define DEFAULT_BUFFER_SIZE          2048
 

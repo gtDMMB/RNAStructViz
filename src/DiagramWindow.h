@@ -21,7 +21,7 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_DIM                    (475)
+#define IMAGE_DIM                    (485)
 #define IMAGE_WIDTH                  (IMAGE_DIM)
 #define IMAGE_HEIGHT                 (IMAGE_DIM)
 #define IMAGE_DEPTH                  (3)
@@ -223,7 +223,8 @@ private:
 
     void RedrawStrandEdgeMarker(cairo_t *curWinContext);
     
-    static double GetTextRotationAngle(double theta, int *rxmult, int *rymult);
+    static double GetTextRotationAngle(double theta, double x, double y, 
+		                       double rx, double ry);
     static double TranslateAngleFromUserAxes(double theta);
     static void TranslateUTMCoordinates(double *xcoord, double *ycoord, 
 		                        double *xcenter, double *ycenter);
