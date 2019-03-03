@@ -371,6 +371,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 		      IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
             thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
 	    cairo_stroke(thisWindow->crDraw);
+            thisWindow->RedrawStructureTickMarks(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
     }
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
@@ -1392,6 +1393,39 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
      cairo_surface_flush(strandEdgeMarkerSurface);
      cairo_surface_flush(cairo_get_target(curWinContext));
      cairo_surface_destroy(strandEdgeMarkerSurface); strandEdgeMarkerSurface = NULL;
+
+}
+
+void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
+
+     if(curWinContext == NULL || m_structures.size() == 0) {
+          return;
+     }
+     
+     int firstStructIndex = m_structures[0];
+     size_t numTicks = RNAStructViz::GetInstance()->GetStructureManager()->
+	                             GetStructure(firstStructIndex)->GetLength();
+     int arcCenterX = IMAGE_WIDTH / 2, arcCenterY = IMAGE_HEIGHT / 2; 
+     int arcRadius = IMAGE_WIDTH / 2 - 15.f;
+     double tickInsetLength = 3;
+
+     cairo_save(curWinContext);
+     cairo_set_line_cap(curWinContext, CAIRO_LINE_CAP_ROUND);
+     cairo_set_line_width(curWinContext, 1);
+     cairo_translate(curWinContext, arcCenterX, arcCenterY);
+     SetCairoColor(curWinContext, CR_BLACK);
+     for(int t = 1; t <= numTicks; t++) { 
+          
+	  double nextStartX = (arcRadius - tickInsetLength) * cos(2 * t * M_PI / numTicks);
+	  double nextStartY = (arcRadius - tickInsetLength) * sin(2 * t * M_PI / numTicks);
+          double nextFinishX = arcRadius * cos(2 * t * M_PI / numTicks);
+          double nextFinishY = arcRadius * sin(2 * t * M_PI / numTicks);
+          cairo_move_to(curWinContext, nextStartX, nextStartY);
+          cairo_line_to(curWinContext, nextFinishX, nextFinishY);
+	  cairo_stroke(curWinContext);
+
+     }
+     cairo_restore(curWinContext);
 
 }
 

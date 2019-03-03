@@ -216,6 +216,7 @@ private:
     void HandleUserZoomAction();
 
     void RedrawStrandEdgeMarker(cairo_t *curWinContext);
+    void RedrawStructureTickMarks(cairo_t *curWinContext);
 
     void WarnUserDrawingConflict();
     void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 
