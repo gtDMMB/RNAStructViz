@@ -19,12 +19,14 @@
 
 class RNABranchType_t;
 
-#define MAX(x, y)         (x <= y ? (y) : (x))
-#define MIN(x, y)         (x <= y ? (x) : (y))
-#define ABS(x)            (x >= 0 ? (x) : -1 * (x))
-#define MIN3(x, y, z)     MIN(x, MIN(y, z))
+#define MAX(x, y)                    (x <= y ? (y) : (x))
+#define MIN(x, y)                    (x <= y ? (x) : (y))
+#define MIN3(x, y, z)                MIN(x, MIN(y, z))
+#define ABS(x)                       (x >= 0 ? (x) : -1 * (x))
 
-#define DEFAULT_BUFFER_SIZE    2048
+#define RadiansToDegrees(theta)      (theta * 180.0 / M_PI)
+
+#define DEFAULT_BUFFER_SIZE          2048
 
 class RNAStructure
 {
@@ -202,6 +204,7 @@ class RNAStructure
         char *m_ctDisplayFormatString, *m_seqDisplayFormatString;
 	char *charSeq, *dotFormatCharSeq;
         unsigned int charSeqSize;
+	static RNAStructure *m_currentOpenCTViewer;
 
     public:
 	class Util { 
@@ -217,6 +220,8 @@ class RNAStructure
 		       const char *fileExtText = ""
 		  );
 	};
+        static bool HaveOpenCTFileViewerWindow();
+	static bool ScrollOpenCTFileViewerWindow(int pairIndex); 
 
 };
 

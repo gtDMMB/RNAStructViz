@@ -21,14 +21,14 @@
 #include "RNAStructure.h"
 #include "BranchTypeIdentification.h"
 
-#define IMAGE_DIM                    (485)
+#define IMAGE_DIM                    (475)
 #define IMAGE_WIDTH                  (IMAGE_DIM)
 #define IMAGE_HEIGHT                 (IMAGE_DIM)
 #define IMAGE_DEPTH                  (3)
 #define STRAND_MARKER_IMAGE_HEIGHT   (25)
 #define PNG_FOOTER_HEIGHT            (100)
 
-#define GLWIN_TRANSLATEX             (35)
+#define GLWIN_TRANSLATEX             (50)
 #define GLWIN_TRANSLATEY             (110)
 
 #define WIDGET_SPACING               (35)
@@ -41,6 +41,9 @@
 #define DIAGRAMWIN_DEFAULT_CURSOR    (FL_CURSOR_CROSS)
 #define DWIN_REDRAW_REFRESH          (1.75)
 #define DWIN_DRAG_DX                 (3)
+
+#define DWINARC_MAX_TICKS            (100)
+#define DWINARC_LABEL_PCT            ((double) 1.0 / 6.0)
 
 typedef enum {
      CR_BLACK       = 0, 
@@ -57,7 +60,8 @@ typedef enum {
      CR_WHITE       = 11,
      CR_TRANSPARENT = 12,
      CR_SOLID_BLACK = 14,
-     CR_SOLID_WHITE = 15
+     CR_SOLID_WHITE = 15, 
+     CR_LIGHT_GRAY  = 16, 
 } CairoColorSpec_t;
 
 class DiagramWindow : public Fl_Cairo_Window
@@ -122,6 +126,7 @@ private:
 		             int enabled, 
                              CairoColorSpec_t fallbackColorFlag);
     void SetCairoColor(cairo_t *cr, int colorFlag); 
+    void SetCairoToFLColor(cairo_t *cr, Fl_Color flc);
 
     inline void CairoRectangle(cairo_t *cr, int x, int y, int w, int h) {
          double rectX = (double) x / this->w();
@@ -188,7 +193,7 @@ private:
     std::vector<int> m_structures;
 
     Fl_Choice* m_menus[3];
-    Fl_Check_Button *m_drawBranchesIndicator;
+    Fl_Check_Button *m_drawBranchesIndicator, *m_cbShowTicks;
     Fl_Button *exportButton;
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
@@ -199,6 +204,7 @@ private:
     uchar *imageData;
     bool cairoTranslate;
     bool m_redrawStructures;
+    bool showPlotTickMarks;
     
     int numPairs[7];
     int folderIndex;
@@ -216,7 +222,13 @@ private:
     void HandleUserZoomAction();
 
     void RedrawStrandEdgeMarker(cairo_t *curWinContext);
+    
+    static double GetTextRotationAngle(double theta);
+    static double TranslateAngleFromUserAxes(double theta);
+    static void TranslateUTMCoordinates(double *xcoord, double *ycoord, 
+		                        double *xcenter, double *ycenter);
     void RedrawStructureTickMarks(cairo_t *curWinContext);
+    static void ShowTickMarksCallback(Fl_Widget *cbw, void *udata);
 
     void WarnUserDrawingConflict();
     void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 

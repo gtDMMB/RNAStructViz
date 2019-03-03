@@ -13,6 +13,7 @@
 #include "ThemesConfig.h"
 
 const unsigned int RNAStructure::UNPAIRED = ~0x0;
+RNAStructure *RNAStructure::m_currentOpenCTViewer = NULL;
 
 RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(NULL), 
@@ -396,7 +397,10 @@ void RNAStructure::DisplayFileContents()
     GenerateString();
     
     if(m_contentWindow) {
-        delete m_contentWindow; m_contentWindow = NULL;
+        if(this == m_currentOpenCTViewer) { 
+	     m_currentOpenCTViewer = NULL;
+	}
+	delete m_contentWindow; m_contentWindow = NULL;
     	delete m_ctTextDisplay; m_ctTextDisplay = NULL;
 	delete m_seqTextDisplay; m_seqTextDisplay = NULL;
 	delete m_ctTextBuffer; m_ctTextBuffer = NULL;
@@ -480,6 +484,8 @@ void RNAStructure::DisplayFileContents()
 		         sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
 	m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
 		          TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
+	//m_seqTextDisplay->linenumber_width(6);
+	//m_seqTextDisplay->linenumber_format("%02X");
 	curYOffset += 135 + windowSpacing;
 
 	m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
@@ -521,6 +527,7 @@ void RNAStructure::DisplayFileContents()
 
     }
     m_contentWindow->show();
+    m_currentOpenCTViewer = this;
 
 }
 
@@ -802,4 +809,21 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
      return operationStatus;
 }
 
+bool RNAStructure::HaveOpenCTFileViewerWindow() {
+     return m_currentOpenCTViewer != NULL;
+}
 
+bool RNAStructure::ScrollOpenCTFileViewerWindow(int pairIndex) {
+     if(!HaveOpenCTFileViewerWindow()) {
+          return false;
+     }
+     else if(m_currentOpenCTViewer->m_ctTextDisplay == NULL || 
+             m_currentOpenCTViewer->m_contentWindow == NULL) {
+          return false;
+     }
+     else if(pairIndex <= 0 || pairIndex > m_currentOpenCTViewer->GetLength()) {
+          return false;
+     }
+     m_currentOpenCTViewer->m_ctTextDisplay->scroll(pairIndex + 2, 1);
+     m_currentOpenCTViewer->m_contentWindow->show();
+}

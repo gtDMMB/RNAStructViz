@@ -47,7 +47,9 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     m_menuItemsSize = 0;
     folderIndex = -1;
     m_drawBranchesIndicator = NULL;
+    m_cbShowTicks = NULL;
     userConflictAlerted = false;
+    showPlotTickMarks = true;
 
     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
@@ -57,7 +59,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     color(GUI_WINDOW_BGCOLOR);
     fl_rectf(0, 0, w, h);
     size_range(w, h, w, h);
-    set_modal();
+    //set_modal();
     box(FL_NO_BOX);
     setAsCurrentDiagramWindow();
     if(!redrawRefreshTimerSet) { 
@@ -122,9 +124,15 @@ DiagramWindow::~DiagramWindow() {
 
 void DiagramWindow::SetFolderIndex(int index) {
     folderIndex = index;
-    char *structureNameFull = RNAStructViz::GetInstance()->GetStructureManager()->
-                              GetFolderAt(index)->folderName;
-    sprintf(title, "Comparison of Arc Diagrams: %-.48s", structureNameFull);
+    struct Folder *dwinFolder = RNAStructViz::GetInstance()->GetStructureManager()->
+                                GetFolderAt(index);
+    const char *structureNameFull = dwinFolder->folderName;
+    int containedStructIndex = (dwinFolder->structCount > 0 && dwinFolder->folderStructs) ? 0 : -1;
+    int basePairCount = containedStructIndex ? 0 : 
+	                RNAStructViz::GetInstance()->GetStructureManager()->
+			GetStructure(containedStructIndex)->GetLength();
+    sprintf(title, "Comparison of Arc Diagrams: %-.48s  -- % 5d Base Pairs", 
+	    structureNameFull, basePairCount);
     label(title);
 }
 
@@ -234,6 +242,7 @@ void DiagramWindow::resize(int x, int y, int w, int h) {
 void DiagramWindow::drawWidgets(bool fillWin = true) {
     
     exportButton->redraw();
+    m_cbShowTicks->redraw();
     for(int m = 0; m < 3; m++) {
         if(m_menus[m] != NULL && !m_menus[m]->active()) {
 	    m_menus[m]->redraw();
@@ -355,23 +364,23 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    // __Draw the actual arc diagram pixels and frame 
 	    //   them in a circular frame:__ 
 	    cairo_identity_matrix(thisWindow->crDraw);
-            thisWindow->SetCairoColor(thisWindow->crDraw, CR_TRANSPARENT);
-	    cairo_rectangle(thisWindow->crDraw, 0, 0, thisWindow->w(), thisWindow->h());
+            thisWindow->SetCairoToFLColor(thisWindow->crDraw, thisWindow->color());
+	    cairo_rectangle(thisWindow->crDraw, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
             cairo_fill(thisWindow->crDraw);
 	    cairo_push_group(thisWindow->crDraw);
             int drawParams[] = { numToDraw, keyA, keyB };
 	    thisWindow->RedrawBuffer(thisWindow->crDraw, sequences, drawParams, IMAGE_WIDTH);
 	    cairo_pop_group_to_source(thisWindow->crDraw);
             cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
-		      IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
+		      IMAGE_WIDTH / 2 - 20.f, 0.0, 2.0 * M_PI);
             cairo_clip(thisWindow->crDraw);
             cairo_paint(thisWindow->crDraw);
 	    cairo_reset_clip(thisWindow->crDraw);
 	    cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
-		      IMAGE_WIDTH / 2 - 15.f, 0.0, 2.0 * M_PI);
+		      IMAGE_WIDTH / 2 - 20.f, 0.0, 2.0 * M_PI);
             thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
 	    cairo_stroke(thisWindow->crDraw);
-            thisWindow->RedrawStructureTickMarks(thisWindow->crDraw);
+	    thisWindow->RedrawStructureTickMarks(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
     }
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
@@ -545,31 +554,24 @@ void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
 
     switch (nextColorFlag) {
         case CR_BLACK:
-            //CairoSetRGB(cr, 0, 0, 0);
             CairoSetRGB(cr, 46, 52, 54);
 	    break;
         case CR_RED:
-            //CairoSetRGB(cr, 239, 41, 41);
 	    CairoSetRGB(cr, 164, 0, 0);
             break;
         case CR_GREEN:
-            //CairoSetRGB(cr, 78, 154, 6);
 	    CairoSetRGB(cr, 115, 210, 22);
             break;
         case CR_BLUE:
-            //CairoSetRGB(cr, 52, 101, 164);
 	    CairoSetRGB(cr, 32, 74, 135);
             break;
         case CR_YELLOW:
-            //CairoSetRGB(cr, 252, 233, 79);
 	    CairoSetRGB(cr, 196, 160, 0);
             break;
         case CR_MAGENTA:
-            //CairoSetRGB(cr, 255, 57, 225);
 	    CairoSetRGB(cr, 239, 41, 159);
             break;
         case CR_CYAN:
-            //CairoSetRGB(cr, 60, 208, 237);
 	    CairoSetRGB(cr, 0, 195, 215);
             break;
         case CR_BRANCH1:
@@ -588,7 +590,7 @@ void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
 	    CairoSetRGB(cr, 255, 255, 255);
 	    break;
 	case CR_TRANSPARENT:
-	    CairoSetRGB(cr, 255, 255, 255, 0);
+	    CairoSetRGB(cr, 255, 255, 255, 0x7f);
 	    break;
         case CR_SOLID_BLACK:
 	    CairoSetRGB(cr, 0, 0, 0, 255);
@@ -596,9 +598,23 @@ void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
         case CR_SOLID_WHITE:
 	    CairoSetRGB(cr, 255, 255, 255, 255);
 	    break;
+	case CR_LIGHT_GRAY:
+	    CairoSetRGB(cr, 46, 52, 54);
+	    break;
 	default:
             break;
     }
+
+}
+
+void DiagramWindow::SetCairoToFLColor(cairo_t *cr, Fl_Color flc) {
+
+     if(cr == NULL) {
+          return;
+     }
+     uchar flR, flG, flB;
+     Fl::get_color(flc, flR, flG, flB);
+     CairoSetRGB(cr, flR, flG, flB, 255);
 
 }
 
@@ -1064,7 +1080,7 @@ void DiagramWindow::ComputeDiagramParams(
     angleBase = 1.5f * M_PI - 0.025f;
     centerX = (float) resolution / 2.0f;
     centerY = (float) resolution / 2.0f;
-    radius = centerX < centerY ? centerX - 15.f : centerY - 15.f;
+    radius = centerX < centerY ? centerX - 20.f : centerY - 20.f;
 }
 
 void DiagramWindow::AddStructure(const int index) {
@@ -1143,11 +1159,24 @@ void DiagramWindow::RebuildMenus() {
 	     m_drawBranchesIndicator->hide(); // make this option invisible
 	}
 
-        exportButton = new Fl_Button(horizCheckBoxPos, 25, 
-		       EXPORT_BUTTON_WIDTH, 25, "@filesaveas   Export PNG");
-        exportButton->type(FL_NORMAL_BUTTON);
-        exportButton->callback(exportToPNGButtonPressHandler, exportButton);
-        exportButton->labelcolor(GUI_BTEXT_COLOR);
+	if(exportButton == NULL || m_cbShowTicks == NULL) { 
+	     int offsetY = 25;
+             exportButton = new Fl_Button(horizCheckBoxPos, offsetY, 
+	                	          EXPORT_BUTTON_WIDTH, 25, "@filesaveas   Export PNG");
+             exportButton->type(FL_NORMAL_BUTTON);
+             exportButton->callback(exportToPNGButtonPressHandler, exportButton);
+             exportButton->labelcolor(GUI_BTEXT_COLOR);
+	     offsetY += 25;
+
+	     m_cbShowTicks = new Fl_Check_Button(horizCheckBoxPos + 4, offsetY, 
+			                         EXPORT_BUTTON_WIDTH, 25, 
+					         "Draw Tick Marks");
+	     m_cbShowTicks->callback(ShowTickMarksCallback);
+	     m_cbShowTicks->type(FL_TOGGLE_BUTTON);
+	     m_cbShowTicks->labelcolor(GUI_TEXT_COLOR);
+	     m_cbShowTicks->selection_color(GUI_BTEXT_COLOR); // checkmark color
+	     m_cbShowTicks->value(showPlotTickMarks);
+	}
 
         this->end();
     } else {
@@ -1396,37 +1425,109 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
 
 }
 
+double DiagramWindow::GetTextRotationAngle(double theta) { 
+     while(theta < 0) { 
+          theta += 2.0 * M_PI;
+     }
+     if(theta >= 0.0 && theta < M_PI_2) { // QI (in UTM): 
+          return theta - 2.0 * M_PI;
+     }
+     else if(theta >= M_PI_2 && theta < M_PI) { // QII: 
+          return theta - M_PI;
+     }
+     else if(theta >= M_PI && theta < 3.0 * M_PI_2) { // QIII: 
+          return theta - M_PI;
+     }
+     else { // QIV: 
+          return theta;
+     }
+}
+
+double DiagramWindow::TranslateAngleFromUserAxes(double theta) { 
+     // Cairo rotates according to the user coordinate axes from +x->+y, 
+     // where the user coordinate axes are oriented from TopLeft->BottomRight 
+     // in our setting. Therefore we can just flip the angle and get the 
+     // usual (expected) geometry out of our code-based formulas:
+     return theta + 3.0 * M_PI_2;
+}
+
+void DiagramWindow::TranslateUTMCoordinates(double *xc, double *yc, double *x0, double *y0) {
+     if(yc == NULL || y0 == NULL) { 
+          return;
+     }	  
+     *yc = (*y0) - (*yc);
+}
+
 void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
 
-     if(curWinContext == NULL || m_structures.size() == 0) {
+     if(curWinContext == NULL || m_structures.size() == 0 || !showPlotTickMarks) {
           return;
      }
      
      int firstStructIndex = m_structures[0];
-     size_t numTicks = RNAStructViz::GetInstance()->GetStructureManager()->
-	                             GetStructure(firstStructIndex)->GetLength();
-     int arcCenterX = IMAGE_WIDTH / 2, arcCenterY = IMAGE_HEIGHT / 2; 
-     int arcRadius = IMAGE_WIDTH / 2 - 15.f;
-     double tickInsetLength = 3;
+     size_t totalNumTicks = RNAStructViz::GetInstance()->GetStructureManager()->
+	                                  GetStructure(firstStructIndex)->GetLength();
+     size_t numTicks = MIN(totalNumTicks, DWINARC_MAX_TICKS) + 1;
+     int tickLabelMod = MAX((int) (numTicks * DWINARC_LABEL_PCT), 1), numTickLabels = 0;
+     double arcCenterX = IMAGE_WIDTH / 2, arcCenterY = IMAGE_HEIGHT / 2; 
+     double arcRadius = IMAGE_WIDTH / 2 - 20.f + 2;
+     double tickInsetLength = 1;
+     char numericLabelStr[MAX_BUFFER_SIZE + 1];
+     numericLabelStr[MAX_BUFFER_SIZE] = '\0';
 
      cairo_save(curWinContext);
      cairo_set_line_cap(curWinContext, CAIRO_LINE_CAP_ROUND);
-     cairo_set_line_width(curWinContext, 1);
+     cairo_set_line_width(curWinContext, 2);
      cairo_translate(curWinContext, arcCenterX, arcCenterY);
-     SetCairoColor(curWinContext, CR_BLACK);
-     for(int t = 1; t <= numTicks; t++) { 
+     cairo_select_font_face(curWinContext, "Courier New", CAIRO_FONT_SLANT_NORMAL, 
+		            CAIRO_FONT_WEIGHT_BOLD);
+     cairo_set_font_size(curWinContext, 8);
+     SetCairoColor(curWinContext, CR_LIGHT_GRAY);
+     
+     for(int t = 1; t < numTicks; t++) { 
           
-	  double nextStartX = (arcRadius - tickInsetLength) * cos(2 * t * M_PI / numTicks);
-	  double nextStartY = (arcRadius - tickInsetLength) * sin(2 * t * M_PI / numTicks);
-          double nextFinishX = arcRadius * cos(2 * t * M_PI / numTicks);
-          double nextFinishY = arcRadius * sin(2 * t * M_PI / numTicks);
-          cairo_move_to(curWinContext, nextStartX, nextStartY);
+	  double rotationAngle = (double) ((2.0 * t * M_PI) / numTicks);
+	  double rotationAngle2 = TranslateAngleFromUserAxes(rotationAngle);
+	  double nextStartX = (arcRadius - tickInsetLength) * cos(rotationAngle2);
+	  double nextStartY = (arcRadius - tickInsetLength) * sin(rotationAngle2);
+          TranslateUTMCoordinates(&nextStartX, &nextStartY, &arcCenterX, &arcCenterY);
+	  double nextFinishX = arcRadius * cos(rotationAngle2);
+          double nextFinishY = arcRadius * sin(rotationAngle2);
+          TranslateUTMCoordinates(&nextFinishX, &nextFinishY, &arcCenterX, &arcCenterY);
+	  cairo_move_to(curWinContext, nextStartX, nextStartY);
           cairo_line_to(curWinContext, nextFinishX, nextFinishY);
 	  cairo_stroke(curWinContext);
+	  if(t % tickLabelMod == 0) { // draw rotated numeric label:
+
+	       int numericLabel = (int) (totalNumTicks * ++numTickLabels * DWINARC_LABEL_PCT);
+               cairo_save(curWinContext);
+               snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d \0", numericLabel);
+	       fprintf(stderr, "#%d :: %d(%d:%d:%d)\n", numTickLabels, numericLabel, 
+	              numTickLabels, tickLabelMod, (int) (360 + rotationAngle * 180 / M_PI) % 360);
+	       //double textRotationAngle = GetTextRotationAngle(rotationAngle);
+	       //cairo_rotate(curWinContext, textRotationAngle);
+	       cairo_text_extents_t crNumericLabelDims;
+	       cairo_text_extents(curWinContext, numericLabelStr, &crNumericLabelDims);
+	       double textStartX = crNumericLabelDims.width  * cos(rotationAngle2);
+	       double textStartY = crNumericLabelDims.height * sin(rotationAngle2);
+	       TranslateUTMCoordinates(&textStartX, &textStartY, &arcCenterX, &arcCenterY);
+	       cairo_move_to(curWinContext, nextFinishX + textStartX, nextFinishY + textStartY);
+	       cairo_show_text(curWinContext, numericLabelStr);
+	       cairo_restore(curWinContext);
+
+	  }
 
      }
      cairo_restore(curWinContext);
 
+}
+
+void DiagramWindow::ShowTickMarksCallback(Fl_Widget *cbw, void *udata) { 
+     Fl_Check_Button *cbtn = (Fl_Check_Button *) cbw;
+     DiagramWindow *dwin = (DiagramWindow *) cbtn->parent();
+     dwin->showPlotTickMarks = cbtn->value() ? true : false;
+     dwin->m_redrawStructures = true;
+     dwin->redraw();
 }
 
 void DiagramWindow::WarnUserDrawingConflict() {
