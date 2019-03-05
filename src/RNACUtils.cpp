@@ -35,17 +35,18 @@ static inline const char* RemoveCharsFromStringByPredicate(char *str, PredicateF
 
 #define StringRemoveWhitespace(s)                 RemoveCharsFromStringByPredicate(s, isspace)
 
+#define StringsEqual(s1, s2)                      (!strcmp(s1, s2))
+#define PointersEqual(p1, p2)                     ((p1 == p2) || *p1 == *p2)
+
 template<typename TSpec>
 static inline bool IsEqualDefaultCPPCheck(TSpec x, TSpec y) { 
      return (x) == (y);
 }
 
-#define StringsEqual(s1, s2)                      (!strcmp(s1, s2))
-#define PointersEqual(p1, p2)                     ((p1 == p2) || *p1 == *p2)
-
 template<typename TSpec>
 static inline bool ElementInSet(TSpec universe[], TSpec element, 
-		                void *compareFunc = IsEqualDefaultCPPCheck) {
+		                bool (*compareFunc)(TSpec, TSpec) = 
+				IsEqualDefaultCPPCheck) {
      for(int e = 0; e < GetArrayLength(universe); e++) {
           if(compareFunc(universe[e], element)) {
                return true;
