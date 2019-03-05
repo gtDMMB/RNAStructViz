@@ -14,7 +14,7 @@ done
 if [[ "$(uname -s)" == "Linux" && "$1" == "--libs" ]]; then
 	LINUX_EXTRA_DIR=$(echo $(ls -d /usr/lib/*-linux-gnu) | tr " " "\n" | head -n 1);
 	if [[ "${LINUX_EXTRA_DIR}" != "" ]]; then
-		PKGOUT+=" -L${LINUX_EXTRA_DIR}";
+		PKGOUT+=" -L${LINUX_EXTRA_DIR} -LX11";
 	fi
 fi
 

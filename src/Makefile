@@ -1,7 +1,29 @@
+#### Makefile 
+#### Author: Maxie D. Schmidt (maxieds@gmail.com)
+#### Updated: 2019.03.05 (V2)
+
 CXX=g++
+CXXFLAGS= -g -rdynamic -Wall -Wextra -pedantic -O1
+
 LD=g++
+LDFLAGS=-Wall -Wextra -rdynamic -g1 -lm
 
 .DEFAULT: default
+
+# Optional compile with clang compiler:
+BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
+ifneq "$(BUILD_WITH_COMPILER)" ""
+	# add necessary CXX/LDFLAGS for clang++:
+	CLANG_EXTRA_CXXFLAGS=  -std=c++17 -stdlib=libc++ \
+		-I$(shell ls -d /usr/include | tail -n1)
+	CLANG_EXTRA_LDFLAGS= -std=c++17 -stdlib=libc++ -lm \
+		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/7* | tail -n1) \
+		-lgcc_s -lpthread -lrt -lsupc++
+	CXX=$(BUILD_WITH_COMPILER)
+	CXXFLAGS+=$(CLANG_EXTRA_CXXFLAGS)
+	LD=$(BUILD_WITH_COMPILER)
+	LDFLAGS+=$(CLANG_EXTRA_LDFLAGS)
+endif
 
 # OSX-specific locations and utility names:
 TARGET_PLATFORM=$(shell uname -s)
@@ -32,17 +54,15 @@ endif
 BINARY_OUTPUT=RNAStructViz
 OBJEXT=o
 
-CXXFLAGS= -g -rdynamic -Wall -Wextra #-O2
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -funsigned-char -Wno-c++11-narrowing 
-CXXFLAGS_FULL=$(CXXFLAGS) $(CXXFLAGS_EXTRA)
+CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
-LDFLAGS=-Wall -Wextra -rdynamic -g1 -lm
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
-LDFLAGS_FULL=$(LDFLAGS) $(LDFLAGS_EXTRA)
+LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)\
 	DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
