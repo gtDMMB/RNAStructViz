@@ -7,7 +7,9 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_File_Chooser.H>
 
+#include "RNAStructViz.h"
 #include "RNAStructure.h"
+#include "StructureManager.h"
 #include "BranchTypeIdentification.h"
 #include "ConfigOptions.h"
 #include "ThemesConfig.h"
@@ -517,7 +519,7 @@ void RNAStructure::DisplayFileContents()
         curYOffset += 300 + windowSpacing;
 
 	int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
-	const char *notationStr = "Note: An asterisk (*) to the left of a sequence\nentry in the CT viewer above denotes that the\nentry is the first in its pair.";
+	const char *notationStr = "Note: An asterisk (*) to the left of a sequence\nentry in the CT viewer above denotes that the\nbase pair is the first in its pair.";
         m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 			                   pairNoteSubwinHeight, notationStr);
         m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -529,7 +531,9 @@ void RNAStructure::DisplayFileContents()
 
     }
     m_contentWindow->show();
+    Fl::lock();
     m_currentOpenCTViewer = this;
+    Fl::unlock();
 
 }
 
@@ -662,9 +666,6 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
      if(clusterSize > 0) { 
           numSpaces = MAX(0, charSeqSize / clusterSize - 1);
      }
-     //if(charSeqSize + numSpaces + 1 > maxChars) { 
-     //     return 0;
-     //}
      char *strBufActivePtr = strBuf, *destPos = NULL;
      size_t charsCopied = 0, csize = 0;
      for(int strpos = 0; strpos < MIN(charSeqSize, maxChars); strpos += clusterSize) { 
@@ -818,6 +819,17 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
 
 bool RNAStructure::HaveOpenCTFileViewerWindow() {
      return m_currentOpenCTViewer != NULL;
+}
+
+bool RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex) {
+     StructureManager *rnaStructManager = RNAStructViz::GetInstance()->GetStructureManager();
+     RNAStructure *rnaStructure = !rnaStructManager ? NULL : 
+	                          rnaStructManager->GetStructure(structureFolderIndex);
+     if((rnaStructManager != NULL) && (rnaStructure != NULL)) { 
+          rnaStructManager->DisplayFileContents(structureFolderIndex);
+	  return true;
+     }
+     return false;
 }
 
 bool RNAStructure::ScrollOpenCTFileViewerWindow(int pairIndex) {

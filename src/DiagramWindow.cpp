@@ -125,19 +125,20 @@ DiagramWindow::~DiagramWindow() {
     }
 }
 
-void DiagramWindow::SetFolderIndex(int index) {
-    folderIndex = index;
-    struct Folder *dwinFolder = RNAStructViz::GetInstance()->GetStructureManager()->
-                                GetFolderAt(index);
+void DiagramWindow::SetFolderIndex(int folderIndex) {
+    this->structureFolderIndex = folderIndex;
+    struct Folder *dwinFolder = RNAStructViz::GetInstance()->
+	                        GetStructureManager()->
+                                GetFolderAt(folderIndex);
     const char *structureNameFull = dwinFolder->folderName;
     int containedStructIndex = (dwinFolder->structCount > 0 && dwinFolder->folderStructs) ? 0 : -1;
     int basePairCount = containedStructIndex ? 0 : 
 	                RNAStructViz::GetInstance()->GetStructureManager()->
 			GetStructure(containedStructIndex)->GetLength();
+    this->sequenceLength = basePairCount;
     sprintf(title, "Comparison of Arc Diagrams: %-.48s  -- % 5d Base Pairs", 
 	    structureNameFull, basePairCount);
     label(title);
-    sequenceLength = basePairCount;
 }
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
@@ -1313,7 +1314,7 @@ int DiagramWindow::handle(int flEvent) {
 			      	      "CT file contents!\n");
 			      return 1;
 			 }
-			 else if(!RNAStructure::HaveOpenCTFileViewerWindow()) {
+			 else if(!RNAStructure::ActionOpenCTFileViewerWindow(structureFolderIndex)) {
 			      fprintf(stderr, 
 				      "Open an active CT file viewer window before trying to scroll to "
 			              "CT file contents for the active structure!\n");
@@ -1371,13 +1372,14 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
      int horizLineConsts[2] = { zy0 + zh, zy0 };
      int vertLineConsts[2] = { zx0, zx0 + zw };
      int x0 = bddCircCenterX, y0 = bddCircCenterY, term;
+     int radiusR = Square(bddCircRadius);
      vector<Point_t> matchingArcPoints;
      Point_t pointStruct;
      fprintf(stderr, "[h,w]=[%d,%d]; %d, %d, %d, %d\n", zh, zw, zx0, zy0, zx1, zy1);
      for(int idx = 0; idx < 2; idx++) { 
 
 	  int hlineC = horizLineConsts[idx];
-          int hlineSqrtTerm = (int) sqrt(abs(hlineC - Square(hlineC - y0)));
+          int hlineSqrtTerm = (int) sqrt(abs(radiusR - Square(hlineC - y0)));
 	  fprintf(stderr, "%d <= %d <= %d\n", zx0, x0 - hlineSqrtTerm, zx0+zw);
 	  term = x0 - hlineSqrtTerm;
 	  if(term >= 0 && term >= zx0 && term <= zx0 + zw) { 
@@ -1393,7 +1395,7 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
 	       matchingArcPoints.push_back(pointStruct);
 	  }
 	  int vlineD = vertLineConsts[idx];
-	  int vlineSqrtTerm = (int) sqrt(abs(vlineD - Square(vlineD - x0)));
+	  int vlineSqrtTerm = (int) sqrt(abs(radiusR - Square(vlineD - x0)));
           fprintf(stderr, "%d <= %d <= %d\n", zy0, y0 - vlineSqrtTerm, zy0+zh);
 	  term = y0 - vlineSqrtTerm;
 	  if(term >= 0 && term >= zy0 && term <= zy0 + zh) { 
@@ -1414,16 +1416,20 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
      if(matchingArcPoints.size() == 0) {
           return false;
      }
+     for(int i = 0; i < matchingArcPoints.size(); i++) {
+          fprintf(stderr, "   => Matching Arc Point #%d: (x,y)=(%d,%d)\n", 
+		  i + 1, matchingArcPoints[i].x, matchingArcPoints[i].y);
+     }
 
      vector<int> matchingBasePairs;
      for(int vidx = 0; vidx < matchingArcPoints.size(); vidx++) { 
           double pointTheta = atan2(matchingArcPoints[vidx].y, matchingArcPoints[vidx].x);
 	  double pairIdxPct = abs(pointTheta / 2.0 / M_PI);
-	  int closestIndex = (int) pairIdxPct * sequenceLength;
+	  int closestIndex = (int) (pairIdxPct * sequenceLength);
 	  matchingBasePairs.push_back(closestIndex);
      }
-     zoomBufferMinArcIndex = *min_element(matchingBasePairs.begin(), matchingBasePairs.end());
-     zoomBufferMaxArcIndex = *max_element(matchingBasePairs.begin(), matchingBasePairs.end());
+     zoomBufferMinArcIndex = *(min_element(matchingBasePairs.begin(), matchingBasePairs.end()));
+     zoomBufferMaxArcIndex = *(max_element(matchingBasePairs.begin(), matchingBasePairs.end()));
 
      fprintf(stderr, "MIN, MAX = %d, %d\n", zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
      return (zoomBufferMinArcIndex > 0) && (zoomBufferMaxArcIndex > 0);

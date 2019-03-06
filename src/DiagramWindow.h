@@ -215,7 +215,7 @@ private:
     
     int numPairs[7];
     int folderIndex;
-    int sequenceLength;
+    int structureFolderIndex, sequenceLength;
     int pixelWidth;
     bool userConflictAlerted;
     
