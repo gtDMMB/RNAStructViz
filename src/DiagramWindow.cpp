@@ -135,7 +135,7 @@ void DiagramWindow::SetFolderIndex(int folderIndex) {
 			      GetStructure(folderIndex);
     int basePairCount = (rnaStruct != NULL) ? rnaStruct->GetLength() : 0;
     this->sequenceLength = basePairCount;
-    sprintf(title, "Comparison of Arc Diagrams: %-.48s  -- % 5d Base Pairs", 
+    sprintf(title, "Comparison of Arc Diagrams: %-.48s  -- % 5d Bases", 
 	    structureNameFull, basePairCount);
     label(title);
 }
@@ -1260,7 +1260,7 @@ void DiagramWindow::RebuildMenus() {
              
 	     m_cbDrawBases = new Fl_Check_Button(horizCheckBoxPos + 4, offsetY, 
 			                         EXPORT_BUTTON_WIDTH, 25, 
-					         "Draw Base Pairs");
+					         "Draw Bases");
 	     m_cbDrawBases->callback(DrawBasesCallback);
 	     m_cbDrawBases->type(FL_TOGGLE_BUTTON);
 	     m_cbDrawBases->labelcolor(GUI_TEXT_COLOR);
@@ -1662,7 +1662,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      int tickLabelMod = MAX((int) (numTicks - 1) * DWINARC_LABEL_PCT, 1), numTickLabels = 0;
      double arcOriginX = IMAGE_WIDTH / 2, arcOriginY = IMAGE_HEIGHT / 2; 
      double arcRadius = IMAGE_WIDTH / 2 - 25.f + 1;
-     double tickInsetLength = 1;
+     double tickInsetLength = 2;
      char numericLabelStr[MAX_BUFFER_SIZE + 1];
      numericLabelStr[MAX_BUFFER_SIZE] = '\0';
 
@@ -1702,14 +1702,14 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
 	       cairo_text_extents(curWinContext, numericLabelStr, &textDims);
 	       if(rotationAngle2 >= 0 && rotationAngle2 < M_PI_2) { 
 		    nextFinishX += textDims.width / 2;
-		    nextFinishY += textDims.height;
+		    nextFinishY -= 0.5 * textDims.height;
 	       }
 	       else if(rotationAngle2 >= M_PI_2 && rotationAngle2 < M_PI) { 
 		    nextFinishX -= textDims.width;
 		    nextFinishY -= textDims.height;
 	       }
 	       else if(rotationAngle2 >= M_PI && rotationAngle2 < 3.0 * M_PI_2) {
-		    nextFinishX -= textDims.width;
+		    nextFinishX -= 1.5 * textDims.width;
 		    nextFinishY += textDims.height;
 	       }
 	       else {

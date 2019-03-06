@@ -50,8 +50,8 @@ using std::max_element;
 #define DWIN_REDRAW_REFRESH          (1.75)
 #define DWIN_DRAG_DX                 (3)
 
-#define DWINARC_MAX_TICKS            (100)
-#define DWINARC_LABEL_PCT            (0.15)
+#define DWINARC_MAX_TICKS            (12)
+#define DWINARC_LABEL_PCT            (0.0833)
 
 typedef enum {
      CR_BLACK       = 0, 
