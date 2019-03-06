@@ -98,7 +98,8 @@ public:
     }
     
     void SetFolderIndex(int index);
-    
+    int GetFolderIndex() const;
+
 protected:
 
     static void checkBoxChangedStateCallback(Fl_Widget*, void *v);

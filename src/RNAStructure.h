@@ -213,6 +213,9 @@ class RNAStructure
 	Fl_Box *m_ctSubwindowBox, *m_ctViewerNotationBox;
 	Fl_Button *m_exportFASTABtn, *m_exportDBBtn;
 
+	void DeleteContentWindow();
+	static void HideContentWindowCallback(Fl_Widget *cwin, void *udata);
+
         char *m_ctDisplayString, *m_seqDisplayString;
         char *m_ctDisplayFormatString, *m_seqDisplayFormatString;
 	char *charSeq, *dotFormatCharSeq;

@@ -269,9 +269,9 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 	     continue;
 	}
 	char nextFilePath[MAX_BUFFER_SIZE];
-	snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s\0", nextWorkingDir, 
-	         nextFilename);
-        fprintf(stderr, "[% 4d] %s\n", strlen(nextFilePath), nextFilePath);
+	snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir, 
+	         nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/", 
+		 nextFilename);
 	RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
     }
     Delete(ms_instance->m_fileChooser);
@@ -287,7 +287,6 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
      cfgWindow->show();
      while(!cfgWindow->isDone() && cfgWindow->visible()) 
           Fl::wait();
-     //RethemeMainWindow();
      delete cfgWindow;
 
 }

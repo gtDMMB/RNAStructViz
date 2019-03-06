@@ -131,14 +131,17 @@ void DiagramWindow::SetFolderIndex(int folderIndex) {
 	                        GetStructureManager()->
                                 GetFolderAt(folderIndex);
     const char *structureNameFull = dwinFolder->folderName;
-    int containedStructIndex = (dwinFolder->structCount > 0 && dwinFolder->folderStructs) ? 0 : -1;
-    int basePairCount = containedStructIndex ? 0 : 
-	                RNAStructViz::GetInstance()->GetStructureManager()->
-			GetStructure(containedStructIndex)->GetLength();
+    RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
+			      GetStructure(folderIndex);
+    int basePairCount = (rnaStruct != NULL) ? rnaStruct->GetLength() : 0;
     this->sequenceLength = basePairCount;
     sprintf(title, "Comparison of Arc Diagrams: %-.48s  -- % 5d Base Pairs", 
 	    structureNameFull, basePairCount);
     label(title);
+}
+
+int DiagramWindow::GetFolderIndex() const {
+     return structureFolderIndex;
 }
 
 void DiagramWindow::ResetWindow(bool resetMenus = true) {
@@ -162,6 +165,8 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
     zoomBufferContainsArc = false;
     zx0 = zx1 = zy0 = zy1 = zw = zh = 0;
     zoomBufferMinArcIndex = zoomBufferMaxArcIndex = 0;
+    sequenceLength = 0; 
+    structureFolderIndex = -1;
     redraw();
 
 }
@@ -1341,9 +1346,12 @@ int DiagramWindow::handle(int flEvent) {
 
      switch(flEvent) { 
 	  case FL_SHOW:
+	       make_current();
 	       m_redrawStructures = true;
                redraw();
 	       Fl::flush();
+	       return 1;
+	  case FL_HIDE:
 	       return 1;
 	  case FL_PUSH: // mouse down
                if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 

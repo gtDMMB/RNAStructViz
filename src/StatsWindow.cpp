@@ -771,9 +771,12 @@ void StatsWindow::ResetWindow()
 void StatsWindow::SetFolderIndex(int index)
 {
     folderIndex = index;
-    
     sprintf(title, "Statistics: %-.48s", structureManager->GetFolderAt(index)->folderName);
     label(title);
+}
+
+int StatsWindow::GetFolderIndex() const {
+     return folderIndex;
 }
 
 void StatsWindow::SetStructures(const std::vector<int>& structures)

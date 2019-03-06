@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
    
     Fl::option(Fl::OPTION_VISIBLE_FOCUS, false);
     Fl::option(Fl::OPTION_SHOW_TOOLTIPS, true);
-    Fl::option(Fl::OPTION_FNFC_USES_GTK, true);
+    Fl::option(Fl::OPTION_FNFC_USES_GTK, false);
     
     Fl_File_Icon::load_system_icons();
     Fl::scheme((char *) FLTK_THEME);

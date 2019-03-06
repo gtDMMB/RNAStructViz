@@ -65,11 +65,11 @@ void RNAStructViz::AddDiagramWindow(int index)
         }
     }
     
-    DiagramWindow* diagram = 0;
+    DiagramWindow* diagram = NULL;
     for (unsigned int i = 0; i < m_diagramWindows.size(); ++i)
     {
         diagram = m_diagramWindows[i];
-        if (!diagram->visible())
+        if ((diagram != NULL) && (diagram->GetFolderIndex() == index) && !diagram->visible())
         {
             diagram->SetStructures(structures);
             diagram->SetFolderIndex(index);
@@ -85,11 +85,11 @@ void RNAStructViz::AddDiagramWindow(int index)
     diagram = new DiagramWindow(3 * DiagramWindow::ms_menu_width, 
 		                IMAGE_HEIGHT + GLWIN_TRANSLATEY + 35, 
 				title, structures);
-    free(title); 
-    
     diagram->SetFolderIndex(index);
+    diagram->setAsCurrentDiagramWindow();
     m_diagramWindows.push_back(diagram);
     diagram->show();
+    free(title); 
 }
 
 void RNAStructViz::AddStatsWindow(int index)
@@ -119,7 +119,8 @@ void RNAStructViz::AddStatsWindow(int index)
     for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
     {
         stats = m_statsWindows[i];
-        if (!stats->visible())
+        if ((stats != NULL) && (stats->GetFolderIndex() == index) && 
+	    !stats->visible())
         {
             stats->SetStructures(structures);
             stats->SetFolderIndex(index);
@@ -143,6 +144,8 @@ void RNAStructViz::AddStatsWindow(int index)
 void RNAStructViz::TestFolders()
 {
     m_structureManager->PrintFolders();
+    fprintf(stderr, "Number of Diagram/Stats Windows: %d/%d\n\n", 
+            m_diagramWindows.size(), m_statsWindows.size());
 }
 
 

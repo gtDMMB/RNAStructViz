@@ -77,21 +77,7 @@ RNAStructure::~RNAStructure()
          branchType = NULL;
     }
     #endif
-    if(m_contentWindow) { 
-	Delete(m_contentWindow); m_contentWindow = NULL;
-    	Delete(m_ctTextDisplay); m_ctTextDisplay = NULL;
-	Delete(m_seqTextDisplay); m_seqTextDisplay = NULL;
-	Delete(m_ctTextBuffer); m_ctTextBuffer = NULL;
-	Delete(m_ctStyleBuffer); m_ctStyleBuffer = NULL;
-	Delete(m_seqTextDisplay); m_seqTextDisplay = NULL;
-        Delete(m_seqStyleBuffer); m_seqStyleBuffer = NULL;
-	Delete(m_exportExtFilesBox); m_exportExtFilesBox = NULL;
-	Delete(m_seqSubwindowBox); m_seqSubwindowBox = NULL;
-	Delete(m_ctSubwindowBox); m_ctSubwindowBox = NULL;
-	Delete(m_ctViewerNotationBox); m_ctViewerNotationBox = NULL;
-	Delete(m_exportFASTABtn); m_exportFASTABtn = NULL;
-	Delete(m_exportDBBtn); m_exportDBBtn = NULL;
-    }
+    DeleteContentWindow();
     Delete(m_fileCommentLine); m_fileCommentLine = NULL;
     Delete(m_suggestedFolderName); m_suggestedFolderName = NULL;
 }
@@ -457,34 +443,9 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
         GenerateString();
     }
 
-    if(m_contentWindow) {
-        m_contentWindow->hide();
-	if(this == m_currentOpenCTViewer) { 
-	     
-	     #if !defined(__LOCAL_NOUSE_THREADS)
-	     Fl::lock();
-	     m_currentOpenCTViewer = NULL;
-	     Fl::unlock();
-             #else
-	     m_currentOpenCTViewer = NULL;
-             #endif
-	}
-	Delete(m_contentWindow);
-    	Delete(m_ctTextDisplay);
-	Delete(m_ctTextBuffer);
-	Delete(m_seqTextDisplay);
-	Delete(m_ctTextBuffer);
-        Delete(m_seqStyleBuffer);
-	Delete(m_exportExtFilesBox);
-	Delete(m_seqSubwindowBox);
-	Delete(m_ctSubwindowBox);
-	Delete(m_exportFASTABtn);
-	Delete(m_exportDBBtn);
-    }
-
     if (!m_contentWindow)
     {
-        int subwinWidth = 425, subwinTotalHeight = 675, 
+        int subwinWidth = 423, subwinTotalHeight = 675, 
 	    subwinResizeSpacing = 24;
 	int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
 	int labelHeight = 25, btnHeight = 25, btnWidth = 145;
@@ -501,7 +462,9 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 			               subwinTotalHeight - subwinResizeSpacing);
 	m_contentWindow->resizable(resizeBox);
 	m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
-        subwinWidth -= subwinResizeSpacing;
+        m_contentWindow->user_data((void *) this);
+	m_contentWindow->callback(HideContentWindowCallback);
+	subwinWidth -= subwinResizeSpacing;
 
 	m_exportExtFilesBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 				         labelHeight, 
@@ -585,7 +548,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
         curYOffset += 300 + windowSpacing;
 
 	int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
-	const char *notationStr = "@line    Note: An asterisk (*) to the left of a sequence\n   entry in the CT viewer above denotes that the\n   base pair is the first in its pair.     @line";
+	const char *notationStr = "@line  Note: An asterisk (*) to the left of a sequence\n entry in the CT viewer above denotes that the\n base pair is the first in its pair.     @line";
         m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 			                   pairNoteSubwinHeight, notationStr);
         m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -597,6 +560,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 
     }
     m_contentWindow->show();
+    m_contentWindow->make_current();
     #if !defined(__LOCAL_NOUSE_THREADS)
     Fl::lock();
     m_currentOpenCTViewer = this;
@@ -828,6 +792,37 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
           fl_alert("Unable to write output DOT file \"%s\" to disk!", 
 	           exportPath);
      }
+}
+
+void RNAStructure::DeleteContentWindow() {
+    if(m_contentWindow) {
+        m_contentWindow->hide();
+	if(this == m_currentOpenCTViewer) { 
+	     #if !defined(__LOCAL_NOUSE_THREADS)
+	     Fl::lock();
+	     m_currentOpenCTViewer = NULL;
+	     Fl::unlock();
+             #else
+	     m_currentOpenCTViewer = NULL;
+             #endif
+	}
+	Delete(m_contentWindow);
+    	Delete(m_ctTextDisplay);
+	Delete(m_ctTextBuffer);
+	Delete(m_seqTextDisplay);
+	Delete(m_ctTextBuffer);
+        Delete(m_seqStyleBuffer);
+	Delete(m_exportExtFilesBox);
+	Delete(m_seqSubwindowBox);
+	Delete(m_ctSubwindowBox);
+	Delete(m_exportFASTABtn);
+	Delete(m_exportDBBtn);
+    }
+}
+
+void RNAStructure::HideContentWindowCallback(Fl_Widget *cwin, void *udata) {
+     RNAStructure *rnaStruct = (RNAStructure *) cwin->user_data();
+     rnaStruct->DeleteContentWindow();
 }
 
 char RNAStructure::Util::GetBaseStringFormat(const char *baseStr) {

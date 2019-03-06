@@ -241,6 +241,7 @@ void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)
             break;
     }
     RNAStructViz::GetInstance()->AddDiagramWindow(index);
+    //RNAStructViz::GetInstance()->TestFolders();
     
 }
 

@@ -70,7 +70,8 @@ public:
     }
     
     void SetFolderIndex(int index);
-    
+    int GetFolderIndex() const;
+
     /* Populates the reference structure dropdown list with options from the 
     current structures folder */
     void BuildRefMenu();
