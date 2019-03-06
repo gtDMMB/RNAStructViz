@@ -52,7 +52,8 @@ class StructureManager
         /*
 	    Popup (or bring to front) a window displaying the file contents.
         */
-        void DisplayFileContents(const int index);
+        void DisplayFileContents(const int index, 
+			         const char *displaySuffix = NULL);
     
         /*
          Update Diagram Window, Stats Window, and Folder Window for a folder.

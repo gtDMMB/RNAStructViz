@@ -26,6 +26,7 @@ using std::max_element;
 
 #include "ConfigOptions.h"
 #include "RNAStructure.h"
+
 #include "BranchTypeIdentification.h"
 
 #define IMAGE_DIM                    (485)

@@ -149,7 +149,7 @@ void InputWindow::CloseCallback(Fl_Widget* widget, void* userData)
 
 std::string InputWindow::ExtractStructureNameFromCTName(const char *ctPath) {
     char suggestedShortName[MAX_BUFFER_SIZE];
-    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "Structure #% 2d\0", ++InputWindow::distinctStructureCount);
+    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d\0", ++InputWindow::distinctStructureCount);
     return std::string(suggestedShortName);
 }
 

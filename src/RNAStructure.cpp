@@ -10,11 +10,14 @@
 #include "RNAStructViz.h"
 #include "RNAStructure.h"
 #include "StructureManager.h"
-#include "BranchTypeIdentification.h"
 #include "ConfigOptions.h"
 #include "ThemesConfig.h"
 
-const unsigned int RNAStructure::UNPAIRED = ~0x0;
+#if PERFORM_BRANCH_TYPE_ID
+#include "BranchTypeIdentification.h"
+#endif
+
+const RNAStructure::BasePair RNAStructure::UNPAIRED = ~0x0;
 RNAStructure *RNAStructure::m_currentOpenCTViewer = NULL;
 
 RNAStructure::RNAStructure()
@@ -30,7 +33,9 @@ RNAStructure::RNAStructure()
       m_ctSubwindowBox(NULL), m_ctViewerNotationBox(NULL), 
       m_exportFASTABtn(NULL), m_exportDBBtn(NULL) 	
 {
+     #if PERFORM_BRANCH_TYPE_ID
      branchType = NULL; 
+     #endif
      m_contentWindow = NULL;
 }
 
@@ -66,10 +71,12 @@ RNAStructure::~RNAStructure()
     if(m_pathname_noext != NULL) {
         free(m_pathname_noext);
     }
+    #if PERFORM_BRANCH_TYPE_ID
     if(branchType != NULL) {
          delete branchType;
          branchType = NULL;
     }
+    #endif
     if(m_contentWindow) { 
 	Delete(m_contentWindow); m_contentWindow = NULL;
     	Delete(m_ctTextDisplay); m_ctTextDisplay = NULL;
@@ -98,6 +105,7 @@ RNAStructure::BaseData* RNAStructure::GetBaseAt(unsigned int position)
     return NULL;
 }
 
+#if PERFORM_BRAMCH_TYPE_ID
 RNABranchType_t* RNAStructure::GetBranchTypeAt(unsigned int position)
 {
     if (position < m_sequenceLength)
@@ -106,6 +114,7 @@ RNABranchType_t* RNAStructure::GetBranchTypeAt(unsigned int position)
     }
     return NULL;
 }
+#endif
 
 RNAStructure* RNAStructure::CreateFromFile(const char* filename, 
 	const bool isBPSEQ)
@@ -129,7 +138,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
     std::vector<char> tempSeq;
     result->m_sequenceLength = 0;
     unsigned int maxSize = 1024;
-    result->m_sequence = (BaseData*)malloc(sizeof(BaseData) * maxSize);
+    result->m_sequence = (BaseData*) malloc(sizeof(BaseData) * maxSize);
     int numElements = 0;
     while (true)
     {
@@ -288,7 +297,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
 		result->m_sequenceLength++;
 		if (result->m_sequenceLength == maxSize)
 		{
-		    maxSize += 1024;
+		    maxSize += 100;
 		    result->m_sequence = (BaseData*)realloc(result->m_sequence, 
                                                     sizeof(BaseData) * maxSize);
 		}
@@ -305,12 +314,13 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
 		return 0;
     }
 
-    result->m_sequence = (BaseData*)realloc(result->m_sequence, 
-                                            sizeof(BaseData)*result->m_sequenceLength);
-    if(PERFORM_BRANCH_TYPE_ID) {
-        result->branchType = (RNABranchType_t*) malloc( 
-		sizeof(RNABranchType_t) * result->m_sequenceLength);
-    }
+    result->m_sequence = (BaseData*) realloc(result->m_sequence, 
+                                             sizeof(BaseData) * result->m_sequenceLength);
+    
+    #if PERFORM_BRANCH_TYPE_ID
+    result->branchType = (RNABranchType_t*) malloc( 
+                         sizeof(RNABranchType_t) * result->m_sequenceLength);
+    #endif
     result->m_pathname = strdup(filename);
     result->charSeqSize = tempSeq.size();
     result->charSeq = (char *) malloc(sizeof(char) * result->charSeqSize);
@@ -330,10 +340,9 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
 	     result->dotFormatCharSeq[i] = ')';
 	}
     }
-    if(PERFORM_BRANCH_TYPE_ID) {
-        RNABranchType_t::PerformBranchClassification(result, 
-			 result->m_sequenceLength);
-    }
+    #if PERFORM_BRANCH_TYPE_ID    
+    RNABranchType_t::PerformBranchClassification(result, result->m_sequenceLength);
+    #endif
 
     return result;
 }
@@ -356,8 +365,7 @@ const char* RNAStructure::GetFilenameNoExtension() {
      char *fullFilename = (char *) GetFilename();
      char *dotPosPtr = strrchr(fullFilename, '.');
      if(dotPosPtr == NULL) {
-          m_pathname_noext = fullFilename;
-          return m_pathname_noext;
+          return fullFilename;
      }
      size_t basePathLen = dotPosPtr - fullFilename;
      m_pathname_noext = (char *) malloc((basePathLen + 1) * sizeof(char));
@@ -387,48 +395,52 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
      return m_suggestedFolderName;
 }
 
-void RNAStructure::DisplayFileContents()
+void RNAStructure::DisplayFileContents(const char *titleSuffix)
 {
-    if (m_ctDisplayString && m_ctDisplayFormatString && 
-        m_seqDisplayString && m_seqDisplayFormatString) {
-        free(m_ctDisplayString); m_ctDisplayString = NULL;
-	free(m_ctDisplayFormatString); m_ctDisplayFormatString = NULL;
-        free(m_seqDisplayString); m_seqDisplayString = NULL;
-	free(m_seqDisplayFormatString); m_seqDisplayFormatString = NULL;
+    if(!m_ctDisplayString || !m_ctDisplayFormatString || 
+       !m_seqDisplayString || !m_seqDisplayFormatString) { 
+        Delete(m_ctDisplayString);
+	Delete(m_ctDisplayFormatString);
+	Delete(m_seqDisplayString);
+	Delete(m_seqDisplayFormatString);
+        GenerateString();
     }
-    GenerateString();
-    
+
     if(m_contentWindow) {
-        if(this == m_currentOpenCTViewer) { 
+        m_contentWindow->hide();
+	if(this == m_currentOpenCTViewer) { 
 	     Fl::lock();
 	     m_currentOpenCTViewer = NULL;
 	     Fl::unlock();
 	}
-	delete m_contentWindow; m_contentWindow = NULL;
-    	delete m_ctTextDisplay; m_ctTextDisplay = NULL;
-	delete m_seqTextDisplay; m_seqTextDisplay = NULL;
-	delete m_ctTextBuffer; m_ctTextBuffer = NULL;
-	delete m_ctStyleBuffer; m_ctStyleBuffer = NULL;
-	delete m_seqTextDisplay; m_seqTextDisplay = NULL;
-        delete m_seqStyleBuffer; m_seqStyleBuffer = NULL;
-	delete m_exportExtFilesBox; m_exportExtFilesBox = NULL;
-	delete m_seqSubwindowBox; m_seqSubwindowBox = NULL;
-	delete m_ctSubwindowBox; m_ctSubwindowBox = NULL;
-	delete m_exportFASTABtn; m_exportFASTABtn = NULL;
-	delete m_exportDBBtn; m_exportDBBtn = NULL;
+	Delete(m_contentWindow);
+    	Delete(m_ctTextDisplay);
+	Delete(m_ctTextBuffer);
+	Delete(m_seqTextDisplay);
+	Delete(m_ctTextBuffer);
+        Delete(m_seqStyleBuffer);
+	Delete(m_exportExtFilesBox);
+	Delete(m_seqSubwindowBox);
+	Delete(m_ctSubwindowBox);
+	Delete(m_exportFASTABtn);
+	Delete(m_exportDBBtn);
     }
 
     if (!m_contentWindow)
     {
-        int subwinWidth = 325, subwinTotalHeight = 675, 
+        int subwinWidth = 425, subwinTotalHeight = 675, 
 	    subwinResizeSpacing = 24;
 	int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
 	int labelHeight = 25, btnHeight = 25, btnWidth = 145;
 	Fl_Boxtype labelBoxType = FL_ROUND_DOWN_BOX;
 	Fl_Boxtype noteBoxType = FL_DOWN_BOX;
 
+	char contentWinTitleString[MAX_BUFFER_SIZE];
+	snprintf(contentWinTitleString, MAX_BUFFER_SIZE, "%s%s%s\0", 
+	         GetFilenameNoExtension(), titleSuffix == NULL ? "" : " : ", 
+		 titleSuffix == NULL ? "" : titleSuffix);
 	m_contentWindow = new Fl_Double_Window(subwinWidth, 
-			      subwinTotalHeight, GetFilename());
+			      subwinTotalHeight, contentWinTitleString);
 	Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
 			               subwinTotalHeight - subwinResizeSpacing);
 	m_contentWindow->resizable(resizeBox);
@@ -564,8 +576,8 @@ void RNAStructure::GenerateString()
     
     for (int i = 0; i < (int)m_sequenceLength; ++i)
     {
-		const char* baseStr = NULL;
-		switch (m_sequence[i].m_base)
+		const char* baseStr = "X";
+		switch ((int) m_sequence[i].m_base)
 		{
 		    case A: baseStr = "A";
 			    break;
@@ -586,8 +598,8 @@ void RNAStructure::GenerateString()
 		}
 		else
 		{
-		    int pairID = (int)m_sequence[i].m_pair;
-		    const char* pairStr = 0;
+		    RNAStructure::BasePair pairID = m_sequence[i].m_pair;
+		    const char* pairStr = "X";
 		    switch (m_sequence[pairID].m_base)
 		    {
 			    case A: 
@@ -761,13 +773,13 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
 }
 
 char RNAStructure::Util::GetBaseStringFormat(const char *baseStr) {
-     if(!strcasecmp(baseStr, "A")) 
+     if(baseStr && !strcasecmp(baseStr, "A")) 
           return TBUFSTYLE_SEQPAIR_A;
-     else if(!strcasecmp(baseStr, "C"))
+     else if(baseStr && !strcasecmp(baseStr, "C"))
 	  return TBUFSTYLE_SEQPAIR_C;
-     else if(!strcasecmp(baseStr, "G"))
+     else if(baseStr && !strcasecmp(baseStr, "G"))
 	  return TBUFSTYLE_SEQPAIR_G;
-     else if(!strcasecmp(baseStr, "U"))
+     else if(baseStr && !strcasecmp(baseStr, "U"))
 	  return TBUFSTYLE_SEQPAIR_U;
      else 
 	  return TBUFSTYLE_DEFAULT;
@@ -821,12 +833,20 @@ bool RNAStructure::HaveOpenCTFileViewerWindow() {
      return m_currentOpenCTViewer != NULL;
 }
 
-bool RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex) {
+bool RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex, 
+		                                int minArcIdx, int maxArcIdx) {
      StructureManager *rnaStructManager = RNAStructViz::GetInstance()->GetStructureManager();
      RNAStructure *rnaStructure = !rnaStructManager ? NULL : 
 	                          rnaStructManager->GetStructure(structureFolderIndex);
      if((rnaStructManager != NULL) && (rnaStructure != NULL)) { 
-          rnaStructManager->DisplayFileContents(structureFolderIndex);
+	  if(minArcIdx <= 0 || maxArcIdx <= 0) { 
+	       minArcIdx = 1;
+	       maxArcIdx = rnaStructure->m_sequenceLength;
+	  }
+          char arcIndexDisplaySuffix[MAX_BUFFER_SIZE];
+	  snprintf(arcIndexDisplaySuffix, MAX_BUFFER_SIZE, "#%d -- #%d (of %d)\0", 
+		   minArcIdx, maxArcIdx, rnaStructure->m_sequenceLength); 
+	  rnaStructManager->DisplayFileContents(structureFolderIndex, arcIndexDisplaySuffix);
 	  return true;
      }
      return false;

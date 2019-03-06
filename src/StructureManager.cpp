@@ -52,7 +52,6 @@ void StructureManager::AddFile(const char* filename)
 		basename++;
     
     // Don't load if it shares a filename with another loaded structure
-    // TODO: Check whether to allow multiple structures with the same filename
     for (int i = 0; i < m_structureCount; ++i)
     {
         if (m_structures[i])
@@ -93,7 +92,6 @@ void StructureManager::AddFile(const char* filename)
 
     if (structure)
     {
-    	// TODO: Check for duplicates.
     	int count = (int)folders.size();
 	AddFirstEmpty(structure);
         if(count == (int) folders.size()-1)
@@ -354,9 +352,10 @@ bool StructureManager::SequenceCompare(RNAStructure* struct1, RNAStructure* stru
     return true;
 }
 
-void StructureManager::DisplayFileContents(const int index)
+void StructureManager::DisplayFileContents(const int index, 
+		                           const char *displaySuffix)
 {
-    m_structures[index]->DisplayFileContents();
+    m_structures[index]->DisplayFileContents(displaySuffix);
 }
 
 void StructureManager::PrintFolders()

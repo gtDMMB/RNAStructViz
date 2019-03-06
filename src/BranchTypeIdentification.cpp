@@ -13,7 +13,8 @@ using std::vector;
 using std::sort;
 
 #include "BranchTypeIdentification.h"
-//#include "Utils.h"
+
+#if PERFORM_BRANCH_TYPE_ID
 
 vector<RNAStructure::BaseData *> RNABranchType_t::getEnclosingArcs( 
        RNAStructure * &rnaStructBase, bool removeTopFour = false) { 
@@ -258,4 +259,6 @@ bool RNABranchType_t::PerformBranchClassification(class RNAStructure * &rnaStruc
           }
      }
      return true;
-} 
+}
+
+#endif

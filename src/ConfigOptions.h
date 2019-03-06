@@ -23,7 +23,10 @@ using std::string;
 
 #include "BuildTargetInfo.h"
 
-#define PERFORM_BRANCH_TYPE_ID          (false)
+#ifndef PERFORM_BRANCH_TYPE_ID
+     #define PERFORM_BRANCH_TYPE_ID          (false)
+#endif
+
 #define MAX_BUFFER_SIZE                 (256)
 
 #define DEFAULT_CTFILE_SEARCH_DIRECTORY (GetUserHome())

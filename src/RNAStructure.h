@@ -27,30 +27,35 @@ class RNABranchType_t;
 #define RadiansToDegrees(theta)      (theta * 180.0 / M_PI)
 #define Square(x)                    ((x) * (x))
 
-#define DEFAULT_BUFFER_SIZE          2048
+#define DEFAULT_BUFFER_SIZE          1750
 
 class RNAStructure
 {
     public:
         enum Base
         {
-	        A = 0x1,
-        	C = 0x2,
-	        G = 0x4,
-	        U = 0x8
-        };
+	        A = 0x01,
+        	C = 0x02,
+	        G = 0x04,
+	        U = 0x08
+        } __attribute__ ((__packed__));
+        
+	typedef uint16_t BasePair;
 
+        #if PERFORM_BRANCH_TYPE_ID
         class RNABranchType_t *branchType;
+        #endif
 
         // A value for the pair of unpaired bases.
-        static const unsigned int UNPAIRED;
+        static const BasePair UNPAIRED;
 
         // Data on a single base
+        #pragma pack(push, 1)
         class BaseData
         {
 	        public:
-                unsigned int m_index; // The index of this structure
-                unsigned int m_pair; // The index of the base it is paired with, or UNPAIRED.
+                BasePair m_index; // The index of this structure
+                BasePair m_pair; // The index of the base it is paired with, or UNPAIRED.
 	        Base m_base;	// The base type.
 
                 inline char getBaseChar() const {
@@ -93,7 +98,8 @@ class RNAStructure
                 return ABS(MAX(m_pair, m_index) - MIN(m_pair, m_index));
             }
 
-        };
+        }; //__attribute__ ((__packed__));
+        #pragma pack(pop)
 
         /*
 	    Creation method, designed to allow error handling during construction.
@@ -112,7 +118,14 @@ class RNAStructure
 	    Return the base at a given location. Indexed starting at 0.
         */
         BaseData* GetBaseAt(unsigned int position);
-        RNABranchType_t* GetBranchTypeAt(unsigned int position);
+        
+        #if PERFORM_BRANCH_TYPE_ID
+	RNABranchType_t* GetBranchTypeAt(unsigned int position);
+        #else
+        inline RNABranchType_t*	GetBranchTypeAt(unsigned int position) {
+	     return NULL;
+	}
+        #endif
 
         /*
 	    Return the number of bases in the sequence.
@@ -152,7 +165,7 @@ class RNAStructure
         /*
 	     Display the contents of the file in a window (or bring it to the top if already existing).
         */
-        void DisplayFileContents();
+        void DisplayFileContents(const char *titleSuffix = NULL);
 
         /*
          Returns a reference to the local m_sequence BaseData* pointer.
@@ -222,7 +235,9 @@ class RNAStructure
 		  );
 	};
         static bool HaveOpenCTFileViewerWindow();
-	static bool ActionOpenCTFileViewerWindow(int structureFolderIndex);
+	static bool ActionOpenCTFileViewerWindow(int structureFolderIndex, 
+			                         int minArcIdx = -1, 
+						 int maxArcIdx = -1);
 	static bool ScrollOpenCTFileViewerWindow(int pairIndex); 
 
 };

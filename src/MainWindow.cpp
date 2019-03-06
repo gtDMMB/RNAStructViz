@@ -238,7 +238,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     ms_instance->CreateFileChooser();
     int fileChooserReturnCode = ms_instance->m_fileChooser->show();
     if(fileChooserReturnCode == -1 || fileChooserReturnCode == 1) { 
-        if(fileChooserReturnCode == -1) { // display weird exceptional error case:
+        Delete(ms_instance->m_fileChooser);
+	if(fileChooserReturnCode == -1) { // display weird exceptional error case:
 	    fl_alert("Unable to open new RNA sequence files: %s\n", 
 		     ms_instance->m_fileChooser->errmsg());
 	}
@@ -262,7 +263,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 	}
         RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilename);
     }
-    
+    Delete(ms_instance->m_fileChooser);
+
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
 
@@ -457,10 +459,8 @@ void MainWindow::MoveFolderDown(Fl_Widget *widget, void* userData)
 bool MainWindow::CreateFileChooser()
 {
     if(m_fileChooser) {
-	delete m_fileChooser;
-        m_fileChooser = NULL;
+	Delete(m_fileChooser);
     }
-    
     // Get the current working directory.
     char currentWD[MAX_BUFFER_SIZE];
     if(ConfigParser::directoryExists((char *) CTFILE_SEARCH_DIRECTORY)) { 
@@ -470,17 +470,13 @@ bool MainWindow::CreateFileChooser()
         std::cerr << "Error: getcwd failed. Cannot create file chooser.\n";
         return false;
     }
-    
     m_fileChooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_MULTI_FILE);
     m_fileChooser->title("Select RNA Sequences From File(s) ...");
     m_fileChooser->filter(
 		        "CT File\t*.ct\n"
 		        "CT File\t*.nopct\n"
 		        "SEQ File\t*.bpseq\n"
-			"DOT File\t*.dot\n"
-			"DOT File\t*.db\n"
-			"CT Files -- All Formats\t*.{ct,nopct}\n"
-			"DOT Files -- All Formats\t*.{dot,db,DOT}"
+			"CT Files -- All Formats\t*.{ct,nopct}"
 		    );
     m_fileChooser->directory(currentWD);
     m_fileChooser->options(Fl_Native_File_Chooser::NO_OPTIONS | 
@@ -488,7 +484,6 @@ bool MainWindow::CreateFileChooser()
 			   Fl_Native_File_Chooser::NEW_FOLDER | 
 			   Fl_Native_File_Chooser::USE_FILTER_EXT | 
 			   Fl_Native_File_Chooser::SAVEAS_CONFIRM);
-
     return true;
 }
 
