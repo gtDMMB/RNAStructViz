@@ -116,8 +116,7 @@ RNABranchType_t* RNAStructure::GetBranchTypeAt(unsigned int position)
 }
 #endif
 
-RNAStructure* RNAStructure::CreateFromFile(const char* filename, 
-	const bool isBPSEQ)
+RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBPSEQ)
 {
     std::ifstream inStream(filename);
     if (!inStream.good())
@@ -137,7 +136,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
     RNAStructure* result = new RNAStructure();
     std::vector<char> tempSeq;
     result->m_sequenceLength = 0;
-    unsigned int maxSize = 1024;
+    unsigned int maxSize = 128;
     result->m_sequence = (BaseData*) malloc(sizeof(BaseData) * maxSize);
     int numElements = 0;
     while (true)
@@ -152,14 +151,26 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename,
 		    if (inStream.eof() || inStream.bad())
 		    {
 		    	break;
-			}
+	            }
 		    inStream.clear(); // Try clearing the fail
 		
-		    // Ignore this line
-		    while (!inStream.eof() && inStream.get() != '\n');
-		    {
-		    	continue;
+		    // Ignore the first line as a comment:
+		    int commentLineCount = 0;
+		    result->m_fileCommentLine = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
+		    while (!inStream.eof() && 
+			   ((!commentLineCount && inStream.get(result->m_fileCommentLine, 
+							       MAX_BUFFER_SIZE, '\n')) || 
+			    (commentLineCount && inStream.get() != '\n'))) {
+		    	 commentLineCount++;
+		         continue;
 		    }
+		    result->m_fileCommentLine[MAX_BUFFER_SIZE] = '\0';
+		    size_t commentLineLen = strnlen(result->m_fileCommentLine, MAX_BUFFER_SIZE);
+		    if(commentLineLen < MAX_BUFFER_SIZE) {
+		         result->m_fileCommentLine = (char *) 
+				 realloc(result->m_fileCommentLine, commentLineLen + 1);
+			 result->m_fileCommentLine[commentLineLen] = '\0';
+		    }    
 		}
 
 		// Check for the next ID. If not, ignore the line.
@@ -378,19 +389,72 @@ const char* RNAStructure::GetInitialFileComment() const {
      return m_fileCommentLine;
 }
 const char* RNAStructure::GetSuggestedStructureFolderName() {
+     
      if(m_suggestedFolderName) { // we have already computed this data:
           return m_suggestedFolderName;
      }
-     else if(m_fileCommentLine == NULL) { // file we loaded contained no comment:
-        const char *fileNamePath = strrchr(GetFilenameNoExtension(), '/');
-	fileNamePath = fileNamePath ? fileNamePath : GetFilenameNoExtension();
-        strcpy(m_suggestedFolderName, fileNamePath);
-	char filePathReplaceChars[][2] = {
-	     {'_', '-'}, 
-	     {'.', ' '}, 
-	     {'-', ' '}
-	};
+     else {
+          m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
+     }
+     
+     vector<string> searchForStructStrings;
+     if(m_fileCommentLine != NULL) { // file we loaded contained a comment:
+          searchForStructStrings.push_back(string(m_fileCommentLine));
+     }
+     const char *fileNamePath = strrchr(GetFilenameNoExtension(), '/');
+     fileNamePath = fileNamePath ? fileNamePath : GetFilenameNoExtension();
+     searchForStructStrings.push_back(string(fileNamePath));
 
+     // search for patterns of the form <CAPLETTER>.<LOWERCASELETTERS>, e.g., 
+     // E.coli or C.elegans, in the file name for a suggested structure name:
+     char filePathReplaceChars[][2] = {
+          {'_', '-'}, 
+     };
+     bool foundMatch = false;
+     for(int sidx = 0; sidx < searchForStructStrings.size(); sidx++) { 
+	strncpy(m_suggestedFolderName, searchForStructStrings[sidx].c_str(), MAX_BUFFER_SIZE + 1);
+	m_suggestedFolderName[MAX_BUFFER_SIZE] = '\0';
+        for(int rsidx = 0; rsidx < GetArrayLength(filePathReplaceChars); rsidx++) { 
+	     StringTranslateCharacters(m_suggestedFolderName, 
+			               filePathReplaceChars[rsidx][0], 
+				       filePathReplaceChars[rsidx][1]);
+	}
+	char *dotPos = NULL;
+	size_t strOffset = 0, sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
+	while(*(dotPos = strchrnul(m_suggestedFolderName + strOffset, '.')) != '\0') {
+	     strOffset = dotPos - m_suggestedFolderName;
+	     if(strOffset > 0 && isupper(m_suggestedFolderName[strOffset - 1])) { 
+	          size_t endingLowerPos = strOffset + 1;
+		  while((endingLowerPos < sfnLen) && islower(m_suggestedFolderName[endingLowerPos])) {
+		       endingLowerPos++;
+		  }
+		  size_t orgSubnameLen = endingLowerPos - strOffset - 1;
+		  if(orgSubnameLen > 0) {
+		       char structName[MAX_BUFFER_SIZE + 1];
+		       strncpy(structName, &(m_suggestedFolderName[strOffset - 1]), 2);
+		       structName[2] = ' ';
+		       strncpy(structName + 3, &(m_suggestedFolderName[strOffset + 1]), orgSubnameLen);
+		       structName[orgSubnameLen + 3] = '\0';
+		       strcpy(m_suggestedFolderName, structName);
+		       foundMatch = true;
+		       break;
+		  }
+	     }
+        }
+	if(foundMatch) { 
+             break;
+	}
+     }
+     if(!foundMatch) {
+          free(m_suggestedFolderName);
+	  m_suggestedFolderName = NULL;
+	  return NULL;
+     }
+     
+     size_t sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
+     if(sfnLen < MAX_BUFFER_SIZE) {
+          m_suggestedFolderName = (char *) realloc(m_suggestedFolderName, sfnLen + 1);
+	  m_suggestedFolderName[sfnLen] = '\0';
      }
      return m_suggestedFolderName;
 }
@@ -500,8 +564,6 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 		         sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
 	m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
 		          TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
-	//m_seqTextDisplay->linenumber_width(6);
-	//m_seqTextDisplay->linenumber_format("%02X");
 	curYOffset += 135 + windowSpacing;
 
 	m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
@@ -624,15 +686,14 @@ void RNAStructure::GenerateString()
 			    baseStr,
 			    pairStr,
 			    pairID + 1);
-		    const char *pairMarkerFmt = ((i <= pairID) ? 
-				TBUFSTYLE_BPAIR_START_STRFMT : 
-				TBUFSTYLE_BPAIR_END_STRFMT);
+		    const char *pairMarkerFmt = ((i <= pairID) ? TBUFSTYLE_BPAIR_START_STRFMT : 
+				                                 TBUFSTYLE_BPAIR_END_STRFMT);
 		    int numDigits = Util::GetNumDigitsBase10(pairID + 1);
 		    std::string numFmtStr = Util::GetRepeatedString(
 				            pairMarkerFmt, numDigits);
 		    snprintf(formatPosn, remainingSize, 
 		             " %c AAAAAA  | %c - %c  (%s)\n", 
-		             (i <= pairID) ? TBUFSTYLE_BPAIR_END : ' ', 
+		             (i <= pairID) ? TBUFSTYLE_BPAIR_END : '*', 
 			     Util::GetBaseStringFormat(baseStr), 
 			     Util::GetBaseStringFormat(pairStr), 
 			     numFmtStr.c_str());    
@@ -653,11 +714,11 @@ void RNAStructure::GenerateString()
     size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, 
 		                             DEFAULT_BUFFER_SIZE);
     if(seqDSLen + 1 < DEFAULT_BUFFER_SIZE) { 
-        m_seqDisplayString = (char *) realloc(m_seqDisplayString, 
-			              sizeof(char) * (DEFAULT_BUFFER_SIZE - 1 - seqDSLen));
+        m_seqDisplayString = (char *) realloc(m_seqDisplayString, (seqDSLen + 1) * sizeof(char));
     }
     else {
          strcat(m_seqDisplayString, " ...");
+	 seqDSLen += 4;
     }
     m_seqDisplayFormatString = (char *) malloc((seqDSLen + 1) * sizeof(char));
     strcpy(m_seqDisplayFormatString, m_seqDisplayString);
@@ -666,6 +727,7 @@ void RNAStructure::GenerateString()
     StringMapCharacter(m_seqDisplayFormatString, 'C', TBUFSTYLE_SEQPAIR_C);
     StringMapCharacter(m_seqDisplayFormatString, 'G', TBUFSTYLE_SEQPAIR_G);
     StringMapCharacter(m_seqDisplayFormatString, 'U', TBUFSTYLE_SEQPAIR_U);
+    StringMapCharacter(m_seqDisplayFormatString, '.', TBUFSTYLE_DEFAULT);
 
 }
 

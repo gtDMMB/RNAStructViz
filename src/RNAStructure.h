@@ -27,7 +27,7 @@ class RNABranchType_t;
 #define RadiansToDegrees(theta)      (theta * 180.0 / M_PI)
 #define Square(x)                    ((x) * (x))
 
-#define DEFAULT_BUFFER_SIZE          1750
+#define DEFAULT_BUFFER_SIZE          1024
 
 class RNAStructure
 {
@@ -160,7 +160,6 @@ class RNAStructure
         const char* GetFilenameNoExtension();
 	const char* GetInitialFileComment() const;
 	const char* GetSuggestedStructureFolderName();
-	const char* GetSuggestedStructureFolderName(const char* structFileNames[], unsigned int numFiles);
 
         /*
 	     Display the contents of the file in a window (or bring it to the top if already existing).

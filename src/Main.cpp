@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
     fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
 
     int flRunCode = Fl::run();
+    RNAStructViz::Shutdown();
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     return flRunCode;
 

@@ -49,6 +49,19 @@ class StructureManager
 	        return m_structures[index];
         }
 
+	inline RNAStructure* LookupStructureByCTPath(const char *ctPath) {
+	     if(ctPath == NULL) {
+	          return NULL;
+	     }
+	     for(int sidx = 0; sidx < m_structureCount; sidx++) {
+	          RNAStructure *rnaStruct = GetStructure(sidx);
+		  if((rnaStruct != NULL) && !strcmp(rnaStruct->GetFilename(), ctPath)) {
+	               return rnaStruct;
+		  }
+	     }
+	     return NULL;
+	}
+
         /*
 	    Popup (or bring to front) a window displaying the file contents.
         */

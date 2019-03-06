@@ -20,7 +20,7 @@
 #include "pixmaps/RNAWindowIcon.xbm"
 #include "pixmaps/HelpIcon.c"
 
-MainWindow* MainWindow::ms_instance = 0;
+MainWindow* MainWindow::ms_instance = NULL;
 
 Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
 	       HelpIcon.pixel_data, 
@@ -463,6 +463,7 @@ bool MainWindow::CreateFileChooser()
     }
     // Get the current working directory.
     char currentWD[MAX_BUFFER_SIZE];
+    currentWD[0] = '\0';
     if(ConfigParser::directoryExists((char *) CTFILE_SEARCH_DIRECTORY)) { 
         strncpy(currentWD, (char *) CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1); 
     }

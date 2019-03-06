@@ -17,7 +17,7 @@ int InputWindow::distinctStructureCount = 0;
 
 InputWindow::InputWindow(int w, int h, const char *label, 
 	const char *defaultName, InputWindowType type) : 
-	Fl_Window(w, h, label), cbUseDefaultNames(NULL) 
+	Fl_Window(MAX(w, 445), h, label), cbUseDefaultNames(NULL) 
 {	
     string = (char*)malloc(sizeof(char)*90);
     color(GUI_WINDOW_BGCOLOR);
@@ -66,25 +66,25 @@ InputWindow::InputWindow(int w, int h, const char *label,
             ConfigParser::nullTerminateString(inputText, actualStructName.size());
 
 	    sprintf(string, "Creating new folder for the CT structure %s", defaultName);
-	    input = new Fl_Input(160, 50, 100, 30, "@fileopen  New Folder Name:");
+	    input = new Fl_Input(160, 50, 250, 30, "@fileopen  New Folder Name:");
 	    input->when(FL_WHEN_ENTER_KEY);
             input->maximum_size(60);
 	    input->value(inputText);
 	    input->color(GUI_BGCOLOR);
 	    input->textcolor(GUI_BTEXT_COLOR);
-	    Fl_Box *box = new Fl_Box(50, 1, 300, 40, (const char*)string);
+	    Fl_Box *box = new Fl_Box(75, 1, 300, 40, (const char*) string);
 	    box->box(FL_OSHADOW_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 	    box->color(GUI_BGCOLOR);
 	    box->labelcolor(GUI_BTEXT_COLOR);
-	    Fl_Button *button = new Fl_Button(265, 50, 100, 30, "Add Folder @|>");
+	    Fl_Button *button = new Fl_Button(340, 50, 100, 30, "Add Folder @|>");
 	    button->callback(InputCallback, (void*)0);
 	    button->labelcolor(GUI_BTEXT_COLOR);
 	    button->set_active();
 	    input->callback(InputCallback, (void*)0);
 	    input->labelcolor(GUI_TEXT_COLOR);
 	    const char *cbText = " Use only default names for structure folders";
-	    cbUseDefaultNames = new Fl_Check_Button(30, 100, 325, 30, cbText);
+	    cbUseDefaultNames = new Fl_Check_Button(55, 100, 325, 30, cbText);
 	    cbUseDefaultNames->box(FL_ROUND_UP_BOX);
 	    cbUseDefaultNames->color(GUI_BGCOLOR);
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
@@ -148,8 +148,13 @@ void InputWindow::CloseCallback(Fl_Widget* widget, void* userData)
 }
 
 std::string InputWindow::ExtractStructureNameFromCTName(const char *ctPath) {
+    RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
+	                      LookupStructureByCTPath(ctPath);
+    const char *suggestedFolderName = rnaStruct ? rnaStruct->GetSuggestedStructureFolderName() : NULL;
+    const char *folderNumberDivider = suggestedFolderName ? " -- " : "";
     char suggestedShortName[MAX_BUFFER_SIZE];
-    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d\0", ++InputWindow::distinctStructureCount);
+    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d%s%s\0", ++InputWindow::distinctStructureCount, 
+	     folderNumberDivider, suggestedFolderName ? suggestedFolderName : "");
     return std::string(suggestedShortName);
 }
 

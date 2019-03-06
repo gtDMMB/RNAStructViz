@@ -41,7 +41,7 @@ class RNAStructViz
             return m_statsWindows;
         }
 
-        void AddStatsWindow(int index);
+	void AddStatsWindow(int index);
         void TestFolders();
 
     private:
