@@ -27,7 +27,7 @@ using std::string;
      #define PERFORM_BRANCH_TYPE_ID          (false)
 #endif
 
-#define MAX_BUFFER_SIZE                 (112)
+#define MAX_BUFFER_SIZE                 (224)
 
 #define DEFAULT_CTFILE_SEARCH_DIRECTORY (GetUserHome())
 #define DEFAULT_PNG_OUTPUT_DIRECTORY    (GetUserHome())

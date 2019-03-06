@@ -33,16 +33,9 @@ void StructureManager::AddFile(const char* filename)
 	    return;
 
     char* localCopy = strdup(filename);
-    if (!localCopy)
-    {
-		return;
+    if (!localCopy) {
+        return;
     }
-
-    // Strip any trailing directory markers. 
-    // Maybe we could load all files in the directory in this case,
-    // but it hardly seems worth the effort.
-    while (strlen(localCopy) > 0 && localCopy[strlen(localCopy) - 1] == '/')
-    	localCopy[strlen(localCopy) - 1] = 0;
 
     // Get the base file name
     const char* basename = strrchr(localCopy, '/');
@@ -68,7 +61,8 @@ void StructureManager::AddFile(const char* filename)
     
     // Figure out what kind of file we have and try to load it.
     const char* extension = strrchr(basename, '.');
-    RNAStructure* structure = 0;
+    extension = extension ? extension : "";
+    RNAStructure* structure = NULL;
     if (extension && !strncmp(extension, ".bpseq", 6))
     {
 		structure = RNAStructure::CreateFromFile(localCopy, true);

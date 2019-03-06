@@ -5,6 +5,10 @@
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
 
+#ifdef WITHGPERFTOOLS
+#include <gperftools/heap-profiler.h>
+#endif
+
 #include "MainWindow.h"
 #include "RNAStructViz.h"
 #include "ConfigOptions.h"
@@ -13,6 +17,10 @@
 
 int main(int argc, char **argv) {
 
+    #ifdef WITHGPERFTOOLS
+    HeapProfilerStart("RNAStructViz.log");
+    #endif
+    
     DisplayConfigWindow::SetupInitialConfig();
     if(argc > 1 && 
        (!strcmp(argv[1], "--about") || !strcmp(argv[0], "--help") || 
@@ -40,10 +48,18 @@ int main(int argc, char **argv) {
     MainWindow::ResetThemeColormaps();
     fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
 
-    int flRunCode = Fl::run();
+    //int flRunCode = Fl::run();
+    while(MainWindow::IsRunning()) {
+        Fl::wait(0.5);
+    }
     RNAStructViz::Shutdown();
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
-    return flRunCode;
+    
+    #ifdef WITHGPERFTOOLS
+    HeapProfilerStop();
+    #endif
+    
+    return 0;
 
 }
 

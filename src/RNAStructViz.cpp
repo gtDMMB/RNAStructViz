@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-RNAStructViz* RNAStructViz::ms_instance = 0;
+RNAStructViz* RNAStructViz::ms_instance = NULL;
 
 RNAStructViz::RNAStructViz()
 {
@@ -25,11 +25,10 @@ RNAStructViz::~RNAStructViz()
 
 bool RNAStructViz::Initialize(int argc, char** argv)
 {
-    if (!ms_instance)
-    {
-	    ms_instance = new RNAStructViz();
+    if (!ms_instance) {
+        ms_instance = new RNAStructViz();
+        MainWindow::Initialize(argc, argv);
     }
-    MainWindow::Initialize(argc, argv);
     return true;
 }
 

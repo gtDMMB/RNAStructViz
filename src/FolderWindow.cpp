@@ -157,7 +157,8 @@ void FolderWindow::AddStructure(const char* filename, const int index)
 	     filePrefix, spaceBuffer.substr(0, 
              MAX(0, MAX_FOLDER_LABEL_CHARS - ((int ) strlen(filePrefix)))).c_str());
     strcat(labelWithIcon, "   @|>");
-    label->copy_label(labelWithIcon); 
+    label->copy_label(labelWithIcon);
+    label->tooltip(filename); 
     
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
     removeButton->callback(FolderWindow::RemoveCallback);
@@ -264,14 +265,7 @@ void FolderWindow::RethemeFolderWindow() {
      if(folderScroll != NULL) {
 	  folderScroll->color(nextBGColor);
 	  folderScroll->labelcolor(nextLabelColor);
-          //folderScroll->redraw();
      }
-     //if(folderPack != NULL) {
-     //     folderPack->color(nextBGColor);
-     //	  folderPack->labelcolor(nextLabelColor);
-     //     folderPack->damage(FL_DAMAGE_ALL | FL_DAMAGE_USER1);
-     //	  folderPack->redraw();
-     //}
      if(fileOpsLabel != NULL) {
           fileOpsLabel->color(nextBGColor);
 	  fileOpsLabel->labelcolor(nextLabelColor);

@@ -460,9 +460,14 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     if(m_contentWindow) {
         m_contentWindow->hide();
 	if(this == m_currentOpenCTViewer) { 
+	     
+	     #if !defined(__LOCAL_NOUSE_THREADS)
 	     Fl::lock();
 	     m_currentOpenCTViewer = NULL;
 	     Fl::unlock();
+             #else
+	     m_currentOpenCTViewer = NULL;
+             #endif
 	}
 	Delete(m_contentWindow);
     	Delete(m_ctTextDisplay);
@@ -592,9 +597,13 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 
     }
     m_contentWindow->show();
+    #if !defined(__LOCAL_NOUSE_THREADS)
     Fl::lock();
     m_currentOpenCTViewer = this;
     Fl::unlock();
+    #else
+    m_currentOpenCTViewer = this;
+    #endif
 
 }
 

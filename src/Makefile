@@ -3,10 +3,12 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -rdynamic -Wall -Wextra -pedantic -O1
+CXXFLAGS= -g -rdynamic -Wall -Wextra -pedantic -O0 \
+	  -D__thread='^-^' -Dthread_local='^-^' -D_Thread_local='^-^' -D__LOCAL_NOUSE_THREADS=1\
+	  -static
 
 LD=g++
-LDFLAGS=-Wall -Wextra -rdynamic -g1 -lm
+LDFLAGS=-Wall -Wextra -g1 -lm -Wl,--no-as-needed
 
 .DEFAULT: default
 
@@ -56,7 +58,7 @@ OBJEXT=o
 
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
-CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_THREAD_SAFE -D_REENTRANT -funsigned-char -Wno-c++11-narrowing 
+CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -funsigned-char -Wno-c++11-narrowing 
 CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
@@ -75,21 +77,25 @@ RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
 
+default_with_gperf: prelims $(RNASTRUCTVIZ_OBJECTS)
+	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL) -lprofiler -ltcmalloc
+
 prelims:
 	/bin/bash `$(READLINK) -f ../scripts/build-platform-header.sh` \
 		`$(READLINK) -f ./BuildTargetInfo.h`\
 		`$(READLINK) -f $(FLTKCONFIG)`
 
 diagnostic:
-	echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
-	echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
+	#echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
+	#echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
 	$(CXX) --version -v $(CXXFLAGS_FULL)
 
 run: default
 	./RNAStructViz --about
 
 clean:
-	rm -f *.o *.code BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
+	@rm -f *.o *.code *.log *.callgrind *.out *.ps *.pdf \
+		BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
 
 install: default
 	if test -z "$$INSTALL_PREFIX"; then INSTALL_PREFIX=/usr/local/; fi;\
@@ -100,6 +106,23 @@ install: default
 	cp -ap $(BINARY_OUTPUT) $(INSTALL_PREFIX)/bin/;\
 	cp -ap ../sample_structures/* \
 		$(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
+
+profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
+	./RNAStructViz #--inuse_space --inuse_objects --alloc_space --alloc_objects
+	google-pprof -lines\
+		-add_lib=/usr/local/lib/libfltk.a\
+		-add_lib=/usr/local/lib/libfltk_cairo.a\
+		-add_lib=/usr/local/lib/libfltk_images.a\
+		-text RNAStructViz RNAStructViz.log | less
+	google-pprof -functions\
+		-add_lib=/usr/local/lib/libfltk.a\
+		-add_lib=/usr/local/lib/libfltk_cairo.a\
+		-add_lib=/usr/local/lib/libfltk_images.a\
+		-pdf RNAStructViz RNAStructViz.log > RNAStructViz-HeapProfile.pdf
+	xreader RNAStructViz-HeapProfile.pdf
+
+gitadd:
+	@git add ./*.{cpp,h,c} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp

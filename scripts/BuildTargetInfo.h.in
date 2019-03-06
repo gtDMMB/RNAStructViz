@@ -23,10 +23,19 @@
      #define TARGETOS "Unknown Build Target"
 #endif
 
+#ifdef __LOCAL_NOUSE_THREADS
+     #undef _GLIBCXX__PTHREADS
+     #undef _GLIBCXX_HAS_GTHREADS
+     #ifdef __STDC_NO_THREADS__
+          #undef __STDC_NO_THREADS__
+     #endif
+     #define __STDC_NO_THREADS__ (1)
+#endif
+
 #define FLTK_USE_CAIRO 1
 #define FLTK_HAVE_CAIRO 1
 
-#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.4.3-production -- CT File Viewer and Structure Comparison Tool")
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.4.4-production -- CT File Viewer and Structure Comparison Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")

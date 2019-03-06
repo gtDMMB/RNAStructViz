@@ -190,6 +190,11 @@ void MainWindow::Shutdown()
     }
 }
 
+bool MainWindow::IsRunning() {
+     return (ms_instance != NULL) && (ms_instance->m_mainWindow != NULL) && 
+	     ms_instance->m_mainWindow->visible();
+}
+
 void MainWindow::AddFolder(const char* foldername, const int index, 
                            const bool isSelected)
 {
@@ -210,6 +215,7 @@ void MainWindow::AddFolder(const char* foldername, const int index,
             folder->structCount, folder->folderName);
     label->label(folder->folderNameFileCount);
     label->labelcolor(GUI_BTEXT_COLOR);
+    label->tooltip(foldername);
     
     ms_instance->folderDataBtns.push_back(label);
 
@@ -236,14 +242,9 @@ void MainWindow::AddFolder(const char* foldername, const int index,
 void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 {
     ms_instance->CreateFileChooser();
-    int fileChooserReturnCode = ms_instance->m_fileChooser->show();
-    if(fileChooserReturnCode == -1 || fileChooserReturnCode == 1) { 
-        Delete(ms_instance->m_fileChooser);
-	if(fileChooserReturnCode == -1) { // display weird exceptional error case:
-	    fl_alert("Unable to open new RNA sequence files: %s\n", 
-		     ms_instance->m_fileChooser->errmsg());
-	}
-        return;
+    ms_instance->m_fileChooser->show();
+    while(ms_instance->m_fileChooser->visible()) {
+        Fl::wait(0.5);
     }
 
     const char *nextWorkingDir = ms_instance->m_fileChooser->directory();
@@ -255,13 +256,23 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 
     for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i)
     {
-    	const char *nextFilename = ms_instance->m_fileChooser->filename(i);
+    	const char *nextFilename = strrchr(ms_instance->m_fileChooser->value(i), '/');
+	nextFilename = nextFilename ? nextFilename : ms_instance->m_fileChooser->value(i);
 	if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
 	   !strcmp(nextFilename, "..") || 
 	   ConfigParser::directoryExists(nextFilename)) { // invalid file to parser, so ignore it:
 	    continue;
 	}
-        RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilename);
+        if(strlen(nextFilename) + strlen(nextWorkingDir) + 1 >= MAX_BUFFER_SIZE) {
+	     fl_alert("Unable to open file: %s\nTotal file path name exceeds %d bytes.", 
+		      nextFilename, MAX_BUFFER_SIZE);
+	     continue;
+	}
+	char nextFilePath[MAX_BUFFER_SIZE];
+	snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s\0", nextWorkingDir, 
+	         nextFilename);
+        fprintf(stderr, "[% 4d] %s\n", strlen(nextFilePath), nextFilePath);
+	RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
     }
     Delete(ms_instance->m_fileChooser);
 
@@ -471,20 +482,20 @@ bool MainWindow::CreateFileChooser()
         std::cerr << "Error: getcwd failed. Cannot create file chooser.\n";
         return false;
     }
-    m_fileChooser = new Fl_Native_File_Chooser(Fl_Native_File_Chooser::BROWSE_MULTI_FILE);
-    m_fileChooser->title("Select RNA Sequences From File(s) ...");
+    m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
+    m_fileChooser->label("Select RNA Sequences From File(s) ...");
     m_fileChooser->filter(
-		        "CT File\t*.ct\n"
-		        "CT File\t*.nopct\n"
-		        "SEQ File\t*.bpseq\n"
-			"CT Files -- All Formats\t*.{ct,nopct}"
+			"CT Files (*.{ct,nopct})\t"
+		        "SEQ Files (*.bpseq)\t"
+			"All Files (*)"
 		    );
     m_fileChooser->directory(currentWD);
-    m_fileChooser->options(Fl_Native_File_Chooser::NO_OPTIONS | 
-		           Fl_Native_File_Chooser::PREVIEW | 
-			   Fl_Native_File_Chooser::NEW_FOLDER | 
-			   Fl_Native_File_Chooser::USE_FILTER_EXT | 
-			   Fl_Native_File_Chooser::SAVEAS_CONFIRM);
+    m_fileChooser->preview(true);
+    m_fileChooser->textcolor(GUI_TEXT_COLOR);
+    m_fileChooser->color(GUI_WINDOW_BGCOLOR);
+    m_fileChooser->showHiddenButton->value(true); // show hidden files by default
+    m_fileChooser->favorites_label = "  @search  Goto Favorites ...";
+    
     return true;
 }
 
