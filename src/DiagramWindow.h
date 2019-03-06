@@ -51,7 +51,7 @@ using std::max_element;
 #define DWIN_DRAG_DX                 (3)
 
 #define DWINARC_MAX_TICKS            (100)
-#define DWINARC_LABEL_PCT            ((double) 1.0 / 6.0)
+#define DWINARC_LABEL_PCT            (0.15)
 
 typedef enum {
      CR_BLACK       = 0, 
@@ -201,7 +201,8 @@ private:
     std::vector<int> m_structures;
 
     Fl_Choice* m_menus[3];
-    Fl_Check_Button *m_drawBranchesIndicator, *m_cbShowTicks;
+    Fl_Check_Button *m_drawBranchesIndicator;
+    Fl_Check_Button *m_cbShowTicks, *m_cbDrawBases;
     Fl_Button *exportButton;
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
@@ -239,7 +240,9 @@ private:
     static void TranslateUTMCoordinates(double *xcoord, double *ycoord, 
 		                        double *xcenter, double *ycenter);
     void RedrawStructureTickMarks(cairo_t *curWinContext);
+    
     static void ShowTickMarksCallback(Fl_Widget *cbw, void *udata);
+    static void DrawBasesCallback(Fl_Widget *cbw, void *udata);
 
     void WarnUserDrawingConflict();
     void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 

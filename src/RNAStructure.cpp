@@ -155,22 +155,9 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
 		    inStream.clear(); // Try clearing the fail
 		
 		    // Ignore the first line as a comment:
-		    int commentLineCount = 0;
-		    result->m_fileCommentLine = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
-		    while (!inStream.eof() && 
-			   ((!commentLineCount && inStream.get(result->m_fileCommentLine, 
-							       MAX_BUFFER_SIZE, '\n')) || 
-			    (commentLineCount && inStream.get() != '\n'))) {
-		    	 commentLineCount++;
+		    while (!inStream.eof() && inStream.get() != '\n') {
 		         continue;
 		    }
-		    result->m_fileCommentLine[MAX_BUFFER_SIZE] = '\0';
-		    size_t commentLineLen = strnlen(result->m_fileCommentLine, MAX_BUFFER_SIZE);
-		    if(commentLineLen < MAX_BUFFER_SIZE) {
-		         result->m_fileCommentLine = (char *) 
-				 realloc(result->m_fileCommentLine, commentLineLen + 1);
-			 result->m_fileCommentLine[commentLineLen] = '\0';
-		    }    
 		}
 
 		// Check for the next ID. If not, ignore the line.
@@ -593,7 +580,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
         curYOffset += 300 + windowSpacing;
 
 	int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
-	const char *notationStr = "Note: An asterisk (*) to the left of a sequence\nentry in the CT viewer above denotes that the\nbase pair is the first in its pair.";
+	const char *notationStr = "@line    Note: An asterisk (*) to the left of a sequence\n   entry in the CT viewer above denotes that the\n   base pair is the first in its pair.     @line";
         m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
 			                   pairNoteSubwinHeight, notationStr);
         m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
