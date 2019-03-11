@@ -10,16 +10,31 @@
      #define __TARGETOS_LINUX__
      #define TARGETOS "GNU/Linux"
 #endif
+
 #ifdef TARGETOS_MACOSX
      #define __TARGETOS_APPLE__
      #define TARGETOS "Mac/OSX"
      #define __APPLE__
-     //#define strchrnul(str, ch)    ({ strchr(str, ch) == NULL ? str + strlen(str) : strchr(str, ch); })
+     /* Mac OSX apparently does not support the strchrnul function: */
+     #include <string.h>
+     static inline char* strchrnul(const char *s, int ch) {
+          if(s == NULL) {
+               return NULL;
+	  }
+          char *strchrResult = strchr(s, ch);
+          if(strchrResult == NULL) {
+	       size_t slen = strnlen(s, 2048);
+               return s + slen;
+	  }
+          return strchrResult;
+     }	  
 #endif
+
 #ifdef TARGETOS_GENERIC_UNIX
      #define __TARGETOS_UNIX__
      #define TARGETOS "Unix"
 #endif
+
 #ifndef TARGETOS
      #define TARGETOS "Unknown Build Target"
 #endif

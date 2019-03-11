@@ -3,9 +3,7 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -pedantic -O1
-	  #-D__thread='^-^' -Dthread_local='^-^' -D_Thread_local='^-^' -D__LOCAL_NOUSE_THREADS=1\
-	  #-static
+CXXFLAGS= -g -Wall -Wextra -pedantic -O1 -lstdc++
 
 LD=g++
 LDFLAGS=-Wall -Wextra -g1 -lm -Wl,--no-as-needed
