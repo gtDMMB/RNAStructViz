@@ -5,10 +5,10 @@
 
 #include "RadialLayoutImage.h"
 
-RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height) : 
-	Fl_Cairo_Window(width, height) 
-{
-}
+//RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height) : 
+//	Fl_Cairo_Window(width, height) 
+//{
+//}
 
 CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *rnaSubseq, 
 		                            size_t startPos, size_t endPos, 
