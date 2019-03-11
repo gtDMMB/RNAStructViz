@@ -14,7 +14,7 @@
      #define __TARGETOS_APPLE__
      #define TARGETOS "Mac/OSX"
      #define __APPLE__
-     #define strchrnul(str, ch)    ({ strchr(str, ch) == NULL ? str + strlen(str) : strchr(str, ch); })
+     //#define strchrnul(str, ch)    ({ strchr(str, ch) == NULL ? str + strlen(str) : strchr(str, ch); })
 #endif
 #ifdef TARGETOS_GENERIC_UNIX
      #define __TARGETOS_UNIX__
