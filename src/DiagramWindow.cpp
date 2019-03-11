@@ -104,7 +104,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 DiagramWindow::DiagramWindow(int w, int h, const char *label,
                              const std::vector<int> &structures) 
         : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
-          m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
+          RadialLayoutWindowCallbackInterface(this), 
+	  m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
     
     Construct(w + WINW_EXTENSION, h, structures);
@@ -112,7 +113,8 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
 
 DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
                              const std::vector<int> &structures)
-        : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
+        : Fl_Cairo_Window(w + WINW_EXTENSION, h),
+          RadialLayoutWindowCallbackInterface(this), 	
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
     resize(x, y, w + WINW_EXTENSION, h);

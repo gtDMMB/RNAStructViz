@@ -140,7 +140,6 @@ class CairoContext_t {
 	  typedef enum {
 	       CENTER, 
 	       LEFT_JUSTIFY, 
-	       RIGHT_JUSTIFY
 	  } CairoTextDrawParams_t;
 
 	  typedef enum {
@@ -234,14 +233,16 @@ class CairoContext_t {
 
 	  /* Custom drawing items: */
 	  bool OverlayGraphics(const CairoContext_t &overlayContext, size_t startX, size_t startY);
-	  bool DrawBaseNode(size_t centerX, size_t centerY, char baseChar, size_t baseIdx, 
-			    float pixelSizePct, NodeStyle_t nodeStyle = CIRCLE_NODE);
+	  bool DrawBaseNode(int centerX, int centerY, char baseChar, size_t baseIdx, 
+			    size_t nodeSize, CairoColor_t cairoBaseColor, 
+			    NodeStyle_t nodeStyle = CIRCLE_NODE);
 	  bool GradientFill(CairoColor_t lowerColor, CairoColor_t upperColor, 
 			    GradientFillDir_t gradientDir);
 	  bool GradientFill(CairoColor_t baseColor, float darkerBy, 
 			    GradientFillDir_t gradientDir);
 	  bool DrawLine(size_t baseX, size_t baseY, size_t length);
-	  bool DrawText(size_t baseX, size_t baseY, CairoTextDrawParams_t = LEFT_JUSTIFY);
+	  bool DrawText(size_t baseX, size_t baseY, const char *text, 
+			CairoTextDrawParams_t = LEFT_JUSTIFY);
 
 }; // class CairoContext_t 
 

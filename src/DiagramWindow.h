@@ -28,6 +28,7 @@ using std::max_element;
 #include "RNAStructure.h"
 #include "CairoDrawingUtils.h"
 #include "BranchTypeIdentification.h"
+#include "RadialLayoutImage.h"
 
 #define IMAGE_DIM                    (485)
 #define IMAGE_WIDTH                  (IMAGE_DIM)
@@ -53,9 +54,9 @@ using std::max_element;
 #define DWINARC_MAX_TICKS            (12)
 #define DWINARC_LABEL_PCT            (0.0833)
 
-class DiagramWindow : public Fl_Cairo_Window
-{
-public:
+class DiagramWindow : public Fl_Cairo_Window, public RadialLayoutWindowCallbackInterface {
+
+  public:
     // Constructors
     void Construct(int w, int h, const std::vector<int>& structures);
     DiagramWindow(int w, int h, const char *label, 
@@ -73,13 +74,14 @@ public:
     
     void ResetWindow(bool resetMenus);
     
-    inline int GetFolderIndex()
-    {
+    inline int GetFolderIndex() {
         return folderIndex;
     }
     
     void SetFolderIndex(int index);
     int GetFolderIndex() const;
+
+    inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {} // TODO
 
 protected:
 

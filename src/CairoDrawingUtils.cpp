@@ -563,3 +563,31 @@ bool CairoContext_t::SetColor(const CairoColor_t &cairoColor) {
      return cairoColor.ApplyRGBAColor(this->cairoContext);
 }
 
+bool CairoContext_t::DrawBaseNode(int centerX, int centerY, char baseChar, 
+		                  size_t baseIdx, size_t nodeSize, 
+				  CairoColor_t cairoBaseColor, 
+				  NodeStyle_t nodeStyle) {
+     // TODO: Much more to implement here ... 
+     SaveSettings();
+     SetColor(cairoBaseColor);
+     char pairStr[16];
+     snprintf(pairStr, 16, "[%c]\0", toupper(baseChar));
+     DrawText(centerX, centerY, pairStr, CENTER);
+     return true;
+}
+
+bool CairoContext_t::DrawText(size_t baseX, size_t baseY, const char *text, 
+		              CairoTextDrawParams_t drawAlign) {
+     if(text == NULL) {
+          return false;
+     }
+     else if(drawAlign == CENTER) {
+	  cairo_text_extents_t textStrDims;
+	  cairo_text_extents(cairoContext, text, &textStrDims);
+          baseX += textStrDims.width / 2;
+	  baseY += textStrDims.height / 2;
+     }
+     cairo_move_to(cairoContext, baseX, baseY);
+     cairo_show_text(cairoContext, text);
+     return true;
+}

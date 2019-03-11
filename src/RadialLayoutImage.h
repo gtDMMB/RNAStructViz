@@ -6,48 +6,97 @@
 #ifndef __RADIAL_LAYOUT_IMAGE_H__
 #define __RADIAL_LAYOUT_IMAGE_H__
 
+#include <FL/Fl_Cairo_Window.H>
+#include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Button.H>
+
 #include <cairo.h>
 
-#include "ConfigOptions.h"
-
-#define MAX_SIZET                  ((size_t) -1)
-
-
-
-TODO GetVRNARadialLayoutData(const char *rnaSubseq, size_t startPos = 0, size_t endPos = MAX_SIZET) {
-     
-     char *effectiveRNASubseq = GetSubstringFromRange(rnaSubseq, startPos, endPos);
-     StringToUppercase(effectiveRNASubseq);
-     startPos = 0; endPos = strlen(effectiveRNASubseq);
-
-     unsigned int subseqLen = endPos - startPos + 1;
-     char *rec_sequence = NULL, *mfe_structure = NULL;
-     double minEnery = 0.0, curEnergy = 0.0;
-     vrna_fold_compound_t *vfc = NULL;
-     vrna_md_t vmdParam;
-
-     vfc = vrna_fold_compound(effectiveRNASubseq, &vmdParam, VRNA_OPTION_DEFAULT);
-     mfe_structure = (char *) vrna_alloc((subseqLen + 1) * sizeof(char));
-     minEnergy = (double) vrna_mfe(
-
-
-
-
-
-
-     free(effectiveRNASubseq);
-
+extern "C" {
+     #include <ViennaRNA/utils/basic.h>
+     #include <ViennaRNA/params/basic.h>
+     #include <ViennaRNA/datastructures/basic.h>
+     #include <ViennaRNA/plotting/structures.h>
+     #include <ViennaRNA/fold.h>
+     #include <ViennaRNA/gquad.h>
 }
 
+#include "ConfigOptions.h"
+#include "CairoDrawingUtils.h"
 
+#define DEFAULT_RLWIN_WIDTH           (550)
+#define DEFAULT_RLWIN_HEIGHT          (400)
 
+class RadialLayoutWindowCallbackInterface {
+     
+     public:
+          inline RadialLayoutWindowCallbackInterface() : parentCallingWindow(NULL) {}
+          inline RadialLayoutWindowCallbackInterface(RadialLayoutWindowCallbackInterface *parentWin) : 
+		 parentCallingWindow(parentWin) {}
 
+	  virtual void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) = 0;
+          
+	  inline void SetParentWindow(RadialLayoutWindowCallbackInterface *callingWin) {
+               parentCallingWindow = callingWin;
+	  }
 
+	  inline bool DoRadialWindowClose() {
+               if(parentCallingWindow == NULL) {
+	            return NULL;
+	       }
+	       parentCallingWindow->RadialWindowCloseCallback(NULL, NULL);
+	       return true;
+	  }
+     
+     protected:
+	  RadialLayoutWindowCallbackInterface *parentCallingWindow;
 
+};
 
+class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWindowCallbackInterface {
 
+     public:
+	  typedef enum {
+                PLOT_TYPE_SIMPLE   = VRNA_PLOT_TYPE_SIMPLE, 
+		PLOT_TYPE_CIRCULAR = VRNA_PLOT_TYPE_CIRCULAR, 
+		PLOT_TYPE_NAVIEW
+	  } VRNAPlotType_t;
 
+          RadialLayoutDisplayWindow(size_t width = DEFAULT_RLWIN_WIDTH, 
+			            size_t height = DEFAULT_RLWIN_HEIGHT);
+	  ~RadialLayoutDisplayWindow();
 
+	  bool SetTitle(const char *windowTitleStr);
+	  bool SetTitle(const char *windowTitleFmt, ...);
+	  bool SetParentWindow(RadialLayoutWindowCallbackInterface *parentCallingWin);
+	  
+	  bool SetRadialPlotType(VRNAPlotType_t plotType = PLOT_TYPE_CIRCULAR);
+	  bool DisplayRadialDiagram(const char *rnaSeq, size_t startSeqPos = 0, 
+			            size_t endSeqPos = MAX_SIZET);
 
+     protected:
+	  void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
+
+     private:
+	  char *winTitle;
+	  int vrnaPlotType;
+          CairoContext_t *radialLayoutCanvas;
+	  Fl_Window *parentCallingWindow;
+	  
+	  Fl_Box *closeWindowFrameBox;
+	  Fl_Button *closeWindowBtn, *exportImageToPNGBtn;
+          Fl_Check_Button *cbCircularPlotType;
+
+	  static void CloseWindowCallback(Fl_Widget *cbtn, void *udata);
+	  static void ExportRadialImageToPNGCallback(Fl_Widget *ebtn, void *udata);
+          static void PlotTypeCheckboxCallback(Fl_Widget *cbPlotType, void *udata);
+
+     public:
+          static CairoContext_t * GetVRNARadialLayoutData(const char *rnaSubseq, size_t startPos = 0, 
+		                                          size_t endPos = MAX_SIZET, 
+							  VRNAPlotType_t plotType = PLOT_TYPE_CIRCULAR);
+
+};
 
 #endif

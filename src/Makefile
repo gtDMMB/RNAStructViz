@@ -3,9 +3,9 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -pedantic -O0 \
-	  -D__thread='^-^' -Dthread_local='^-^' -D_Thread_local='^-^' -D__LOCAL_NOUSE_THREADS=1\
-	  -static
+CXXFLAGS= -g -Wall -Wextra -pedantic -O1
+	  #-D__thread='^-^' -Dthread_local='^-^' -D_Thread_local='^-^' -D__LOCAL_NOUSE_THREADS=1\
+	  #-static
 
 LD=g++
 LDFLAGS=-Wall -Wextra -g1 -lm -Wl,--no-as-needed
@@ -58,12 +58,16 @@ OBJEXT=o
 
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
-CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -funsigned-char -Wno-c++11-narrowing 
+CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
+	       -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
+	       -funsigned-char -Wno-c++11-narrowing \
+	       `pkg-config --cflags RNAlib2`
+
 CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
-LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
+LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) `pkg-config --libs RNAlib2`
 LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = \
@@ -71,12 +75,12 @@ RNASTRUCTVIZ_OBJECTS = \
 	ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
 	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
-	RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
+	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
 	StructureManager.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT)\
 	rocbox.$(OBJEXT) 
 
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
-	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
+	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
 
 default_with_gperf: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL) -lprofiler -ltcmalloc
@@ -172,6 +176,10 @@ Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
+
+RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h\
+	RadialLayoutImage.h RadialLayoutImage.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c RadialLayoutImage.cpp
 
 RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
 	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c\
