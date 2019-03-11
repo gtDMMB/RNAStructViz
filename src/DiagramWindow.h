@@ -26,7 +26,7 @@ using std::max_element;
 
 #include "ConfigOptions.h"
 #include "RNAStructure.h"
-
+#include "CairoDrawingUtils.h"
 #include "BranchTypeIdentification.h"
 
 #define IMAGE_DIM                    (485)
@@ -52,25 +52,6 @@ using std::max_element;
 
 #define DWINARC_MAX_TICKS            (12)
 #define DWINARC_LABEL_PCT            (0.0833)
-
-typedef enum {
-     CR_BLACK       = 0, 
-     CR_RED         = 1, 
-     CR_GREEN       = 2, 
-     CR_BLUE        = 3, 
-     CR_YELLOW      = 4, 
-     CR_MAGENTA     = 5, 
-     CR_CYAN        = 6, 
-     CR_BRANCH1     = 7, 
-     CR_BRANCH2     = 8, 
-     CR_BRANCH3     = 9, 
-     CR_BRANCH4     = 10, 
-     CR_WHITE       = 11,
-     CR_TRANSPARENT = 12,
-     CR_SOLID_BLACK = 14,
-     CR_SOLID_WHITE = 15, 
-     CR_LIGHT_GRAY  = 16, 
-} CairoColorSpec_t;
 
 class DiagramWindow : public Fl_Cairo_Window
 {
@@ -195,6 +176,7 @@ private:
 		float& radius);
 
     static void MenuCallback(Fl_Widget *widget, void *userData);
+    static void ChangeBaseColorPaletteCallback(Fl_Widget *btn, void *udata);
 
     // Holds the title of the window
     char* title; 
@@ -205,12 +187,14 @@ private:
     Fl_Check_Button *m_drawBranchesIndicator;
     Fl_Check_Button *m_cbShowTicks, *m_cbDrawBases;
     Fl_Button *exportButton;
+    Fl_RGB_Image *baseColorPaletteImg;
+    Fl_Button *baseColorPaletteChangeBtn;
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
 
     int imageStride;
-    cairo_surface_t *crSurface;
-    cairo_t *crDraw;
+    cairo_surface_t *crSurface, *crBasePairsSurface;
+    cairo_t *crDraw, *crBasePairsOverlay;
     uchar *imageData;
     bool cairoTranslate;
     bool m_redrawStructures;
@@ -246,8 +230,6 @@ private:
     static void DrawBasesCallback(Fl_Widget *cbw, void *udata);
 
     void WarnUserDrawingConflict();
-    void CairoSetRGB(cairo_t *cr, unsigned short R, unsigned short G, 
-		     unsigned short B, unsigned short A = 0x99);
     std::string GetExportPNGFilePath();
 
     volatile static DiagramWindow *currentDiagramWindowInstance;

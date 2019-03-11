@@ -3,7 +3,7 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -rdynamic -Wall -Wextra -pedantic -O0 \
+CXXFLAGS= -g -Wall -Wextra -pedantic -O0 \
 	  -D__thread='^-^' -Dthread_local='^-^' -D_Thread_local='^-^' -D__LOCAL_NOUSE_THREADS=1\
 	  -static
 
@@ -66,8 +66,9 @@ LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-c
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) 
 LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
 
-RNASTRUCTVIZ_OBJECTS = BranchTypeIdentification.$(OBJEXT) ConfigParser.$(OBJEXT)\
-	DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
+RNASTRUCTVIZ_OBJECTS = \
+	BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
+	ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
 	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
 	RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
@@ -122,18 +123,17 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	xreader RNAStructViz-HeapProfile.pdf
 
 gitadd:
-	@git add ./*.{cpp,h,c} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
+	git add ./*.{cpp,h} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c BranchTypeIdentification.cpp
 
+CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h CairoDrawingUtils.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c CairoDrawingUtils.cpp
+
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h ConfigParser.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
-
-#CustomFLTKSymbols.$(OBJEXT): CustomFLTKSymbols.h ConfigOptions.h\
-#	pixmaps/FLTKSymbolFolder.c CustomFLTKSymbols.cpp
-#	$(CXX) $(CXXFLAGS_FULL) -c CustomFLTKSymbols.cpp
 
 DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 	BranchTypeIdentification.h RNAStructure.h\

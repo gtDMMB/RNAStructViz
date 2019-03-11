@@ -111,3 +111,20 @@ typedef struct {
      int y;
 } Point_t;
 
+#define MAX_SIZET                           ((size_t) -1)
+
+static inline char * GetSubstringFromRange(const char *baseStr, size_t startPos, size_t endPos) {
+     size_t baseStrLen = strnlen(baseStr, 2048);
+     if(endPos == MAX_SIZET) {
+          endPos = baseStrLen;
+     }
+     if(startPos > endPos || startPos >= baseStrLen || endPos >= baseStrLen) {
+          return NULL;
+     }
+     size_t substrBufLen = endPos - startPos + 1;
+     char *substrBuf = (char *) malloc((substrBufLen + 1) * sizeof(char));
+     strncpy(substrBuf, baseStr + startPos, substrBufLen);
+     substrBuf[substrBufLen] = '\0';
+     return substrBuf;
+}
+

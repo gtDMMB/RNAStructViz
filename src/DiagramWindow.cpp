@@ -19,8 +19,10 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "ThemesConfig.h"
+#include "CairoDrawingUtils.h"
 
 #include "pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c"
+#include "pixmaps/BaseColorPaletteButtonImage.c"
 
 #include <FL/x.H>
 #ifdef __APPLE__
@@ -55,6 +57,9 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     userConflictAlerted = false;
     showPlotTickMarks = true;
 
+    baseColorPaletteImg = NULL;
+    baseColorPaletteChangeBtn = NULL;
+
     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
     cursor(DIAGRAMWIN_DEFAULT_CURSOR);
@@ -77,10 +82,14 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 		                           IMAGE_WIDTH, IMAGE_HEIGHT);
     crZoomSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
     		    ZOOM_WIDTH, ZOOM_HEIGHT);
+    crBasePairsSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH, IMAGE_HEIGHT);
     crDraw = cairo_create(crSurface);
-    SetCairoColor(crDraw, CR_TRANSPARENT);
+    crBasePairsOverlay = cairo_create(crBasePairsSurface);
+    SetCairoColor(crDraw, CairoColorSpec_t::CR_TRANSPARENT);
     cairo_rectangle(crDraw, 0, 0, this->w(), this->h());
     cairo_fill(crDraw);
+    cairo_rectangle(crBasePairsOverlay, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+    cairo_fill(crBasePairsOverlay);
     crZoom = cairo_create(crZoomSurface);
     cairo_set_source_rgb(crZoom, 
 		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
@@ -122,7 +131,14 @@ DiagramWindow::~DiagramWindow() {
 	cairo_destroy(crDraw);
 	cairo_surface_destroy(crZoomSurface);
         cairo_destroy(crZoom);
+	cairo_surface_destroy(crBasePairsSurface);
+	cairo_destroy(crBasePairsOverlay);
     }
+    Delete(m_drawBranchesIndicator);
+    Delete(m_cbShowTicks);
+    Delete(m_cbDrawBases);
+    Delete(baseColorPaletteImg);
+    Delete(baseColorPaletteChangeBtn);
 }
 
 void DiagramWindow::SetFolderIndex(int folderIndex) {
@@ -197,17 +213,17 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 		                     IMAGE_WIDTH, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT + 
 				     PNG_FOOTER_HEIGHT);
 	cairo_t *crImageOutput = cairo_create(pngSource);
-        thisWindow->SetCairoColor(crImageOutput, CR_TRANSPARENT);
+        thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_TRANSPARENT);
 	cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT + 
 			STRAND_MARKER_IMAGE_HEIGHT + PNG_FOOTER_HEIGHT);
 	cairo_fill(crImageOutput);
 	thisWindow->RedrawStrandEdgeMarker(crImageOutput);
 	// now draw the footer data:
-        thisWindow->SetCairoColor(crImageOutput, CR_SOLID_WHITE);
+        thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_SOLID_WHITE);
 	cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT, 
 			IMAGE_WIDTH, PNG_FOOTER_HEIGHT);
 	cairo_fill(crImageOutput);
-	thisWindow->SetCairoColor(crImageOutput, CR_SOLID_BLACK);
+	thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_SOLID_BLACK);
 	cairo_set_line_width(crImageOutput, 2);
 	cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT); 
 	cairo_line_to(crImageOutput, IMAGE_WIDTH, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT);
@@ -253,9 +269,18 @@ void DiagramWindow::resize(int x, int y, int w, int h) {
 
 void DiagramWindow::drawWidgets(bool fillWin = true) {
     
-    exportButton->redraw();
-    m_cbShowTicks->redraw();
-    m_cbDrawBases->redraw();
+    if(exportButton) { 
+         exportButton->redraw();
+    }
+    if(m_cbShowTicks) { 
+	 m_cbShowTicks->redraw();
+    }
+    if(m_cbDrawBases) { 
+	 m_cbDrawBases->redraw();
+    }
+    if(baseColorPaletteChangeBtn) {
+	 baseColorPaletteChangeBtn->redraw();
+    }
     for(int m = 0; m < 3; m++) {
         if(m_menus[m] != NULL && !m_menus[m]->active()) {
 	    m_menus[m]->redraw();
@@ -391,7 +416,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    cairo_reset_clip(thisWindow->crDraw);
 	    cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
 		      IMAGE_WIDTH / 2 - 25.f, 0.0, 2.0 * M_PI);
-            thisWindow->SetCairoColor(thisWindow->crDraw, CR_BLACK);
+            thisWindow->SetCairoColor(thisWindow->crDraw, CairoColorSpec_t::CR_BLACK);
 	    cairo_stroke(thisWindow->crDraw);
 	    thisWindow->RedrawStructureTickMarks(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
@@ -419,7 +444,7 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     fl_font(priorFont, 10);
     fl_line_style(0);
     
-    SetCairoColor(cr, CR_SOLID_WHITE);
+    SetCairoColor(cr, CairoColorSpec_t::CR_SOLID_WHITE);
     cairo_rectangle(cr, 0, 0, this->w(), this->h());
     cairo_fill(cr);
 
@@ -544,16 +569,16 @@ void DiagramWindow::SetCairoBranchColor(cairo_t *cr,
     if (enabled && branchType != BRANCH_UNDEFINED) {
         switch (branchType) {
             case BRANCH1:
-                nextColorFlag = CR_BRANCH1;
+                nextColorFlag = CairoColorSpec_t::CR_BRANCH1;
                 break;
             case BRANCH2:
-                nextColorFlag = CR_BRANCH2;
+                nextColorFlag = CairoColorSpec_t::CR_BRANCH2;
                 break;
             case BRANCH3:
-                nextColorFlag = CR_BRANCH3;
+                nextColorFlag = CairoColorSpec_t::CR_BRANCH3;
                 break;
             case BRANCH4:
-                nextColorFlag = CR_BRANCH4;
+                nextColorFlag = CairoColorSpec_t::CR_BRANCH4;
                 break;
             default:
                 break;
@@ -564,71 +589,14 @@ void DiagramWindow::SetCairoBranchColor(cairo_t *cr,
 }
     
 void DiagramWindow::SetCairoColor(cairo_t *cr, int nextColorFlag) {
-
-    switch (nextColorFlag) {
-        case CR_BLACK:
-            CairoSetRGB(cr, 46, 52, 54);
-	    break;
-        case CR_RED:
-	    CairoSetRGB(cr, 164, 0, 0);
-            break;
-        case CR_GREEN:
-	    CairoSetRGB(cr, 115, 210, 22);
-            break;
-        case CR_BLUE:
-	    CairoSetRGB(cr, 32, 74, 135);
-            break;
-        case CR_YELLOW:
-	    CairoSetRGB(cr, 196, 160, 0);
-            break;
-        case CR_MAGENTA:
-	    CairoSetRGB(cr, 239, 41, 159);
-            break;
-        case CR_CYAN:
-	    CairoSetRGB(cr, 0, 195, 215);
-            break;
-        case CR_BRANCH1:
-            CairoSetRGB(cr, 92, 160, 215);
-            break;
-        case CR_BRANCH2:
-            CairoSetRGB(cr, 183, 127, 77);
-            break;
-        case CR_BRANCH3:
-            CairoSetRGB(cr, 243, 153, 193);
-            break;
-        case CR_BRANCH4:
-            CairoSetRGB(cr, 123, 204, 153);
-            break;
-	case CR_WHITE:
-	    CairoSetRGB(cr, 255, 255, 255);
-	    break;
-	case CR_TRANSPARENT:
-	    CairoSetRGB(cr, 255, 255, 255, 0x7f);
-	    break;
-        case CR_SOLID_BLACK:
-	    CairoSetRGB(cr, 0, 0, 0, 255);
-	    break;
-        case CR_SOLID_WHITE:
-	    CairoSetRGB(cr, 255, 255, 255, 255);
-	    break;
-	case CR_LIGHT_GRAY:
-	    CairoSetRGB(cr, 46, 52, 54);
-	    break;
-	default:
-            break;
-    }
-
+    CairoColor_t::GetCairoColor((CairoColorSpec_t) nextColorFlag).ApplyRGBAColor(cr);
 }
 
 void DiagramWindow::SetCairoToFLColor(cairo_t *cr, Fl_Color flc) {
-
      if(cr == NULL) {
           return;
      }
-     uchar flR, flG, flB;
-     Fl::get_color(flc, flR, flG, flB);
-     CairoSetRGB(cr, flR, flG, flB, 255);
-
+     CairoColor_t::FromFLColorType(flc).ApplyRGBAColor(cr);
 }
 
 void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int resolution) {
@@ -659,19 +627,19 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
             if (baseData1->m_pair == baseData2->m_pair) {
                 if (baseData1->m_pair == baseData3->m_pair) {
                     fl_color(FL_BLACK);
-                    SetCairoColor(cr, CR_BLACK);
+                    SetCairoColor(cr, CairoColorSpec_t::CR_BLACK);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
-                                        (int) m_drawBranchesIndicator->value(), CR_BLACK);
+                                        (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLACK);
                     #endif
 		    DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
                 } else {
                     fl_color(fl_rgb_color(255, 200, 0));
-		    SetCairoColor(cr, CR_YELLOW);
+		    SetCairoColor(cr, CairoColorSpec_t::CR_YELLOW);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                        (int) m_drawBranchesIndicator->value(), CR_YELLOW);
+                                        (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_YELLOW);
                     #endif
 		    DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
@@ -679,10 +647,10 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                     if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                         baseData3->m_pair > ui) {
                         fl_color(FL_BLUE);
-			SetCairoColor(cr, CR_BLUE);
+			SetCairoColor(cr, CairoColorSpec_t::CR_BLUE);
                         #if PERFORM_BRANCH_TYPE_ID
 			SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
-                                            (int) m_drawBranchesIndicator->value(), CR_BLUE);
+                                            (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
                         #endif
 			DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                                 angleDelta, radius);
@@ -690,10 +658,10 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 }
             } else if (baseData1->m_pair == baseData3->m_pair) {
                 fl_color(FL_MAGENTA);
-		SetCairoColor(cr, CR_MAGENTA);
+		SetCairoColor(cr, CairoColorSpec_t::CR_MAGENTA);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
-                                    (int) m_drawBranchesIndicator->value(), CR_MAGENTA);
+                                    (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_MAGENTA);
                 #endif
 		DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
@@ -701,20 +669,20 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 if (baseData2->m_pair != RNAStructure::UNPAIRED &&
                     baseData2->m_pair > ui) {
                     fl_color(FL_GREEN);
-		    SetCairoColor(cr, CR_GREEN);
+		    SetCairoColor(cr, CairoColorSpec_t::CR_GREEN);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                        (int) m_drawBranchesIndicator->value(), CR_GREEN);
+                                        (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
                     #endif
 		    DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
                 }
             } else {
                 fl_color(FL_RED);
-		SetCairoColor(cr, CR_RED);
+		SetCairoColor(cr, CairoColorSpec_t::CR_RED);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
-                                    (int) m_drawBranchesIndicator->value(), CR_RED);
+                                    (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_RED);
                 #endif
 		DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
@@ -723,19 +691,19 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                     baseData2->m_pair > ui) {
                     if (baseData2->m_pair == baseData3->m_pair) {
                         fl_color(FL_CYAN);
-			SetCairoColor(cr, CR_CYAN);
+			SetCairoColor(cr, CairoColorSpec_t::CR_CYAN);
                         #if PERFORM_BRANCH_TYPE_ID
 			SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                            (int) m_drawBranchesIndicator->value(), CR_CYAN);
+                                            (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_CYAN);
                         #endif
 			DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                                 angleDelta, radius);
                     } else {
                         fl_color(FL_GREEN);
-			SetCairoColor(cr, CR_GREEN);
+			SetCairoColor(cr, CairoColorSpec_t::CR_GREEN);
                         #if PERFORM_BRANCH_TYPE_ID
 			SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
-                                            (int) m_drawBranchesIndicator->value(), CR_GREEN);
+                                            (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
                         #endif
 			DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                                 angleDelta, radius);
@@ -743,10 +711,10 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                         if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                             baseData3->m_pair > ui) {
                             fl_color(FL_BLUE);
-			    SetCairoColor(cr, CR_BLUE);
+			    SetCairoColor(cr, CairoColorSpec_t::CR_BLUE);
                             #if PERFORM_BRANCH_TYPE_ID
 			    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
-                                                (int) m_drawBranchesIndicator->value(), CR_BLUE);
+                                                (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
                             #endif
 			    DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                                     angleDelta, radius);
@@ -755,10 +723,10 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 } else if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                            baseData3->m_pair > ui) {
                     fl_color(FL_BLUE);
-		    SetCairoColor(cr, CR_BLUE);
+		    SetCairoColor(cr, CairoColorSpec_t::CR_BLUE);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
-                                        (int) m_drawBranchesIndicator->value(), CR_BLUE);
+                                        (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
                     #endif
 		    DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
@@ -768,19 +736,19 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                    baseData2->m_pair > ui) {
             if (baseData2->m_pair == baseData3->m_pair) {
                 fl_color(FL_CYAN);
-		SetCairoColor(cr, CR_CYAN);
+		SetCairoColor(cr, CairoColorSpec_t::CR_CYAN);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                    (int) m_drawBranchesIndicator->value(), CR_CYAN);
+                                    (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_CYAN);
                 #endif
 		DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
             } else {
                 fl_color(FL_GREEN);
-		SetCairoColor(cr, CR_GREEN);
+		SetCairoColor(cr, CairoColorSpec_t::CR_GREEN);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                    (int) m_drawBranchesIndicator->value(), CR_GREEN);
+                                    (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
                 #endif
 		DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
@@ -788,10 +756,10 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                     baseData3->m_pair > ui) {
                     fl_color(FL_BLUE);
-		    SetCairoColor(cr, CR_BLUE);
+		    SetCairoColor(cr, CairoColorSpec_t::CR_BLUE);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
-                                        (int) m_drawBranchesIndicator->value(), CR_BLUE);
+                                        (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
                     #endif
 		    DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
@@ -800,10 +768,10 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
         } else if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                    baseData3->m_pair > ui) {
             fl_color(FL_BLUE);
-	    SetCairoColor(cr, CR_BLUE);
+	    SetCairoColor(cr, CairoColorSpec_t::CR_BLUE);
             #if PERFORM_BRANCH_TYPE_ID
 	    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
-                                (int) m_drawBranchesIndicator->value(), CR_BLUE);
+                                (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
             #endif
 	    DrawArc(cr, ui, baseData3->m_pair, centerX, centerY, angleBase,
                     angleDelta, radius);
@@ -835,19 +803,19 @@ void DiagramWindow::Draw2(cairo_t *cr, RNAStructure **structures, const int reso
             && baseData1->m_pair > ui) {
             if (baseData1->m_pair == baseData2->m_pair) {
                 fl_color(FL_BLACK);
-		SetCairoColor(cr, CR_BLACK);
+		SetCairoColor(cr, CairoColorSpec_t::CR_BLACK);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
-                                    (int) m_drawBranchesIndicator->value(), CR_BLACK);
+                                    (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLACK);
                 #endif
 		DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
             } else {
                 fl_color(FL_RED);
-		SetCairoColor(cr, CR_RED);
+		SetCairoColor(cr, CairoColorSpec_t::CR_RED);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                    (int) m_drawBranchesIndicator->value(), CR_RED);
+                                    (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_RED);
                 #endif
 		DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                         angleDelta, radius);
@@ -855,10 +823,10 @@ void DiagramWindow::Draw2(cairo_t *cr, RNAStructure **structures, const int reso
                 if (baseData2->m_pair !=
                     RNAStructure::UNPAIRED && baseData2->m_pair > ui) {
                     fl_color(FL_GREEN);
-		    SetCairoColor(cr, CR_GREEN);
+		    SetCairoColor(cr, CairoColorSpec_t::CR_GREEN);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                        (int) m_drawBranchesIndicator->value(), CR_GREEN);
+                                        (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
                     #endif
 		    DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                             angleDelta, radius);
@@ -867,10 +835,10 @@ void DiagramWindow::Draw2(cairo_t *cr, RNAStructure **structures, const int reso
         } else if (baseData2->m_pair !=
                    RNAStructure::UNPAIRED && baseData2->m_pair > ui) {
             fl_color(FL_GREEN);
-	    SetCairoColor(cr, CR_GREEN);
+	    SetCairoColor(cr, CairoColorSpec_t::CR_GREEN);
             #if PERFORM_BRANCH_TYPE_ID
 	    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
-                                (int) m_drawBranchesIndicator->value(), CR_GREEN);
+                                (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
             #endif
 	    DrawArc(cr, ui, baseData2->m_pair, centerX, centerY, angleBase,
                     angleDelta, radius);
@@ -900,10 +868,10 @@ void DiagramWindow::Draw1(cairo_t *cr, RNAStructure **structures, const int reso
         if (baseData1->m_pair != RNAStructure::UNPAIRED
             && baseData1->m_pair > ui) {
             fl_color(FL_BLACK);
-	    SetCairoColor(cr, CR_BLACK);
+	    SetCairoColor(cr, CairoColorSpec_t::CR_BLACK);
             #if PERFORM_BRANCH_TYPE_ID
 	    SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
-                                (int) m_drawBranchesIndicator->value(), CR_BLACK);
+                                (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLACK);
             #endif
 	    DrawArc(cr, ui, baseData1->m_pair, centerX, centerY, angleBase,
                     angleDelta, radius);
@@ -1238,7 +1206,7 @@ void DiagramWindow::RebuildMenus() {
 	     m_drawBranchesIndicator->hide(); // make this option invisible
 	}
 
-	if(exportButton == NULL || m_cbShowTicks == NULL || m_cbDrawBases == NULL) { 
+	if(exportButton == NULL || m_cbShowTicks == NULL || baseColorPaletteImg == NULL) { 
 	     
 	     int offsetY = 25;
              exportButton = new Fl_Button(horizCheckBoxPos, offsetY, 
@@ -1259,14 +1227,37 @@ void DiagramWindow::RebuildMenus() {
 	     offsetY += 25;
              
 	     m_cbDrawBases = new Fl_Check_Button(horizCheckBoxPos + 4, offsetY, 
-			                         EXPORT_BUTTON_WIDTH, 25, 
-					         "Draw Bases");
+	     		                         EXPORT_BUTTON_WIDTH, 25, 
+	     				         "Draw Bases");
 	     m_cbDrawBases->callback(DrawBasesCallback);
 	     m_cbDrawBases->type(FL_TOGGLE_BUTTON);
 	     m_cbDrawBases->labelcolor(GUI_TEXT_COLOR);
 	     m_cbDrawBases->selection_color(GUI_BTEXT_COLOR); // checkmark color
 	     m_cbDrawBases->value(0);
+	     offsetY += 35;
 
+	     baseColorPaletteImg = new Fl_RGB_Image(
+			                BaseColorPaletteButtonImage.pixel_data, 
+			                BaseColorPaletteButtonImage.width, 
+			                BaseColorPaletteButtonImage.height, 
+			                BaseColorPaletteButtonImage.bytes_per_pixel
+			           );
+	     int btnXPos = w() - 1.3 * BaseColorPaletteButtonImage.width;
+	     baseColorPaletteChangeBtn = new Fl_Button(btnXPos, offsetY, 
+			                     BaseColorPaletteButtonImage.width, 
+			                     BaseColorPaletteButtonImage.height, "");
+	     baseColorPaletteChangeBtn->color(GUI_WINDOW_BGCOLOR);
+             baseColorPaletteChangeBtn->labelcolor(GUI_BTEXT_COLOR);
+             baseColorPaletteChangeBtn->image(baseColorPaletteImg);
+             baseColorPaletteChangeBtn->deimage(baseColorPaletteImg);
+             baseColorPaletteChangeBtn->align(FL_ALIGN_IMAGE_BACKDROP | 
+			                      FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+             baseColorPaletteChangeBtn->labeltype(_FL_ICON_LABEL);
+             baseColorPaletteChangeBtn->shortcut(FL_CTRL + 'b');
+	     baseColorPaletteChangeBtn->box(FL_NO_BOX);
+             baseColorPaletteChangeBtn->callback(ChangeBaseColorPaletteCallback);
+	     baseColorPaletteChangeBtn->redraw();
+	
 	}
 
         this->end();
@@ -1340,6 +1331,10 @@ void DiagramWindow::MenuCallback(Fl_Widget *widget, void *userData) {
     window->ResetWindow(false);
     window->m_redrawStructures = true;
     window->redraw();
+}
+
+void DiagramWindow::ChangeBaseColorPaletteCallback(Fl_Widget *btn, void *udata) {
+     fl_alert("Placeholder -- Change base colors for each structure for drawing ... ");
 }
 
 int DiagramWindow::handle(int flEvent) {
@@ -1519,7 +1514,7 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
     cairo_fill(curWinContext);
     
     // now draw the frame around the zoom buffer:
-    SetCairoColor(curWinContext, CR_BLUE);
+    SetCairoColor(curWinContext, CairoColorSpec_t::CR_BLUE);
     cairo_set_line_cap(curWinContext, CAIRO_LINE_CAP_ROUND);
     cairo_set_line_width(curWinContext, 5);
     cairo_set_line_join(curWinContext, CAIRO_LINE_JOIN_ROUND);
@@ -1527,21 +1522,23 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
 		    ZOOM_WIDTH, ZOOM_HEIGHT);
     cairo_stroke(curWinContext);
 
-    SetCairoColor(curWinContext, CR_BLACK);
+    SetCairoColor(curWinContext, CairoColorSpec_t::CR_BLACK);
     cairo_select_font_face(curWinContext, "Courier New", 
 		           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size(curWinContext, 17);
-    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 20);
+    cairo_set_font_size(curWinContext, CairoContext_t::FONT_SIZE_HEADER);
+    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 35);
     cairo_show_text(curWinContext, "Drag Mouse to Zoom:");
-    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 7);
-    cairo_set_font_size(curWinContext, 14);
-    cairo_show_text(curWinContext, "(<SHIFT+G> for CT View)");
+    cairo_set_font_size(curWinContext, CairoContext_t::FONT_SIZE_SUBHEADER);
+    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 20);
+    cairo_show_text(curWinContext, "<SHIFT+G>   : CT View");
+    cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 8);
+    cairo_show_text(curWinContext, "<SHIFT+C/R> : Radial Views");
 
 
     // now draw the zoom selection area of the window:
     if(haveZoomBuffer && zw > 0 && zh > 0) {
 	cairo_set_line_width(curWinContext, 2);
-        SetCairoColor(curWinContext, CR_SOLID_BLACK);
+        SetCairoColor(curWinContext, CairoColorSpec_t::CR_SOLID_BLACK);
 	const double boxDashPattern[] = {6.0, 6.0};
 	cairo_set_dash(curWinContext, boxDashPattern, 2, 0.0);
 	cairo_rectangle(curWinContext, zx0, zy0, zw, zh);
@@ -1627,7 +1624,7 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
      unsigned int markerImageDrawX = (IMAGE_WIDTH - markerImageWidth - 2) / 2;
      unsigned int markerImageDrawY = IMAGE_HEIGHT - 25.f;
      cairo_reset_clip(curWinContext);
-     SetCairoColor(curWinContext, CR_TRANSPARENT);
+     SetCairoColor(curWinContext, CairoColorSpec_t::CR_TRANSPARENT);
      cairo_set_source_surface(curWinContext, strandEdgeMarkerSurface, 
  		             GLWIN_TRANSLATEX + markerImageDrawX, 
  			     GLWIN_TRANSLATEY + markerImageDrawY);
@@ -1672,7 +1669,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      cairo_select_font_face(curWinContext, "Courier New", CAIRO_FONT_SLANT_NORMAL, 
 		            CAIRO_FONT_WEIGHT_BOLD);
      cairo_set_font_size(curWinContext, 7);
-     SetCairoColor(curWinContext, CR_LIGHT_GRAY);
+     SetCairoColor(curWinContext, CairoColorSpec_t::CR_LIGHT_GRAY);
      
      for(int t = 1; t <= numTicks; t++) { 
           
@@ -1748,12 +1745,6 @@ void DiagramWindow::WarnUserDrawingConflict() {
         }
         userConflictAlerted = true;
     }
-}
-
-void DiagramWindow::CairoSetRGB(cairo_t *cr, 
-		    unsigned short R, unsigned short G, unsigned short B, 
-		    unsigned short A) {
-    cairo_set_source_rgba(cr, R / 255.0, G / 255.0, B / 255.0, A / 255.0);
 }
 
 std::string DiagramWindow::GetExportPNGFilePath() {

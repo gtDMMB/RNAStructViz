@@ -22,6 +22,7 @@
 using std::string;
 
 #include "BuildTargetInfo.h"
+#include "CairoDrawingUtils.h"
 
 #ifndef PERFORM_BRANCH_TYPE_ID
      #define PERFORM_BRANCH_TYPE_ID          (false)
@@ -47,14 +48,14 @@ extern const char *FLTK_THEME_HELP[FLTK_THEME_COUNT];
 extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 
 /* Some basic color operations for getting shades of color: */
-#define RGBColor(r, g, b)               (((r & 0xff) << 24) | ((g & 0xff) << 16) | ((b & 0xff) << 8))
-#define Lighter(color, alpha)           (fl_color_average(color, FL_WHITE, alpha))
-#define Darker(color, alpha)            (fl_color_average(color, FL_BLACK, alpha))
-#define Inactive(color)                 (fl_inactive(color))
-#define Contrast(color)                 (fl_contrast(color, FL_WHITE))
-#define GetRed(flc)                     ((flc >> 24) & 0x000000ff)
-#define GetGreen(flc)                   ((flc >> 16) & 0x000000ff)
-#define GetBlue(flc)                    ((flc >> 8) & 0x000000ff)
+#define RGBColor(r, g, b)               ColorUtil::GetRGBColor(r, g, b)
+#define Lighter(color, alpha)           ColorUtil::Lighter(color, alpha)
+#define Darker(color, alpha)            ColorUtil::Darker(color, alpha)
+#define Inactive(color)                 ColorUtil::Inactive(color)
+#define Contrast(color)                 ColorUtil::Contrast(color)
+#define GetRed(flc)                     ColorUtil::RGBGetRed(flc)
+#define GetGreen(flc)                   ColorUtil::RGBGetGreen(flc)
+#define GetBlue(flc)                    ColorUtil::RGBGetBlue(flc) 
 
 /* Local "theme" defines for RNAStructViz: */
 #define LOCAL_WINDOW_BGCOLOR            (0xffffff00)
