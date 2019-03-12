@@ -248,9 +248,6 @@ bool CairoColor_t::ApplyRGBAColor(cairo_t *crContext) const {
 }
 
 bool CairoColor_t::ApplyRGBAColor(CairoContext_t &crContext) const {
-     if(crContext == NULL) {
-          return false;
-     }
      cairo_set_source_rgba(crContext.GetCairoContext(), 
 		           GetRedRatio(), GetGreenRatio(), 
 		           GetBlueRatio(), GetAlphaRatio());
@@ -374,6 +371,7 @@ bool CairoContext_t::InitCairoStructures(size_t w, size_t h) {
      height = h;
      cairoSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
      cairoContext = cairo_create(cairoSurface);
+     BlankFillCanvas();
      return Initialized();
 }
 
@@ -383,7 +381,20 @@ bool CairoContext_t::InitCairoStructures(cairo_t *crContext) {
      cairoContext = crContext;
      width = cairo_image_surface_get_width(cairoSurface);
      height = cairo_image_surface_get_height(cairoSurface);
+     BlankFillCanvas();
      return Initialized();
+}
+
+bool CairoContext_t::BlankFillCanvas() {
+     if(!Initialized()) {
+          return false;
+     }
+     cairo_save(cairoContext);
+     SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
+     cairo_rectangle(cairoContext, 0, 0, width, height);
+     cairo_fill(cairoContext);
+     cairo_restore(cairoContext);
+     return true;
 }
 
 bool CairoContext_t::CopyContextData(const CairoContext_t &crContext) {
@@ -488,7 +499,8 @@ bool CairoContext_t::SaveToImage(const char *imageOutPath) {
      if(imageOutPath == NULL) {
           return false;
      }
-     cairo_status_t opStatus = cairo_surface_write_to_png(cairoSurface, imageOutPath);
+     cairo_status_t opStatus = cairo_surface_write_to_png(cairo_get_target(cairoContext), 
+		                                          imageOutPath);
      return opStatus == CAIRO_STATUS_SUCCESS;
 }
 

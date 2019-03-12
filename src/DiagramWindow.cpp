@@ -63,6 +63,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
     cursor(DIAGRAMWIN_DEFAULT_CURSOR);
+    set_non_modal();
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
@@ -144,7 +145,7 @@ DiagramWindow::~DiagramWindow() {
 }
 
 void DiagramWindow::SetFolderIndex(int folderIndex) {
-    this->structureFolderIndex = folderIndex;
+    this->structureFolderIndex = this->folderIndex = folderIndex;
     struct Folder *dwinFolder = RNAStructViz::GetInstance()->
 	                        GetStructureManager()->
                                 GetFolderAt(folderIndex);
@@ -1414,6 +1415,19 @@ int DiagramWindow::handle(int flEvent) {
 			      fprintf(stderr, "CT view operation failed. Try zooming again?\n");
 			      return 1;
 			 }
+		    }
+		    else if(Fl::event_length() == 1 && 
+		            (*(Fl::event_text()) == 'C' || *(Fl::event_text()) == 'R')) {
+		          
+		         RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
+				                   GetStructure(folderIndex);
+			 const char *rnaSeqStr = rnaStruct->GetSequenceString();
+			 size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
+			 size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
+			 delete RadialLayoutDisplayWindow::GetVRNARadialLayoutData(rnaSeqStr, 
+					                   seqStartPos, seqEndPos, 
+							   RadialLayoutDisplayWindow::PLOT_TYPE_SIMPLE);
+
 		    }
 	       }
 	  default:

@@ -14,6 +14,8 @@
 #include <FL/fl_draw.H>
 #include <FL/Enumerations.H>
 
+namespace CairoDraw {
+
 class CairoContext_t { 
 
      public:
@@ -193,6 +195,7 @@ class CairoContext_t {
 	  void FreeCairoStructures();
 	  bool InitCairoStructures(size_t width, size_t height);
 	  bool InitCairoStructures(cairo_t *crContext);
+	  bool BlankFillCanvas();
 	  bool CopyContextData(const CairoContext_t &crContext);
 
 	  cairo_font_slant_t ExtractFontSlantFromStyle(uint16_t fontStyle);
@@ -246,7 +249,10 @@ class CairoContext_t {
 
 }; // class CairoContext_t 
 
+} // namespace CairoDraw
+
 /* Typedefs for convenience (keep from having to over-scope everything): */
+using namespace CairoDraw;
 typedef CairoContext_t::CairoColor_t::CairoColorSpec_t CairoColorSpec_t;
 typedef CairoContext_t::CairoColor_t CairoColor_t;
 typedef CairoColor_t::CairoRGBA_t CairoRGBA_t;

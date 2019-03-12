@@ -114,9 +114,9 @@ typedef struct {
 #define MAX_SIZET                           ((size_t) -1)
 
 static inline char * GetSubstringFromRange(const char *baseStr, size_t startPos, size_t endPos) {
-     size_t baseStrLen = strnlen(baseStr, 2048);
+     size_t baseStrLen = strlen(baseStr);
      if(endPos == MAX_SIZET) {
-          endPos = baseStrLen;
+          endPos = baseStrLen ? baseStrLen - 1 : 0;
      }
      if(startPos > endPos || startPos >= baseStrLen || endPos >= baseStrLen) {
           return NULL;

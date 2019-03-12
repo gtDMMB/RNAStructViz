@@ -17,6 +17,7 @@ extern "C" {
      #include <ViennaRNA/utils/basic.h>
      #include <ViennaRNA/params/basic.h>
      #include <ViennaRNA/datastructures/basic.h>
+     #include <ViennaRNA/utils/strings.h>
      #include <ViennaRNA/plotting/structures.h>
      #include <ViennaRNA/fold.h>
      #include <ViennaRNA/gquad.h>
@@ -93,9 +94,10 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
           static void PlotTypeCheckboxCallback(Fl_Widget *cbPlotType, void *udata);
 
      public:
-          static CairoContext_t * GetVRNARadialLayoutData(const char *rnaSubseq, size_t startPos = 0, 
+          static CairoContext_t * GetVRNARadialLayoutData(const char *rnaSubseq, 
+			                                  size_t startPos = 0, 
 		                                          size_t endPos = MAX_SIZET, 
-							  VRNAPlotType_t plotType = PLOT_TYPE_CIRCULAR);
+							  VRNAPlotType_t plotType = PLOT_TYPE_SIMPLE);
 
 };
 

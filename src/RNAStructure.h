@@ -192,6 +192,16 @@ class RNAStructure
 	size_t GenerateFASTAFormatString(char *strBuf, size_t maxChars) const;
 	size_t GenerateDotBracketFormatString(char *strBuf, size_t maxChars) const; 
 
+    public:
+	inline const char * GetSequenceString() {
+	     if(charSeq == NULL) {
+	          GenerateString();
+	     }
+	     return charSeq;
+	}
+
+    private:
+
 	/* Callbacks for the export buttons: */
         static void ExportFASTAFileCallback(Fl_Widget *btn, void *udata);
 	static void ExportDotBracketFileCallback(Fl_Widget *btn, void *udata);

@@ -307,9 +307,9 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     #endif
     result->m_pathname = strdup(filename);
     result->charSeqSize = tempSeq.size();
-    result->charSeq = (char *) malloc(sizeof(char) * result->charSeqSize);
+    result->charSeq = (char *) malloc((result->charSeqSize + 1) * sizeof(char));
     result->dotFormatCharSeq = (char *) 
-	    malloc(sizeof(char) * result->charSeqSize);
+	    malloc((result->charSeqSize + 1) * sizeof(char));
     for(unsigned i = 0; i < tempSeq.size(); i++)
     {
         result->charSeq[i] = toupper(tempSeq.at(i));
@@ -324,6 +324,8 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
 	     result->dotFormatCharSeq[i] = ')';
 	}
     }
+    result->charSeq[result->charSeqSize] = '\0';
+    result->dotFormatCharSeq[result->charSeqSize] = '\0';
     #if PERFORM_BRANCH_TYPE_ID    
     RNABranchType_t::PerformBranchClassification(result, result->m_sequenceLength);
     #endif

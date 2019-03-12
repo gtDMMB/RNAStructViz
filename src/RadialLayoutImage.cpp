@@ -17,11 +17,17 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      char *effectiveRNASubseq = GetSubstringFromRange(rnaSubseq, 0, MAX_SIZET);
      StringToUppercase(effectiveRNASubseq);
      startPos = 0; endPos = strlen(effectiveRNASubseq);
+     endPos = endPos ? endPos - 1 : 0;
      unsigned int rnaSubseqLen = endPos - startPos + 1;
-    
-     vrna_md_t vmdParam; 
-     char *mfeStructure = (char *) vrna_alloc((rnaSubseqLen + 1) * sizeof(char));
-     vrna_fold_compound_t *vfc = vrna_fold_compound(effectiveRNASubseq, &vmdParam, VRNA_OPTION_DEFAULT);
+     vrna_seq_toRNA(effectiveRNASubseq);
+     fprintf(stderr, "%s\n", rnaSubseq);
+     fprintf(stderr, "%s\n", effectiveRNASubseq);
+
+     vrna_fold_compound_t *vfc = vrna_fold_compound(effectiveRNASubseq, NULL, VRNA_OPTION_DEFAULT);
+     vrna_md_t vmdParam = vfc->params->model_details;
+     int length = vfc->length;
+     
+     char *mfeStructure = (char *) vrna_alloc((length + 1) * sizeof(char));
      double minEnergy = (double) vrna_mfe(vfc, mfeStructure);
      short *pairTable = vrna_ptable(mfeStructure); 
      short *pairTableG = vrna_ptable(mfeStructure);
@@ -55,7 +61,9 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           workingIdx = naview_xy_coordinates(pairTableG, xPosArr, yPosArr);
      }
      if(workingIdx != rnaSubseqLen) {
-          fl_alert("Warning: Strange things are happening with the ViennaRNA PS plot algorithm ...");
+          fl_alert("Warning: Strange things are happening with the ViennaRNA PS plot algorithm ...\n"
+	           " > workingIdx = %d, RNASubseqLen = %d;", 
+		   workingIdx, rnaSubseqLen);
      }
 
      float xmin, xmax, ymin, ymax;
@@ -63,33 +71,24 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      ymin = ymax = yPosArr[0];
      for(int idx = 1; idx < rnaSubseqLen; idx++) {
           xmin = xPosArr[idx] < xmin ? xPosArr[idx] : xmin;
-          xmax = xPosArr[idx] > xmin ? xPosArr[idx] : xmax;
+          xmax = xPosArr[idx] > xmax ? xPosArr[idx] : xmax;
           ymin = yPosArr[idx] < ymin ? yPosArr[idx] : ymin;
-          ymax = yPosArr[idx] > xmin ? yPosArr[idx] : ymax;
+          ymax = yPosArr[idx] > ymax ? yPosArr[idx] : ymax;
      }
-     CairoContext_t *plotCanvas = new CairoContext_t(2 * (xmax - xmin), 2 * (ymax - ymin));
+     float xScale = (float) (0.8 *(DEFAULT_RLWIN_WIDTH / xmax));
+     float yScale = (float) (0.8 *(DEFAULT_RLWIN_HEIGHT / ymax));
+     
+     CairoContext_t *plotCanvas = new CairoContext_t(DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_HEIGHT);
+     plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK));
 
      // TODO: Draw connecting lines;
-     ge = 0;
-     while( (ee = parse_gquad(mfeStructure + ge, &Lg, l)) > 0) {
-	  ge += ee;
-	  gb = ge - 4 * Lg - l[0] - l[1] - l[2] + 1;
-	  for(int k = 0; k < Lg; k++) {
-               int ii, jj;
-	       for(int il = 0, ii = gb + k; il < 3; il++) {
-	            jj = ii + l[il] + Lg;
-		    plotCanvas->DrawBaseNode(ii, jj, '?', 0, 15, 
-				             CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_CYAN), 
-					     CairoContext_t::NodeStyle_t::CIRCLE_NODE);
-		    ii = jj;
-	       }
-	       jj = gb + k;
-	       plotCanvas->DrawBaseNode(jj, ii, 'X', 0, 15, 
-			                CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_MAGENTA), 
-					CairoContext_t::NodeStyle_t::SQUARE_NODE);
-	  }
+     int idx = 0;
+     while(idx < rnaSubseqLen) {
+          plotCanvas->DrawBaseNode(xPosArr[idx] * xScale, yPosArr[idx] * yScale, 
+			           effectiveRNASubseq[idx], idx + 1, 8, 
+				   CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK));
+	  idx++;
      }
-     plotCanvas->SaveToImage("/home/maxie/Desktop/testRadial.png");
 
      free(effectiveRNASubseq);
      free(vfc);
@@ -98,6 +97,8 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      free(pairTableG);
      free(xPosArr);
      free(yPosArr);
+     
+     //plotCanvas->SaveToImage("/home/maxie/Desktop/testRadial.png");
      return plotCanvas;
 
 }

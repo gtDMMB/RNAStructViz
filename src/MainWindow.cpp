@@ -32,7 +32,7 @@ MainWindow::MainWindow(int argc, char **argv)
 {
     m_mainWindow = new Fl_Double_Window(650, 450, RNASTRUCTVIZ_VSTRING);
     m_mainWindow->size_range(650, 450, 650, 450);
-    m_mainWindow->callback(CloseCallback);
+    //m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(GUI_WINDOW_BGCOLOR);
     m_mainWindow->begin();    
 
@@ -158,15 +158,15 @@ MainWindow::~MainWindow()
     if (m_fileChooser) {
         delete m_fileChooser;
     }
-    delete m_mainWindow;
-    delete m_packedInfo;
-    delete m_structureInfo;
-    delete columnLabel;
-    delete actionsLabel;
-    delete topTextDivider;
-    delete midTextDivider;
-    delete openButton;
-    delete configOptionsButton;
+    Delete(m_mainWindow);
+    Delete(m_packedInfo);
+    Delete(m_structureInfo);
+    Delete(columnLabel);
+    Delete(actionsLabel);
+    Delete(topTextDivider);
+    Delete(midTextDivider);
+    Delete(openButton);
+    Delete(configOptionsButton);
     for(int w = 0; w < folderDataBtns.size(); w++) {
         delete folderDataBtns[w];
 	folderDataBtns[w] = NULL;
