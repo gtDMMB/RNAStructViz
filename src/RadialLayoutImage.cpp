@@ -132,17 +132,11 @@ void RadialLayoutDisplayWindow::CloseWindowCallback(Fl_Widget *cbtn, void *udata
 }
 
 void RadialLayoutDisplayWindow::ExportRadialImageToPNGCallback(Fl_Widget *ebtn, void *udata) {
-
-
-
-
+     fl_alert("TODO");
 }
 
 void RadialLayoutDisplayWindow::PlotTypeCheckboxCallback(Fl_Widget *cbw, void *udata) {
-
-
-
-
+     fl_alert("TODO");
 }
 
 CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *rnaSubseq, 
