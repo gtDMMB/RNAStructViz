@@ -17,6 +17,14 @@ static inline void DeletePointerCheck(void *ptr) {
 
 #define Delete(p)                       ({ DeletePointerCheck(p); p = NULL; })
 
+static inline void FreePointerCheck(void *ptr) {
+     if(ptr != NULL) {
+          free(ptr);
+     }
+}
+
+#define Free(p)                         ({ FreePointerCheck(p); p = NULL; })
+
 typedef bool (*PredicateFunc_t)(char);
 
 static inline const char* RemoveCharsFromStringByPredicate(char *str, PredicateFunc_t predicateFunc) {

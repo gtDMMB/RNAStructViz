@@ -29,6 +29,10 @@ extern "C" {
 #define DEFAULT_RLWIN_WIDTH           (550)
 #define DEFAULT_RLWIN_HEIGHT          (400)
 
+#define WIDGET_HEIGHT                 (15)
+#define WIDGET_WIDTH                  (50)
+#define WIDGET_SPACING                (5)
+
 class RadialLayoutWindowCallbackInterface {
      
      public:
@@ -69,25 +73,25 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  ~RadialLayoutDisplayWindow();
 
 	  bool SetTitle(const char *windowTitleStr);
-	  bool SetTitle(const char *windowTitleFmt, ...);
-	  bool SetParentWindow(RadialLayoutWindowCallbackInterface *parentCallingWin);
+	  bool SetTitleFormat(const char *windowTitleFmt, ...);
 	  
 	  bool SetRadialPlotType(VRNAPlotType_t plotType = PLOT_TYPE_CIRCULAR);
 	  bool DisplayRadialDiagram(const char *rnaSeq, size_t startSeqPos = 0, 
 			            size_t endSeqPos = MAX_SIZET);
 
+	  inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {}
+
      protected:
-	  void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
+	  static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
      private:
 	  char *winTitle;
 	  int vrnaPlotType;
           CairoContext_t *radialLayoutCanvas;
-	  Fl_Window *parentCallingWindow;
 	  
 	  Fl_Box *closeWindowFrameBox;
 	  Fl_Button *closeWindowBtn, *exportImageToPNGBtn;
-          Fl_Check_Button *cbCircularPlotType;
+          Fl_Check_Button *cbPlotType;
 
 	  static void CloseWindowCallback(Fl_Widget *cbtn, void *udata);
 	  static void ExportRadialImageToPNGCallback(Fl_Widget *ebtn, void *udata);

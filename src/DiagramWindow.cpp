@@ -56,9 +56,9 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     m_cbDrawBases = NULL;
     userConflictAlerted = false;
     showPlotTickMarks = true;
-
     baseColorPaletteImg = NULL;
     baseColorPaletteChangeBtn = NULL;
+    radialDisplayWindow = NULL;
 
     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
@@ -172,6 +172,12 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
         m_drawBranchesIndicator->clear();
         userConflictAlerted = false;
     }
+    if(resetMenus) {
+         zoomButtonDown = haveZoomBuffer = false;
+         zoomBufferContainsArc = false;
+         zx0 = zx1 = zy0 = zy1 = zw = zh = 0;
+         zoomBufferMinArcIndex = zoomBufferMaxArcIndex = 0;
+    }
     if(haveZoomBuffer) {
         cairo_set_source_rgb(crZoom, 
 		               GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
@@ -180,12 +186,6 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
         cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
         cairo_fill(crZoom);
     }
-    zoomButtonDown = haveZoomBuffer = false;
-    zoomBufferContainsArc = false;
-    zx0 = zx1 = zy0 = zy1 = zw = zh = 0;
-    zoomBufferMinArcIndex = zoomBufferMaxArcIndex = 0;
-    sequenceLength = 0; 
-    structureFolderIndex = -1;
     redraw();
 
 }
@@ -1399,7 +1399,7 @@ int DiagramWindow::handle(int flEvent) {
 			      	      "CT file contents!\n");
 			      return 1;
 			 }
-			 else if(!RNAStructure::ActionOpenCTFileViewerWindow(structureFolderIndex, 
+			 else if(!RNAStructure::ActionOpenCTFileViewerWindow(folderIndex, 
 						zoomBufferMinArcIndex, zoomBufferMaxArcIndex)) {
 			      fprintf(stderr, 
 				      "Open an active CT file viewer window before trying to scroll to "
@@ -1424,9 +1424,13 @@ int DiagramWindow::handle(int flEvent) {
 			 const char *rnaSeqStr = rnaStruct->GetSequenceString();
 			 size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
 			 size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
-			 delete RadialLayoutDisplayWindow::GetVRNARadialLayoutData(rnaSeqStr, 
-					                   seqStartPos, seqEndPos, 
-							   RadialLayoutDisplayWindow::PLOT_TYPE_SIMPLE);
+			 radialDisplayWindow = new RadialLayoutDisplayWindow();
+			 radialDisplayWindow->SetTitleFormat("Radial Display for %s -- Highlighting Arcs #%d to #%d", 
+					               rnaStruct->GetFilenameNoExtension(), 
+						       seqStartPos + 1, seqEndPos + 1);
+                         radialDisplayWindow->SetParentWindow(this);
+			 radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos);
+			 radialDisplayWindow->show();
 
 		    }
 	       }

@@ -81,7 +81,13 @@ class DiagramWindow : public Fl_Cairo_Window, public RadialLayoutWindowCallbackI
     void SetFolderIndex(int index);
     int GetFolderIndex() const;
 
-    inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {} // TODO
+    inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {
+         if(radialDisplayWindow == NULL) {
+	      return;
+	 }
+	 radialDisplayWindow->hide();
+	 Delete(radialDisplayWindow);
+    }   
 
 protected:
 
@@ -220,6 +226,8 @@ private:
     bool ParseZoomSelectionArcIndices();
     void RedrawCairoZoomBuffer(cairo_t *curWinContext);
     void HandleUserZoomAction();
+
+    RadialLayoutDisplayWindow *radialDisplayWindow;
 
     void RedrawStrandEdgeMarker(cairo_t *curWinContext);
     
