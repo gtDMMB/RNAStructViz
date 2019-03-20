@@ -21,10 +21,10 @@
           if(s == NULL) {
                return NULL;
 	  }
-          char *strchrResult = strchr(s, ch);
+          char *strchrResult = (char *) strchr(s, ch);
           if(strchrResult == NULL) {
 	       size_t slen = strnlen(s, 2048);
-               return s + slen;
+               return (char *) (s + slen);
 	  }
           return strchrResult;
      }	  

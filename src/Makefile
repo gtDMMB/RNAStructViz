@@ -58,14 +58,13 @@ CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
-	       -funsigned-char -Wno-c++11-narrowing \
-	       `pkg-config --cflags RNAlib2`
+	       -funsigned-char -Wno-c++11-narrowing 
 
 CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
-LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) `pkg-config --libs RNAlib2`
+LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG)
 LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = \

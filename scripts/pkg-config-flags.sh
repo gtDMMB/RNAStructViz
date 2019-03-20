@@ -6,7 +6,7 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 fi
 
 
-PKGS=(glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo xpm)
+PKGS=(glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo xpm RNAlib2)
 PKGOUT=""
 
 for pkg in "${PKGS[@]}"; do
@@ -28,7 +28,7 @@ fi
 if [[ "$(uname -s)" == "Linux" ]]; then
 	PKGOUT+=" -DTARGETOS_LINUX"
 elif [[ "$(uname -s)" == "Darwin" ]]; then
-	PKGOUT+=" -DTARGETOS_APPLE" #-mmacosx-version-min=10.6"
+	PKGOUT+=" -DTARGETOS_MACOSX" #-mmacosx-version-min=10.6"
 else 
 	PKGOUT+=" -DTARGETOS_GENERIC_UNIX"
 fi
