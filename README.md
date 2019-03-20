@@ -1,4 +1,4 @@
-<center><img src="https://user-images.githubusercontent.com/22165688/53954914-92e87480-40a5-11e9-8231-5b5cbc4e2fd1.png" alt="More RNAStructViz Live User Action Shots!" width="575" /></center>
+<center><img src="https://user-images.githubusercontent.com/22165688/53954914-92e87480-40a5-11e9-8231-5b5cbc4e2fd1.png" alt="More RNAStructViz Live User Action Shots!" width="300" /><img src="https://user-images.githubusercontent.com/22165688/54701440-643db580-4b0b-11e9-998a-7f5f3ef73837.png" width="300" /></center>
 
 # Welcome to the RNAStructViz software installation and user documentation!
 
