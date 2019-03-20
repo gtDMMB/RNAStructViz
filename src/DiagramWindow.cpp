@@ -89,6 +89,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     SetCairoColor(crDraw, CairoColorSpec_t::CR_TRANSPARENT);
     cairo_rectangle(crDraw, 0, 0, this->w(), this->h());
     cairo_fill(crDraw);
+    SetCairoColor(crBasePairsOverlay, CairoColorSpec_t::CR_TRANSPARENT);
     cairo_rectangle(crBasePairsOverlay, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
     cairo_fill(crBasePairsOverlay);
     crZoom = cairo_create(crZoomSurface);
@@ -408,11 +409,22 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
             thisWindow->SetCairoToFLColor(thisWindow->crDraw, thisWindow->color());
 	    cairo_rectangle(thisWindow->crDraw, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
             cairo_fill(thisWindow->crDraw);
+	    thisWindow->SetCairoToFLColor(thisWindow->crBasePairsOverlay, thisWindow->color());
+	    cairo_rectangle(thisWindow->crBasePairsOverlay, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+	    cairo_fill(thisWindow->crBasePairsOverlay);
 	    cairo_push_group(thisWindow->crDraw);
-            int drawParams[] = { numToDraw, keyA, keyB };
+	    int drawParams[] = { numToDraw, keyA, keyB };
 	    thisWindow->RedrawBuffer(thisWindow->crDraw, sequences, drawParams, IMAGE_WIDTH);
 	    cairo_pop_group_to_source(thisWindow->crDraw);
-            cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
+            if(thisWindow->m_cbDrawBases->value()) {
+	         cairo_save(thisWindow->crDraw);
+	         cairo_set_source_surface(thisWindow->crDraw, 
+				          cairo_get_target(thisWindow->crBasePairsOverlay), 0, 0);
+                 cairo_rectangle(thisWindow->crDraw, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);    
+                 cairo_fill(thisWindow->crDraw);
+                 cairo_restore(thisWindow->crDraw);
+	    }
+	    cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
 		      IMAGE_WIDTH / 2 - 25.f, 0.0, 2.0 * M_PI);
             cairo_clip(thisWindow->crDraw);
             cairo_paint(thisWindow->crDraw);
@@ -1094,27 +1106,39 @@ void DiagramWindow::DrawBase(
         const float angleDelta,
         const float radius) {
     float angle1 = angleBase - (float) index * angleDelta;
-    float xPosn1 = GLWIN_TRANSLATEX + centerX + cos(angle1) * (radius + 5);
-    float yPosn1 = GLWIN_TRANSLATEY + centerY - sin(angle1) * (radius + 5) - 
+    float xPosn1 = centerX + cos(angle1) * (radius + 5);
+    float yPosn1 = centerY - sin(angle1) * (radius + 5) - 
 	           fl_descent() + 0.5 * fl_height();
+    const char *baseChar = "X";
+    CairoColor_t baseColor = CairoColor_t::FromFLColorType(FL_BLACK);
     switch (base) {
         case RNAStructure::A:
-            fl_color(FL_LOCAL_MEDIUM_GREEN);
-	    fl_draw("A", (int) (xPosn1 - fl_width('A') * 0.5f), (int) yPosn1);
+	    baseChar = "A";
+            baseColor = CairoColor_t::FromFLColorType(FL_LOCAL_MEDIUM_GREEN);
             break;
         case RNAStructure::C:
-	    fl_color(FL_LOCAL_DARK_RED);
-            fl_draw("C", (int) (xPosn1 - fl_width('C') * 0.5f), (int) yPosn1);
+	    baseChar = "C";
+            baseColor = CairoColor_t::FromFLColorType(FL_LOCAL_DARK_RED);
             break;
         case RNAStructure::G:
-	    fl_color(FL_LOCAL_LIGHT_PURPLE);
-            fl_draw("G", (int) (xPosn1 - fl_width('G') * 0.5f), (int) yPosn1);
+	    baseChar = "G";
+            baseColor = CairoColor_t::FromFLColorType(FL_LOCAL_LIGHT_PURPLE);
             break;
         case RNAStructure::U:
-	    fl_color(FL_LOCAL_BRIGHT_YELLOW);
-            fl_draw("U", (int) (xPosn1 - fl_width('U') * 0.5f), (int) yPosn1);
+	    baseChar = "U";
+            baseColor = CairoColor_t::FromFLColorType(FL_LOCAL_BRIGHT_YELLOW);
             break;
     }
+    cairo_save(crBasePairsOverlay);
+    cairo_text_extents_t textDims;
+    cairo_text_extents(crBasePairsOverlay, baseChar, &textDims);
+    baseColor.ApplyRGBAColor(crBasePairsOverlay);
+    cairo_select_font_face(crBasePairsOverlay, "Courier New", 
+		           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(crBasePairsOverlay, CairoContext_t::FONT_SIZE_SMALL);
+    cairo_move_to(crBasePairsOverlay, (int) (xPosn1 - textDims.width / 2), (int) yPosn1);
+    cairo_show_text(crBasePairsOverlay, baseChar);
+    cairo_restore(crBasePairsOverlay);
     fl_color(GUI_WINDOW_BGCOLOR);
 }
 

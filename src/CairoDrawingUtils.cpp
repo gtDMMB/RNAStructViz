@@ -159,9 +159,10 @@ Fl_Color CairoColor_t::ToFLColorType() const {
 CairoColor_t CairoColor_t::FromFLColorType(Fl_Color flColor) {
      uint32_t flHexColor = ColorUtil::RGBHexTupleFromFLColor(flColor);
      CairoColor_t crColor(0, 0, 0);
-     crColor.SetRGB(ColorUtil::RGBGetRed(flHexColor), 
-	            ColorUtil::RGBGetGreen(flHexColor), 
-	            ColorUtil::RGBGetBlue(flHexColor));
+     crColor.SetRGBA(ColorUtil::RGBGetRed(flHexColor), 
+	             ColorUtil::RGBGetGreen(flHexColor), 
+	             ColorUtil::RGBGetBlue(flHexColor), 
+		     CAIRO_COLOR_RGBA_MAXVAL);
      return crColor;
 }
 
