@@ -3,10 +3,10 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -pedantic -O1 -lstdc++
+CXXFLAGS= -g -Wall -Wextra -pedantic -O1 #-lstdc++
 
 LD=g++
-LDFLAGS=-Wall -Wextra -g1 -lm -Wl,--no-as-needed
+LDFLAGS=-Wall -Wextra -g1 -lm
 
 .DEFAULT: default
 
@@ -30,13 +30,12 @@ TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
+	#CXX=g++-4.9
+	#LD=g++-4.9
 else
-	#ifneq "$(shell ls /usr/bin/fltk-config)" ""
-	#	FLTKCONFIG=/usr/bin/fltk-config
-        #else
 	FLTKCONFIG=fltk-config
-	#endif
 	READLINK=readlink
+	LDFLAGS+= -Wl,--no-as-needed
 endif
 
 .EXPORT_ALL_VARIABLES:
