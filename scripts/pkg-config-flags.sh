@@ -1,10 +1,16 @@
 #!/bin/bash
 
+PKGCONFIG=`which pkg-config`
+if [[ "$(uname -s)" == "Darwin" ]]; then 
+	export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/libffi/lib/pkgconfig";
+fi
+
+
 PKGS=(glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo xpm)
 PKGOUT=""
 
 for pkg in "${PKGS[@]}"; do
-	pkg-config --silence-errors --exists $pkg
+	$PKGCONFIG --silence-errors --exists $pkg
 	if [ "$?" == "0" ]; then
 		PKGOUT="${PKGOUT} `pkg-config $1 $pkg`"
 	fi
