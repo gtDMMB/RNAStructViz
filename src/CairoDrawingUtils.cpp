@@ -3,6 +3,8 @@
  * Created: 2019.03.11
  */
 
+#include <math.h>
+
 #include "CairoDrawingUtils.h"
 
 #define TRUNCRGBA(comp)             ((comp < 0 ? 0 : \
@@ -162,7 +164,7 @@ CairoColor_t CairoColor_t::FromFLColorType(Fl_Color flColor) {
      crColor.SetRGBA(ColorUtil::RGBGetRed(flHexColor), 
 	             ColorUtil::RGBGetGreen(flHexColor), 
 	             ColorUtil::RGBGetBlue(flHexColor), 
-		     CAIRO_COLOR_RGBA_MAXVAL);
+		     CAIRO_COLOR_OPAQUE);
      return crColor;
 }
 
@@ -213,7 +215,7 @@ CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor
 	case CR_WHITE:
 	    return GetCairoColor(255, 255, 255);
 	case CR_TRANSPARENT:
-	    return GetCairoColor(255, 255, 255, 0x7f);
+	    return GetCairoColor(255, 255, 255, CAIRO_COLOR_TRANSPARENT);
         case CR_SOLID_BLACK:
 	    return GetCairoColor(0, 0, 0, 255);
         case CR_SOLID_WHITE:
@@ -272,37 +274,42 @@ bool CairoColor_t::operator==(const CairoColor_t &rhsColor) const {
 	    (B == rhsColor.Blue()) && (A == rhsColor.Alpha());
 }
 
-CairoColor_t & CairoColor_t::Lighten(float pct) {
-     FromFLColorType(ColorUtil::Lighter(ToHexInteger(), TRUNCPCT(pct)));
-     return *this;     
+CairoColor_t CairoColor_t::Lighten(float pct) {
+     fl_color(Red(), Green(), Blue());
+     Fl_Color flColor = fl_color();
+     return FromFLColorType(ColorUtil::Lighter(flColor, TRUNCPCT(pct)));
 }
 
-CairoColor_t & CairoColor_t::Darken(float pct) {
-     FromFLColorType(ColorUtil::Darker(ToHexInteger(), TRUNCPCT(pct)));
-     return *this;     
+CairoColor_t CairoColor_t::Darken(float pct) {
+     fl_color(Red(), Green(), Blue());
+     Fl_Color flColor = fl_color();
+     return FromFLColorType(ColorUtil::Darker(flColor, TRUNCPCT(pct)));
 }
 
-CairoColor_t & CairoColor_t::ToGrayscale() {
+CairoColor_t CairoColor_t::ToGrayscale() {
+     CairoColor_t nextColor;
      CairoRGBA_t grayComp = TRUNCRGBA(R * 0.299 + G * 0.587 + B * 0.114);
-     R = G = B = grayComp;
-     return *this;
+     nextColor.R = nextColor.G = nextColor.B = grayComp;
+     nextColor.A = A;
+     return nextColor;
 }
 
-CairoColor_t & CairoColor_t::ToTransparent() {
-     A = CAIRO_COLOR_TRANSPARENT;
-     return *this;
+CairoColor_t CairoColor_t::ToTransparent() {
+     CairoColor_t nextColor = *this;
+     nextColor.A = CAIRO_COLOR_TRANSPARENT;
+     return nextColor;
 }
 
-CairoColor_t & CairoColor_t::ToOpaque() {
-     A = CAIRO_COLOR_OPAQUE;
-     return *this;
+CairoColor_t CairoColor_t::ToOpaque() {
+     CairoColor_t nextColor = *this;
+     nextColor.A = CAIRO_COLOR_OPAQUE;
+     return nextColor;
 }
 
-CairoColor_t & CairoColor_t::Tint(const CairoColor_t &tintColor, float pct) {
+CairoColor_t CairoColor_t::Tint(const CairoColor_t &tintColor, float pct) {
      Fl_Color tintFlColor = tintColor.ToFLColorType();
      Fl_Color curFlColor = ToFLColorType();
-     FromFLColorType(fl_color_average(curFlColor, tintFlColor, TRUNCPCT(pct)));
-     return *this;
+     return FromFLColorType(fl_color_average(curFlColor, tintFlColor, TRUNCPCT(pct)));
 }
 
 uint32_t CairoContext_t::CairoColor_t::ColorUtil::RGBRedComponent(uint32_t rgbHexColor) { 
@@ -372,7 +379,7 @@ bool CairoContext_t::InitCairoStructures(size_t w, size_t h) {
      height = h;
      cairoSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
      cairoContext = cairo_create(cairoSurface);
-     BlankFillCanvas();
+     BlankFillCanvas(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
      return Initialized();
 }
 
@@ -382,16 +389,16 @@ bool CairoContext_t::InitCairoStructures(cairo_t *crContext) {
      cairoContext = crContext;
      width = cairo_image_surface_get_width(cairoSurface);
      height = cairo_image_surface_get_height(cairoSurface);
-     BlankFillCanvas();
+     BlankFillCanvas(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
      return Initialized();
 }
 
-bool CairoContext_t::BlankFillCanvas() {
+bool CairoContext_t::BlankFillCanvas(CairoColor_t cairoFillColor) {
      if(!Initialized()) {
           return false;
      }
      cairo_save(cairoContext);
-     SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
+     SetColor(cairoFillColor);
      cairo_rectangle(cairoContext, 0, 0, width, height);
      cairo_fill(cairoContext);
      cairo_restore(cairoContext);
@@ -453,6 +460,9 @@ CairoContext_t & CairoContext_t::operator=(const CairoContext_t &rhsContext) {
 }
 
 CairoContext_t::~CairoContext_t() {
+     if(cairoSurface != NULL) {
+          cairo_surface_flush(cairoSurface);
+     }
      FreeCairoStructures();
 }
 
@@ -576,16 +586,98 @@ bool CairoContext_t::SetColor(const CairoColor_t &cairoColor) {
      return cairoColor.ApplyRGBAColor(this->cairoContext);
 }
 
+bool CairoContext_t::Scale(double sxy) {
+     cairo_scale(cairoContext, sxy, sxy);
+     return true;
+}
+
+bool CairoContext_t::Scale(double sx, double sy) {
+     cairo_scale(cairoContext, sx, sy);
+     return true;
+}
+
+bool CairoContext_t::Translate(int xoffset, int yoffset) {
+     cairo_translate(cairoContext, xoffset, yoffset);
+     return true;
+}
+
+bool CairoContext_t::ResetToIdentityTransform() {
+     cairo_identity_matrix(cairoContext);
+     return true;
+}
+
+bool CairoContext_t::OverlayGraphics(const CairoContext_t &overlayContext, int startX, int startY) {
+     cairo_t *crOverlayContext = overlayContext.GetCairoContext();
+     cairo_surface_t *crOverlaySurface = cairo_get_target(crOverlayContext);
+     int overlayWidth = cairo_image_surface_get_width(crOverlaySurface);
+     int overlayHeight = cairo_image_surface_get_height(crOverlaySurface);
+     SaveSettings();
+     cairo_set_source_surface(cairoContext, crOverlaySurface, startX, startY);
+     //cairo_rectangle(cairoContext, 0, 0, overlayWidth, overlayHeight);
+     //cairo_fill(cairoContext);
+     cairo_paint(cairoContext);
+     cairo_identity_matrix(cairoContext);
+     RestoreSettings();
+     return true;
+}
+
 bool CairoContext_t::DrawBaseNode(int centerX, int centerY, char baseChar, 
 		                  size_t baseIdx, size_t nodeSize, 
 				  CairoColor_t cairoBaseColor, 
 				  NodeStyle_t nodeStyle) {
-     // TODO: Much more to implement here ... 
-     SaveSettings();
-     SetColor(cairoBaseColor);
+     cairoBaseColor = cairoBaseColor.ToOpaque();
+     CairoColor_t nodeBGColor = cairoBaseColor.Lighten(0.75);
+     //nodeBGColor.SetAlphaRatio(0.75);
+     CairoColor_t nodeBorderColor = cairoBaseColor.Darken(0.1);
+     CairoColor_t nodeTextColor = CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_SOLID_BLACK);
+     CairoColor_t transparentBaseColor = CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT);
+     int nodeRadius = (int) (nodeSize / M_SQRT2 / 2.0 - 3);
+     CairoContext_t nodeOverlayContext(nodeSize, nodeSize);
+     cairo_t *cairoContext2 = nodeOverlayContext.GetCairoContext();
+     transparentBaseColor.ApplyRGBAColor(cairoContext2);
+     cairo_rectangle(cairoContext2, 0, 0, nodeSize, nodeSize);
+     cairo_fill(cairoContext2);
+     if(nodeStyle == CIRCLE_NODE) { 
+          nodeBGColor.ApplyRGBAColor(cairoContext2);
+          cairo_arc(cairoContext2, nodeSize / 2, nodeSize / 2, nodeRadius, 
+	            0.0, 2.0 * M_PI);
+	  //cairo_clip(cairoContext2);
+	  cairo_fill(cairoContext2);
+	  //cairo_reset_clip(cairoContext2);
+	  nodeBorderColor.ApplyRGBAColor(cairoContext2);
+          //cairo_set_line_width(cairoContext2, nodeRadius * 0.05);
+	  cairo_arc(cairoContext2, nodeSize / 2, nodeSize / 2, nodeRadius, 
+		    0.0, 2.0 * M_PI);
+          cairo_stroke(cairoContext2);
+     }
+     else if(nodeStyle == SQUARE_NODE) {
+          nodeBGColor.ApplyRGBAColor(cairoContext2);
+          cairo_rectangle(cairoContext2, 0, 0, 0.95 * nodeSize, 0.95 * nodeSize);
+	  //cairo_clip(cairoContext2);
+	  cairo_fill(cairoContext2);
+	  //cairo_reset_clip(cairoContext2);
+	  nodeBorderColor.ApplyRGBAColor(cairoContext2);
+	  //cairo_set_line_width(cairoContext2, nodeSize * 0.08);
+          cairo_rectangle(cairoContext2, 0, 0, 0.95 * nodeSize, 0.95 * nodeSize);
+          cairo_stroke(cairoContext2);
+     }
+     // now draw the text in the center framed in the center of the node:
+     nodeTextColor.ApplyRGBAColor(cairoContext2);
      char pairStr[16];
-     snprintf(pairStr, 16, "[%c]\0", toupper(baseChar));
-     DrawText(centerX, centerY, pairStr, CENTER);
+     snprintf(pairStr, 16, "%c\0", toupper(baseChar));
+     nodeOverlayContext.DrawText(nodeSize / 2, nodeSize / 2, pairStr, CENTER);
+     transparentBaseColor.ApplyRGBAColor(cairoContext2);
+     transparentBaseColor.ApplyRGBAColor(cairoContext);
+     OverlayGraphics(nodeOverlayContext, centerX - nodeSize / 2, centerY - nodeSize / 2);
+     return true;
+}
+
+bool CairoContext_t::DrawLine(size_t baseX, size_t baseY, size_t nextX, size_t nextY) {
+     SaveSettings();
+     cairo_move_to(cairoContext, baseX, baseY);
+     cairo_line_to(cairoContext, nextX, nextY);
+     cairo_stroke(cairoContext);
+     RestoreSettings();
      return true;
 }
 
@@ -597,7 +689,7 @@ bool CairoContext_t::DrawText(size_t baseX, size_t baseY, const char *text,
      else if(drawAlign == CENTER) {
 	  cairo_text_extents_t textStrDims;
 	  cairo_text_extents(cairoContext, text, &textStrDims);
-          baseX += textStrDims.width / 2;
+          baseX -= textStrDims.width / 2;
 	  baseY += textStrDims.height / 2;
      }
      cairo_move_to(cairoContext, baseX, baseY);

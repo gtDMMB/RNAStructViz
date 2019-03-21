@@ -27,7 +27,7 @@ extern "C" {
 #include "CairoDrawingUtils.h"
 
 #define DEFAULT_RLWIN_WIDTH           (550)
-#define DEFAULT_RLWIN_HEIGHT          (400)
+#define DEFAULT_RLWIN_HEIGHT          (550)
 
 #define WIDGET_HEIGHT                 (15)
 #define WIDGET_WIDTH                  (50)
@@ -102,6 +102,7 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 			                                  size_t startPos = 0, 
 		                                          size_t endPos = MAX_SIZET, 
 							  VRNAPlotType_t plotType = PLOT_TYPE_SIMPLE);
+          static CairoColor_t GetBaseNodeColor(char baseCh);
 
 };
 

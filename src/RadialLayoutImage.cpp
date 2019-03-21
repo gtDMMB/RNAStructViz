@@ -3,7 +3,11 @@
  * Created: 2019.03.11
  */
 
+#include <limits.h>
+
 #include "RadialLayoutImage.h"
+#include "RNAStructure.h"
+#include "ThemesConfig.h"
 
 RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height) : 
 	Fl_Cairo_Window(width, height), RadialLayoutWindowCallbackInterface(), 
@@ -205,18 +209,47 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           ymin = yPosArr[idx] < ymin ? yPosArr[idx] : ymin;
           ymax = yPosArr[idx] > ymax ? yPosArr[idx] : ymax;
      }
-     float xScale = (float) (0.8 *(DEFAULT_RLWIN_WIDTH / xmax));
-     float yScale = (float) (0.8 *(DEFAULT_RLWIN_HEIGHT / ymax));
-     
-     CairoContext_t *plotCanvas = new CairoContext_t(DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_HEIGHT);
-     plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK));
+     for(int xyPos = 0; xyPos < rnaSubseqLen; xyPos++) {
+          if(xmin < 0) {
+	       xPosArr[xyPos] += ABS(xmin);
+	  }
+	  if(ymin < 0) {
+	       yPosArr[xyPos] += ABS(ymin);
+	  }
+     }
+     xmin = xmin < 0 ? 0.0 : xmin;
+     ymin = ymin < 0 ? 0.0 : ymin;
+     const int nodeSize = 30, xyOffset = 16;
+     float xScale = (float) (0.8 * MAX(MAX(xmax / DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_WIDTH / xmax), 1.0));
+     float yScale = (float) (0.8 * MAX(MAX(ymax / DEFAULT_RLWIN_HEIGHT, DEFAULT_RLWIN_HEIGHT / ymax), 1.0));
 
-     // TODO: Draw connecting lines;
-     int idx = 0;
+     CairoContext_t *plotCanvas = new CairoContext_t(DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_HEIGHT);
+     plotCanvas->BlankFillCanvas(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_SOLID_WHITE));
+     plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
+     plotCanvas->SetStrokeSize(2);
+     plotCanvas->SetFontFace(CairoContext_t::CairoFontFace_t::MONOSPACE | 
+		             CairoContext_t::CairoFontStyle_t::BOLD | 
+			     CairoContext_t::CairoFontStyle_t::ITALIC);
+     plotCanvas->SetFontSize(CairoContext_t::FontSize_t::FONT_SIZE_TINY);
+
+     int idx = 0, nodeX = 0, nodeY = 0, lastNodeX, lastNodeY;
      while(idx < rnaSubseqLen) {
-          plotCanvas->DrawBaseNode(xPosArr[idx] * xScale, yPosArr[idx] * yScale, 
-			           effectiveRNASubseq[idx], idx + 1, 8, 
-				   CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK));
+	  lastNodeX = nodeX; 
+	  lastNodeY = nodeY;
+          nodeX = (int) ((xPosArr[idx] - xmin) * xScale);
+	  nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
+	  if(idx > 0) {
+	       plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK));
+	       plotCanvas->DrawLine(nodeX, nodeY, lastNodeX, lastNodeY);
+	  }
+	  CairoColor_t baseNodeColor = GetBaseNodeColor(effectiveRNASubseq[idx]);
+	  if(idx + 1 < startPos || idx + 1 > endPos) {
+	       baseNodeColor = baseNodeColor.ToGrayscale();
+	  } 
+	  plotCanvas->SetColor(baseNodeColor);
+	  plotCanvas->DrawBaseNode(nodeX, nodeY, 
+	  		           effectiveRNASubseq[idx], idx + 1, nodeSize, 
+	  			   baseNodeColor);
 	  idx++;
      }
 
@@ -228,9 +261,24 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      free(xPosArr);
      free(yPosArr);
      
-     //plotCanvas->SaveToImage("/home/maxie/Desktop/testRadial.png");
      return plotCanvas;
 
 }
 
-
+CairoColor_t RadialLayoutDisplayWindow::GetBaseNodeColor(char baseCh) {
+     if(toupper(baseCh) == (int) 'A') {
+          return CairoColor_t::FromFLColorType(FL_LOCAL_MEDIUM_GREEN);
+     }
+     else if(toupper(baseCh) == (int) 'C') {
+	  return CairoColor_t::FromFLColorType(FL_LOCAL_DARK_RED);
+     }
+     else if(toupper(baseCh) == (int) 'G') {
+	  return CairoColor_t::FromFLColorType(FL_LOCAL_LIGHT_PURPLE);
+     }
+     else if(toupper(baseCh) == (int) 'U') {
+	  return CairoColor_t::FromFLColorType(FL_LOCAL_BRIGHT_YELLOW);
+     }
+     else {
+          return CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK);
+     }
+}

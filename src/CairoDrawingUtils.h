@@ -24,8 +24,8 @@ class CairoContext_t {
 	       public:
 		    typedef unsigned short CairoRGBA_t;
                     static const CairoRGBA_t CAIRO_COLOR_DEFAULT_ALPHA = 0x99;
-		    static const CairoRGBA_t CAIRO_COLOR_TRANSPARENT = 0xff;
-		    static const CairoRGBA_t CAIRO_COLOR_OPAQUE = 0x00;
+		    static const CairoRGBA_t CAIRO_COLOR_TRANSPARENT = 0x00;
+		    static const CairoRGBA_t CAIRO_COLOR_OPAQUE = 0xff;
 	            static const CairoRGBA_t CAIRO_COLOR_RGBA_MAXVAL = 0xff;
 
                     typedef enum {
@@ -55,7 +55,7 @@ class CairoContext_t {
                     CairoRGBA_t R, G, B, A;
 	       
 	       public:
-		    CairoColor_t(CairoRGBA_t r, CairoRGBA_t g, CairoRGBA_t b, 
+		    CairoColor_t(CairoRGBA_t r = 0, CairoRGBA_t g = 0, CairoRGBA_t b = 0, 
 				 CairoRGBA_t alpha = CAIRO_COLOR_DEFAULT_ALPHA);
 
 		    CairoColor_t & SetRGB(CairoRGBA_t r, CairoRGBA_t g, CairoRGBA_t b);
@@ -102,12 +102,12 @@ class CairoContext_t {
 		    bool operator==(const CairoColor_t &rhsColor) const;
 
 		    /* Transforms of the color: */
-		    CairoColor_t & Lighten(float pct);
-		    CairoColor_t & Darken(float pct);
-		    CairoColor_t & ToGrayscale();
-		    CairoColor_t & ToTransparent();
-		    CairoColor_t & ToOpaque();
-		    CairoColor_t & Tint(const CairoColor_t &tintColor, float pct);
+		    CairoColor_t Lighten(float pct);
+		    CairoColor_t Darken(float pct);
+		    CairoColor_t ToGrayscale();
+		    CairoColor_t ToTransparent();
+		    CairoColor_t ToOpaque();
+		    CairoColor_t Tint(const CairoColor_t &tintColor, float pct);
 
 	       public:
 		    class ColorUtil {
@@ -161,11 +161,7 @@ class CairoContext_t {
 
 	  typedef enum {
 	       CIRCLE_NODE, 
-	       SQUARE_NODE,
-	       DIAMOND_NODE, 
-	       TRIANGLE_NODE, 
-	       FREE_FORM_NODE, // from structure Image Mask
-	       TREE_NODE,      // from another stock Image Mask
+	       SQUARE_NODE
 	  } NodeStyle_t;
 
 	  typedef enum {
@@ -178,15 +174,6 @@ class CairoContext_t {
 	       FONT_SIZE_SUBHEADER = 12
 	  } FontSize_t;
 
-	  typedef enum {
-	       GRADIENT_L2R, 
-	       GRADIENT_R2L, 
-	       GRADIENT_T2B, 
-	       GRADIENT_B2T, 
-	       GRADIENT_DIAGL2R, 
-	       GRADIENT_DIAGR2L
-	  } GradientFillDir_t;
-
      private:
 	  cairo_surface_t *cairoSurface;
           cairo_t *cairoContext;
@@ -195,7 +182,6 @@ class CairoContext_t {
 	  void FreeCairoStructures();
 	  bool InitCairoStructures(size_t width, size_t height);
 	  bool InitCairoStructures(cairo_t *crContext);
-	  bool BlankFillCanvas();
 	  bool CopyContextData(const CairoContext_t &crContext);
 
 	  cairo_font_slant_t ExtractFontSlantFromStyle(uint16_t fontStyle);
@@ -235,15 +221,17 @@ class CairoContext_t {
 	  bool SetColor(const CairoColor_t &cairoColor);
 
 	  /* Custom drawing items: */
-	  bool OverlayGraphics(const CairoContext_t &overlayContext, size_t startX, size_t startY);
+	  bool BlankFillCanvas(CairoColor_t cairoFillColor);
+	  bool Scale(double sxy);
+	  bool Scale(double sx, double sy);
+	  bool Translate(int xoffset, int yoffset);
+          bool ResetToIdentityTransform();
+
+	  bool OverlayGraphics(const CairoContext_t &overlayContext, int startX, int startY);
 	  bool DrawBaseNode(int centerX, int centerY, char baseChar, size_t baseIdx, 
 			    size_t nodeSize, CairoColor_t cairoBaseColor, 
 			    NodeStyle_t nodeStyle = CIRCLE_NODE);
-	  bool GradientFill(CairoColor_t lowerColor, CairoColor_t upperColor, 
-			    GradientFillDir_t gradientDir);
-	  bool GradientFill(CairoColor_t baseColor, float darkerBy, 
-			    GradientFillDir_t gradientDir);
-	  bool DrawLine(size_t baseX, size_t baseY, size_t length);
+	  bool DrawLine(size_t baseX, size_t baseY, size_t nextX, size_t nextY);
 	  bool DrawText(size_t baseX, size_t baseY, const char *text, 
 			CairoTextDrawParams_t = LEFT_JUSTIFY);
 
