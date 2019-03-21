@@ -241,7 +241,7 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      plotCanvas->SetFontFace(CairoContext_t::CairoFontFace_t::MONOSPACE | 
 		             CairoContext_t::CairoFontStyle_t::BOLD | 
 			     CairoContext_t::CairoFontStyle_t::ITALIC);
-     plotCanvas->SetFontSize(6);
+     plotCanvas->SetFontSize(3);
 
      int idx = 0, nodeX = 0, nodeY = 0, lastNodeX, lastNodeY;
      while(idx < rnaSubseqLen) {
@@ -266,7 +266,7 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 	       baseNodeColor = baseNodeColor.ToGrayscale();
 	  } 
 	  char nodeLabel[32];
-	  if(idx % NUMBERING_MODULO == 0) {
+	  if(idx % NUMBERING_MODULO == NUMBERING_MODULO - 1) {
 	       snprintf(nodeLabel, 32, "%d\0", idx + 1);
 	       plotCanvas->SetFontSize(2);
 	  }
