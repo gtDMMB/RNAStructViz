@@ -10,6 +10,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Scroll.H>
 
 #include <cairo.h>
 
@@ -32,6 +33,7 @@ extern "C" {
 #define WIDGET_HEIGHT                 (15)
 #define WIDGET_WIDTH                  (50)
 #define WIDGET_SPACING                (5)
+#define SCROLL_SIZE                   (20)
 
 #define NUMBERING_MODULO              (10)
 
@@ -83,6 +85,8 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 
 	  inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {}
 
+	  int handle(int eventType);
+
      protected:
 	  static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
@@ -91,19 +95,24 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  int vrnaPlotType;
           CairoContext_t *radialLayoutCanvas;
 	  
-	  Fl_Box *closeWindowFrameBox;
+	  Fl_Box *closeWindowFrameBox, *scrollerFillBox;
 	  Fl_Button *closeWindowBtn, *exportImageToPNGBtn;
           Fl_Check_Button *cbPlotType;
+	  
+	  Fl_Scroll *windowScroller;
+	  int cairoWinTranslateX, cairoWinTranslateY;
+	  double winScaleX, winScaleY;
 
 	  static void CloseWindowCallback(Fl_Widget *cbtn, void *udata);
 	  static void ExportRadialImageToPNGCallback(Fl_Widget *ebtn, void *udata);
           static void PlotTypeCheckboxCallback(Fl_Widget *cbPlotType, void *udata);
+          static void HandleWindowScrollCallback(Fl_Widget *scrw, void *udata);
 
      public:
-          static CairoContext_t * GetVRNARadialLayoutData(const char *rnaSubseq, 
-			                                  size_t startPos = 0, 
-		                                          size_t endPos = MAX_SIZET, 
-							  VRNAPlotType_t plotType = PLOT_TYPE_SIMPLE);
+          CairoContext_t * GetVRNARadialLayoutData(const char *rnaSubseq, 
+ 		                                   size_t startPos = 0, 
+		                                   size_t endPos = MAX_SIZET, 
+					           VRNAPlotType_t plotType = PLOT_TYPE_SIMPLE);
           static CairoColor_t GetBaseNodeColor(char baseCh);
 
 };
