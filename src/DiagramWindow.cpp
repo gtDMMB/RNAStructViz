@@ -1449,7 +1449,7 @@ int DiagramWindow::handle(int flEvent) {
 			 size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
 			 size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
 			 radialDisplayWindow = new RadialLayoutDisplayWindow();
-			 radialDisplayWindow->SetTitleFormat("Radial Display for %s -- Highlighting Arcs #%d to #%d", 
+			 radialDisplayWindow->SetTitleFormat("Radial Display for %s -- Highlighting Bases #%d to #%d", 
 					               rnaStruct->GetFilenameNoExtension(), 
 						       seqStartPos + 1, seqEndPos + 1);
                          radialDisplayWindow->SetParentWindow(this);
