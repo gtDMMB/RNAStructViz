@@ -85,8 +85,6 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 
 	  inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {}
 
-	  int handle(int eventType);
-
      protected:
 	  static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 

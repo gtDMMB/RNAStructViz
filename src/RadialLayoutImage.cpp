@@ -123,25 +123,12 @@ bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t 
      if(radialLayoutCanvas == NULL) {
           return false;
      }
-     int nextFillerWidth = winScaleX * (radialLayoutCanvas->GetWidth() - (this->w() - SCROLL_SIZE));
-     int nextFillerHeight = winScaleY * (radialLayoutCanvas->GetHeight() - (this->h() - SCROLL_SIZE));
+     int nextFillerWidth = radialLayoutCanvas->GetWidth() - scrollerFillBox->x();
+     int nextFillerHeight = radialLayoutCanvas->GetHeight() - scrollerFillBox->y();
      scrollerFillBox->resize(scrollerFillBox->x(), scrollerFillBox->y(), nextFillerWidth, nextFillerHeight);
      windowScroller->redraw();
      redraw();
      return true;
-}
-
-int RadialLayoutDisplayWindow::handle(int eventType) {
-     if(eventType == FL_PUSH || eventType == FL_DRAG || eventType == FL_RELEASE) {
-	  int eventX = Fl::event_x(), eventY = Fl::event_y();
-	  if(eventX >= this->w() - SCROLL_SIZE && eventX <= this->w() && 
-	     eventY >= this->h() - SCROLL_SIZE && eventY <= this->h()) {
-               HandleWindowScrollCallback(windowScroller, NULL);
-	  }
-	  Fl_Cairo_Window::handle(eventType);
-	  return 1;
-     }
-     return Fl_Cairo_Window::handle(eventType);
 }
 
 void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
@@ -149,20 +136,20 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
           return;
      }
      fl_color(GUI_WINDOW_BGCOLOR);
-     fl_rectf(0, 0, thisCairoWindow->w() - 2 * SCROLL_SIZE, thisCairoWindow->h() - 2 * SCROLL_SIZE);
+     fl_rectf(0, 0, thisCairoWindow->w() - SCROLL_SIZE, thisCairoWindow->h() - SCROLL_SIZE);
      RadialLayoutDisplayWindow *thisWindow = (RadialLayoutDisplayWindow *) thisCairoWindow; 
      thisWindow->radialLayoutCanvas->SaveSettings();
      thisWindow->cairoWinTranslateX = thisWindow->windowScroller->xposition();
      thisWindow->cairoWinTranslateY = thisWindow->windowScroller->yposition();
      cairo_surface_t *crSurface = cairo_get_target(thisWindow->radialLayoutCanvas->GetCairoContext());
-     cairo_set_source_surface(cr, crSurface, thisWindow->cairoWinTranslateX, thisWindow->cairoWinTranslateY);
+     cairo_set_source_surface(cr, crSurface, -thisWindow->cairoWinTranslateX, -thisWindow->cairoWinTranslateY);
      cairo_rectangle(cr, 0, 0, 
-		     thisWindow->w() - 2 * SCROLL_SIZE, thisWindow->h() - 2 * SCROLL_SIZE);
+		     thisWindow->w() - SCROLL_SIZE, thisWindow->h() - SCROLL_SIZE);
      cairo_clip(cr);
      cairo_paint(cr);
      cairo_reset_clip(cr);
-     fprintf(stderr, "%d, %d; %d, %d\n", thisWindow->cairoWinTranslateX, thisWindow->cairoWinTranslateY, 
-             thisWindow->windowScroller->xposition(), thisWindow->windowScroller->yposition());
+     //fprintf(stderr, "%d, %d; %d, %d\n", thisWindow->cairoWinTranslateX, thisWindow->cairoWinTranslateY, 
+     //        thisWindow->windowScroller->xposition(), thisWindow->windowScroller->yposition());
      if(thisWindow->closeWindowFrameBox != NULL) {
           thisWindow->closeWindowFrameBox->redraw();
           thisWindow->closeWindowBtn->redraw();
@@ -297,9 +284,11 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      this->winScaleX = xScale;
      this->winScaleY = yScale;
 
-     CairoContext_t *plotCanvas = new CairoContext_t(MAX(DEFAULT_RLWIN_WIDTH, xmax - xmin) + nodeSize, 
-		                                     MAX(DEFAULT_RLWIN_HEIGHT, ymax - ymin) + nodeSize);
-     plotCanvas->BlankFillCanvas(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_SOLID_WHITE));
+     CairoContext_t *plotCanvas = new CairoContext_t(MAX(DEFAULT_RLWIN_WIDTH - SCROLL_SIZE, xmax - xmin) * xScale + 
+		                                     nodeSize, 
+		                                     MAX(DEFAULT_RLWIN_HEIGHT - SCROLL_SIZE, ymax - ymin) * yScale + 
+						     nodeSize);
+     plotCanvas->BlankFillCanvas(CairoColor_t::FromFLColorType(GUI_WINDOW_BGCOLOR));
      plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
      plotCanvas->Translate(nodeSize, nodeSize);
      plotCanvas->SetStrokeSize(2);
