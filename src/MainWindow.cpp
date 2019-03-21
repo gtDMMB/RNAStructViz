@@ -32,7 +32,7 @@ MainWindow::MainWindow(int argc, char **argv)
 {
     m_mainWindow = new Fl_Double_Window(650, 450, RNASTRUCTVIZ_VSTRING);
     m_mainWindow->size_range(650, 450, 650, 450);
-    //m_mainWindow->callback(CloseCallback);
+    m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(GUI_WINDOW_BGCOLOR);
     m_mainWindow->begin();    
 
@@ -158,7 +158,6 @@ MainWindow::~MainWindow()
     if (m_fileChooser) {
         delete m_fileChooser;
     }
-    Delete(m_mainWindow);
     Delete(m_packedInfo);
     Delete(m_structureInfo);
     Delete(columnLabel);
@@ -171,6 +170,7 @@ MainWindow::~MainWindow()
         delete folderDataBtns[w];
 	folderDataBtns[w] = NULL;
     }
+    Delete(m_mainWindow);
 }
 
 bool MainWindow::Initialize(int argc, char **argv)
@@ -191,8 +191,7 @@ void MainWindow::Shutdown()
 }
 
 bool MainWindow::IsRunning() {
-     return (ms_instance != NULL) && (ms_instance->m_mainWindow != NULL) && 
-	     ms_instance->m_mainWindow->visible();
+     return (ms_instance != NULL) && (ms_instance->m_mainWindow != NULL);
 }
 
 void MainWindow::AddFolder(const char* foldername, const int index, 
