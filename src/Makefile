@@ -3,7 +3,7 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -pedantic -O1 #-lstdc++
+CXXFLAGS= -g -Wall -Wextra -pedantic -O0 #-lstdc++
 
 LD=g++
 LDFLAGS=-Wall -Wextra -g1 -lm

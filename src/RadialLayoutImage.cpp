@@ -152,9 +152,10 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           return NULL;
      }
      StringToUppercase(effectiveRNASubseq);
-     startPos = 0; endPos = strlen(effectiveRNASubseq);
-     endPos = endPos ? endPos - 1 : 0;
-     unsigned int rnaSubseqLen = endPos - startPos + 1;
+     size_t startPos2 = 0; 
+     size_t endPos2 = strlen(effectiveRNASubseq);
+     endPos2 = endPos2 ? endPos2 - 1 : 0;
+     unsigned int rnaSubseqLen = endPos2 - startPos2 + 1;
      vrna_seq_toRNA(effectiveRNASubseq);
 
      vrna_fold_compound_t *vfc = vrna_fold_compound(effectiveRNASubseq, NULL, VRNA_OPTION_DEFAULT);
@@ -243,10 +244,10 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 	       plotCanvas->DrawLine(nodeX, nodeY, lastNodeX, lastNodeY);
 	  }
 	  CairoColor_t baseNodeColor = GetBaseNodeColor(effectiveRNASubseq[idx]);
-	  if(idx + 1 < startPos || idx + 1 > endPos) {
+	  if(idx < startPos || idx > endPos) {
 	       baseNodeColor = baseNodeColor.ToGrayscale();
 	  } 
-	  plotCanvas->SetColor(baseNodeColor);
+	  //plotCanvas->SetColor(baseNodeColor);
 	  plotCanvas->DrawBaseNode(nodeX, nodeY, 
 	  		           effectiveRNASubseq[idx], idx + 1, nodeSize, 
 	  			   baseNodeColor);
