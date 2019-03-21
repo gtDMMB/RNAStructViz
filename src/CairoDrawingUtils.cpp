@@ -621,14 +621,14 @@ bool CairoContext_t::OverlayGraphics(const CairoContext_t &overlayContext, int s
      return true;
 }
 
-bool CairoContext_t::DrawBaseNode(int centerX, int centerY, char baseChar, 
-		                  size_t baseIdx, size_t nodeSize, 
+bool CairoContext_t::DrawBaseNode(int centerX, int centerY, 
+		                  const char *nodeLabel, 
+				  size_t nodeSize, 
 				  CairoColor_t cairoBaseColor, 
 				  NodeStyle_t nodeStyle) {
      cairoBaseColor = cairoBaseColor.ToOpaque();
-     CairoColor_t nodeBGColor = cairoBaseColor.Lighten(0.75);
-     //nodeBGColor.SetAlphaRatio(0.75);
-     CairoColor_t nodeBorderColor = cairoBaseColor.Darken(0.1);
+     CairoColor_t nodeBGColor = cairoBaseColor.Lighten(0.75).ToOpaque();
+     CairoColor_t nodeBorderColor = cairoBaseColor.Darken(0.1).ToOpaque();
      CairoColor_t nodeTextColor = CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_SOLID_BLACK);
      CairoColor_t transparentBaseColor = CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT);
      int nodeRadius = (int) (nodeSize / M_SQRT2 / 2.0 - 3);
@@ -641,11 +641,8 @@ bool CairoContext_t::DrawBaseNode(int centerX, int centerY, char baseChar,
           nodeBGColor.ApplyRGBAColor(cairoContext2);
           cairo_arc(cairoContext2, nodeSize / 2, nodeSize / 2, nodeRadius, 
 	            0.0, 2.0 * M_PI);
-	  //cairo_clip(cairoContext2);
 	  cairo_fill(cairoContext2);
-	  //cairo_reset_clip(cairoContext2);
 	  nodeBorderColor.ApplyRGBAColor(cairoContext2);
-          //cairo_set_line_width(cairoContext2, nodeRadius * 0.05);
 	  cairo_arc(cairoContext2, nodeSize / 2, nodeSize / 2, nodeRadius, 
 		    0.0, 2.0 * M_PI);
           cairo_stroke(cairoContext2);
@@ -653,19 +650,14 @@ bool CairoContext_t::DrawBaseNode(int centerX, int centerY, char baseChar,
      else if(nodeStyle == SQUARE_NODE) {
           nodeBGColor.ApplyRGBAColor(cairoContext2);
           cairo_rectangle(cairoContext2, 0, 0, 0.95 * nodeSize, 0.95 * nodeSize);
-	  //cairo_clip(cairoContext2);
 	  cairo_fill(cairoContext2);
-	  //cairo_reset_clip(cairoContext2);
 	  nodeBorderColor.ApplyRGBAColor(cairoContext2);
-	  //cairo_set_line_width(cairoContext2, nodeSize * 0.08);
           cairo_rectangle(cairoContext2, 0, 0, 0.95 * nodeSize, 0.95 * nodeSize);
           cairo_stroke(cairoContext2);
      }
      // now draw the text in the center framed in the center of the node:
      nodeTextColor.ApplyRGBAColor(cairoContext2);
-     char pairStr[16];
-     snprintf(pairStr, 16, "%c\0", toupper(baseChar));
-     nodeOverlayContext.DrawText(nodeSize / 2, nodeSize / 2, pairStr, CENTER);
+     nodeOverlayContext.DrawText(nodeSize / 2, nodeSize / 2, nodeLabel, CENTER);
      transparentBaseColor.ApplyRGBAColor(cairoContext2);
      transparentBaseColor.ApplyRGBAColor(cairoContext);
      OverlayGraphics(nodeOverlayContext, centerX - nodeSize / 2, centerY - nodeSize / 2);

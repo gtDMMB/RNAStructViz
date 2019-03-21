@@ -228,7 +228,7 @@ class CairoContext_t {
           bool ResetToIdentityTransform();
 
 	  bool OverlayGraphics(const CairoContext_t &overlayContext, int startX, int startY);
-	  bool DrawBaseNode(int centerX, int centerY, char baseChar, size_t baseIdx, 
+	  bool DrawBaseNode(int centerX, int centerY, const char *nodeLabel, 
 			    size_t nodeSize, CairoColor_t cairoBaseColor, 
 			    NodeStyle_t nodeStyle = CIRCLE_NODE);
 	  bool DrawLine(size_t baseX, size_t baseY, size_t nextX, size_t nextY);

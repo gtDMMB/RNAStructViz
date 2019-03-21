@@ -33,6 +33,8 @@ extern "C" {
 #define WIDGET_WIDTH                  (50)
 #define WIDGET_SPACING                (5)
 
+#define NUMBERING_MODULO              (10)
+
 class RadialLayoutWindowCallbackInterface {
      
      public:

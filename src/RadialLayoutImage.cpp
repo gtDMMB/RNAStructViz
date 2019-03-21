@@ -201,14 +201,22 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 		   workingIdx, rnaSubseqLen);
      }
 
-     float xmin, xmax, ymin, ymax;
+     float xmin, xmax, ymin, ymax, dmin;
      xmin = xmax = xPosArr[0];
      ymin = ymax = yPosArr[0];
+     dmin = (float) INT_MAX;
      for(int idx = 1; idx < rnaSubseqLen; idx++) {
           xmin = xPosArr[idx] < xmin ? xPosArr[idx] : xmin;
           xmax = xPosArr[idx] > xmax ? xPosArr[idx] : xmax;
           ymin = yPosArr[idx] < ymin ? yPosArr[idx] : ymin;
           ymax = yPosArr[idx] > ymax ? yPosArr[idx] : ymax;
+	  for(int j = idx + 1; j < rnaSubseqLen; j++) {
+	       double edist = Square(xPosArr[idx] - xPosArr[j]) + Square(yPosArr[idx] - yPosArr[j]);
+	       edist = sqrt(edist);
+	       if(edist < dmin) {
+	            dmin = edist;
+	       }
+	  }
      }
      for(int xyPos = 0; xyPos < rnaSubseqLen; xyPos++) {
           if(xmin < 0) {
@@ -220,18 +228,20 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      }
      xmin = xmin < 0 ? 0.0 : xmin;
      ymin = ymin < 0 ? 0.0 : ymin;
-     const int nodeSize = 30, xyOffset = 16;
-     float xScale = (float) (0.8 * MAX(MAX(xmax / DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_WIDTH / xmax), 1.0));
-     float yScale = (float) (0.8 * MAX(MAX(ymax / DEFAULT_RLWIN_HEIGHT, DEFAULT_RLWIN_HEIGHT / ymax), 1.0));
+     const int nodeSize = 29;
+     float winScale = nodeSize / dmin / M_SQRT2;
+     float xScale = (float) (0.85 * winScale * MAX(MAX(xmax / DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_WIDTH / xmax), 1.0));
+     float yScale = (float) (0.85 * winScale * MAX(MAX(ymax / DEFAULT_RLWIN_HEIGHT, DEFAULT_RLWIN_HEIGHT / ymax), 1.0));
 
      CairoContext_t *plotCanvas = new CairoContext_t(DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_HEIGHT);
      plotCanvas->BlankFillCanvas(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_SOLID_WHITE));
      plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
+     plotCanvas->Translate(nodeSize, nodeSize);
      plotCanvas->SetStrokeSize(2);
      plotCanvas->SetFontFace(CairoContext_t::CairoFontFace_t::MONOSPACE | 
 		             CairoContext_t::CairoFontStyle_t::BOLD | 
 			     CairoContext_t::CairoFontStyle_t::ITALIC);
-     plotCanvas->SetFontSize(CairoContext_t::FontSize_t::FONT_SIZE_TINY);
+     plotCanvas->SetFontSize(6);
 
      int idx = 0, nodeX = 0, nodeY = 0, lastNodeX, lastNodeY;
      while(idx < rnaSubseqLen) {
@@ -240,16 +250,31 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           nodeX = (int) ((xPosArr[idx] - xmin) * xScale);
 	  nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
 	  if(idx > 0) {
-	       plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK));
+	       plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).Lighten(0.5).ToOpaque());
 	       plotCanvas->DrawLine(nodeX, nodeY, lastNodeX, lastNodeY);
 	  }
+          idx++;
+     }
+     idx = 0;
+     while(idx < rnaSubseqLen) {
+	  lastNodeX = nodeX; 
+	  lastNodeY = nodeY;
+          nodeX = (int) ((xPosArr[idx] - xmin) * xScale);
+	  nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
 	  CairoColor_t baseNodeColor = GetBaseNodeColor(effectiveRNASubseq[idx]);
 	  if(idx < startPos || idx > endPos) {
 	       baseNodeColor = baseNodeColor.ToGrayscale();
 	  } 
-	  //plotCanvas->SetColor(baseNodeColor);
-	  plotCanvas->DrawBaseNode(nodeX, nodeY, 
-	  		           effectiveRNASubseq[idx], idx + 1, nodeSize, 
+	  char nodeLabel[32];
+	  if(idx % NUMBERING_MODULO == 0) {
+	       snprintf(nodeLabel, 32, "%d\0", idx + 1);
+	       plotCanvas->SetFontSize(2);
+	  }
+	  else {
+	       snprintf(nodeLabel, 32, "%c\0", effectiveRNASubseq[idx]);
+	       plotCanvas->SetFontSize(6);
+	  }
+	  plotCanvas->DrawBaseNode(nodeX, nodeY, nodeLabel, nodeSize, 
 	  			   baseNodeColor);
 	  idx++;
      }
