@@ -1245,7 +1245,7 @@ void DiagramWindow::RebuildMenus() {
 
 	     m_cbShowTicks = new Fl_Check_Button(horizCheckBoxPos + 4, offsetY, 
 			                         EXPORT_BUTTON_WIDTH, 25, 
-					         "Draw Tick Marks");
+					         "Draw Ticks");
 	     m_cbShowTicks->callback(ShowTickMarksCallback);
 	     m_cbShowTicks->type(FL_TOGGLE_BUTTON);
 	     m_cbShowTicks->labelcolor(GUI_TEXT_COLOR);
@@ -1576,7 +1576,7 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
     cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 20);
     cairo_show_text(curWinContext, "<SHIFT+G>   : CT View");
     cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 8);
-    cairo_show_text(curWinContext, "<SHIFT+R> : Radial Views");
+    cairo_show_text(curWinContext, "<SHIFT+R>   : Radial Views");
 
 
     // now draw the zoom selection area of the window:

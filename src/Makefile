@@ -14,9 +14,9 @@ LDFLAGS=-Wall -Wextra -g1 -lm
 BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
 ifneq "$(BUILD_WITH_COMPILER)" ""
 	# add necessary CXX/LDFLAGS for clang++:
-	CLANG_EXTRA_CXXFLAGS=  -std=c++17 -stdlib=libc++ \
+	CLANG_EXTRA_CXXFLAGS= -stdlib=libc++ \
 		-I$(shell ls -d /usr/include | tail -n1)
-	CLANG_EXTRA_LDFLAGS= -std=c++17 -stdlib=libc++ -lm \
+	CLANG_EXTRA_LDFLAGS= -stdlib=libc++ -lm \
 		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/7* | tail -n1) \
 		-lgcc_s -lpthread -lrt -lsupc++
 	CXX=$(BUILD_WITH_COMPILER)
@@ -56,7 +56,7 @@ OBJEXT=o
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
-	       -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
+	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
 	       -D_LARGEFILE64_SOURCE -funsigned-char \
 	       -Wno-c++11-narrowing -Wno-c++17-narrowing
 
