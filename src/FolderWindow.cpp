@@ -75,22 +75,17 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     fileLabel->labelsize(LOCAL_TEXT_SIZE);
     fileLabel->box(FL_RSHADOW_BOX);
 
-    folderScroll = new Fl_Scroll(x+10, y + yOffset + spacingHeight + fileOpsLabelHeight + 
-		                 dividerTextHeight + 2 * spacingHeight, 
-			         280, 310 - fileOpsLabelHeight - dividerTextHeight - 
-				 fileOpsLabelHeight - 2 * spacingHeight - NAVBUTTONS_BHEIGHT);
+    folderScroll = new Fl_Scroll(x+10, y + yOffset + fileOpsLabelHeight + 
+		                 dividerTextHeight + 3 * spacingHeight, 
+			         280, 310 - 2 * fileOpsLabelHeight - dividerTextHeight - 
+				 2 * spacingHeight - NAVBUTTONS_BHEIGHT);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
 
-    folderPack = new Fl_Pack(x+10, y+55 + 26 + fileOpsLabelHeight + 
-		             dividerTextHeight + fileOpsLabelHeight + 
-			     2 * spacingHeight, 260, 
-			     290 - fileOpsLabelHeight - dividerTextHeight - 
-			     fileOpsLabelHeight - 2 * spacingHeight - 
-			     NAVBUTTONS_BHEIGHT);
+    folderPack = new Fl_Pack(x+10, y + yOffset + fileOpsLabelHeight + 
+		             dividerTextHeight + 3 * spacingHeight, 260, 
+			     290 - 2 * fileOpsLabelHeight - dividerTextHeight - 
+			     2 * spacingHeight - NAVBUTTONS_BHEIGHT);
     folderPack->type(Fl_Pack::VERTICAL);
-    fprintf(stderr, "FolderWindow: pack height = %d\n", 290 - fileOpsLabelHeight - dividerTextHeight - 
-			     fileOpsLabelHeight - 2 * spacingHeight - 
-			     NAVBUTTONS_BHEIGHT);
 
     folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
@@ -139,7 +134,7 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     Fl_Pack* pack = folderPack;
     pack->begin();
     
-    int vertPosn = pack->children() * NAVBUTTONS_BHEIGHT + pack->y() + 15;
+    int vertPosn = pack->children() * NAVBUTTONS_BHEIGHT; //+ pack->y() + 15;
     
     Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(), NAVBUTTONS_BHEIGHT);
     group->begin();

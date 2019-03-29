@@ -36,7 +36,7 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->color(GUI_WINDOW_BGCOLOR);
     m_mainWindow->begin();    
 
-    mainMenuPane = new Fl_Group(0,0,300,450,"");
+    mainMenuPane = new Fl_Group(0, 0, 300, 450,"");
     {
         
 	    // setup the program logo (for now dynamically loaded):
@@ -147,7 +147,7 @@ MainWindow::MainWindow(int argc, char **argv)
     folderWindowPane->color(GUI_WINDOW_BGCOLOR);
     
     m_mainWindow->resizable(mainMenuPane);
-    //m_mainWindow->size_range(650, 450, 650, 0);
+    m_mainWindow->size_range(650, 450, 650, 0);
     m_mainWindow->end();
 
     m_mainWindow->show(argc, argv);
