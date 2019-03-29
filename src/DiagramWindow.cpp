@@ -1809,7 +1809,7 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     fileChooser.preset_file(defaultFilePath);
     switch(fileChooser.show()) {
         case -1: // ERROR
-             fl_alert("Error selecting PNG save file path: %s\n", fileChooser.errmsg());
+             fl_alert("Error selecting file path to save PNG image: \"%s\".\nIf you are receiving a permissions error trying to save the image into the directory you have chosen, try again by saving the PNG image into a path in your user home directory.", fileChooser.errmsg());
 	     return string("");
 	case 1: // CANCEL
 	     return string("");

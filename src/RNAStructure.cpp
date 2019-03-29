@@ -769,7 +769,7 @@ void RNAStructure::ExportFASTAFileCallback(Fl_Widget *btn, void *udata) {
      bool fileWriteStatus = RNAStructure::Util::ExportStringToPlaintextFile(
           exportPath, fastaData, fdataLength);
      if(!fileWriteStatus) { 
-          fl_alert("Unable to write output FASTA file \"%s\" to disk!", 
+          fl_alert("Unable to write output FASTA file \"%s\" to disk! If you have a permissions error saving the file to disk, try saving to a location in your home directory.", 
 	           exportPath);
      }
 }
@@ -791,7 +791,7 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
      bool fileWriteStatus = RNAStructure::Util::ExportStringToPlaintextFile(
           exportPath, dotData, dotDataLength);
      if(!fileWriteStatus) { 
-          fl_alert("Unable to write output DOT file \"%s\" to disk!", 
+          fl_alert("Unable to write output DOT file \"%s\" to disk! If you have a permissions error saving the file to disk, try saving to a location in your home directory.", 
 	           exportPath);
      }
 }
