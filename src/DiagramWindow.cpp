@@ -1441,7 +1441,7 @@ int DiagramWindow::handle(int flEvent) {
 			 }
 		    }
 		    else if(Fl::event_length() == 1 && 
-		            (*(Fl::event_text()) == 'C' || *(Fl::event_text()) == 'R')) {
+		            (*(Fl::event_text()) == 'R')) {
 		          
 		         RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
 				                   GetStructure(folderIndex);
@@ -1576,7 +1576,7 @@ void DiagramWindow::RedrawCairoZoomBuffer(cairo_t *curWinContext) {
     cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 20);
     cairo_show_text(curWinContext, "<SHIFT+G>   : CT View");
     cairo_move_to(curWinContext, zoomBufXPos, zoomBufYPos - 8);
-    cairo_show_text(curWinContext, "<SHIFT+C/R> : Radial Views");
+    cairo_show_text(curWinContext, "<SHIFT+R> : Radial Views");
 
 
     // now draw the zoom selection area of the window:

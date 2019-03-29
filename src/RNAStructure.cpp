@@ -589,7 +589,7 @@ void RNAStructure::GenerateString()
     
     // table header labels:
     charsWritten = snprintf(currentPosn, remainingSize, 
-		   "   BaseIdx |  Pair  (PairIdx)\n-----------------------------\n");
+		   "   BaseId  |  Pair  (PairId )\n-----------------------------\n");
     snprintf(formatPosn, remainingSize, "%s\n", 
              Util::GetRepeatedString(TBUFSTYLE_DEFAULT_STRFMT, 
 		                     charsWritten + 1).c_str());
@@ -745,7 +745,7 @@ size_t RNAStructure::GenerateDotBracketFormatString(char *strBuf,
      if(fastaFileSize + charSeqSize + 2 > maxChars) { 
           return 0;
      }
-     strncpy(strBuf, fastaFileStr, fastaFileSize);
+     strncpy(strBuf, fastaFileStr, fastaFileSize + 1);
      strcat(strBuf, "\n");
      strncat(strBuf, dotFormatCharSeq, charSeqSize);
      strBuf[fastaFileSize + charSeqSize] = '\0';
@@ -761,7 +761,7 @@ void RNAStructure::ExportFASTAFileCallback(Fl_Widget *btn, void *udata) {
      size_t fdataLength = rnaStructBaseObj->GenerateFASTAFormatString(
 		                            fastaData, fdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
-     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s%s.fasta\0", 
+     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.fasta\0", 
 	      CTFILE_SEARCH_DIRECTORY, 
 	      rnaStructBaseObj->GetFilenameNoExtension());
      const char *exportPath = fl_file_chooser("Choose FASTA File Location ...", 
@@ -783,7 +783,7 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
      size_t dotDataLength = rnaStructBaseObj->GenerateDotBracketFormatString(
 		                              dotData, dbdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
-     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s%s.dot\0", 
+     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.dot\0", 
 	      CTFILE_SEARCH_DIRECTORY, 
 	      rnaStructBaseObj->GetFilenameNoExtension());
      const char *exportPath = fl_file_chooser("Choose DOT File Location ...", 
