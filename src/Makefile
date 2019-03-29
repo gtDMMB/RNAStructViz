@@ -30,7 +30,7 @@ TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
-	CXXFLAGS+= -Wno-c++11-narrowing
+	CXXFLAGS+= -Wno-c++11-narrowing -Wno-c++17-narrowing
 	#CXX=g++-8
 	#LD=g++-8
 else
