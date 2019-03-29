@@ -1,9 +1,11 @@
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "StructureManager.h"
 #include "RNAStructViz.h"
 #include "MainWindow.h"
 #include "FolderStructure.h"
-#include <stdlib.h>
-#include <unistd.h>
+#include "ConfigParser.h"
 
 RNAStructViz* RNAStructViz::ms_instance = NULL;
 
@@ -34,6 +36,7 @@ bool RNAStructViz::Initialize(int argc, char** argv)
 
 void RNAStructViz::Shutdown()
 {
+    ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     MainWindow::Shutdown();
     if (ms_instance)
     {

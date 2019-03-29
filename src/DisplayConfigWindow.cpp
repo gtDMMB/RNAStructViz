@@ -87,11 +87,13 @@ bool DisplayConfigWindow::SetupInitialConfig() {
 	      FL_PATCH_VERSION, FL_VERSION, FL_API_VERSION);
      ConfigParser::nullTerminateString(LIBFLTK_VERSION_STRING); 
 
-     GUI_WINDOW_BGCOLOR = LOCAL_WINDOW_BGCOLOR;
-     GUI_BGCOLOR = LOCAL_BGCOLOR;
-     GUI_BTEXT_COLOR = LOCAL_BUTTON_COLOR;
-     GUI_TEXT_COLOR = LOCAL_TEXT_COLOR;
-     GUI_CTFILEVIEW_COLOR = Darker(LOCAL_WINDOW_BGCOLOR, 0.385f);
+     if(!UpdateApplicationThemeByName("Structviz default")) {
+          GUI_WINDOW_BGCOLOR = LOCAL_WINDOW_BGCOLOR;
+          GUI_BGCOLOR = LOCAL_BGCOLOR;
+          GUI_BTEXT_COLOR = LOCAL_BUTTON_COLOR;
+          GUI_TEXT_COLOR = LOCAL_TEXT_COLOR;
+          GUI_CTFILEVIEW_COLOR = Darker(LOCAL_WINDOW_BGCOLOR, 0.385f);
+     }
 
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
      DEBUGGING_ON = false;
@@ -137,15 +139,6 @@ DisplayConfigWindow::DisplayConfigWindow() :
      set_draw_cb(Draw); 
      callback(WindowCloseCallback);
 
-     //#ifndef __APPLE__
-     //fl_open_display();
-     //Pixmap iconPixmap = XCreateBitmapFromData(fl_display, 
-     // 		         DefaultRootWindow(fl_display),
-     //                    ConfigWindowIcon_bits, ConfigWindowIcon_width, 
-     //    	         ConfigWindowIcon_height);
-     //this->icon((const void *) iconPixmap);
-     //#endif
-
      ConstructWindow();
 
 }
@@ -160,8 +153,6 @@ DisplayConfigWindow::~DisplayConfigWindow() {
      if(pngNewPathIcon != NULL) {
           delete pngNewPathIcon;
      }
-     //cairo_destroy(crDraw);
-     //cairo_surface_destroy(crSurface);
      delete imageData;
      imageData = NULL;
 }
@@ -409,6 +400,33 @@ void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
 
 }
 
+bool DisplayConfigWindow::UpdateApplicationThemeByName(const char *themeName) {
+     int themeIndex = -1;
+     for(int t = 0; t < GetArrayLength(PRESET_COLOR_THEMES); t++) {
+          if(!strcmp(themeName, PRESET_COLOR_THEMES[t].themeName)) {
+	       themeIndex = t;
+	       break;
+	  }
+     }
+     return UpdateApplicationThemeByIndex(themeIndex);
+}
+
+bool DisplayConfigWindow::UpdateApplicationThemeByIndex(int themeIndex) {
+     if(themeIndex < 0 || themeIndex >= GetArrayLength(PRESET_COLOR_THEMES)) {
+          return false;
+     }
+     ColorTheme_t nextTheme = PRESET_COLOR_THEMES[themeIndex];
+     if(!nextTheme.isValid) {
+          return false;
+     }
+     GUI_WINDOW_BGCOLOR = nextTheme.windowBGColor;
+     GUI_BGCOLOR = nextTheme.widgetBGColor;
+     GUI_BTEXT_COLOR = nextTheme.widgetTextColor;
+     GUI_TEXT_COLOR = nextTheme.printTextColor;
+     GUI_CTFILEVIEW_COLOR = nextTheme.ctFileDisplayColor;
+     return true;
+}
+
 void DisplayConfigWindow::SelectDirectoryCallback(Fl_Widget *btn, void *udata) { 
 
      DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
@@ -469,17 +487,10 @@ void DisplayConfigWindow::FLTKThemeChoiceMenuCallback(Fl_Widget *widget, void *u
 }
 
 void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *ud) {
+     
      DisplayConfigWindow *thisWin = (DisplayConfigWindow *) btn->parent();
      long int themeIndex = (long int) ud;
-     ColorTheme_t nextTheme = PRESET_COLOR_THEMES[themeIndex];
-     if(!nextTheme.isValid) {
-          return;
-     }
-     GUI_WINDOW_BGCOLOR = nextTheme.windowBGColor;
-     GUI_BGCOLOR = nextTheme.widgetBGColor;
-     GUI_BTEXT_COLOR = nextTheme.widgetTextColor;
-     GUI_TEXT_COLOR = nextTheme.printTextColor;
-     GUI_CTFILEVIEW_COLOR = nextTheme.ctFileDisplayColor;
+     UpdateApplicationThemeByIndex(themeIndex);
      for(int c = 0; c < GUICOLORS; c++) {
           thisWin->colorDisplayBoxes[c]->color((Fl_Color) 
 			                 *(thisWin->colorChangeRefs[c]));
@@ -491,7 +502,6 @@ void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *u
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      btn->parent()->hide();
-     //MainWindow::RethemeMainWindow();
 }
 
 void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {

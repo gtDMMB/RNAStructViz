@@ -51,7 +51,10 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 	protected:
                 void drawWidgets();        
 		static void Draw(Fl_Cairo_Window *crWin, cairo_t *cr);
-	
+
+		static bool UpdateApplicationThemeByName(const char *themeName);
+		static bool UpdateApplicationThemeByIndex(int themeIdx);
+
 	        static void SelectDirectoryCallback(Fl_Widget *btn, void *ud);	
 		static void UpdatePNGPathCallback(Fl_Widget *btn, void *udata);
 		static void FLTKThemeChoiceMenuCallback(Fl_Widget *menu, void *);

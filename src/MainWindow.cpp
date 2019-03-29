@@ -898,15 +898,6 @@ void MainWindow::ResetThemeColormaps() {
 
 void MainWindow::RethemeMainWindow() {
 	     
-	     //Fl::foreground(GetRed(LOCAL_FGCOLOR), 
-	     //		    GetGreen(LOCAL_FGCOLOR), 
-	     //		    GetBlue(LOCAL_FGCOLOR));
-	     //Fl::background(GetRed(GUI_BGCOLOR), 
-	     //		    GetGreen(GUI_BGCOLOR), 
-	     //		    GetBlue(GUI_BGCOLOR)); 
-             //Fl::background2(GetRed(LOCAL_BG2COLOR), 
-	     //		     GetGreen(LOCAL_BG2COLOR), 
-	     //		     GetBlue(LOCAL_BG2COLOR));
 	     ResetThemeColormaps();
 
 	     if(ms_instance == NULL) {
@@ -959,10 +950,7 @@ void MainWindow::RethemeMainWindow() {
 			       RNAStructViz::GetInstance()->
 			       GetStructureManager()->
 			       GetFolders()[ms_instance->selectedFolderIndex];
-		  //curFolderWin->redraw();
 		  curFolderWin->RethemeFolderWindow();
-		  //ShowFolderCallback(ms_instance->selectedFolderBtn, 
-		  //       (void *) ms_instance->selectedFolderBtn->user_data());
 	     }
 	     Fl::scheme((char *) FLTK_THEME);
 	     Fl::redraw();
