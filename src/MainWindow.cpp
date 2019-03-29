@@ -67,7 +67,7 @@ MainWindow::MainWindow(int argc, char **argv)
 
 	// consistent alignment with the folder window display:
 	int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
-	int dividerTextHeight = 4;
+	int dividerTextHeight = NAVBUTTONS_SPACING; // 4
 
     	// make it more user friendly by including some help text: 
 	const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
@@ -84,9 +84,9 @@ MainWindow::MainWindow(int argc, char **argv)
 
         //Open button
         openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
-		                        NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
-		                        NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-		                        "@search   Load Files @>|");
+		                   NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
+		                   NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
+		                   "@search   Load Files @>|");
         openButton->callback(OpenFileCallback);
         openButton->labelcolor(GUI_BTEXT_COLOR);
 
@@ -101,8 +101,9 @@ MainWindow::MainWindow(int argc, char **argv)
 
 	const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
         columnLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 
-		      50 + upperYOffset + navButtonsLabelHeight + 
-	              dividerTextHeight, 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+		      NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
+	              NAVBUTTONS_BHEIGHT + dividerTextHeight, 
+		      2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
 		      navButtonsLabelHeight, foldersInstText);
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         columnLabel->color(GUI_BGCOLOR);
@@ -120,7 +121,7 @@ MainWindow::MainWindow(int argc, char **argv)
 			           dividerTextHeight + 15, 270,
 			           360 - upperYOffset - navButtonsLabelHeight - dividerTextHeight - 50);
         m_packedInfo->type(Fl_Pack::VERTICAL);
-        
+
         m_packedInfo->end();
         m_packedInfo->color(GUI_WINDOW_BGCOLOR);
         m_structureInfo->end();

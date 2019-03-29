@@ -30,6 +30,7 @@ TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
+	CXXFLAGS+= -Wno-c++11-narrowing
 	#CXX=g++-8
 	#LD=g++-8
 else
@@ -57,8 +58,7 @@ CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -std=gnu++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
-	       -D_LARGEFILE64_SOURCE -funsigned-char \
-	       -Wno-c++11-narrowing 
+	       -D_LARGEFILE64_SOURCE -funsigned-char 
 
 CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 

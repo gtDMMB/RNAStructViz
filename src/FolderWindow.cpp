@@ -1,13 +1,17 @@
+#include <unistd.h>
+
+#include <iostream>
+
+#include <FL/Fl_Button.H>
+
 #include "FolderWindow.h"
 #include "StructureManager.h"
 #include "RNAStructViz.h"
 #include "MainWindow.h"
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
-#include <unistd.h>
-#include <iostream>
-#include <FL/Fl_Button.H>
 
+#include "pixmaps/RNAStructVizLogo.c"
 #include "pixmaps/StructureOperationIcon.c"
 
 void FolderWindow::Construct(int w, int h, int folderIndex) {}
@@ -28,16 +32,17 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
 		    StructureOperationIcon.width, StructureOperationIcon.height, 
 		    StructureOperationIcon.bytes_per_pixel);
-    Fl_Box *structIconBox = new Fl_Box(x - 14, y - 50, structureIcon->w(), structureIcon->h());
+    Fl_Box *structIconBox = new Fl_Box(x - 14, y - 42, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     
     int dividerTextHeight = 0, spacingHeight = NAVBUTTONS_SPACING;
     int fileOpsLabelHeight = 2 * NAVBUTTONS_BHEIGHT; 
     int fileOpsLabelWidth = 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING;
+    int initYOffset = NAVBUTTONS_OFFSETY + RNAStructVizLogo.height + 5; // y + 36 + dividerTextHeight
     const char *fileOpsLabelText = "@reload Structure Operations.\nEach operation opens a new window.";
-    fileOpsLabel = new Fl_Box(x + NAVBUTTONS_SPACING, y + 36 + dividerTextHeight, 
-		                              fileOpsLabelWidth, fileOpsLabelHeight, 
-				                      fileOpsLabelText);
+    fileOpsLabel = new Fl_Box(x + NAVBUTTONS_SPACING, initYOffset, 
+		              fileOpsLabelWidth, fileOpsLabelHeight, 
+			      fileOpsLabelText);
     fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
     fileOpsLabel->color(GUI_BGCOLOR);
     fileOpsLabel->labelcolor(GUI_BTEXT_COLOR);
@@ -46,11 +51,10 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     fileOpsLabel->box(FL_RSHADOW_BOX);
 
     int opButtonWidth = 110;
-    int yOffset = y + 36 + dividerTextHeight + fileOpsLabelHeight;
-    Fl_Button* diagramButton = new Fl_Button(x+20, 
-		               yOffset + spacingHeight,
-		               opButtonWidth, 30,
-		               "@circle   Diagram @>|");
+    int yOffset = initYOffset + fileOpsLabelHeight;
+    Fl_Button* diagramButton = new Fl_Button(x + 20, yOffset + spacingHeight,
+		                             opButtonWidth, 30,
+		                             "@circle   Diagram @>|");
     diagramButton->callback(DiagramCallback);
     diagramButton->labelcolor(GUI_BTEXT_COLOR);
 
@@ -62,10 +66,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     statsButton->labelcolor(GUI_BTEXT_COLOR);
 
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents in new window.";
-    fileLabel = new Fl_Box(x+NAVBUTTONS_SPACING,y+55 + 26 + dividerTextHeight + 
-		                   fileOpsLabelHeight + spacingHeight, 
-				   fileOpsLabelWidth, fileOpsLabelHeight, 
-		                   fileInstText);
+    fileLabel = new Fl_Box(x + NAVBUTTONS_SPACING, y + yOffset + spacingHeight, 
+			   fileOpsLabelWidth, fileOpsLabelHeight, fileInstText);
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     fileLabel->color(GUI_BGCOLOR);
     fileLabel->labelcolor(GUI_BTEXT_COLOR);
@@ -73,21 +75,23 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     fileLabel->labelsize(LOCAL_TEXT_SIZE);
     fileLabel->box(FL_RSHADOW_BOX);
 
-    folderScroll = new Fl_Scroll(x+10, y+55 + 26 + fileOpsLabelHeight + 
-		                         dividerTextHeight + fileOpsLabelHeight + 
-			                	 2 * spacingHeight, 
-			                	 280, 310 - fileOpsLabelHeight - 
-				                 dividerTextHeight - fileOpsLabelHeight - 
-				                 2 * spacingHeight);
+    folderScroll = new Fl_Scroll(x+10, y + yOffset + spacingHeight + fileOpsLabelHeight + 
+		                 dividerTextHeight + 2 * spacingHeight, 
+			         280, 310 - fileOpsLabelHeight - dividerTextHeight - 
+				 fileOpsLabelHeight - 2 * spacingHeight - NAVBUTTONS_BHEIGHT);
     folderScroll->type(Fl_Scroll::VERTICAL_ALWAYS);
 
     folderPack = new Fl_Pack(x+10, y+55 + 26 + fileOpsLabelHeight + 
-		                     dividerTextHeight + fileOpsLabelHeight + 
-			                 2 * spacingHeight, 260, 
-			                 310 - fileOpsLabelHeight - dividerTextHeight - 
-			                 fileOpsLabelHeight - 2 * spacingHeight);
+		             dividerTextHeight + fileOpsLabelHeight + 
+			     2 * spacingHeight, 260, 
+			     290 - fileOpsLabelHeight - dividerTextHeight - 
+			     fileOpsLabelHeight - 2 * spacingHeight - 
+			     NAVBUTTONS_BHEIGHT);
     folderPack->type(Fl_Pack::VERTICAL);
-    
+    fprintf(stderr, "FolderWindow: pack height = %d\n", 290 - fileOpsLabelHeight - dividerTextHeight - 
+			     fileOpsLabelHeight - 2 * spacingHeight - 
+			     NAVBUTTONS_BHEIGHT);
+
     folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
 
@@ -135,9 +139,9 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     Fl_Pack* pack = folderPack;
     pack->begin();
     
-    int vertPosn = pack->children() * 30 + pack->y() + 120;
+    int vertPosn = pack->children() * NAVBUTTONS_BHEIGHT + pack->y() + 15;
     
-    Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(), 30);
+    Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(), NAVBUTTONS_BHEIGHT);
     group->begin();
     
     Fl_Button* label = new Fl_Button(pack->x() + 10, vertPosn, pack->w() - 40, 30, filename);
@@ -241,7 +245,6 @@ void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)
             break;
     }
     RNAStructViz::GetInstance()->AddDiagramWindow(index);
-    //RNAStructViz::GetInstance()->TestFolders();
     
 }
 
