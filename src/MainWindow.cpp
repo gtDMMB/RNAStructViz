@@ -146,7 +146,7 @@ MainWindow::MainWindow(int argc, char **argv)
     folderWindowPane->color(GUI_WINDOW_BGCOLOR);
     
     m_mainWindow->resizable(mainMenuPane);
-    m_mainWindow->size_range(650, 450, 650, 0);
+    //m_mainWindow->size_range(650, 450, 650, 0);
     m_mainWindow->end();
 
     m_mainWindow->show(argc, argv);

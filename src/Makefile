@@ -56,8 +56,9 @@ OBJEXT=o
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
-	       -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
-	       -funsigned-char -Wno-c++11-narrowing 
+	       -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
+	       -D_LARGEFILE64_SOURCE -funsigned-char \
+	       -Wno-c++11-narrowing -Wno-c++17-narrowing
 
 CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
