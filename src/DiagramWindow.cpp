@@ -1453,6 +1453,7 @@ int DiagramWindow::handle(int flEvent) {
 			 StructureManager *structManager = RNAStructViz::GetInstance()->
 				                           GetStructureManager();
 		         int ctFileSelectIndex = ctFileSelectWin->getFileSelectionIndex();
+			 Delete(ctFileSelectWin);
 			 int structIdx = structManager->GetFolderAt(folderIndex)->
 				         folderStructs[ctFileSelectIndex];
 		         RNAStructure *rnaStruct = structManager->GetStructure(structIdx);
@@ -1460,13 +1461,13 @@ int DiagramWindow::handle(int flEvent) {
 			 size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
 			 size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
 			 radialDisplayWindow = new RadialLayoutDisplayWindow();
+			 //Fl::grab(radialDisplayWindow);
 			 radialDisplayWindow->SetTitleFormat(
-					      "Radial Display for %s -- Highlighting Bases #%d to #%d", 
-					      rnaStruct->GetFilenameNoExtension(), 
-					      seqStartPos + 1, seqEndPos + 1);
+			 		      "Radial Display for %s -- Highlighting Bases #%d to #%d", 
+			 		      rnaStruct->GetFilenameNoExtension(), 
+			 		      seqStartPos + 1, seqEndPos + 1);
                          radialDisplayWindow->SetParentWindow(this);
 			 radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos);
-			 Fl::grab(radialDisplayWindow);
 			 radialDisplayWindow->show();
 
 		    }

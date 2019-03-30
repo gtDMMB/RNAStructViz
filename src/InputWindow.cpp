@@ -28,7 +28,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
     set_modal();
     windowType = type;
     inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
-    
+    fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
+
     if(type == InputWindow::FILE_INPUT) {
     	    strncpy(inputText, defaultName, MAX_BUFFER_SIZE - 1);
 	    inputText[MAX_BUFFER_SIZE - 1] = '\0';
@@ -74,7 +75,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input->value(inputText);
 	    input->color(GUI_BGCOLOR);
 	    input->textcolor(GUI_BTEXT_COLOR);
-	    Fl_Box *box = new Fl_Box(75, 1, 300, 40, (const char*) string);
+	    Fl_Box *box = new Fl_Box(50, 1, 350, 40, (const char*) string);
 	    box->box(FL_OSHADOW_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 	    box->color(GUI_BGCOLOR);
@@ -86,7 +87,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input->callback(InputCallback, (void*)0);
 	    input->labelcolor(GUI_TEXT_COLOR);
 	    const char *cbText = " Use only default names for structure folders";
-	    cbUseDefaultNames = new Fl_Check_Button(55, 100, 325, 30, cbText);
+	    cbUseDefaultNames = new Fl_Check_Button(30, 100, 375, 30, cbText);
 	    cbUseDefaultNames->box(FL_ROUND_UP_BOX);
 	    cbUseDefaultNames->color(GUI_BGCOLOR);
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
@@ -102,17 +103,17 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 	    box->color(GUI_BGCOLOR);
 	    box->labelcolor(GUI_BTEXT_COLOR);
-	    Fl_Button *displayButton = new Fl_Button(100, 100, 155, 30, "Display Zoomed Region @|>");
+	    Fl_Button *displayButton = new Fl_Button(100, 100, 200, 30, "Display Zoomed Region @|>");
 	    displayButton->callback(DisplayCTFileCallback, (void*)0);
 	    displayButton->color(GUI_BGCOLOR);
 	    displayButton->labelcolor(GUI_BTEXT_COLOR);
 	    displayButton->set_active();
-	    Fl_Button *cancelButton = new Fl_Button(275, 100, 75, 30, "Cancel @1+");
+	    Fl_Button *cancelButton = new Fl_Button(310, 100, 75, 30, "Cancel @1+");
             cancelButton->callback(CancelCallback); 
 	    cancelButton->color(GUI_BGCOLOR);
 	    cancelButton->labelcolor(GUI_BTEXT_COLOR);
             
-	    ctFileChooser = new Fl_Choice(190, 55, 200, 30, "Choose CT Structure: ");
+	    ctFileChooser = new Fl_Choice(175, 55, 215, 30, "Choose CT Structure: ");
             ctFileChooser->color(GUI_BGCOLOR);
 	    ctFileChooser->labelcolor(GUI_BTEXT_COLOR);
 

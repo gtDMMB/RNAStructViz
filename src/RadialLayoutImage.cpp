@@ -24,11 +24,11 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
      windowScroller->callback(HandleWindowScrollCallback);
      windowScroller->type(Fl_Scroll::BOTH_ALWAYS);
      windowScroller->box(FL_BORDER_BOX);
-     windowScroller->begin();
+     //windowScroller->begin();
 
      int offsetY = 10, offsetX = w() - 3 * WIDGET_WIDTH;
 
-     closeWindowFrameBox = new Fl_Box(offsetX, offsetY, 3 * WIDGET_WIDTH, 
+     /*closeWindowFrameBox = new Fl_Box(offsetX, offsetY, 3 * WIDGET_WIDTH, 
 		                      3 * WIDGET_HEIGHT + 2 * WIDGET_SPACING);
      closeWindowFrameBox->box(FL_RSHADOW_BOX);
      closeWindowFrameBox->color(GUI_BGCOLOR);
@@ -57,17 +57,17 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
      cbPlotType->labelcolor(GUI_TEXT_COLOR);
      cbPlotType->selection_color(GUI_BTEXT_COLOR);
      cbPlotType->value(1);
-     offsetY += WIDGET_HEIGHT + 2 * WIDGET_SPACING;
+     offsetY += WIDGET_HEIGHT + 2 * WIDGET_SPACING;*/
 
-     scrollerFillBox = new Fl_Box(0, offsetY, width - SCROLL_SIZE, height - SCROLL_SIZE);
-     scrollerFillBox->type(FL_NO_BOX);
-     windowScroller->end();
+     //scrollerFillBox = new Fl_Box(0, offsetY, 0, 0); //width - SCROLL_SIZE, height - SCROLL_SIZE);
+     //scrollerFillBox->type(FL_NO_BOX);
+     //windowScroller->end();
      //this->resizable(windowScroller);
 
-     set_modal();
+     //set_modal();
      color(GUI_WINDOW_BGCOLOR);
-     fl_rectf(0, 0, w() - SCROLL_SIZE, h() - SCROLL_SIZE);
-     box(FL_NO_BOX);
+     //fl_rectf(0, 0, w() - SCROLL_SIZE, h() - SCROLL_SIZE);
+     //box(FL_NO_BOX);
      set_draw_cb(Draw);
 
 }
@@ -119,24 +119,28 @@ bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t 
           return false;
      }
      radialLayoutCanvas = GetVRNARadialLayoutData(rnaSeq, startSeqPos, endSeqPos, 
-		                                  (VRNAPlotType_t) vrnaPlotType);
+     		                                  (VRNAPlotType_t) vrnaPlotType);
      if(radialLayoutCanvas == NULL) {
           return false;
      }
-     int nextFillerWidth = radialLayoutCanvas->GetWidth() - scrollerFillBox->x();
-     int nextFillerHeight = radialLayoutCanvas->GetHeight() - scrollerFillBox->y();
-     scrollerFillBox->resize(scrollerFillBox->x(), scrollerFillBox->y(), nextFillerWidth, nextFillerHeight);
+     int nextFillerWidth = radialLayoutCanvas->GetWidth();
+     int nextFillerHeight = radialLayoutCanvas->GetHeight();
+     windowScroller->begin();
+     scrollerFillBox = new Fl_Box(0, 0, nextFillerWidth, nextFillerHeight); 
+     scrollerFillBox->type(FL_NO_BOX);
+     windowScroller->end();
      windowScroller->redraw();
      redraw();
      return true;
 }
 
 void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
-     if(thisCairoWindow == NULL || cr == NULL) {
+     if(thisCairoWindow == NULL || cr == NULL || 
+        ((RadialLayoutDisplayWindow *) thisCairoWindow)->radialLayoutCanvas == NULL) {
           return;
      }
      fl_color(GUI_WINDOW_BGCOLOR);
-     fl_rectf(0, 0, thisCairoWindow->w() - SCROLL_SIZE, thisCairoWindow->h() - SCROLL_SIZE);
+     fl_rectf(0, 0, thisCairoWindow->w() - SCROLL_SIZE - 2, thisCairoWindow->h() - SCROLL_SIZE - 2);
      RadialLayoutDisplayWindow *thisWindow = (RadialLayoutDisplayWindow *) thisCairoWindow; 
      thisWindow->radialLayoutCanvas->SaveSettings();
      thisWindow->cairoWinTranslateX = thisWindow->windowScroller->xposition();
@@ -144,12 +148,10 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
      cairo_surface_t *crSurface = cairo_get_target(thisWindow->radialLayoutCanvas->GetCairoContext());
      cairo_set_source_surface(cr, crSurface, -thisWindow->cairoWinTranslateX, -thisWindow->cairoWinTranslateY);
      cairo_rectangle(cr, 0, 0, 
-		     thisWindow->w() - SCROLL_SIZE, thisWindow->h() - SCROLL_SIZE);
+		     thisWindow->w() - SCROLL_SIZE - 2, thisWindow->h() - SCROLL_SIZE - 2);
      cairo_clip(cr);
      cairo_paint(cr);
      cairo_reset_clip(cr);
-     //fprintf(stderr, "%d, %d; %d, %d\n", thisWindow->cairoWinTranslateX, thisWindow->cairoWinTranslateY, 
-     //        thisWindow->windowScroller->xposition(), thisWindow->windowScroller->yposition());
      if(thisWindow->closeWindowFrameBox != NULL) {
           thisWindow->closeWindowFrameBox->redraw();
           thisWindow->closeWindowBtn->redraw();

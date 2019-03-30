@@ -24,6 +24,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 {
 
     // label configuration:  
+    fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
     //labelcolor(GUI_TEXT_COLOR);
     labelfont(LOCAL_BFFONT);
     labelsize(LOCAL_TEXT_SIZE);    
@@ -54,14 +55,14 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     int yOffset = initYOffset + fileOpsLabelHeight;
     Fl_Button* diagramButton = new Fl_Button(x + 20, yOffset + spacingHeight,
 		                             opButtonWidth, 30,
-		                             "@circle   Diagram @>|");
+		                             "Diagram @>|");
     diagramButton->callback(DiagramCallback);
     diagramButton->labelcolor(GUI_BTEXT_COLOR);
 
     Fl_Button* statsButton = new Fl_Button(x + 20 + opButtonWidth + 
 		             spacingHeight, yOffset + spacingHeight, 
 	                     opButtonWidth, 30,
-		             "@square   Statistics @>|");
+		             "Statistics @>|");
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(GUI_BTEXT_COLOR);
 
@@ -155,7 +156,7 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s", 
 	     filePrefix, spaceBuffer.substr(0, 
              MAX(0, MAX_FOLDER_LABEL_CHARS - ((int ) strlen(filePrefix)))).c_str());
-    strcat(labelWithIcon, "   @|>");
+    //strcat(labelWithIcon, "   @|>");
     label->copy_label(labelWithIcon);
     label->tooltip(filename); 
     

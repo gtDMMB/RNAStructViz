@@ -30,6 +30,8 @@ MainWindow::MainWindow(int argc, char **argv)
           : m_fileChooser(NULL), selectedFolderBtn(NULL), 
 	    selectedFolderIndex(-1)
 {
+    
+    fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);	
     m_mainWindow = new Fl_Double_Window(650, 450, RNASTRUCTVIZ_VSTRING);
     m_mainWindow->size_range(650, 450, 650, 450);
     m_mainWindow->callback(CloseCallback);
@@ -95,7 +97,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
 		  NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		          NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-		  "@menu   Config Options @>|");
+		  "@menu   Config Options");
 	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
 
