@@ -68,6 +68,7 @@
 
      bool GUI_USE_DEFAULT_FOLDER_NAMES;
      bool DEBUGGING_ON;
+     bool DISPLAY_FIRSTRUN_MESSAGE;
 
 #endif
 
@@ -97,6 +98,7 @@ bool DisplayConfigWindow::SetupInitialConfig() {
 
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
      DEBUGGING_ON = false;
+     DISPLAY_FIRSTRUN_MESSAGE = true;
 
      ConfigParser cfgParser(USER_CONFIG_PATH, !DEBUGGING_ON);
      cfgParser.storeVariables();      

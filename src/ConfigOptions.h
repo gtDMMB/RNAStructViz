@@ -77,6 +77,7 @@ extern volatile Fl_Color GUI_CTFILEVIEW_COLOR;
 
 extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
 extern bool DEBUGGING_ON;
+extern bool DISPLAY_FIRSTRUN_MESSAGE;
 
 /* Helper functions and inline utilities we do not place elsewhere: */
 #include "RNACUtils.cpp"

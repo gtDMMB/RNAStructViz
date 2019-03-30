@@ -5,10 +5,13 @@
 #ifndef RNASTRUCTVIZ_H
 #define RNASTRUCTVIZ_H
 
+#include <vector>
+using std::vector;
+
 #include "StructureManager.h"
+#include "MainWindow.h"
 #include "DiagramWindow.h"
 #include "StatsWindow.h"
-#include <vector>
 
 class RNAStructViz
 {

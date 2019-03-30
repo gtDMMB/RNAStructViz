@@ -1665,8 +1665,8 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
 		          markerImageHeight, 
 		          markerImageStride
 		      );
-     unsigned int markerImageDrawX = (IMAGE_WIDTH - markerImageWidth - 2) / 2;
-     unsigned int markerImageDrawY = IMAGE_HEIGHT - 25.f;
+     unsigned int markerImageDrawX = (IMAGE_WIDTH - markerImageWidth + 4) / 2;
+     unsigned int markerImageDrawY = IMAGE_HEIGHT - 25.f - 2;
      cairo_reset_clip(curWinContext);
      SetCairoColor(curWinContext, CairoColorSpec_t::CR_TRANSPARENT);
      cairo_set_source_surface(curWinContext, strandEdgeMarkerSurface, 

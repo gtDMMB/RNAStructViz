@@ -46,6 +46,16 @@ class MainWindow
 	 */
 	static bool IsRunning();
 
+	/* 
+	 * Get the main instance of this class.
+	 */
+	static MainWindow* GetInstance(); 
+
+	/* 
+	 * Display first-time-run instructions for new users:
+	 */
+	void DisplayFirstTimeUserInstructions();
+
         /*
          Add a new folder to the list of displayed folders
          */
@@ -83,8 +93,8 @@ class MainWindow
 	    Protected destructor to enforce singleton semantics.
         */
         ~MainWindow();
-
-        /*
+	
+	/*
 	    Callback for file loading.
         */
         static void OpenFileCallback(Fl_Widget* widget, void* userData);

@@ -99,6 +99,9 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 	  else if(!strcmp(parsedLine.cfgOption, "GUI_CTFILEVIEW_COLOR")) { 
                guiCTFileViewColor = strtol(parsedLine.cfgValue, NULL, 16);
 	  }
+	  else if(!strcmp(parsedLine.cfgOption, "DISPLAY_FIRSTRUN_MESSAGE")) {
+               guiDisplayFirstRunMessage = !strcasecmp(parsedLine.cfgValue, "true");
+	  }
 	  else {
 	       fprintf(stderr, "Unknown config option \"%s\" ... skipping.\n", 
 	               parsedLine.cfgOption);
@@ -179,7 +182,19 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 	       return errno;
 	  }
      }
-     
+     int curLineNum = sizeof(cfgValues) + NUM_OPTIONS + 1;
+
+     char lastOutputLine[MAX_BUFFER_SIZE];
+     int lineLen = snprintf(lastOutputLine, MAX_BUFFER_SIZE, "DISPLAY_FIRSTRUN_MESSAGE=%s", 
+	                    guiDisplayFirstRunMessage ? "true" : "false");
+     nullTerminateString(lastOutputLine, MAX_BUFFER_SIZE - 1);
+     if(!fwrite(lastOutputLine, sizeof(char), lineLen, fpCfgFile)) {
+          fprintf(stderr, "Error writing line #%d to file: %s\n", 
+	          curLineNum, strerror(errno));
+	  fclose(fpCfgFile);
+	  return errno;
+     }
+
      fclose(fpCfgFile); 
      return 0;
 
@@ -201,6 +216,8 @@ void ConfigParser::storeVariables() const {
      GUI_BTEXT_COLOR = guiBTextColor;
      GUI_TEXT_COLOR = guiTextColor;
      GUI_CTFILEVIEW_COLOR = guiCTFileViewColor;
+
+     DISPLAY_FIRSTRUN_MESSAGE = guiDisplayFirstRunMessage;
 
 } 
 
@@ -261,6 +278,8 @@ void ConfigParser::setDefaults() {
      guiBTextColor = GUI_BTEXT_COLOR;
      guiTextColor = GUI_TEXT_COLOR;
      guiCTFileViewColor = GUI_CTFILEVIEW_COLOR;
+
+     guiDisplayFirstRunMessage = DISPLAY_FIRSTRUN_MESSAGE;
 
 }
 

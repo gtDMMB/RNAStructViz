@@ -22,6 +22,7 @@ class ConfigParser {
 		Fl_Color guiBTextColor;
 		Fl_Color guiTextColor;
 		Fl_Color guiCTFileViewColor;
+                bool guiDisplayFirstRunMessage;
 
 	public:
 		ConfigParser(); 

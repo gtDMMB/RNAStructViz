@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 	++argv; --argc;
     }	
     RNAStructViz::Initialize(argc, argv);
-   
+    
     Fl::option(Fl::OPTION_VISIBLE_FOCUS, false);
     Fl::option(Fl::OPTION_SHOW_TOOLTIPS, true);
     Fl::option(Fl::OPTION_FNFC_USES_GTK, false);
@@ -48,12 +48,13 @@ int main(int argc, char **argv) {
     MainWindow::ResetThemeColormaps();
     fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
 
-    //int flRunCode = Fl::run();
+    if(DISPLAY_FIRSTRUN_MESSAGE) {
+         MainWindow::GetInstance()->DisplayFirstTimeUserInstructions();
+    }
     while(MainWindow::IsRunning()) {
         Fl::wait(0.5);
     }
     RNAStructViz::Shutdown();
-    ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     
     #ifdef WITHGPERFTOOLS
     HeapProfilerStop();
