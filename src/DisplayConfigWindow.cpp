@@ -25,11 +25,12 @@
 #include "ConfigParser.h"
 #include "MainWindow.h"
 #include "ThemesConfig.h"
+#include "CairoDrawingUtils.h"
 
 #include "pixmaps/ConfigPathsIcon.c"
 #include "pixmaps/ConfigThemesIcon.c"
 #include "pixmaps/PNGNewPathIcon.c"
-#include "pixmaps/ConfigWindowIcon.xbm"
+#include "pixmaps/ConfigDiagramWindow.c"
 
 /* Setup initial definitions of the extern'ed variables here: */
 #ifndef _SETUP_GLOBAL_EXTERNS_
@@ -65,6 +66,7 @@
      volatile Fl_Color GUI_BTEXT_COLOR;
      volatile Fl_Color GUI_TEXT_COLOR;
      volatile Fl_Color GUI_CTFILEVIEW_COLOR;
+     volatile Fl_Color STRUCTURE_DIAGRAM_COLORS[3][7];
 
      bool GUI_USE_DEFAULT_FOLDER_NAMES;
      bool DEBUGGING_ON;
@@ -94,6 +96,32 @@ bool DisplayConfigWindow::SetupInitialConfig() {
           GUI_BTEXT_COLOR = LOCAL_BUTTON_COLOR;
           GUI_TEXT_COLOR = LOCAL_TEXT_COLOR;
           GUI_CTFILEVIEW_COLOR = Darker(LOCAL_WINDOW_BGCOLOR, 0.385f);
+     }
+
+     int structDiagramColorCounts[3] = { 1, 3, 7 };
+     Fl_Color diagramInitColors[3][7] = {
+	     {
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType()
+	     },
+	     {
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_RED).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_GREEN).ToFLColorType()
+	     },
+	     {
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_YELLOW).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLUE).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_MAGENTA).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_GREEN).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_RED).ToFLColorType(),
+		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_CYAN).ToFLColorType()
+	     },
+     };
+     for(int s = 0; s < 3; s++) {
+          for(int c = 0; c < structDiagramColorCounts[s]; c++) {
+               STRUCTURE_DIAGRAM_COLORS[s][c] = diagramInitColors[s][c];
+	  }
      }
 
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
@@ -146,12 +174,14 @@ DisplayConfigWindow::DisplayConfigWindow() :
 }
 
 DisplayConfigWindow::~DisplayConfigWindow() {
+     Fl::remove_timeout(RedrawTimerCallback, (void*) this);
      for(int w = 0; w < windowWidgets.size(); w++) {
           delete windowWidgets[w];
 	  windowWidgets[w] = NULL;
      }
      delete fpathsIcon;
      delete themesIcon;
+     delete dwinSettingsIcon;
      if(pngNewPathIcon != NULL) {
           delete pngNewPathIcon;
      }
@@ -162,7 +192,7 @@ DisplayConfigWindow::~DisplayConfigWindow() {
 void DisplayConfigWindow::ConstructWindow() {
 
      // place the widgets in the window:
-     int workingYOffset = CFGWIN_WIDGET_OFFSETY + CFGWIN_SPACING;
+     int workingYOffset = CFGWIN_WIDGET_OFFSETY;
     
      fpathsIcon = new Fl_RGB_Image(ConfigPathsIcon.pixel_data, 
 		  ConfigPathsIcon.width, ConfigPathsIcon.height, 
@@ -174,7 +204,7 @@ void DisplayConfigWindow::ConstructWindow() {
      workingYOffset += fpathsIcon->h() + CFGWIN_SPACING;
 
      const char *fieldDesc[] = {
-	"@->   Structure Search Directory:", 
+	"@->   File Search Directory:", 
 	"@->   PNG Output Directory:", 
 	"@->   PNG Output File Name:"
      };
@@ -198,7 +228,7 @@ void DisplayConfigWindow::ConstructWindow() {
 	 windowWidgets.push_back(descBox);
 	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
          Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
-			      (int) (1.5 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
+			      (int) (2 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
                               (char *) *(fieldUpdateVars[f]));
 	 settingBox->copy_label(TrimFilePathDisplay((char *) *(fieldUpdateVars[f])));
 	 settingBox->color(GUI_BTEXT_COLOR);
@@ -207,7 +237,7 @@ void DisplayConfigWindow::ConstructWindow() {
          fpathsSettingBoxes[f] = settingBox;
 	 fpathsUpdateRefs[f] = (char *) *(fieldUpdateVars[f]);
 	 windowWidgets.push_back(settingBox);
-	 offsetX += (int) (1.5 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
+	 offsetX += (int) (2 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
 	 if(needsDirChooser[f]) { 
               Fl_Button *chooseDirBtn = new Fl_Button(offsetX, workingYOffset, 
 			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
@@ -232,6 +262,67 @@ void DisplayConfigWindow::ConstructWindow() {
      }
      workingYOffset += CFGWIN_SPACING;
      
+     dwinSettingsIcon = new Fl_RGB_Image(ConfigDiagramWindow.pixel_data, 
+		                         ConfigDiagramWindow.width, ConfigDiagramWindow.height, 
+		                         ConfigDiagramWindow.bytes_per_pixel);
+     Fl_Box *dwinSettingsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
+		                              dwinSettingsIcon->w(), dwinSettingsIcon->h());
+     dwinSettingsIconBox->image(dwinSettingsIcon);
+     windowWidgets.push_back(dwinSettingsIconBox);
+     workingYOffset += dwinSettingsIcon->h() + CFGWIN_SPACING;
+
+     int structColorCounts[3] = { 1, 3, 7 };
+     const char *arcColorRowDesc[3] = {
+          "@->   Arc Colors for One Structure:", 
+	  "@->   Arc Colors for Two Structures:", 
+	  "@->   Arc Colors for Three Structures:" 
+     };
+     volatile Fl_Color *structColorVarRefs[3][7] = {
+	     { 
+		     &STRUCTURE_DIAGRAM_COLORS[0][0]
+	     },
+	     {
+		     &STRUCTURE_DIAGRAM_COLORS[1][0], 
+		     &STRUCTURE_DIAGRAM_COLORS[1][1], 
+                     &STRUCTURE_DIAGRAM_COLORS[1][2]
+	     },
+	     {
+		     &STRUCTURE_DIAGRAM_COLORS[2][0], 
+                     &STRUCTURE_DIAGRAM_COLORS[2][1], 
+                     &STRUCTURE_DIAGRAM_COLORS[2][2], 
+                     &STRUCTURE_DIAGRAM_COLORS[2][3], 
+                     &STRUCTURE_DIAGRAM_COLORS[2][4], 
+                     &STRUCTURE_DIAGRAM_COLORS[2][5], 
+                     &STRUCTURE_DIAGRAM_COLORS[2][6]
+	     }
+     };
+     int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+     int offsetXInit = offsetX;
+     for(int s = 0; s < 3; s++) {
+          Fl_Box *structColorsDescBox = new Fl_Box(offsetX, workingYOffset, 
+			                           1.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                                                   arcColorRowDesc[s]);
+          structColorsDescBox->labelcolor(GUI_TEXT_COLOR);
+          structColorsDescBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+          windowWidgets.push_back(structColorsDescBox);
+          offsetX += 1.5 * CFGWIN_LABEL_WIDTH + CFGWIN_COLOR_WIDTH + 2 * CFGWIN_SPACING;
+          for(int c = 0; c < structColorCounts[s]; c++) { 
+	       Fl_Button *colorButton = new Fl_Button(offsetX, workingYOffset, 
+			                              CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "+");
+	       colorButton->color(*(structColorVarRefs[s][c]));
+	       colorButton->labelcolor(GUI_BTEXT_COLOR);
+	       int indexUserData = (s & 0x0000ffff) | ((c << 16) & 0xffff0000);
+	       colorButton->user_data((void *) indexUserData);
+	       colorButton->callback(ChangeDiagramWindowArcColorCallback);
+	       dwinArcColorChangeRefs[s][c] = structColorVarRefs[s][c];
+	       windowWidgets.push_back(colorButton);
+	       offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
+	  }
+	  offsetX = offsetXInit;
+          workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+     }
+
+     // now handle user customizable selections of the FLTK schemes:
      themesIcon = new Fl_RGB_Image(ConfigThemesIcon.pixel_data, 
 		  ConfigThemesIcon.width, ConfigThemesIcon.height, 
 		  ConfigThemesIcon.bytes_per_pixel);
@@ -241,11 +332,9 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(themesIconBox);
      workingYOffset += themesIcon->h() + CFGWIN_SPACING;
 
-     // now handle user customizable selections of the FLTK schemes:
-     int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
      Fl_Box *themeDescBox = new Fl_Box(offsetX, workingYOffset, 
 	 	        	       CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-	 		               "@->   Global FLTK and Preset Themes: ");
+	 		               "@->   Global Preset Themes: ");
      themeDescBox->labelcolor(GUI_TEXT_COLOR);
      themeDescBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
      windowWidgets.push_back(themeDescBox);
@@ -268,7 +357,7 @@ void DisplayConfigWindow::ConstructWindow() {
      fltkThemeChoiceMenu->labelcolor(GUI_BTEXT_COLOR);
      windowWidgets.push_back(fltkThemeChoiceMenu);
      
-     offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+     offsetX += CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING;
      Fl_Choice *presetThemesChooser = new Fl_Choice(offsetX, workingYOffset, 
 		                      CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
      int numThemes = sizeof(PRESET_COLOR_THEMES) / sizeof(PRESET_COLOR_THEMES[0]);
@@ -286,10 +375,10 @@ void DisplayConfigWindow::ConstructWindow() {
      workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
 
      const char *colorFieldDesc[] = {
-          "@->   GUI Window Background Color:", 
-	  "@->   GUI Widget Color:", 
-	  "@->   GUI Button Text Color:", 
-	  "@->   GUI Primary (Dark) Text Color:"
+          "@->   Window Background:", 
+	  "@->   Widget Color:", 
+	  "@->   Button Text Color:", 
+	  "@->   Primary Text Color:"
      };
      volatile Fl_Color *colorVarRefs[] = {
           &GUI_WINDOW_BGCOLOR, 
@@ -305,7 +394,7 @@ void DisplayConfigWindow::ConstructWindow() {
 	 descBox->labelcolor(GUI_TEXT_COLOR);
 	 descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	 windowWidgets.push_back(descBox);
-	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
+	 offsetX += CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
 	 Fl_Box *colorBox = new Fl_Box(offsetX, workingYOffset, 
 			    CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "@square");
 	 colorBox->labelcolor(*(colorVarRefs[c]));
@@ -377,6 +466,8 @@ void DisplayConfigWindow::ConstructWindow() {
      cancelBtn->callback(WindowCloseCallback);
      windowWidgets.push_back(cancelBtn);
 
+     this->redraw();
+     //Fl::add_timeout(1.0, RedrawTimerCallback, (void*) this);
 } 
 
 bool DisplayConfigWindow::isDone() const {
@@ -393,11 +484,13 @@ void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
 
     DisplayConfigWindow *thisWin = (DisplayConfigWindow *) crWin;
     cairo_set_source_rgb(thisWin->crDraw, 
-		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
-		         GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
+    		         GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+    			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_scale(thisWin->crDraw, thisWin->w(), thisWin->h());
     cairo_fill(thisWin->crDraw);
+    //fl_color(GUI_WINDOW_BGCOLOR);
+    //fl_rectf(0, 0, thisWin->w(), thisWin->h());
     thisWin->drawWidgets();
 
 }
@@ -544,6 +637,19 @@ void DisplayConfigWindow::SelectFromColormapCallback(Fl_Widget *btn, void *udata
 
 }
 
+void DisplayConfigWindow::ChangeDiagramWindowArcColorCallback(Fl_Widget *btn, void *udata) {
+     DisplayConfigWindow *displayWin = (DisplayConfigWindow *) btn->parent();
+     Fl_Button *buttonRef = (Fl_Button *) btn;
+     long int userIndexData = (long int) udata, structIdx, colorIdx;
+     structIdx = userIndexData & 0x0000ffff;
+     colorIdx = (userIndexData >> 16) & 0x0000ffff;
+     Fl_Color currentColor = *(displayWin->dwinArcColorChangeRefs[structIdx][colorIdx]);
+     Fl_Color nextColor = fl_show_colormap(currentColor);
+     *(displayWin->dwinArcColorChangeRefs[structIdx][colorIdx]) = Fl::get_color(nextColor);
+     buttonRef->color(Fl::get_color(nextColor));
+     buttonRef->redraw();
+}
+
 void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {
      DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
      DisplayConfigWindow::SetupInitialConfig();
@@ -555,7 +661,13 @@ void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {
           parentWin->colorDisplayBoxes[c]->labelcolor(*(parentWin->colorChangeRefs[c]));
 	  parentWin->colorDisplayBoxes[c]->redraw();
      }
-     //MainWindow::RethemeMainWindow();
+}
+
+void DisplayConfigWindow::RedrawTimerCallback(void *data) {
+     DisplayConfigWindow *displayWin = (DisplayConfigWindow *) data;
+     displayWin->redraw();
+     Fl::remove_timeout(RedrawTimerCallback, data);
+     Fl::add_timeout(1.0, RedrawTimerCallback, data);
 }
 
 void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
@@ -568,6 +680,4 @@ void DisplayConfigWindow::WindowCloseCallback(Fl_Widget *win, void *udata) {
      }
      thisWin->hide();
      thisWin->finished = true;
-     //MainWindow::ms_instance->m_mainWindow->redraw();
-     //MainWindow::RethemeMainWindow();
 }

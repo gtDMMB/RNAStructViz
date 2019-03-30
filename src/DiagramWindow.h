@@ -196,7 +196,7 @@ private:
     Fl_Check_Button *m_cbShowTicks, *m_cbDrawBases;
     Fl_Button *exportButton;
     Fl_RGB_Image *baseColorPaletteImg;
-    Fl_Button *baseColorPaletteChangeBtn;
+    Fl_Button *baseColorPaletteImgBtn, *baseColorPaletteChangeBtn;
     Fl_Menu_Item* m_menuItems;
     int m_menuItemsSize;
 

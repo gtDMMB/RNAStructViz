@@ -334,13 +334,11 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 }
 
 void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
-    
      DisplayConfigWindow *cfgWindow = new DisplayConfigWindow(); 
      cfgWindow->show();
      while(!cfgWindow->isDone() && cfgWindow->visible()) 
           Fl::wait();
      delete cfgWindow;
-
 }
 
 void MainWindow::TestCallback(Fl_Widget* widget, void* userData)

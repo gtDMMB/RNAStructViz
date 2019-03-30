@@ -18,17 +18,17 @@
 
 #include "ConfigOptions.h"
 
-#define CONFIG_WINDOW_WIDTH         (750)
-#define CONFIG_WINDOW_HEIGHT        (550)
-#define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Options")
+#define CONFIG_WINDOW_WIDTH         (800)
+#define CONFIG_WINDOW_HEIGHT        (580)
+#define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Options and Settings")
 
 #define CFGWIN_WIDGET_OFFSETX       (10)
 #define CFGWIN_WIDGET_OFFSETY       (10)
 #define CFGWIN_LABEL_HEIGHT         (20)
 #define CFGWIN_LABEL_WIDTH          (200)
-#define CFGWIN_BUTTON_WIDTH         (135)
+#define CFGWIN_BUTTON_WIDTH         (145)
 #define CFGWIN_COLOR_WIDTH          (25)
-#define CFGWIN_SPACING              (18)
+#define CFGWIN_SPACING              (10)
 #define CFGWIN_CDIALOG_X            (100)
 #define CFGWIN_CDIALOG_Y            (100)
 #define CFGWIN_CDIALOG_WIDTH        (250)
@@ -61,8 +61,10 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 		static void PresetThemeChooserMenuCallback(Fl_Widget *, void *);
 		static void ChangeColorCallback(Fl_Widget *btn, void *udata); 
                 static void SelectFromColormapCallback(Fl_Widget *btn, void *);
+		static void ChangeDiagramWindowArcColorCallback(Fl_Widget *btn, void *udata);
 		static void WriteConfigFileCallback(Fl_Widget *btn, void *);
 		static void RestoreDefaultsCallback(Fl_Widget *btn, void *);
+		static void RedrawTimerCallback(void *data);
 		static void WindowCloseCallback(Fl_Widget *win, void *udata);
 
 		bool finished;
@@ -75,11 +77,12 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
                 #define NUMSETTINGS      (3)
                 #define GUICOLORS        (4)
 
-		Fl_RGB_Image *fpathsIcon, *themesIcon, *pngNewPathIcon;
+		Fl_RGB_Image *fpathsIcon, *themesIcon, *dwinSettingsIcon, *pngNewPathIcon;
 	        Fl_Box *fpathsSettingBoxes[NUMSETTINGS];
 	        char *fpathsUpdateRefs[NUMSETTINGS];	
 		Fl_Box *colorDisplayBoxes[GUICOLORS];
 		volatile Fl_Color *colorChangeRefs[GUICOLORS];
+		volatile Fl_Color *dwinArcColorChangeRefs[3][7];
 		std::vector<Fl_Widget *> windowWidgets;
 };
 
