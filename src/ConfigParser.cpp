@@ -102,6 +102,35 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 	  else if(!strcmp(parsedLine.cfgOption, "DISPLAY_FIRSTRUN_MESSAGE")) {
                guiDisplayFirstRunMessage = !strcasecmp(parsedLine.cfgValue, "true");
 	  }
+	  else if(!strncmp(parsedLine.cfgOption, "DWIN_COLORS_STRUCT", 18) && 
+	          strlen(parsedLine.cfgOption) == 19) {
+               int structIndex = atoi(parsedLine.cfgOption + 18) - 1;
+	       if(structIndex < 0 || structIndex >= 3) {
+                    fprintf(stderr, "Unknown structure index \"%s\" ... skipping\n", 
+			    parsedLine.cfgOption + 18);
+                    continue;
+	       }
+	       char *commaDelimPos = strchrnul(parsedLine.cfgValue, ',');
+	       char *curStrStartPos = parsedLine.cfgValue;
+	       bool reachedLastColor = false;
+	       int colorIdx = 0;
+	       while(!reachedLastColor) {
+                    char colorStr[MAX_BUFFER_SIZE];
+		    int colorStrLen = commaDelimPos - curStrStartPos;
+		    strncpy(colorStr, curStrStartPos, colorStrLen);
+		    colorStr[colorStrLen] = '\0';
+		    guiStructureDiagramColors[structIndex][colorIdx] = strtol(colorStr, NULL, 16);
+		    curStrStartPos = commaDelimPos + 1;
+		    if(*commaDelimPos == '\0') {
+		         reachedLastColor = true;
+		    }
+		    else {
+			 commaDelimPos = strchrnul(curStrStartPos, ',');
+		    }
+		    colorIdx++;
+	       }
+	       guiStructureDiagramColorsCount[structIndex] = colorIdx;
+	  }
 	  else {
 	       fprintf(stderr, "Unknown config option \"%s\" ... skipping.\n", 
 	               parsedLine.cfgOption);
@@ -184,6 +213,25 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
      }
      int curLineNum = sizeof(cfgValues) + NUM_OPTIONS + 1;
 
+     for(int s = 0; s < 3; s++) {
+          char colorListLine[MAX_BUFFER_SIZE], curColorStr[MAX_BUFFER_SIZE];
+	  snprintf(colorListLine, MAX_BUFFER_SIZE, "DWIN_COLORS_STRUCT%d=\0", s + 1);
+	  for(int c = 0; c < guiStructureDiagramColorsCount[s]; c++) {
+	       snprintf(curColorStr, MAX_BUFFER_SIZE, "0x%08x\0", guiStructureDiagramColors[s][c]);
+	       strcat(colorListLine, curColorStr);
+	       if(c + 1 < guiStructureDiagramColorsCount[s]) {
+	            strcat(colorListLine, ",");
+	       }
+	  }
+	  strcat(colorListLine, "\n");
+	  curLineNum++;
+	  if(!fwrite(colorListLine, sizeof(char), strlen(colorListLine), fpCfgFile)) {
+               fprintf(stderr, "Error writing line #%d to file: %s\n", curLineNum, strerror(errno));
+	       fclose(fpCfgFile);
+	       return errno;
+	  }
+     }
+
      char lastOutputLine[MAX_BUFFER_SIZE];
      int lineLen = snprintf(lastOutputLine, MAX_BUFFER_SIZE, "DISPLAY_FIRSTRUN_MESSAGE=%s", 
 	                    guiDisplayFirstRunMessage ? "true" : "false");
@@ -216,6 +264,12 @@ void ConfigParser::storeVariables() const {
      GUI_BTEXT_COLOR = guiBTextColor;
      GUI_TEXT_COLOR = guiTextColor;
      GUI_CTFILEVIEW_COLOR = guiCTFileViewColor;
+
+     for(int s = 0; s < 3; s++) {
+          for(int c = 0; c < guiStructureDiagramColorsCount[s]; c++) {
+               STRUCTURE_DIAGRAM_COLORS[s][c] = guiStructureDiagramColors[s][c];
+	  }
+     }
 
      DISPLAY_FIRSTRUN_MESSAGE = guiDisplayFirstRunMessage;
 
@@ -279,6 +333,15 @@ void ConfigParser::setDefaults() {
      guiTextColor = GUI_TEXT_COLOR;
      guiCTFileViewColor = GUI_CTFILEVIEW_COLOR;
 
+     guiStructureDiagramColorsCount[0] = 1;
+     guiStructureDiagramColorsCount[1] = 3;
+     guiStructureDiagramColorsCount[2] = 7;
+     for(int s = 0; s < 3; s++) {
+          for(int c = 0; c < guiStructureDiagramColorsCount[s]; c++) {
+               guiStructureDiagramColors[s][c] = STRUCTURE_DIAGRAM_COLORS[s][c];
+	  }
+     }
+     
      guiDisplayFirstRunMessage = DISPLAY_FIRSTRUN_MESSAGE;
 
 }
