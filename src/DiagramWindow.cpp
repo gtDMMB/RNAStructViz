@@ -617,7 +617,7 @@ void DiagramWindow::SetCairoToFLColor(cairo_t *cr, Fl_Color flc) {
      if(cr == NULL) {
           return;
      }
-     CairoColor_t::FromFLColorType(flc).ApplyRGBAColor(cr);
+     CairoColor_t::FromFLColorType(flc).SetAlpha(0x99).ApplyRGBAColor(cr);
 }
 
 void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int resolution) {
@@ -648,7 +648,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
             if (baseData1->m_pair == baseData2->m_pair) {
                 if (baseData1->m_pair == baseData3->m_pair) {
                     fl_color(STRUCTURE_DIAGRAM_COLORS[2][0]);
-                    SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][0]);
+                    SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][0]);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLACK);
@@ -657,7 +657,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                             angleDelta, radius);
                 } else {
                     fl_color(STRUCTURE_DIAGRAM_COLORS[2][1]);
-		    SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][1]);
+		    SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][1]);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_YELLOW);
@@ -668,7 +668,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                     if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                         baseData3->m_pair > ui) {
                         fl_color(STRUCTURE_DIAGRAM_COLORS[2][2]);
-			SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
+			SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
                         #if PERFORM_BRANCH_TYPE_ID
 			SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                             (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
@@ -679,7 +679,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 }
             } else if (baseData1->m_pair == baseData3->m_pair) {
                 fl_color(STRUCTURE_DIAGRAM_COLORS[2][3]);
-		SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][3]);
+		SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][3]);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_MAGENTA);
@@ -690,7 +690,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 if (baseData2->m_pair != RNAStructure::UNPAIRED &&
                     baseData2->m_pair > ui) {
                     fl_color(STRUCTURE_DIAGRAM_COLORS[2][4]);
-		    SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][4]);
+		    SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][4]);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
@@ -700,7 +700,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 }
             } else {
                 fl_color(STRUCTURE_DIAGRAM_COLORS[2][5]);
-		SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][5]);
+		SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][5]);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_RED);
@@ -712,7 +712,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                     baseData2->m_pair > ui) {
                     if (baseData2->m_pair == baseData3->m_pair) {
                         fl_color(STRUCTURE_DIAGRAM_COLORS[2][6]);
-			SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][6]);
+			SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][6]);
                         #if PERFORM_BRANCH_TYPE_ID
 			SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                             (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_CYAN);
@@ -721,7 +721,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                                 angleDelta, radius);
                     } else {
                         fl_color(STRUCTURE_DIAGRAM_COLORS[2][4]);
-			SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][4]);
+			SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][4]);
                         #if PERFORM_BRANCH_TYPE_ID
 			SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                             (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
@@ -732,7 +732,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                         if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                             baseData3->m_pair > ui) {
                             fl_color(STRUCTURE_DIAGRAM_COLORS[2][2]);
-			    SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
+			    SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
                             #if PERFORM_BRANCH_TYPE_ID
 			    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                                 (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
@@ -744,7 +744,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 } else if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                            baseData3->m_pair > ui) {
                     fl_color(STRUCTURE_DIAGRAM_COLORS[2][2]);
-		    SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
+		    SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
@@ -757,7 +757,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                    baseData2->m_pair > ui) {
             if (baseData2->m_pair == baseData3->m_pair) {
                 fl_color(STRUCTURE_DIAGRAM_COLORS[2][6]);
-		SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][6]);
+		SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][6]);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_CYAN);
@@ -766,7 +766,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                         angleDelta, radius);
             } else {
                 fl_color(STRUCTURE_DIAGRAM_COLORS[2][4]);
-		SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][4]);
+		SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][4]);
                 #if PERFORM_BRANCH_TYPE_ID
 		SetCairoBranchColor(cr, structures[1]->GetBranchTypeAt(ui)->getBranchID(),
                                     (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_GREEN);
@@ -777,7 +777,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
                 if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                     baseData3->m_pair > ui) {
                     fl_color(STRUCTURE_DIAGRAM_COLORS[2][2]);
-		    SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
+		    SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
                     #if PERFORM_BRANCH_TYPE_ID
 		    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                         (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);
@@ -789,7 +789,7 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
         } else if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                    baseData3->m_pair > ui) {
             fl_color(STRUCTURE_DIAGRAM_COLORS[2][2]);
-	    SetCairoColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
+	    SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[2][2]);
             #if PERFORM_BRANCH_TYPE_ID
 	    SetCairoBranchColor(cr, structures[2]->GetBranchTypeAt(ui)->getBranchID(),
                                 (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLUE);

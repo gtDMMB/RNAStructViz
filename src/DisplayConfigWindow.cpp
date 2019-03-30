@@ -101,21 +101,33 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      int structDiagramColorCounts[3] = { 1, 3, 7 };
      Fl_Color diagramInitColors[3][7] = {
 	     {
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType()
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType()
+		     FL_BLACK
 	     },
 	     {
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_RED).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_GREEN).ToFLColorType()
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_RED).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_GREEN).ToFLColorType()
+		     FL_BLACK, 
+		     FL_RED,
+		     FL_GREEN,
 	     },
 	     {
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_YELLOW).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLUE).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_MAGENTA).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_GREEN).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_RED).ToFLColorType(),
-		     CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_CYAN).ToFLColorType()
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_YELLOW).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLUE).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_MAGENTA).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_GREEN).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_RED).ToFLColorType(),
+		     //CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_CYAN).ToFLColorType()
+		     FL_BLACK, 
+		     FL_LOCAL_BRIGHT_YELLOW,
+		     FL_BLUE,
+		     FL_MAGENTA,
+		     FL_GREEN,
+		     FL_RED,
+		     FL_CYAN
+
 	     },
      };
      for(int s = 0; s < 3; s++) {
