@@ -127,8 +127,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	
 	}
         show();
-        if(type == InputWindow::FILE_INPUT || type == InputWindow::CTVIEWER_FILE_INPUT || 
-	   !GUI_USE_DEFAULT_FOLDER_NAMES) { 
+        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES) { 
             show();
 	}
 	else {
@@ -154,7 +153,7 @@ bool InputWindow::isCanceled() const {
 }
 
 void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
-    InputWindow *window = (InputWindow*)widget->parent();
+    InputWindow *window = (InputWindow*) widget->parent();
     if(window->windowType == InputWindow::FILE_INPUT) {
          char exportSaveDir[MAX_BUFFER_SIZE];
 	 char *fileSepPtr = strrchr(window->inputText, '/');
