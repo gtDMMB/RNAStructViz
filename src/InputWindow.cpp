@@ -1,23 +1,27 @@
-#include <FL/Fl_Input.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Box.H>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <string>
 
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Box.H>
+
 #include "InputWindow.h"
 #include "MainWindow.h"
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
+#include "RNAStructViz.h"
+#include "StructureManager.h"
+#include "FolderStructure.h"
 
 int InputWindow::distinctStructureCount = 0;
 
 InputWindow::InputWindow(int w, int h, const char *label, 
-	const char *defaultName, InputWindowType type) : 
-	Fl_Window(MAX(w, 445), h, label), cbUseDefaultNames(NULL) 
+	const char *defaultName, InputWindowType type, int folderIndex) : 
+	Fl_Window(MAX(w, 445), h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
+	userWindowStatus(OK), fileSelectionIndex(-1)
 {	
     string = (char*)malloc(sizeof(char)*90);
     color(GUI_WINDOW_BGCOLOR);
@@ -25,8 +29,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
     windowType = type;
     inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
     
-    if (type == InputWindow::FILE_INPUT)
-    {
+    if(type == InputWindow::FILE_INPUT) {
     	    strncpy(inputText, defaultName, MAX_BUFFER_SIZE - 1);
 	    inputText[MAX_BUFFER_SIZE - 1] = '\0';
 	    char *extPtr = strrchr(inputText, '.');
@@ -57,8 +60,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input->callback(InputCallback, (void*)0);
 	    callback(CloseCallback);
     }
-    else
-    {    
+    else if(type == InputWindow::FOLDER_INPUT) {    
 	    std::string actualStructName = 
 		        ExtractStructureNameFromCTName(defaultName);
             const char *actualStructNameCStr = actualStructName.c_str();
@@ -92,8 +94,41 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    callback(CloseCallback);
 	}
+        else { 
+	    
+	    const char *windowDisplayMsg = "Which CT file structure for the organism\ndo you want to display?";
+	    Fl_Box *box = new Fl_Box(75, 5, 300, 40, windowDisplayMsg);
+	    box->box(FL_RSHADOW_BOX);
+	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+	    box->color(GUI_BGCOLOR);
+	    box->labelcolor(GUI_BTEXT_COLOR);
+	    Fl_Button *displayButton = new Fl_Button(100, 100, 155, 30, "Display Zoomed Region @|>");
+	    displayButton->callback(DisplayCTFileCallback, (void*)0);
+	    displayButton->color(GUI_BGCOLOR);
+	    displayButton->labelcolor(GUI_BTEXT_COLOR);
+	    displayButton->set_active();
+	    Fl_Button *cancelButton = new Fl_Button(275, 100, 75, 30, "Cancel @1+");
+            cancelButton->callback(CancelCallback); 
+	    cancelButton->color(GUI_BGCOLOR);
+	    cancelButton->labelcolor(GUI_BTEXT_COLOR);
+            
+	    ctFileChooser = new Fl_Choice(190, 55, 200, 30, "Choose CT Structure: ");
+            ctFileChooser->color(GUI_BGCOLOR);
+	    ctFileChooser->labelcolor(GUI_BTEXT_COLOR);
+
+	    StructureManager *structManager = RNAStructViz::GetInstance()->GetStructureManager();
+	    Folder *curFolder = structManager->GetFolderAt(folderIndex);
+	    for(int s = 0; s < curFolder->structCount; s++) { 
+                 RNAStructure *rnaStruct = structManager->GetStructure(curFolder->folderStructs[s]);
+		 const char *ctFileName = rnaStruct->GetFilename();
+		 ctFileChooser->add(ctFileName);
+	    }
+	    ctFileChooser->value(0);
+	
+	}
         show();
-        if(type == InputWindow::FILE_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES) { 
+        if(type == InputWindow::FILE_INPUT || type == InputWindow::CTVIEWER_FILE_INPUT || 
+	   !GUI_USE_DEFAULT_FOLDER_NAMES) { 
             show();
 	}
 	else {
@@ -110,8 +145,15 @@ InputWindow::~InputWindow() {
     free(inputText);
 }
 
-void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
-{
+int InputWindow::getFileSelectionIndex() const {
+     return fileSelectionIndex;
+}
+
+bool InputWindow::isCanceled() const {
+     return userWindowStatus == CANCELED;
+}
+
+void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
     InputWindow *window = (InputWindow*)widget->parent();
     if(window->windowType == InputWindow::FILE_INPUT) {
          char exportSaveDir[MAX_BUFFER_SIZE];
@@ -139,12 +181,31 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata)
     window->hide();
 }
 
-void InputWindow::CloseCallback(Fl_Widget* widget, void* userData)
-{
+void InputWindow::CloseCallback(Fl_Widget* widget, void* userData) {
     InputWindow *window = (InputWindow*)widget;
     window->name = "";
     free(window->string);
     window->hide();
+}
+
+void InputWindow::DisplayCTFileCallback(Fl_Widget *w, void *udata) {
+     InputWindow *iwin = (InputWindow *) w->parent();
+     if(iwin->ctFileChooser == NULL) {
+          iwin->userWindowStatus = CANCELED;
+	  iwin->fileSelectionIndex = -1;
+     }
+     else {
+	  iwin->userWindowStatus = OK;
+	  iwin->fileSelectionIndex = iwin->ctFileChooser->value();
+     }
+     iwin->hide();
+}
+
+void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
+     InputWindow *iwin = (InputWindow *) w->parent();
+     iwin->userWindowStatus = CANCELED;
+     iwin->fileSelectionIndex = -1;
+     iwin->hide();
 }
 
 std::string InputWindow::ExtractStructureNameFromCTName(const char *ctPath) {

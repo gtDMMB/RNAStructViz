@@ -1423,11 +1423,9 @@ int DiagramWindow::handle(int flEvent) {
 			      	      "CT file contents!\n");
 			      return 1;
 			 }
-			 else if(!RNAStructure::ActionOpenCTFileViewerWindow(folderIndex, 
-						zoomBufferMinArcIndex, zoomBufferMaxArcIndex)) {
-			      fprintf(stderr, 
-				      "Open an active CT file viewer window before trying to scroll to "
-			              "CT file contents for the active structure!\n");
+			 int structIndex = RNAStructure::ActionOpenCTFileViewerWindow(folderIndex, 
+				           zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
+			 if(structIndex < 0) {
 			      return 1;
 			 }
 			 int minArcPairIndex = MIN(zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
@@ -1435,28 +1433,44 @@ int DiagramWindow::handle(int flEvent) {
 			      fprintf(stderr, "Invalid arc index bounds selected! Try zooming again.\n");
 			      return 1;
 			 }
-			 else if(!RNAStructure::ScrollOpenCTFileViewerWindow(minArcPairIndex)) { 
+			 else if(!RNAStructure::ScrollOpenCTFileViewerWindow(structIndex, minArcPairIndex)) { 
 			      fprintf(stderr, "CT view operation failed. Try zooming again?\n");
 			      return 1;
 			 }
 		    }
-		    else if(Fl::event_length() == 1 && 
-		            (*(Fl::event_text()) == 'R')) {
-		          
-		         RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
-				                   GetStructure(folderIndex);
+		    else if(Fl::event_length() == 1 && *(Fl::event_text()) == 'R') {
+		         
+			 InputWindow *ctFileSelectWin = new InputWindow(400, 175, 
+					                "Select CT File to View ...", "", 
+							InputWindow::RADIAL_LAYOUT_FILE_INPUT, 
+							folderIndex);
+			 while(ctFileSelectWin->visible()) {
+		              Fl::wait();
+			 }
+			 if(ctFileSelectWin->isCanceled() || ctFileSelectWin->getFileSelectionIndex() < 0) {
+			      break;
+			 }
+			 StructureManager *structManager = RNAStructViz::GetInstance()->
+				                           GetStructureManager();
+		         int ctFileSelectIndex = ctFileSelectWin->getFileSelectionIndex();
+			 int structIdx = structManager->GetFolderAt(folderIndex)->
+				         folderStructs[ctFileSelectIndex];
+		         RNAStructure *rnaStruct = structManager->GetStructure(structIdx);
 			 const char *rnaSeqStr = rnaStruct->GetSequenceString();
 			 size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
 			 size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
 			 radialDisplayWindow = new RadialLayoutDisplayWindow();
-			 radialDisplayWindow->SetTitleFormat("Radial Display for %s -- Highlighting Bases #%d to #%d", 
-					               rnaStruct->GetFilenameNoExtension(), 
-						       seqStartPos + 1, seqEndPos + 1);
+			 radialDisplayWindow->SetTitleFormat(
+					      "Radial Display for %s -- Highlighting Bases #%d to #%d", 
+					      rnaStruct->GetFilenameNoExtension(), 
+					      seqStartPos + 1, seqEndPos + 1);
                          radialDisplayWindow->SetParentWindow(this);
 			 radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos);
+			 Fl::grab(radialDisplayWindow);
 			 radialDisplayWindow->show();
 
 		    }
+		    return 1;
 	       }
 	  default:
                return Fl_Cairo_Window::handle(flEvent);

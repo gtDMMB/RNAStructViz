@@ -230,7 +230,6 @@ class RNAStructure
         char *m_ctDisplayFormatString, *m_seqDisplayFormatString;
 	char *charSeq, *dotFormatCharSeq;
         unsigned int charSeqSize;
-	static RNAStructure *m_currentOpenCTViewer;
 
     public:
 	class Util { 
@@ -246,11 +245,11 @@ class RNAStructure
 		       const char *fileExtText = ""
 		  );
 	};
-        static bool HaveOpenCTFileViewerWindow();
-	static bool ActionOpenCTFileViewerWindow(int structureFolderIndex, 
-			                         int minArcIdx = -1, 
-						 int maxArcIdx = -1);
-	static bool ScrollOpenCTFileViewerWindow(int pairIndex); 
+	
+	static int ActionOpenCTFileViewerWindow(int structureFolderIndex, 
+			                        int minArcIdx = -1, 
+						int maxArcIdx = -1);
+	static bool ScrollOpenCTFileViewerWindow(int structIndex, int pairIndex); 
 
 };
 

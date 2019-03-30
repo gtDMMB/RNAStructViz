@@ -18,7 +18,6 @@
 #endif
 
 const RNAStructure::BasePair RNAStructure::UNPAIRED = ~0x0;
-RNAStructure *RNAStructure::m_currentOpenCTViewer = NULL;
 
 RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(NULL), 
@@ -563,13 +562,6 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     }
     m_contentWindow->show();
     m_contentWindow->make_current();
-    #if !defined(__LOCAL_NOUSE_THREADS)
-    Fl::lock();
-    m_currentOpenCTViewer = this;
-    Fl::unlock();
-    #else
-    m_currentOpenCTViewer = this;
-    #endif
 
 }
 
@@ -589,7 +581,7 @@ void RNAStructure::GenerateString()
     
     // table header labels:
     charsWritten = snprintf(currentPosn, remainingSize, 
-		   "   BaseId  |  Pair  (PairId )\n-----------------------------\n");
+		   "   BaseId  |  Pair  (PairId) \n-----------------------------\n");
     snprintf(formatPosn, remainingSize, "%s\n", 
              Util::GetRepeatedString(TBUFSTYLE_DEFAULT_STRFMT, 
 		                     charsWritten + 1).c_str());
@@ -799,15 +791,6 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
 void RNAStructure::DeleteContentWindow() {
     if(m_contentWindow) {
         m_contentWindow->hide();
-	if(this == m_currentOpenCTViewer) { 
-	     #if !defined(__LOCAL_NOUSE_THREADS)
-	     Fl::lock();
-	     m_currentOpenCTViewer = NULL;
-	     Fl::unlock();
-             #else
-	     m_currentOpenCTViewer = NULL;
-             #endif
-	}
 	Delete(m_contentWindow);
     	Delete(m_ctTextDisplay);
 	Delete(m_ctTextBuffer);
@@ -884,15 +867,22 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
      return operationStatus;
 }
 
-bool RNAStructure::HaveOpenCTFileViewerWindow() {
-     return m_currentOpenCTViewer != NULL;
-}
-
-bool RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex, 
+int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex, 
 		                                int minArcIdx, int maxArcIdx) {
+     InputWindow *ctFileSelectionWin = new InputWindow(400, 175, "Select CT File to Highlight ...", 
+		                                       "", InputWindow::CTVIEWER_FILE_INPUT, 
+						       structureFolderIndex);
+     while(ctFileSelectionWin->visible()) {
+          Fl::wait();
+     }
+     if(ctFileSelectionWin->isCanceled() || ctFileSelectionWin->getFileSelectionIndex() < 0) {
+          return -1;
+     }
      StructureManager *rnaStructManager = RNAStructViz::GetInstance()->GetStructureManager();
-     RNAStructure *rnaStructure = !rnaStructManager ? NULL : 
-	                          rnaStructManager->GetStructure(structureFolderIndex);
+     int fileSelectionIndex = ctFileSelectionWin->getFileSelectionIndex();
+     int structIndex = rnaStructManager->GetFolderAt(structureFolderIndex)->
+	               folderStructs[fileSelectionIndex];
+     RNAStructure *rnaStructure = rnaStructManager->GetStructure(structIndex);
      if((rnaStructManager != NULL) && (rnaStructure != NULL)) { 
 	  if(minArcIdx <= 0 || maxArcIdx <= 0) { 
 	       minArcIdx = 1;
@@ -901,23 +891,22 @@ bool RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
           char arcIndexDisplaySuffix[MAX_BUFFER_SIZE];
 	  snprintf(arcIndexDisplaySuffix, MAX_BUFFER_SIZE, "#%d -- #%d (of %d)\0", 
 		   minArcIdx, maxArcIdx, rnaStructure->m_sequenceLength); 
-	  rnaStructManager->DisplayFileContents(structureFolderIndex, arcIndexDisplaySuffix);
-	  return true;
+	  rnaStructManager->DisplayFileContents(structIndex, arcIndexDisplaySuffix);
+	  return structIndex;
      }
-     return false;
+     return -1;
 }
 
-bool RNAStructure::ScrollOpenCTFileViewerWindow(int pairIndex) {
-     if(!HaveOpenCTFileViewerWindow()) {
+bool RNAStructure::ScrollOpenCTFileViewerWindow(int structIndex, int pairIndex) {
+     RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
+	                       GetStructure(structIndex);
+     if(rnaStruct == NULL || rnaStruct->m_ctTextDisplay == NULL || 
+	rnaStruct->m_contentWindow == NULL) {
           return false;
      }
-     else if(m_currentOpenCTViewer->m_ctTextDisplay == NULL || 
-             m_currentOpenCTViewer->m_contentWindow == NULL) {
+     else if(pairIndex <= 0 || pairIndex > rnaStruct->GetLength()) {
           return false;
      }
-     else if(pairIndex <= 0 || pairIndex > m_currentOpenCTViewer->GetLength()) {
-          return false;
-     }
-     m_currentOpenCTViewer->m_ctTextDisplay->scroll(pairIndex + 2, 1);
-     m_currentOpenCTViewer->m_contentWindow->show();
+     rnaStruct->m_ctTextDisplay->scroll(pairIndex + 2, 1);
+     rnaStruct->m_contentWindow->show();
 }
