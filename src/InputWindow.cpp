@@ -28,7 +28,6 @@ InputWindow::InputWindow(int w, int h, const char *label,
     set_modal();
     windowType = type;
     inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
-    fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
 
     if(type == InputWindow::FILE_INPUT) {
     	    strncpy(inputText, defaultName, MAX_BUFFER_SIZE - 1);

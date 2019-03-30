@@ -24,7 +24,6 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 {
 
     // label configuration:  
-    fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
     //labelcolor(GUI_TEXT_COLOR);
     labelfont(LOCAL_BFFONT);
     labelsize(LOCAL_TEXT_SIZE);    
