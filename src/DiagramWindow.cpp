@@ -65,7 +65,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
     cursor(DIAGRAMWIN_DEFAULT_CURSOR);
-    set_non_modal();
+    //set_non_modal();
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
