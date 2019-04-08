@@ -486,7 +486,7 @@ void DiagramWindow::DrawKey3() {
     int yPosn = 55;
     char mystr[10] = "";
 
-    fl_color(FL_BLACK);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[2][0]);
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
@@ -494,7 +494,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_RED);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[2][5]);
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_line_style(FL_DOT);
     fl_xyline(m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
@@ -503,7 +503,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_GREEN);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[2][4]);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_line_style(FL_DOT);
     fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
@@ -512,7 +512,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_BLUE);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[2][2]);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     fl_line_style(FL_DOT);
     fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
@@ -521,7 +521,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    fl_color(fl_rgb_color(255, 200, 0));
+    fl_color(STRUCTURE_DIAGRAM_COLORS[2][1]);
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_line_style(FL_DOT);
@@ -530,7 +530,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_MAGENTA);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[2][3]);
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     fl_line_style(FL_DOT);
@@ -539,7 +539,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_CYAN);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[2][6]);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     fl_line_style(FL_DOT);
@@ -553,20 +553,20 @@ void DiagramWindow::DrawKey2(const int a, const int b) {
     int yPosn = 55;
     char mystr[10] = "";
 
-    fl_color(FL_BLACK);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[1][0]);
     fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
     fl_rectf(m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
     sprintf(mystr, "%d", numPairs[0]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_RED);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[1][1]);
     fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
     sprintf(mystr, "%d", numPairs[1]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(FL_GREEN);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[1][2]);
     fl_rectf(m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
     sprintf(mystr, "%d", numPairs[2]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
@@ -574,9 +574,8 @@ void DiagramWindow::DrawKey2(const int a, const int b) {
 }
 
 void DiagramWindow::DrawKey1(const int a) {
-    fl_color(FL_BLACK);
+    fl_color(STRUCTURE_DIAGRAM_COLORS[0][0]);
     fl_rectf(m_menus[a]->x(), 55, m_menus[a]->w(), 3);
-
     char mystr[10] = "";
     sprintf(mystr, "%d", numPairs[0]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, 55 + 3);
