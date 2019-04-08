@@ -442,12 +442,12 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    thisWindow->RedrawStructureTickMarks(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
     }
+    thisWindow->RedrawStrandEdgeMarker(cr);
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
 		             GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_rectangle(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, 
 		    IMAGE_WIDTH, IMAGE_HEIGHT);    
     cairo_fill(cr);
-    thisWindow->RedrawStrandEdgeMarker(cr);
     thisWindow->RedrawCairoZoomBuffer(cr);
     
     fl_color(priorColor);
@@ -616,7 +616,7 @@ void DiagramWindow::SetCairoToFLColor(cairo_t *cr, Fl_Color flc) {
      if(cr == NULL) {
           return;
      }
-     CairoColor_t::FromFLColorType(flc).SetAlpha(0x99).ApplyRGBAColor(cr);
+     CairoColor_t::FromFLColorType(flc).ToOpaque().ApplyRGBAColor(cr);
 }
 
 void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int resolution) {
@@ -1157,9 +1157,9 @@ void DiagramWindow::ComputeDiagramParams(
         float &radius) {
     angleDelta = (M_PI * 2.0f - 0.05f) / (float) numBases;
     angleBase = 1.5f * M_PI - 0.025f;
-    centerX = (float) resolution / 2.0f;
-    centerY = (float) resolution / 2.0f;
-    radius = centerX < centerY ? centerX - 5.f : centerY - 5.f;
+    centerX = (float) resolution / DIAGRAM_TO_IMAGE_RATIO / 2.0f;
+    centerY = (float) resolution / DIAGRAM_TO_IMAGE_RATIO / 2.0f;
+    radius = (resolution + 10.f) / 2.0f;
 }
 
 void DiagramWindow::AddStructure(const int index) {
