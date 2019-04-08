@@ -279,8 +279,8 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           ymax += ABS(ymin);
 	  ymin = 0.0;
      }
-     const int nodeSize = 29;
-     float winScale = nodeSize / dmin / M_SQRT2;
+     const int nodeSize = 38;
+     float winScale = 1.25 * nodeSize / MAX(dmin, 1) / M_SQRT2;
      float xScale = (float) (0.85 * winScale * MAX(MAX(xmax / DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_WIDTH / xmax), 1.0));
      float yScale = (float) (0.85 * winScale * MAX(MAX(ymax / DEFAULT_RLWIN_HEIGHT, DEFAULT_RLWIN_HEIGHT / ymax), 1.0));
      this->winScaleX = xScale;
@@ -324,11 +324,11 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 	  char nodeLabel[32];
 	  if(idx % NUMBERING_MODULO == NUMBERING_MODULO - 1) {
 	       snprintf(nodeLabel, 32, "%d\0", idx + 1);
-	       plotCanvas->SetFontSize(2);
+	       plotCanvas->SetFontSize(1);
 	  }
 	  else {
 	       snprintf(nodeLabel, 32, "%c\0", effectiveRNASubseq[idx]);
-	       plotCanvas->SetFontSize(6);
+	       //plotCanvas->SetFontSize(6);
 	  }
 	  plotCanvas->DrawBaseNode(nodeX, nodeY, nodeLabel, nodeSize, 
 	  			   baseNodeColor);

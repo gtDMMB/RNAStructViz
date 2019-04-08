@@ -611,8 +611,6 @@ bool CairoContext_t::OverlayGraphics(const CairoContext_t &overlayContext, int s
      int overlayHeight = cairo_image_surface_get_height(crOverlaySurface);
      SaveSettings();
      cairo_set_source_surface(cairoContext, crOverlaySurface, startX, startY);
-     //cairo_rectangle(cairoContext, 0, 0, overlayWidth, overlayHeight);
-     //cairo_fill(cairoContext);
      cairo_paint(cairoContext);
      cairo_identity_matrix(cairoContext);
      RestoreSettings();
