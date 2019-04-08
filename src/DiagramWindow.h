@@ -32,7 +32,9 @@ using std::max_element;
 
 #define IMAGE_DIM                    (485)
 #define IMAGE_WIDTH                  (IMAGE_DIM)
+#define DIAGRAM_WIDTH                (0.85 * IMAGE_WIDTH)
 #define IMAGE_HEIGHT                 (IMAGE_DIM)
+#define DIAGRAM_HEIGHT               (0.85 * IMAGE_HEIGHT)
 #define IMAGE_DEPTH                  (3)
 #define STRAND_MARKER_IMAGE_HEIGHT   (25)
 #define PNG_FOOTER_HEIGHT            (100)
@@ -230,10 +232,6 @@ private:
     RadialLayoutDisplayWindow *radialDisplayWindow;
 
     void RedrawStrandEdgeMarker(cairo_t *curWinContext);
-    
-    static double TranslateAngleFromUserAxes(double theta);
-    static void TranslateUTMCoordinates(double *xcoord, double *ycoord, 
-		                        double *xcenter, double *ycenter);
     void RedrawStructureTickMarks(cairo_t *curWinContext);
     
     static void ShowTickMarksCallback(Fl_Widget *cbw, void *udata);

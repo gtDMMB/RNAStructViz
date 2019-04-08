@@ -420,7 +420,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    cairo_fill(thisWindow->crBasePairsOverlay);
 	    cairo_push_group(thisWindow->crDraw);
 	    int drawParams[] = { numToDraw, keyA, keyB };
-	    thisWindow->RedrawBuffer(thisWindow->crDraw, sequences, drawParams, IMAGE_WIDTH);
+	    thisWindow->RedrawBuffer(thisWindow->crDraw, sequences, drawParams, DIAGRAM_WIDTH);
 	    cairo_pop_group_to_source(thisWindow->crDraw);
             if(thisWindow->m_cbDrawBases->value()) {
 	         cairo_save(thisWindow->crDraw);
@@ -431,12 +431,12 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
                  cairo_restore(thisWindow->crDraw);
 	    }
 	    cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
-		      IMAGE_WIDTH / 2 - 25.f, 0.0, 2.0 * M_PI);
+		      DIAGRAM_WIDTH / 2, 0.0, 2.0 * M_PI);
             cairo_clip(thisWindow->crDraw);
             cairo_paint(thisWindow->crDraw);
 	    cairo_reset_clip(thisWindow->crDraw);
 	    cairo_arc(thisWindow->crDraw, IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, 
-		      IMAGE_WIDTH / 2 - 25.f, 0.0, 2.0 * M_PI);
+		      DIAGRAM_WIDTH / 2, 0.0, 2.0 * M_PI);
             thisWindow->SetCairoColor(thisWindow->crDraw, CairoColorSpec_t::CR_BLACK);
 	    cairo_stroke(thisWindow->crDraw);
 	    thisWindow->RedrawStructureTickMarks(thisWindow->crDraw);
@@ -1160,7 +1160,7 @@ void DiagramWindow::ComputeDiagramParams(
     angleBase = 1.5f * M_PI - 0.025f;
     centerX = (float) resolution / 2.0f;
     centerY = (float) resolution / 2.0f;
-    radius = centerX < centerY ? centerX - 25.f : centerY - 25.f;
+    radius = centerX < centerY ? centerX - 5.f : centerY - 5.f;
 }
 
 void DiagramWindow::AddStructure(const int index) {
@@ -1509,7 +1509,7 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
      
      int bddCircCenterX = GLWIN_TRANSLATEX + IMAGE_WIDTH / 2;
      int bddCircCenterY = GLWIN_TRANSLATEY + IMAGE_HEIGHT / 2;
-     int bddCircRadius = IMAGE_WIDTH / 2 - 25.f;
+     int bddCircRadius = DIAGRAM_WIDTH / 2 - 5.f;
 
      // now find the points of intersection so we can determine which 
      // pair indices they correspond to:
@@ -1702,8 +1702,8 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
 		          markerImageHeight, 
 		          markerImageStride
 		      );
-     unsigned int markerImageDrawX = (IMAGE_WIDTH - markerImageWidth + 4) / 2;
-     unsigned int markerImageDrawY = IMAGE_HEIGHT - 25.f - 2;
+     unsigned int markerImageDrawX = (IMAGE_WIDTH - markerImageWidth) / 2;
+     unsigned int markerImageDrawY = (IMAGE_HEIGHT + DIAGRAM_HEIGHT) / 2;
      cairo_reset_clip(curWinContext);
      SetCairoColor(curWinContext, CairoColorSpec_t::CR_TRANSPARENT);
      cairo_set_source_surface(curWinContext, strandEdgeMarkerSurface, 
@@ -1716,17 +1716,6 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
 
 }
 
-double DiagramWindow::TranslateAngleFromUserAxes(double theta) { 
-     return theta - M_PI_2;
-}
-
-void DiagramWindow::TranslateUTMCoordinates(double *xc, double *yc, double *x0, double *y0) {
-     if(yc == NULL || y0 == NULL) { 
-          return;
-     }	  
-     *yc = -1 * (*yc);
-}
-
 void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
 
      if(curWinContext == NULL || m_structures.size() == 0 || !showPlotTickMarks) {
@@ -1737,68 +1726,56 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      size_t totalNumTicks = RNAStructViz::GetInstance()->GetStructureManager()->
 	                                  GetStructure(firstStructIndex)->GetLength();
      size_t numTicks = MIN(totalNumTicks, DWINARC_MAX_TICKS) + 1;
-     int tickLabelMod = MAX((int) (numTicks - 1) * DWINARC_LABEL_PCT, 1), numTickLabels = 0;
      double arcOriginX = IMAGE_WIDTH / 2, arcOriginY = IMAGE_HEIGHT / 2; 
-     double arcRadius = IMAGE_WIDTH / 2 - 25.f + 1;
+     double arcRadius = DIAGRAM_WIDTH / 2, arcRadiusDelta = 2, arcRadiusTextDelta = 4;
      double tickInsetLength = 2;
      char numericLabelStr[MAX_BUFFER_SIZE + 1];
      numericLabelStr[MAX_BUFFER_SIZE] = '\0';
 
      cairo_set_line_cap(curWinContext, CAIRO_LINE_CAP_ROUND);
      cairo_set_line_width(curWinContext, 2);
-     cairo_translate(curWinContext, arcOriginX, arcOriginY);
      cairo_select_font_face(curWinContext, "Courier New", CAIRO_FONT_SLANT_NORMAL, 
 		            CAIRO_FONT_WEIGHT_BOLD);
      cairo_set_font_size(curWinContext, 7);
      SetCairoColor(curWinContext, CairoColorSpec_t::CR_LIGHT_GRAY);
      
-     for(int t = 1; t <= numTicks; t++) { 
-          
-	  double rotationAngle = (double) (-1.0 * (2.0 * t * M_PI) / numTicks);
-	  double rotationAngle2 = TranslateAngleFromUserAxes(rotationAngle);
-	  double nextStartX = (arcRadius - tickInsetLength) * cos(rotationAngle2);
-	  double nextStartY = (arcRadius - tickInsetLength) * sin(rotationAngle2);
-          TranslateUTMCoordinates(&nextStartX, &nextStartY, &arcOriginX, &arcOriginY);
-	  double nextFinishX = arcRadius * cos(rotationAngle2);
-          double nextFinishY = arcRadius * sin(rotationAngle2);
-          TranslateUTMCoordinates(&nextFinishX, &nextFinishY, &arcOriginX, &arcOriginY);
-	  cairo_move_to(curWinContext, nextStartX, nextStartY);
-          cairo_line_to(curWinContext, nextFinishX, nextFinishY);
+     for(int t = 1; t < numTicks; t++) {
+          double tickAngle = -M_PI_2 - t * 2 * M_PI / numTicks;
+	  int tickStartX = (int) (arcOriginX + arcRadius * cos(tickAngle));
+          int tickStartY = (int) (arcOriginY - arcRadius * sin(tickAngle));
+          int tickOuterX = (int) (arcOriginX + (arcRadius + arcRadiusDelta) * cos(tickAngle));
+          int tickOuterY = (int) (arcOriginY - (arcRadius + arcRadiusDelta) * sin(tickAngle));
+          cairo_move_to(curWinContext, tickStartX, tickStartY);
+          cairo_line_to(curWinContext, tickOuterX, tickOuterY);
 	  cairo_stroke(curWinContext);
-	  if(t % tickLabelMod == 0) { // draw rotated numeric label:
-
-	       while(rotationAngle2 < 0) { 
-                    rotationAngle2 += 2.0 * M_PI;
-               }
-               while(rotationAngle2 >= 2.0 * M_PI) { 
-                    rotationAngle2 -= 2.0 * M_PI;
-               }
-	       numTickLabels++;
-	       int numericLabel = (int) (totalNumTicks * numTickLabels * DWINARC_LABEL_PCT);
-               snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d \0", numericLabel);
-	       cairo_text_extents_t textDims;
-	       cairo_text_extents(curWinContext, numericLabelStr, &textDims);
-	       if(rotationAngle2 >= 0 && rotationAngle2 < M_PI_2) { 
-		    nextFinishX += textDims.width / 2;
-		    nextFinishY -= 0.5 * textDims.height;
-	       }
-	       else if(rotationAngle2 >= M_PI_2 && rotationAngle2 < M_PI) { 
-		    nextFinishX -= textDims.width;
-		    nextFinishY -= textDims.height;
-	       }
-	       else if(rotationAngle2 >= M_PI && rotationAngle2 < 3.0 * M_PI_2) {
-		    nextFinishX -= 1.5 * textDims.width;
-		    nextFinishY += textDims.height;
-	       }
-	       else {
-		    nextFinishX += textDims.width / 3;
-		    nextFinishY += textDims.height;
-	       }
-	       cairo_move_to(curWinContext, nextFinishX, nextFinishY);
-	       cairo_show_text(curWinContext, numericLabelStr);
-
+          int numericLabel = (int) (totalNumTicks * t * DWINARC_LABEL_PCT);
+          snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d\0", numericLabel);
+	  cairo_text_extents_t textDims;
+	  cairo_text_extents(curWinContext, numericLabelStr, &textDims);
+	  int textSize = MAX(textDims.width, textDims.height);
+          int tickTextX = (int) (arcOriginX + (arcRadius + arcRadiusTextDelta) * cos(tickAngle));
+          int tickTextY = (int) (arcOriginY - (arcRadius + arcRadiusTextDelta) * sin(tickAngle));
+	  while(tickAngle < 0) {
+	       tickAngle += 2 * M_PI;
 	  }
-
+	  if(0 <= tickAngle && M_PI_2 > tickAngle) { // Q1:
+	       //tickTextX += textDims.width;
+	       //tickTextY -= textDims.height;
+	  }
+	  else if(M_PI_2 <= tickAngle && M_PI > tickAngle) { // Q2:
+	       tickTextX -= textDims.width;
+	       //tickTextY -= textDims.height;
+	  }
+	  else if(M_PI <= tickAngle && 3 * M_PI_2 > tickAngle) { // Q3:
+	       tickTextX -= textDims.width;
+	       tickTextY += textDims.height;
+	  }
+	  else {
+	       //tickTextX += textDims.width;
+	       tickTextY += textDims.height;
+	  }
+          cairo_move_to(curWinContext, tickTextX, tickTextY);
+	  cairo_show_text(curWinContext, numericLabelStr);
      }
 }
 
