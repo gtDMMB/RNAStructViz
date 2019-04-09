@@ -59,15 +59,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
      cbPlotType->value(1);
      offsetY += WIDGET_HEIGHT + 2 * WIDGET_SPACING;*/
 
-     //scrollerFillBox = new Fl_Box(0, offsetY, 0, 0); //width - SCROLL_SIZE, height - SCROLL_SIZE);
-     //scrollerFillBox->type(FL_NO_BOX);
-     //windowScroller->end();
-     //this->resizable(windowScroller);
-
-     //set_modal();
      color(GUI_WINDOW_BGCOLOR);
-     //fl_rectf(0, 0, w() - SCROLL_SIZE, h() - SCROLL_SIZE);
-     //box(FL_NO_BOX);
      set_draw_cb(Draw);
 
 }
@@ -114,11 +106,11 @@ bool RadialLayoutDisplayWindow::SetRadialPlotType(VRNAPlotType_t plotType) {
 }
 
 bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t startSeqPos, 
-		                                     size_t endSeqPos) { 
+		                                     size_t endSeqPos, size_t seqLength) { 
      if(rnaSeq == NULL) {
           return false;
      }
-     radialLayoutCanvas = GetVRNARadialLayoutData(rnaSeq, startSeqPos, endSeqPos, 
+     radialLayoutCanvas = GetVRNARadialLayoutData(rnaSeq, startSeqPos, endSeqPos, seqLength, 
      		                                  (VRNAPlotType_t) vrnaPlotType);
      if(radialLayoutCanvas == NULL) {
           return false;
@@ -189,10 +181,20 @@ void RadialLayoutDisplayWindow::HandleWindowScrollCallback(Fl_Widget *scrw, void
 }
 
 CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *rnaSubseq, 
-		                            size_t startPos, size_t endPos, 
+		                            size_t startPos, size_t endPos, size_t seqLength, 
 					    VRNAPlotType_t plotType) {
      
-     char *effectiveRNASubseq = GetSubstringFromRange(rnaSubseq, 0, MAX_SIZET);
+     char *effectiveRNASubseq = NULL;
+     int seqIndexOffset = 0;
+     if(seqLength <= MAX_SEQUENCE_DISPLAY_LENGTH) {
+          effectiveRNASubseq = GetSubstringFromRange(rnaSubseq, 0, MAX_SIZET);
+     }
+     else {
+          int seqStartIdx = MAX(0, startPos - 25);
+	  int seqEndIdx = MIN(endPos + 25, seqLength);
+	  seqIndexOffset = seqStartIdx;
+	  effectiveRNASubseq = GetSubstringFromRange(rnaSubseq, seqStartIdx, seqEndIdx);
+     }
      if(effectiveRNASubseq == NULL) {
           return NULL;
      }
@@ -246,10 +248,10 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 		   workingIdx, rnaSubseqLen);
      }
 
-     float xmin, xmax, ymin, ymax, dmin;
+     double xmin, xmax, ymin, ymax, dmin;
      xmin = xmax = xPosArr[0];
      ymin = ymax = yPosArr[0];
-     dmin = (float) INT_MAX;
+     dmin = (double) INT_MAX;
      for(int idx = 1; idx < rnaSubseqLen; idx++) {
           xmin = xPosArr[idx] < xmin ? xPosArr[idx] : xmin;
           xmax = xPosArr[idx] > xmax ? xPosArr[idx] : xmax;
@@ -280,9 +282,9 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 	  ymin = 0.0;
      }
      const int nodeSize = 38;
-     float winScale = 1.25 * nodeSize / MAX(dmin, 1) / M_SQRT2;
-     float xScale = (float) (0.85 * winScale * MAX(MAX(xmax / DEFAULT_RLWIN_WIDTH, DEFAULT_RLWIN_WIDTH / xmax), 1.0));
-     float yScale = (float) (0.85 * winScale * MAX(MAX(ymax / DEFAULT_RLWIN_HEIGHT, DEFAULT_RLWIN_HEIGHT / ymax), 1.0));
+     float winScale = 1.25 * nodeSize / dmin / M_SQRT2;
+     float xScale = (float) (0.85 * winScale * MAX(xmax / DEFAULT_RLWIN_WIDTH, 1.0));
+     float yScale = (float) (0.85 * winScale * MAX(ymax / DEFAULT_RLWIN_HEIGHT, 1.0));
      this->winScaleX = xScale;
      this->winScaleY = yScale;
 
@@ -318,17 +320,16 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           nodeX = (int) ((xPosArr[idx] - xmin) * xScale);
 	  nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
 	  CairoColor_t baseNodeColor = GetBaseNodeColor(effectiveRNASubseq[idx]);
-	  if(idx < startPos || idx > endPos) {
+	  if(idx + seqIndexOffset < startPos || idx + seqIndexOffset > endPos) {
 	       baseNodeColor = baseNodeColor.ToGrayscale();
 	  } 
 	  char nodeLabel[32];
 	  if(idx % NUMBERING_MODULO == NUMBERING_MODULO - 1) {
-	       snprintf(nodeLabel, 32, "%d\0", idx + 1);
+	       snprintf(nodeLabel, 32, "%d\0", idx + seqIndexOffset + 1);
 	       plotCanvas->SetFontSize(1);
 	  }
 	  else {
 	       snprintf(nodeLabel, 32, "%c\0", effectiveRNASubseq[idx]);
-	       //plotCanvas->SetFontSize(6);
 	  }
 	  plotCanvas->DrawBaseNode(nodeX, nodeY, nodeLabel, nodeSize, 
 	  			   baseNodeColor);

@@ -40,7 +40,7 @@ extern "C" {
 class RadialLayoutWindowCallbackInterface {
      
      public:
-          inline RadialLayoutWindowCallbackInterface() : parentCallingWindow(NULL) {}
+	  inline RadialLayoutWindowCallbackInterface() : parentCallingWindow(NULL) {}
           inline RadialLayoutWindowCallbackInterface(RadialLayoutWindowCallbackInterface *parentWin) : 
 		 parentCallingWindow(parentWin) {}
 
@@ -66,6 +66,8 @@ class RadialLayoutWindowCallbackInterface {
 class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWindowCallbackInterface {
 
      public:
+          static const int MAX_SEQUENCE_DISPLAY_LENGTH = 500;
+	  
 	  typedef enum {
                 PLOT_TYPE_SIMPLE   = VRNA_PLOT_TYPE_SIMPLE, 
 		PLOT_TYPE_CIRCULAR = VRNA_PLOT_TYPE_CIRCULAR, 
@@ -80,8 +82,8 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  bool SetTitleFormat(const char *windowTitleFmt, ...);
 	  
 	  bool SetRadialPlotType(VRNAPlotType_t plotType = PLOT_TYPE_CIRCULAR);
-	  bool DisplayRadialDiagram(const char *rnaSeq, size_t startSeqPos = 0, 
-			            size_t endSeqPos = MAX_SIZET);
+	  bool DisplayRadialDiagram(const char *rnaSeq, size_t startSeqPos, 
+			            size_t endSeqPos, size_t seqLength);
 
 	  inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {}
 
@@ -108,9 +110,10 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 
      public:
           CairoContext_t * GetVRNARadialLayoutData(const char *rnaSubseq, 
- 		                                   size_t startPos = 0, 
-		                                   size_t endPos = MAX_SIZET, 
-					           VRNAPlotType_t plotType = PLOT_TYPE_SIMPLE);
+ 		                                   size_t startPos, 
+		                                   size_t endPos, 
+					           size_t seqLength, 
+						   VRNAPlotType_t plotType = PLOT_TYPE_SIMPLE);
           static CairoColor_t GetBaseNodeColor(char baseCh);
 
 };

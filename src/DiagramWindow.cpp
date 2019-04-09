@@ -442,12 +442,12 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 	    thisWindow->RedrawStructureTickMarks(thisWindow->crDraw);
 	    thisWindow->m_redrawStructures = false;
     }
-    thisWindow->RedrawStrandEdgeMarker(cr);
     cairo_set_source_surface(cr, cairo_get_target(thisWindow->crDraw), 
 		             GLWIN_TRANSLATEX, GLWIN_TRANSLATEY);
     cairo_rectangle(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, 
 		    IMAGE_WIDTH, IMAGE_HEIGHT);    
     cairo_fill(cr);
+    thisWindow->RedrawStrandEdgeMarker(cr);
     thisWindow->RedrawCairoZoomBuffer(cr);
     
     fl_color(priorColor);
@@ -1482,13 +1482,29 @@ int DiagramWindow::handle(int flEvent) {
 			 const char *rnaSeqStr = rnaStruct->GetSequenceString();
 			 size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
 			 size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
+			 // we have to include all pairs of the clipped / highlighted radial view (increase as needed):
+			 size_t nextStartPos = seqStartPos, nextEndPos = seqEndPos;
+                         for(int pos = seqStartPos; pos <= seqEndPos; pos++) {
+			      if(rnaStruct->GetBaseAt(pos)->m_pair != RNAStructure::UNPAIRED) {
+			           int pairIndex = rnaStruct->GetBaseAt(pos)->m_pair;
+                                   nextStartPos = MIN(nextStartPos, pairIndex);
+				   nextEndPos = MAX(nextEndPos, pairIndex);
+			      }
+			 }
+                         seqStartPos = nextStartPos;
+			 seqEndPos = nextEndPos;
+			 if(seqEndPos - seqStartPos + 1 > RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH) {
+			      fprintf(stderr, "DISABLED FEATURE: Only support radial layout displays for sequence lengths <= %d\n", 
+					      RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH);
+			      return 1;
+			 }
 			 radialDisplayWindow = new RadialLayoutDisplayWindow();
 			 radialDisplayWindow->SetTitleFormat(
 			 		      "Radial Display for %s -- Highlighting Bases #%d to #%d", 
 			 		      rnaStruct->GetFilenameNoExtension(), 
 			 		      seqStartPos + 1, seqEndPos + 1);
                          radialDisplayWindow->SetParentWindow(this);
-			 radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos);
+			 radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos, rnaStruct->GetLength());
 			 radialDisplayWindow->show();
 
 		    }
