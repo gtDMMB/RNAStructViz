@@ -446,10 +446,10 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 
     if (!m_contentWindow)
     {
-        int subwinWidth = 423, subwinTotalHeight = 675, 
+        int subwinWidth = 473, subwinTotalHeight = 675, 
 	    subwinResizeSpacing = 24;
 	int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
-	int labelHeight = 25, btnHeight = 25, btnWidth = 145;
+	int labelHeight = 25, btnHeight = 25, btnWidth = 175;
 	Fl_Boxtype labelBoxType = FL_ROUND_DOWN_BOX;
 	Fl_Boxtype noteBoxType = FL_DOWN_BOX;
 
@@ -544,6 +544,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 	m_ctTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
 	m_ctTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
 	m_ctStyleBuffer->text(m_ctDisplayFormatString);
+	m_ctTextDisplay->labelfont(LOCAL_BFFONT);
 	m_ctTextDisplay->highlight_data(m_ctStyleBuffer, 
 		       TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
         curYOffset += 300 + windowSpacing;
@@ -581,7 +582,7 @@ void RNAStructure::GenerateString()
     
     // table header labels:
     charsWritten = snprintf(currentPosn, remainingSize, 
-		   "   BaseId  |  Pair  (PairId) \n-----------------------------\n");
+		   "   BaseId  |  Pair  (PairId) \n-------------------------------------\n");
     snprintf(formatPosn, remainingSize, "%s\n", 
              Util::GetRepeatedString(TBUFSTYLE_DEFAULT_STRFMT, 
 		                     charsWritten + 1).c_str());
