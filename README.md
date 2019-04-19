@@ -1,5 +1,3 @@
-<center><img src="https://user-images.githubusercontent.com/22165688/53954914-92e87480-40a5-11e9-8231-5b5cbc4e2fd1.png" alt="More RNAStructViz Live User Action Shots!" width="300" /><img src="https://user-images.githubusercontent.com/22165688/54701440-643db580-4b0b-11e9-998a-7f5f3ef73837.png" width="300" /></center>
-
 # Welcome to the RNAStructViz software installation and user documentation!
 
 In an effort to maintain only one accurate set of user and install docs, we will point users to [our wonderful WIKI site](https://github.com/gtDMMB/RNAStructViz/wiki). This WIKI site contains all relevant information needed for users to get RNAStructViz up and running on their platform of choice along with graphical schematics to guide new users through the inner workings of using this utility. If you have any questions or other suggestions for improving RNAStructViz, please [post a new issue here](https://github.com/gtDMMB/RNAStructViz/issues) or alternately contact one of the active developers [Maxie D. Schmidt](mailto:maxieds@gmail.com) or [Anna E. Kirkpatrick](mailto:akirkpatrick3@gatech.edu) to obtain support. Thank you for using our software!
