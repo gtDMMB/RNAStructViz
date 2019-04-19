@@ -2082,7 +2082,7 @@ void StatsWindow::BuildCompMenu()
 		}
 	    selectAllCompsBtn = new Fl_Button(lastBtnX + 20, lastBtnY + 120, 
 	                        mww - 40, 35, 
-	                        "Compare All Structures (Select All) @redo");
+	                        "Compare All Structures @redo");
             selectAllCompsBtn->callback(SelectAllButtonCallback);
 	    selectAllCompsBtn->color(GUI_BGCOLOR);
 	    selectAllCompsBtn->labelcolor(GUI_BTEXT_COLOR);
