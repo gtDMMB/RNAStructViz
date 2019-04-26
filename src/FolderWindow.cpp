@@ -32,7 +32,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
 		    StructureOperationIcon.width, StructureOperationIcon.height, 
 		    StructureOperationIcon.bytes_per_pixel);
-    Fl_Box *structIconBox = new Fl_Box(x - 14, y - 42, structureIcon->w(), structureIcon->h());
+    Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     
     int dividerTextHeight = 0, spacingHeight = NAVBUTTONS_SPACING;
@@ -119,13 +119,13 @@ void FolderWindow::SetStructures(int folderIndex)
         RNAStructure *strct = structureManager->GetStructure(i);
 	AddStructure(strct->GetFilename(), i);
     }
-    this->label(folder->folderName);
+    label(folder->folderName);
     char structLabel[MAX_BUFFER_SIZE];
-    snprintf(structLabel, MAX_BUFFER_SIZE - 1, "Structure:\n%s", folder->folderName);
+    snprintf(structLabel, MAX_BUFFER_SIZE - 1, " \n\n\n\n\n%s", folder->folderName);
     ConfigParser::nullTerminateString(structLabel);
     copy_label(structLabel);
-    this->labelsize(LOCAL_TEXT_SIZE);
-    
+    labelsize(1.25 * LOCAL_TEXT_SIZE);
+    align(FL_ALIGN_TOP);
 }
 
 void FolderWindow::AddStructure(const char* filename, const int index)
@@ -235,8 +235,7 @@ void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)
     int index;
     for (index = 0; index < folders.size(); ++index)
     {
-        if (!strcmp(folders[index]->folderName, 
-		    folderGroup->label() + strlen("Structure:\n")))
+        if (!strcmp(folders[index]->folderName, folderGroup->label() + 6))
             break;
     }
     RNAStructViz::GetInstance()->AddDiagramWindow(index);
@@ -251,8 +250,7 @@ void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
     int index;
     for (index = 0; index < folders.size(); ++index)
     {
-        if (!strcmp(folders[index]->folderName, 
-		    folderGroup->label() + strlen("Structure:\n")))
+        if (!strcmp(folders[index]->folderName, folderGroup->label() + 6))
             break;
     }
     RNAStructViz::GetInstance()->AddStatsWindow(index);

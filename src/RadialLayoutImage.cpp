@@ -5,6 +5,8 @@
 
 #include <limits.h>
 
+#include <FL/fl_draw.H>
+
 #include "RadialLayoutImage.h"
 #include "RNAStructure.h"
 #include "ThemesConfig.h"
@@ -12,52 +14,35 @@
 RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height) : 
 	Fl_Cairo_Window(width, height), RadialLayoutWindowCallbackInterface(), 
 	winTitle(NULL), vrnaPlotType(PLOT_TYPE_SIMPLE), radialLayoutCanvas(NULL), 
-	closeWindowFrameBox(NULL), scrollerFillBox(NULL), 
-	closeWindowBtn(NULL), exportImageToPNGBtn(NULL), 
-	cbPlotType(NULL), windowScroller(NULL), 
-	cairoWinTranslateX(0), cairoWinTranslateY(0), 
+	scrollerFillBox(NULL), windowScroller(NULL), 
+	scalePlusBtn(NULL), scaleMinusBtn(NULL), 
+	cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
         winScaleX(1.0), winScaleY(1.0) {
 
-     windowScroller = new Fl_Scroll(0, 0, width, height);
+     int offsetY = 10, offsetX = w() - 2 * RADIAL_BUTTON_WIDTH - RADIAL_WIDGET_WIDTH;
+     
+     scalePlusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
+		                  "@<<   Zoom In");
+     scalePlusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
+     scalePlusBtn->labelcolor(GUI_BTEXT_COLOR);
+     scalePlusBtn->callback(ScaleRadialLayoutPlusCallback);
+     offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
+
+     scaleMinusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
+		                   "Zoom Out   @>>");
+     scaleMinusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
+     scaleMinusBtn->labelcolor(GUI_BTEXT_COLOR);
+     scaleMinusBtn->callback(ScaleRadialLayoutMinusCallback);
+
+     offsetY += 10 + RADIAL_WIDGET_HEIGHT;
+     buttonToolbarHeight = offsetY; 
+
+     windowScroller = new Fl_Scroll(0, offsetY, width, height - buttonToolbarHeight);
      windowScroller->color(GUI_WINDOW_BGCOLOR);
      windowScroller->scrollbar_size(SCROLL_SIZE);
      windowScroller->callback(HandleWindowScrollCallback);
      windowScroller->type(Fl_Scroll::BOTH_ALWAYS);
      windowScroller->box(FL_BORDER_BOX);
-     //windowScroller->begin();
-
-     int offsetY = 10, offsetX = w() - 3 * WIDGET_WIDTH;
-
-     /*closeWindowFrameBox = new Fl_Box(offsetX, offsetY, 3 * WIDGET_WIDTH, 
-		                      3 * WIDGET_HEIGHT + 2 * WIDGET_SPACING);
-     closeWindowFrameBox->box(FL_RSHADOW_BOX);
-     closeWindowFrameBox->color(GUI_BGCOLOR);
-     offsetY += WIDGET_HEIGHT / 2;
-
-     closeWindowBtn = new Fl_Button(offsetX + WIDGET_WIDTH / 2, offsetY, 
-		                    WIDGET_WIDTH, WIDGET_HEIGHT, 
-				    "@1+  Close Window");
-     closeWindowBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
-     closeWindowBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
-     closeWindowBtn->callback(CloseWindowCallback);
-
-     exportImageToPNGBtn = new Fl_Button(offsetX + 1.5 * WIDGET_WIDTH, offsetY, 
-		                         WIDGET_WIDTH, WIDGET_HEIGHT, 
-					 "@saveas  Export to PNG");
-     exportImageToPNGBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
-     exportImageToPNGBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
-     exportImageToPNGBtn->callback(ExportRadialImageToPNGCallback);
-     offsetY += WIDGET_HEIGHT + WIDGET_SPACING;
-
-     cbPlotType = new Fl_Check_Button(offsetX + WIDGET_WIDTH / 2, offsetY, 
-		                      WIDGET_WIDTH, WIDGET_HEIGHT, 
-				      "Simple Radial Plot");
-     cbPlotType->callback(PlotTypeCheckboxCallback);
-     cbPlotType->type(FL_TOGGLE_BUTTON);
-     cbPlotType->labelcolor(GUI_TEXT_COLOR);
-     cbPlotType->selection_color(GUI_BTEXT_COLOR);
-     cbPlotType->value(1);
-     offsetY += WIDGET_HEIGHT + 2 * WIDGET_SPACING;*/
 
      color(GUI_WINDOW_BGCOLOR);
      set_draw_cb(Draw);
@@ -67,10 +52,8 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 RadialLayoutDisplayWindow::~RadialLayoutDisplayWindow() {
      Free(winTitle);
      Delete(radialLayoutCanvas);
-     Delete(closeWindowFrameBox);
-     Delete(closeWindowBtn);
-     Delete(exportImageToPNGBtn);
-     Delete(cbPlotType);
+     Delete(scalePlusBtn);
+     Delete(scaleMinusBtn);
      Delete(windowScroller);
 }
 
@@ -112,18 +95,26 @@ bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t 
      }
      radialLayoutCanvas = GetVRNARadialLayoutData(rnaSeq, startSeqPos, endSeqPos, seqLength, 
      		                                  (VRNAPlotType_t) vrnaPlotType);
-     if(radialLayoutCanvas == NULL) {
-          return false;
+     
+     ResizeScrollerFillBox();
+     return true;
+}
+
+void RadialLayoutDisplayWindow::ResizeScrollerFillBox() {
+     if(radialLayoutCanvas == NULL || windowScroller == NULL) {
+          return;
      }
-     int nextFillerWidth = radialLayoutCanvas->GetWidth();
-     int nextFillerHeight = radialLayoutCanvas->GetHeight();
+     if(scrollerFillBox != NULL) {
+          Delete(scrollerFillBox);
+     }
+     int nextFillerWidth = MIN(DEFAULT_RLWIN_WIDTH, radialLayoutCanvas->GetWidth() + SCROLL_SIZE);
+     int nextFillerHeight = MIN(DEFAULT_RLWIN_HEIGHT, radialLayoutCanvas->GetHeight());
      windowScroller->begin();
      scrollerFillBox = new Fl_Box(0, 0, nextFillerWidth, nextFillerHeight); 
      scrollerFillBox->type(FL_NO_BOX);
      windowScroller->end();
      windowScroller->redraw();
      redraw();
-     return true;
 }
 
 void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
@@ -131,40 +122,49 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
         ((RadialLayoutDisplayWindow *) thisCairoWindow)->radialLayoutCanvas == NULL) {
           return;
      }
-     fl_color(GUI_WINDOW_BGCOLOR);
-     fl_rectf(0, 0, thisCairoWindow->w() - SCROLL_SIZE - 2, thisCairoWindow->h() - SCROLL_SIZE - 2);
      RadialLayoutDisplayWindow *thisWindow = (RadialLayoutDisplayWindow *) thisCairoWindow; 
-     thisWindow->radialLayoutCanvas->SaveSettings();
+     fl_color(GUI_WINDOW_BGCOLOR);
+     fl_rectf(0, thisWindow->buttonToolbarHeight, 
+	      thisCairoWindow->w() - SCROLL_SIZE - 2, thisCairoWindow->h() - SCROLL_SIZE - 2);
+     fl_color(FL_BLACK);
+     fl_line_style(FL_SOLID | FL_CAP_ROUND | FL_JOIN_BEVEL);
+     fl_xyline(0, thisWindow->buttonToolbarHeight - 2, thisCairoWindow->w());
+     fl_line_style(0);
+     fl_color(GUI_WINDOW_BGCOLOR);
+     //thisWindow->radialLayoutCanvas->SaveSettings();
      thisWindow->cairoWinTranslateX = thisWindow->windowScroller->xposition();
      thisWindow->cairoWinTranslateY = thisWindow->windowScroller->yposition();
      cairo_surface_t *crSurface = cairo_get_target(thisWindow->radialLayoutCanvas->GetCairoContext());
      cairo_set_source_surface(cr, crSurface, -thisWindow->cairoWinTranslateX, -thisWindow->cairoWinTranslateY);
-     cairo_rectangle(cr, 0, 0, 
+     cairo_rectangle(cr, 0, thisWindow->buttonToolbarHeight, 
 		     thisWindow->w() - SCROLL_SIZE - 2, thisWindow->h() - SCROLL_SIZE - 2);
      cairo_clip(cr);
      cairo_paint(cr);
      cairo_reset_clip(cr);
-     if(thisWindow->closeWindowFrameBox != NULL) {
-          thisWindow->closeWindowFrameBox->redraw();
-          thisWindow->closeWindowBtn->redraw();
-	  thisWindow->exportImageToPNGBtn->redraw();
-	  thisWindow->cbPlotType->redraw();
+     if(thisWindow->windowScroller != NULL) {
+          thisWindow->scalePlusBtn->redraw();
+	  thisWindow->scaleMinusBtn->redraw();
 	  thisWindow->windowScroller->redraw();
      }
-     thisWindow->radialLayoutCanvas->RestoreSettings(); 
+     //thisWindow->radialLayoutCanvas->RestoreSettings(); 
+}
+
+void RadialLayoutDisplayWindow::ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBtn, void *udata) {
+     RadialLayoutDisplayWindow *rwin = (RadialLayoutDisplayWindow *) scaleBtn->parent();
+     rwin->radialLayoutCanvas->Scale(1.0 + DEFAULT_SCALING_PERCENT);
+     
+     rwin->redraw();
+}
+
+void RadialLayoutDisplayWindow::ScaleRadialLayoutMinusCallback(Fl_Widget *scaleBtn, void *udata) {
+     RadialLayoutDisplayWindow *rwin = (RadialLayoutDisplayWindow *) scaleBtn->parent();
+     rwin->radialLayoutCanvas->Scale(1.0 - DEFAULT_SCALING_PERCENT);
+     rwin->redraw();
 }
 
 void RadialLayoutDisplayWindow::CloseWindowCallback(Fl_Widget *cbtn, void *udata) {
      RadialLayoutDisplayWindow *rlWin = (RadialLayoutDisplayWindow *) cbtn->parent();
      rlWin->DoRadialWindowClose();
-}
-
-void RadialLayoutDisplayWindow::ExportRadialImageToPNGCallback(Fl_Widget *ebtn, void *udata) {
-     fl_alert("TODO");
-}
-
-void RadialLayoutDisplayWindow::PlotTypeCheckboxCallback(Fl_Widget *cbw, void *udata) {
-     fl_alert("TODO");
 }
 
 void RadialLayoutDisplayWindow::HandleWindowScrollCallback(Fl_Widget *scrw, void *udata) {
@@ -176,7 +176,7 @@ void RadialLayoutDisplayWindow::HandleWindowScrollCallback(Fl_Widget *scrw, void
      int scrollXPos = windowScroller->xposition();
      int scrollYPos = windowScroller->yposition();
      mainWindow->cairoWinTranslateX = scrollXPos; //* mainWindow->winScaleX;
-     mainWindow->cairoWinTranslateY = scrollYPos; //* mainWindow->winScaleY;
+     mainWindow->cairoWinTranslateY = mainWindow->buttonToolbarHeight + scrollYPos; //* mainWindow->winScaleY;
      mainWindow->redraw();
 }
 

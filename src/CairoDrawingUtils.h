@@ -179,7 +179,7 @@ class CairoContext_t {
           cairo_t *cairoContext;
           size_t width, height;
 
-	  void FreeCairoStructures();
+	  void FreeCairoStructures(cairo_t *cr, cairo_surface_t *crs);
 	  bool InitCairoStructures(size_t width, size_t height);
 	  bool InitCairoStructures(cairo_t *crContext);
 	  bool CopyContextData(const CairoContext_t &crContext);

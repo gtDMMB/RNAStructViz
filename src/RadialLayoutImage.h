@@ -30,12 +30,15 @@ extern "C" {
 #define DEFAULT_RLWIN_WIDTH           (550)
 #define DEFAULT_RLWIN_HEIGHT          (550)
 
-#define WIDGET_HEIGHT                 (15)
-#define WIDGET_WIDTH                  (50)
-#define WIDGET_SPACING                (5)
+#define RADIAL_WIDGET_HEIGHT          (35)
+#define RADIAL_WIDGET_WIDTH           (50)
+#define RADIAL_BUTTON_WIDTH           (115)
+#define RADIAL_WIDGET_SPACING         (10)
 #define SCROLL_SIZE                   (20)
 
 #define NUMBERING_MODULO              (10)
+#define DEFAULT_SCALING_PERCENT       (0.125)
+
 
 class RadialLayoutWindowCallbackInterface {
      
@@ -88,6 +91,7 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  inline void RadialWindowCloseCallback(Fl_Widget *rlWin, void *udata) {}
 
      protected:
+	  void ResizeScrollerFillBox();
 	  static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
      private:
@@ -95,17 +99,16 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  int vrnaPlotType;
           CairoContext_t *radialLayoutCanvas;
 	  
-	  Fl_Box *closeWindowFrameBox, *scrollerFillBox;
-	  Fl_Button *closeWindowBtn, *exportImageToPNGBtn;
-          Fl_Check_Button *cbPlotType;
-	  
+	  Fl_Box *scrollerFillBox;
+	  Fl_Button *scalePlusBtn, *scaleMinusBtn;
 	  Fl_Scroll *windowScroller;
+	  int buttonToolbarHeight;
 	  int cairoWinTranslateX, cairoWinTranslateY;
 	  double winScaleX, winScaleY;
 
+	  static void ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBtn, void *udata);
+          static void ScaleRadialLayoutMinusCallback(Fl_Widget *scaleBtn, void *udata);
 	  static void CloseWindowCallback(Fl_Widget *cbtn, void *udata);
-	  static void ExportRadialImageToPNGCallback(Fl_Widget *ebtn, void *udata);
-          static void PlotTypeCheckboxCallback(Fl_Widget *cbPlotType, void *udata);
           static void HandleWindowScrollCallback(Fl_Widget *scrw, void *udata);
 
      public:
