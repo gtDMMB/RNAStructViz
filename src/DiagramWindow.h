@@ -243,10 +243,13 @@ private:
 
     volatile static DiagramWindow *currentDiagramWindowInstance;
     static bool redrawRefreshTimerSet;
+    static vector<string> errorMsgQueue;
 
 public:
     void setAsCurrentDiagramWindow() const; 
     static void RedrawWidgetsTimerCallback(void *);
+    void AddNewErrorMessageToDisplay(string errorMsg, float callbackTime = 0.5);
+    static void DisplayErrorDialogTimerCallback(void *);
 
 };
 

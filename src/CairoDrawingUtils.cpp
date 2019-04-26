@@ -5,6 +5,8 @@
 
 #include <math.h>
 
+#include "FL/Fl.H"
+
 #include "CairoDrawingUtils.h"
 
 #define TRUNCRGBA(comp)             ((comp < 0 ? 0 : \

@@ -34,6 +34,7 @@
 
 const int DiagramWindow::ms_menu_minx[3] = {5, 205, 405};
 const int DiagramWindow::ms_menu_width = 190;
+vector<string> DiagramWindow::errorMsgQueue;
 
 volatile DiagramWindow * DiagramWindow::currentDiagramWindowInstance = NULL;
 bool DiagramWindow::redrawRefreshTimerSet = false;
@@ -1439,10 +1440,8 @@ int DiagramWindow::handle(int flEvent) {
 	       {
 	            if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
 		         if(!haveZoomBuffer || !zoomBufferContainsArc) { 
-		              fprintf(stderr, 
-				      "Select a zoom area containing a displayed arc "
-			      	      "before trying to view the structure's "
-			      	      "CT file contents!\n");
+		              const char *errMsg = "Select a zoom area containing a displayed arc before trying to view the structure's CT file contents!";
+			      AddNewErrorMessageToDisplay(string(errMsg));
 			      return 1;
 			 }
 			 int structIndex = RNAStructure::ActionOpenCTFileViewerWindow(folderIndex, 
@@ -1452,11 +1451,13 @@ int DiagramWindow::handle(int flEvent) {
 			 }
 			 int minArcPairIndex = MIN(zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
 			 if(minArcPairIndex <= 0) {
-			      fprintf(stderr, "Invalid arc index bounds selected! Try zooming again.\n");
+			      const char * errMsg = "Invalid arc index bounds selected! Try zooming again.";
+			      AddNewErrorMessageToDisplay(string(errMsg));
 			      return 1;
 			 }
 			 else if(!RNAStructure::ScrollOpenCTFileViewerWindow(structIndex, minArcPairIndex)) { 
-			      fprintf(stderr, "CT view operation failed. Try zooming again?\n");
+			      const char * errMsg = "CT view operation failed. Try zooming again?";
+			      AddNewErrorMessageToDisplay(string(errMsg));
 			      return 1;
 			 }
 		    }
@@ -1494,8 +1495,13 @@ int DiagramWindow::handle(int flEvent) {
                          seqStartPos = nextStartPos;
 			 seqEndPos = nextEndPos;
 			 if(seqEndPos - seqStartPos + 1 > RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH) {
-			      fprintf(stderr, "DISABLED FEATURE: Only support radial layout displays for sequence lengths <= %d\n", 
-					      RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH);
+			      char numericBuf[MAX_BUFFER_SIZE];
+			      snprintf(numericBuf, MAX_BUFFER_SIZE, "%d\0", 
+				       RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH);
+			      string errMsg = string("DISABLED FEATURE: We only support radial layout ") + 
+				              string("for sequences <= ") + string(numericBuf) + 
+					      string(" bases."); 
+			      AddNewErrorMessageToDisplay(errMsg);
 			      return 1;
 			 }
 			 radialDisplayWindow = new RadialLayoutDisplayWindow();
@@ -1513,7 +1519,7 @@ int DiagramWindow::handle(int flEvent) {
 	  default:
                return Fl_Cairo_Window::handle(flEvent);
      }
-
+     return 0;
 }
 
 bool DiagramWindow::ParseZoomSelectionArcIndices() {
@@ -1864,3 +1870,18 @@ void DiagramWindow::RedrawWidgetsTimerCallback(void *udata) {
      Fl::repeat_timeout(DWIN_REDRAW_REFRESH, DiagramWindow::RedrawWidgetsTimerCallback);
 }
 
+void DiagramWindow::AddNewErrorMessageToDisplay(string errorMsg, float callbackTime) {
+     Fl::lock();
+     errorMsgQueue.push_back(errorMsg);
+     Fl::unlock();
+     Fl::add_timeout(callbackTime, DisplayErrorDialogTimerCallback);
+}
+
+void DiagramWindow::DisplayErrorDialogTimerCallback(void *handlerRef) {
+     Fl::lock();
+     string errorMsg = errorMsgQueue.back();
+     errorMsgQueue.pop_back();
+     Fl::unlock();
+     fprintf(stderr, "RUNTIME ERROR: %s\n", errorMsg.c_str());
+     fl_alert(errorMsg.c_str());
+}

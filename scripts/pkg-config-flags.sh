@@ -6,7 +6,7 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 fi
 
 
-PKGS=(glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo xpm RNAlib2)
+PKGS=(glu xext xfixes fontconfig xrender cairo-xlib-xrender xinerama cairo xpm RNAlib2 libpng)
 PKGOUT=""
 
 for pkg in "${PKGS[@]}"; do

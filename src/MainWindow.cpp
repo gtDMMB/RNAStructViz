@@ -96,7 +96,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
 		  NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		          NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-		  "@menu   Config Options");
+		  "@menu   User Config");
 	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
 
@@ -200,20 +200,16 @@ void MainWindow::DisplayFirstTimeUserInstructions() {
  
      const char *instTextBuffer[] = {
           "Welcome to RNAStructViz!\n\n", 
-	  "A detailed user manual and explanation of core features\n", 
-	  "of RNAStructViz is available on the project WIKI:\n", 
+	  "A user manual is available on the project WIKI:\n", 
 	  "https://github.com/gtDMMB/RNAStructViz/wiki\n\n",
-	  "We have prepared first-time user run instructions to prepare\n", 
-	  "you as a new user and help you to configure your runtime\n", 
-	  "environment for use with our application. These instructions\n", 
-	  "are available online on our website at:\n", 
+	  "Instructions to help new users first running the application\n", 
+	  "is found online at:\n",  
 	  "https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions\n\n", 
-	  "You can turn off the display of this message when RNAStructViz\n", 
-	  "launches by clicking the \"Do not show again\" button below.\n", 
-	  "If you ever lose the URL to the instructions above, you can always\n", 
-	  "click on the help button indicated by the circled question mark found\n", 
-	  "at the top right of the main window of the application.\n\n", 
-	  "Thank you for using the application and good luck!" 
+	  "You can turn off this message when RNAStructViz launches by clicking\n" 
+	  "the \"Do not show again\" button below.\n", 
+	  "If you need help while running RNAStructViz, click on the help button\n", 
+	  "(circled question mark) at the top-right corner of the left main window pane.\n\n"
+	  "Thank you for using our application and good luck!" 
      };
      char fullInstText[4 * MAX_BUFFER_SIZE];
      fullInstText[0] = '\0';
@@ -349,14 +345,11 @@ void MainWindow::TestCallback(Fl_Widget* widget, void* userData)
 void MainWindow::HelpButtonCallback(Fl_Widget *btn, void *udata) {
      
      const char *helpTextBuffer[] = {
-          "A detailed user manual and explanation of core features\n", 
-	  "of RNAStructViz is available on the project WIKI:\n", 
+          "A detailed user manual is available on the project WIKI:\n", 
 	  "https://github.com/gtDMMB/RNAStructViz/wiki\n\n", 
-	  "Additional runtime diagnostic information can be obtained by\n", 
-	  "running the application with the \"--about\" option from\n", 
-	  "your terminal:\n$ RNAStructViz --about\n\n",
-	  "If you are new to RNAStructViz, see the following link which\n",
-	  "is displayed at the first launch of the program:\n", 
+	  "Diagnostic information about the application can be obtained by\n", 
+	  "running: RNAStructViz --about\n\n",
+	  "If you are new to RNAStructViz, see the following link:\n"
 	  "https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions"
      };
      char fullHelpText[4 * MAX_BUFFER_SIZE];
