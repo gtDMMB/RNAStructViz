@@ -37,7 +37,7 @@ extern "C" {
 #define SCROLL_SIZE                   (20)
 
 #define NUMBERING_MODULO              (10)
-#define DEFAULT_SCALING_PERCENT       (0.125)
+#define DEFAULT_SCALING_PERCENT       (0.25)
 
 
 class RadialLayoutWindowCallbackInterface {
@@ -97,10 +97,10 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
      private:
 	  char *winTitle;
 	  int vrnaPlotType;
-          CairoContext_t *radialLayoutCanvas;
+          CairoContext_t *radialLayoutCanvas, *radialLayoutCanvasOrig;
 	  
 	  Fl_Box *scrollerFillBox;
-	  Fl_Button *scalePlusBtn, *scaleMinusBtn;
+	  Fl_Button *scalePlusBtn, *scaleMinusBtn, *resetBtn;
 	  Fl_Scroll *windowScroller;
 	  int buttonToolbarHeight;
 	  int cairoWinTranslateX, cairoWinTranslateY;
@@ -108,6 +108,7 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 
 	  static void ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBtn, void *udata);
           static void ScaleRadialLayoutMinusCallback(Fl_Widget *scaleBtn, void *udata);
+	  static void RadialLayoutResetCallback(Fl_Widget *resetBtn, void *udata);
 	  static void CloseWindowCallback(Fl_Widget *cbtn, void *udata);
           static void HandleWindowScrollCallback(Fl_Widget *scrw, void *udata);
 

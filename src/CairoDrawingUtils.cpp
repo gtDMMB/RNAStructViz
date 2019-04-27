@@ -8,6 +8,8 @@
 #include "FL/Fl.H"
 
 #include "CairoDrawingUtils.h"
+#include "ConfigOptions.h"
+#include "RNAStructure.h"
 
 #define TRUNCRGBA(comp)             ((comp < 0 ? 0 : \
 			             (comp > CAIRO_COLOR_RGBA_MAXVAL ? CAIRO_COLOR_RGBA_MAXVAL : comp)))
@@ -371,7 +373,7 @@ void CairoContext_t::FreeCairoStructures(cairo_t *cr, cairo_surface_t *crs) {
      }
 }
 
-bool CairoContext_t::InitCairoStructures(size_t w, size_t h) {
+bool CairoContext_t::InitCairoStructures(size_t w, size_t h, bool freeOldStructs) {
      cairo_surface_t *oldCairoSurface = cairoSurface;
      cairo_t *oldCairoContext = cairoContext;
      width = w;
@@ -379,11 +381,13 @@ bool CairoContext_t::InitCairoStructures(size_t w, size_t h) {
      cairoSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
      cairoContext = cairo_create(cairoSurface);
      BlankFillCanvas(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
-     FreeCairoStructures(oldCairoContext, oldCairoSurface);
+     if(freeOldStructs) {
+          FreeCairoStructures(oldCairoContext, oldCairoSurface);
+     }
      return Initialized();
 }
 
-bool CairoContext_t::InitCairoStructures(cairo_t *crContext) {
+bool CairoContext_t::InitCairoStructures(cairo_t *crContext, bool freeOldStructs) {
      cairo_surface_t *oldCairoSurface = cairoSurface;
      cairo_t *oldCairoContext = cairoContext;
      cairoSurface = cairo_get_target(crContext);
@@ -391,7 +395,9 @@ bool CairoContext_t::InitCairoStructures(cairo_t *crContext) {
      width = cairo_image_surface_get_width(cairoSurface);
      height = cairo_image_surface_get_height(cairoSurface);
      BlankFillCanvas(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
-     FreeCairoStructures(oldCairoContext, oldCairoSurface);
+     if(freeOldStructs) {
+          FreeCairoStructures(oldCairoContext, oldCairoSurface);
+     }
      return Initialized();
 }
 
@@ -408,7 +414,7 @@ bool CairoContext_t::BlankFillCanvas(CairoColor_t cairoFillColor) {
 }
 
 bool CairoContext_t::CopyContextData(const CairoContext_t &crContext) {
-     InitCairoStructures(crContext.width, crContext.height);
+     InitCairoStructures(crContext.width, crContext.height, false);
      if(!Initialized()) {
           return false;
      }
@@ -442,15 +448,11 @@ cairo_font_weight_t CairoContext_t::ExtractFontWeightFromStyle(uint16_t fontStyl
 
 CairoContext_t::CairoContext_t() : width(0), height(0), cairoSurface(NULL), cairoContext(NULL) {}
 
-CairoContext_t::CairoContext_t(size_t w, size_t h) : CairoContext_t() {
-     InitCairoStructures(w, h);
+CairoContext_t::CairoContext_t(size_t w, size_t h) {
+     InitCairoStructures(w, h, false);
 }
 
-CairoContext_t::CairoContext_t(cairo_t *crContext) : CairoContext_t() { 
-     InitCairoStructures(crContext);     
-}
-
-CairoContext_t::CairoContext_t(const CairoContext_t &cctxt) {
+CairoContext_t::CairoContext_t(const CairoContext_t &cctxt) : CairoContext_t(cctxt.width, cctxt.height) {
      CopyContextData(cctxt);
 }
 
@@ -523,19 +525,21 @@ CairoContext_t & CairoContext_t::Resize(size_t newWidth, size_t newHeight, bool 
      if(!Initialized() || newWidth == 0 || newHeight == 0) {
           return *this;
      }
+     cairo_surface_t *newCairoSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, newWidth, newHeight);
+     cairo_t *newCairoContext = cairo_create(newCairoSurface);
      if(scalePrevPixels) {
-          cairo_scale(cairoContext, newWidth / width, newHeight / height);
+          cairo_scale(newCairoContext, (double) newWidth / width, (double) newHeight / height);
      }
-     CairoContext_t resizedCairoContext = CairoContext_t(newWidth, newHeight);
-     cairo_set_source_surface(resizedCairoContext.cairoContext, cairoSurface, 0, 0);
-     cairo_rectangle(resizedCairoContext.cairoContext, 0, 0, newWidth, newHeight);
-     cairo_paint(resizedCairoContext.cairoContext);
-     //cairo_set_source_surface(resizedCairoContext.cairoContext, resizedCairoContext.cairoSurface, 0, 0);
-     cairo_identity_matrix(resizedCairoContext.cairoContext);
+     cairo_set_source_surface(newCairoContext, cairo_get_target(cairoContext), 0, 0);
+     cairo_set_operator(newCairoContext, CAIRO_OPERATOR_SOURCE);
+     cairo_paint(newCairoContext);
+     cairo_identity_matrix(newCairoContext);
+     width = newWidth;
+     height = newHeight;
      cairo_surface_t *oldCairoSurface = cairoSurface;
      cairo_t *oldCairoContext = cairoContext;
-     cairoContext = resizedCairoContext.cairoContext;
-     cairoSurface = resizedCairoContext.cairoSurface;
+     cairoSurface = newCairoSurface;
+     cairoContext = newCairoContext;
      FreeCairoStructures(oldCairoContext, oldCairoSurface);
      return *this;
 }
@@ -599,8 +603,8 @@ bool CairoContext_t::Scale(double sxy) {
 }
 
 bool CairoContext_t::Scale(double sx, double sy) {
-     int nextWidth = (int) sx * GetWidth();
-     int nextHeight = (int) sy * GetHeight();
+     int nextWidth = (int) (sx * GetWidth());
+     int nextHeight = (int) (sy * GetHeight());
      Resize(nextWidth, nextHeight, true);
      return true;
 }

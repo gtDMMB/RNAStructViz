@@ -180,8 +180,8 @@ class CairoContext_t {
           size_t width, height;
 
 	  void FreeCairoStructures(cairo_t *cr, cairo_surface_t *crs);
-	  bool InitCairoStructures(size_t width, size_t height);
-	  bool InitCairoStructures(cairo_t *crContext);
+	  bool InitCairoStructures(size_t width, size_t height, bool freeOldStructs = false);
+	  bool InitCairoStructures(cairo_t *crContext, bool freeOldStructs = false);
 	  bool CopyContextData(const CairoContext_t &crContext);
 
 	  cairo_font_slant_t ExtractFontSlantFromStyle(uint16_t fontStyle);

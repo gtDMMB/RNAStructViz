@@ -13,31 +13,41 @@
 
 RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height) : 
 	Fl_Cairo_Window(width, height), RadialLayoutWindowCallbackInterface(), 
-	winTitle(NULL), vrnaPlotType(PLOT_TYPE_SIMPLE), radialLayoutCanvas(NULL), 
+	winTitle(NULL), vrnaPlotType(PLOT_TYPE_SIMPLE), 
+	radialLayoutCanvas(NULL), radialLayoutCanvasOrig(NULL), 
 	scrollerFillBox(NULL), windowScroller(NULL), 
-	scalePlusBtn(NULL), scaleMinusBtn(NULL), 
+	scalePlusBtn(NULL), scaleMinusBtn(NULL), resetBtn(NULL), 
 	cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
         winScaleX(1.0), winScaleY(1.0) {
 
-     int offsetY = 10, offsetX = w() - 2 * RADIAL_BUTTON_WIDTH - RADIAL_WIDGET_WIDTH;
-     
+     int offsetY = 10;
+     int offsetX = (w() - 3 * RADIAL_BUTTON_WIDTH - 2 * RADIAL_WIDGET_WIDTH) / 2 + RADIAL_WIDGET_WIDTH / 2;
+    
+     scaleMinusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
+		                   "@<<   Zoom Out");
+     scaleMinusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
+     scaleMinusBtn->labelcolor(GUI_BTEXT_COLOR);
+     scaleMinusBtn->callback(ScaleRadialLayoutMinusCallback);
+     offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
+ 
      scalePlusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
-		                  "@<<   Zoom In");
+		                  "Zoom In   @>>");
      scalePlusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      scalePlusBtn->labelcolor(GUI_BTEXT_COLOR);
      scalePlusBtn->callback(ScaleRadialLayoutPlusCallback);
      offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
 
-     scaleMinusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
-		                   "Zoom Out   @>>");
-     scaleMinusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
-     scaleMinusBtn->labelcolor(GUI_BTEXT_COLOR);
-     scaleMinusBtn->callback(ScaleRadialLayoutMinusCallback);
+     resetBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
+		                  "@redo   Reset");
+     resetBtn->color(Darker(GUI_BGCOLOR, 0.5f));
+     resetBtn->labelcolor(GUI_BTEXT_COLOR);
+     resetBtn->callback(RadialLayoutResetCallback);
+
 
      offsetY += 10 + RADIAL_WIDGET_HEIGHT;
      buttonToolbarHeight = offsetY; 
 
-     windowScroller = new Fl_Scroll(0, offsetY, width, height - buttonToolbarHeight);
+     windowScroller = new Fl_Scroll(0, offsetY, width, height - offsetY);
      windowScroller->color(GUI_WINDOW_BGCOLOR);
      windowScroller->scrollbar_size(SCROLL_SIZE);
      windowScroller->callback(HandleWindowScrollCallback);
@@ -93,9 +103,12 @@ bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t 
      if(rnaSeq == NULL) {
           return false;
      }
+     Delete(radialLayoutCanvas);
+     Delete(radialLayoutCanvasOrig);
+     
      radialLayoutCanvas = GetVRNARadialLayoutData(rnaSeq, startSeqPos, endSeqPos, seqLength, 
      		                                  (VRNAPlotType_t) vrnaPlotType);
-     
+     radialLayoutCanvasOrig = new CairoContext_t(*radialLayoutCanvas);
      ResizeScrollerFillBox();
      return true;
 }
@@ -105,14 +118,17 @@ void RadialLayoutDisplayWindow::ResizeScrollerFillBox() {
           return;
      }
      if(scrollerFillBox != NULL) {
+          windowScroller->remove(scrollerFillBox);
           Delete(scrollerFillBox);
      }
-     int nextFillerWidth = MIN(DEFAULT_RLWIN_WIDTH, radialLayoutCanvas->GetWidth() + SCROLL_SIZE);
-     int nextFillerHeight = MIN(DEFAULT_RLWIN_HEIGHT, radialLayoutCanvas->GetHeight());
+     int nextFillerWidth = MAX(DEFAULT_RLWIN_WIDTH, radialLayoutCanvas->GetWidth());
+     int nextFillerHeight = MAX(DEFAULT_RLWIN_HEIGHT - buttonToolbarHeight, radialLayoutCanvas->GetHeight());
      windowScroller->begin();
      scrollerFillBox = new Fl_Box(0, 0, nextFillerWidth, nextFillerHeight); 
      scrollerFillBox->type(FL_NO_BOX);
      windowScroller->end();
+     //windowScroller->resize(0, buttonToolbarHeight, w(), h() - buttonToolbarHeight);
+     //windowScroller->scroll_to(0, 0);
      windowScroller->redraw();
      redraw();
 }
@@ -125,19 +141,20 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
      RadialLayoutDisplayWindow *thisWindow = (RadialLayoutDisplayWindow *) thisCairoWindow; 
      fl_color(GUI_WINDOW_BGCOLOR);
      fl_rectf(0, thisWindow->buttonToolbarHeight, 
-	      thisCairoWindow->w() - SCROLL_SIZE - 2, thisCairoWindow->h() - SCROLL_SIZE - 2);
+	      thisCairoWindow->w() - SCROLL_SIZE - 2, 
+	      thisCairoWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
      fl_color(FL_BLACK);
      fl_line_style(FL_SOLID | FL_CAP_ROUND | FL_JOIN_BEVEL);
      fl_xyline(0, thisWindow->buttonToolbarHeight - 2, thisCairoWindow->w());
      fl_line_style(0);
      fl_color(GUI_WINDOW_BGCOLOR);
-     //thisWindow->radialLayoutCanvas->SaveSettings();
      thisWindow->cairoWinTranslateX = thisWindow->windowScroller->xposition();
      thisWindow->cairoWinTranslateY = thisWindow->windowScroller->yposition();
      cairo_surface_t *crSurface = cairo_get_target(thisWindow->radialLayoutCanvas->GetCairoContext());
      cairo_set_source_surface(cr, crSurface, -thisWindow->cairoWinTranslateX, -thisWindow->cairoWinTranslateY);
      cairo_rectangle(cr, 0, thisWindow->buttonToolbarHeight, 
-		     thisWindow->w() - SCROLL_SIZE - 2, thisWindow->h() - SCROLL_SIZE - 2);
+		     thisWindow->w() - SCROLL_SIZE - 2, 
+		     thisWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
      cairo_clip(cr);
      cairo_paint(cr);
      cairo_reset_clip(cr);
@@ -146,19 +163,34 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
 	  thisWindow->scaleMinusBtn->redraw();
 	  thisWindow->windowScroller->redraw();
      }
-     //thisWindow->radialLayoutCanvas->RestoreSettings(); 
 }
 
 void RadialLayoutDisplayWindow::ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBtn, void *udata) {
      RadialLayoutDisplayWindow *rwin = (RadialLayoutDisplayWindow *) scaleBtn->parent();
-     rwin->radialLayoutCanvas->Scale(1.0 + DEFAULT_SCALING_PERCENT);
-     
+     float scalingFactor = 1.0 + DEFAULT_SCALING_PERCENT;
+     rwin->radialLayoutCanvas->Scale(scalingFactor);
+     rwin->ResizeScrollerFillBox();
+     //int nextScrollerX = (int) (scalingFactor * rwin->windowScroller->xposition());
+     //int nextScrollerY = (int) (scalingFactor * rwin->windowScroller->yposition());
+     //rwin->windowScroller->scroll_to(0, 0); 
      rwin->redraw();
 }
 
 void RadialLayoutDisplayWindow::ScaleRadialLayoutMinusCallback(Fl_Widget *scaleBtn, void *udata) {
      RadialLayoutDisplayWindow *rwin = (RadialLayoutDisplayWindow *) scaleBtn->parent();
-     rwin->radialLayoutCanvas->Scale(1.0 - DEFAULT_SCALING_PERCENT);
+     float scalingFactor = 1.0 - DEFAULT_SCALING_PERCENT;
+     rwin->radialLayoutCanvas->Scale(scalingFactor);
+     rwin->ResizeScrollerFillBox();
+     //rwin->windowScroller->scroll_to(0, 0); 
+     rwin->redraw();
+}
+
+void RadialLayoutDisplayWindow::RadialLayoutResetCallback(Fl_Widget *resetBtn, void *udata) {
+     RadialLayoutDisplayWindow *rwin = (RadialLayoutDisplayWindow *) resetBtn->parent();
+     CairoContext_t *oldRadialLayoutCanvas = rwin->radialLayoutCanvas;
+     rwin->radialLayoutCanvas = new CairoContext_t(*(rwin->radialLayoutCanvasOrig));
+     Delete(oldRadialLayoutCanvas);
+     rwin->ResizeScrollerFillBox();
      rwin->redraw();
 }
 
@@ -176,7 +208,7 @@ void RadialLayoutDisplayWindow::HandleWindowScrollCallback(Fl_Widget *scrw, void
      int scrollXPos = windowScroller->xposition();
      int scrollYPos = windowScroller->yposition();
      mainWindow->cairoWinTranslateX = scrollXPos; //* mainWindow->winScaleX;
-     mainWindow->cairoWinTranslateY = mainWindow->buttonToolbarHeight + scrollYPos; //* mainWindow->winScaleY;
+     mainWindow->cairoWinTranslateY = scrollYPos; //* mainWindow->winScaleY;
      mainWindow->redraw();
 }
 
@@ -230,7 +262,7 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           workingIdx = simple_xy_coordinates(pairTableG, xPosArr, yPosArr);
      }
      else if(plotType == PLOT_TYPE_CIRCULAR) {
-          int radius = 3 * rnaSubseqLen;
+          int radius = 2 * rnaSubseqLen;
 	  workingIdx = simple_circplot_coordinates(pairTableG, xPosArr, yPosArr);
 	  for(int idx = 0; idx < rnaSubseqLen; idx++) {
                xPosArr[idx] *= radius;
@@ -252,6 +284,7 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      xmin = xmax = xPosArr[0];
      ymin = ymax = yPosArr[0];
      dmin = (double) INT_MAX;
+     const int nodeSize = 38;
      for(int idx = 1; idx < rnaSubseqLen; idx++) {
           xmin = xPosArr[idx] < xmin ? xPosArr[idx] : xmin;
           xmax = xPosArr[idx] > xmax ? xPosArr[idx] : xmax;
@@ -267,34 +300,33 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      }
      for(int xyPos = 0; xyPos < rnaSubseqLen; xyPos++) {
           if(xmin < 0) {
-	       xPosArr[xyPos] += ABS(xmin);
+	       xPosArr[xyPos] += ABS(xmin) + nodeSize;
 	  }
 	  if(ymin < 0) {
-	       yPosArr[xyPos] += ABS(ymin);
+	       yPosArr[xyPos] += ABS(ymin) + nodeSize;
 	  }
      }
      if(xmin < 0) {
-	  xmax += ABS(xmin);
+	  xmax += ABS(xmin) + nodeSize;
           xmin = 0.0;
      }
      if(ymin < 0) {
-          ymax += ABS(ymin);
+          ymax += ABS(ymin) + nodeSize;
 	  ymin = 0.0;
      }
-     const int nodeSize = 38;
      float winScale = 1.25 * nodeSize / dmin / M_SQRT2;
-     float xScale = (float) (0.85 * winScale * MAX(xmax / DEFAULT_RLWIN_WIDTH, 1.0));
-     float yScale = (float) (0.85 * winScale * MAX(ymax / DEFAULT_RLWIN_HEIGHT, 1.0));
+     float xScale = (float) (winScale * MAX(xmax / DEFAULT_RLWIN_WIDTH, 1.0));
+     float yScale = (float) (winScale * MAX(ymax / DEFAULT_RLWIN_HEIGHT, 1.0));
      this->winScaleX = xScale;
      this->winScaleY = yScale;
 
-     CairoContext_t *plotCanvas = new CairoContext_t(MAX(DEFAULT_RLWIN_WIDTH - SCROLL_SIZE, xmax - xmin) * xScale + 
+     CairoContext_t *plotCanvas = new CairoContext_t(MAX(DEFAULT_RLWIN_WIDTH, xmax - xmin) * xScale + 
 		                                     nodeSize, 
-		                                     MAX(DEFAULT_RLWIN_HEIGHT - SCROLL_SIZE, ymax - ymin) * yScale + 
+		                                     MAX(DEFAULT_RLWIN_HEIGHT, ymax - ymin) * yScale + 
 						     nodeSize);
      plotCanvas->BlankFillCanvas(CairoColor_t::FromFLColorType(GUI_WINDOW_BGCOLOR));
      plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
-     plotCanvas->Translate(nodeSize, nodeSize);
+     plotCanvas->Translate(2 * nodeSize, 2 * nodeSize);
      plotCanvas->SetStrokeSize(2);
      plotCanvas->SetFontFace(CairoContext_t::CairoFontFace_t::MONOSPACE | 
 		             CairoContext_t::CairoFontStyle_t::BOLD | 
