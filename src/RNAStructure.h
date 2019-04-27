@@ -27,13 +27,13 @@ class RNABranchType_t;
 #define RadiansToDegrees(theta)      (theta * 180.0 / M_PI)
 #define Square(x)                    ((x) * (x))
 
-#define DEFAULT_BUFFER_SIZE          1024
+#define DEFAULT_BUFFER_SIZE          (384)
 
 class RNAStructure
 {
     public:
-        enum Base
-        {
+        enum Base {
+		X = 0x00, 
 	        A = 0x01,
         	C = 0x02,
 	        G = 0x04,
@@ -108,7 +108,12 @@ class RNAStructure
 	    0 is returned if there is an error reading the file.
         */
         static RNAStructure* CreateFromFile(const char* filename, const bool isBPSEQ);
+        static RNAStructure* CreateFromDotBracketFile(const char *filename); 
 
+    private:
+	void GenerateDotFormatDataFromPairings();
+
+    public:
         /*
 	    Destructor.
         */
@@ -205,6 +210,7 @@ class RNAStructure
 	/* Callbacks for the export buttons: */
         static void ExportFASTAFileCallback(Fl_Widget *btn, void *udata);
 	static void ExportDotBracketFileCallback(Fl_Widget *btn, void *udata);
+        static void CloseCTViewerContentWindowCallback(Fl_Widget *noWidget, void *udata);
 
         // The structure data
         unsigned int m_sequenceLength;
@@ -241,7 +247,7 @@ class RNAStructure
 		  static bool ExportStringToPlaintextFile(
 		       const char *baseOutPath, 
 		       const char *srcData, 
-		       size_t srcDataLength, 
+		       int srcDataLength, 
 		       const char *fileExtText = ""
 		  );
 	};

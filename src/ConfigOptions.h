@@ -29,6 +29,7 @@ using std::string;
 #endif
 
 #define MAX_BUFFER_SIZE                 (224)
+#define MAX_SEQUENCE_SIZE               (12000)
 
 #define DEFAULT_CTFILE_SEARCH_DIRECTORY (GetUserHome())
 #define DEFAULT_PNG_OUTPUT_DIRECTORY    (GetUserHome())

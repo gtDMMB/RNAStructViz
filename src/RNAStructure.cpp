@@ -3,6 +3,8 @@
 
 #include <fstream>
 #include <vector>
+#include <stack>
+using std::stack;
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_File_Chooser.H>
@@ -332,6 +334,136 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     return result;
 }
 
+RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
+     
+     FILE *fpDotBracketFile = fopen(filename, "r+");
+     if(fpDotBracketFile == NULL) {
+          fprintf(stderr, "ERROR: Opening file \"%s\" : %s\n", filename, strerror(errno));
+     }
+     char lineBuf[MAX_SEQUENCE_SIZE + 1];
+     char baseDataBuf[MAX_SEQUENCE_SIZE + 1], pairingDataBuf[MAX_SEQUENCE_SIZE + 1];
+     bool haveBaseData = false, havePairData = false;
+     while(true) {
+          char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
+	  if(lineReturn == NULL && feof(fpDotBracketFile)) { 
+	       break;
+	  }
+	  else if(lineReturn == NULL) {
+	       fprintf(stderr, "ERROR: Reading DotBracket file \"%s\" : %s\n", filename, strerror(errno));
+	       break;
+	  }
+	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
+	       continue;
+	  }
+	  int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
+	  if(lineBuf[lineLength - 1] == '\n') {
+               lineBuf[lineLength - 1] = '\0';
+	  }
+	  if(!haveBaseData) {
+	       strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+	       haveBaseData = true;
+	       continue;
+	  }
+	  else if(!havePairData) {
+	       strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+	       havePairData = true;
+	  }
+	  if(haveBaseData && havePairData) {
+	       break;
+	  }
+     }
+     fclose(fpDotBracketFile);
+     if(!haveBaseData || !havePairData || strlen(baseDataBuf) != strlen(pairingDataBuf)) {
+          return NULL;
+     }
+     int seqLength = strlen(baseDataBuf);
+     stack<int> unpairedBasePairs;
+     RNAStructure *rnaStruct = new RNAStructure();
+     rnaStruct->m_sequenceLength = seqLength;
+     rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
+     for(int baseIdx = 0; baseIdx < seqLength; baseIdx++) { 
+          RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
+	  switch(baseDataBuf[baseIdx]) {
+	       case 'a':
+	       case 'A':
+	            curBaseData->m_base = A;
+		    break;
+	       case 'c':
+	       case 'C':
+		    curBaseData->m_base = C;
+		    break;
+	       case 'g':
+	       case 'G':
+		    curBaseData->m_base = G;
+		    break;
+	       case 'u':
+	       case 'U':
+		    curBaseData->m_base = U;
+		    break;
+	       default:
+		    curBaseData->m_base = X;
+		    break;
+	  }
+	  curBaseData->m_index = baseIdx + 1;
+	  if(pairingDataBuf[baseIdx] == '.') {
+	       curBaseData->m_pair = UNPAIRED;
+	  }
+	  else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
+		  pairingDataBuf[baseIdx] == '{') {
+	       unpairedBasePairs.push(baseIdx + 1);
+	  }
+	  else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
+		  pairingDataBuf[baseIdx] == '}') {
+	       int pairIndex = unpairedBasePairs.top();
+	       unpairedBasePairs.pop();
+	       curBaseData->m_pair = pairIndex;
+	       RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
+	       pairedBaseData->m_pair = baseIdx + 1;
+	  }
+	  else {
+               fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+		       pairingDataBuf[baseIdx]);
+	       Delete(rnaStruct);
+	       return NULL;
+	  }
+     }
+     #if PERFORM_BRANCH_TYPE_ID
+     rnaStruct->branchType = (RNABranchType_t*) malloc( 
+                             sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
+     #endif
+     rnaStruct->m_pathname = strdup(filename);
+     rnaStruct->charSeqSize = seqLength;
+     rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
+     strncpy(rnaStruct->charSeq, baseDataBuf, seqLength + 1);
+     rnaStruct->charSeq[rnaStruct->charSeqSize] = '\0';
+     rnaStruct->GenerateDotFormatDataFromPairings();
+     #if PERFORM_BRANCH_TYPE_ID    
+     RNABranchType_t::PerformBranchClassification(rnaStruct, rnaStruct->m_sequenceLength);
+     #endif
+     return rnaStruct;
+}
+
+void RNAStructure::GenerateDotFormatDataFromPairings() {
+     if(dotFormatCharSeq != NULL) {
+          free(dotFormatCharSeq);
+     }
+     dotFormatCharSeq = (char *) malloc((charSeqSize + 1) * sizeof(char));
+     for(int pd = 0; pd < charSeqSize; pd++) {
+         charSeq[pd] = toupper(charSeq[pd]);
+	 RNAStructure::BaseData *curBaseData = GetBaseAt(pd);
+	 if(curBaseData->m_pair == UNPAIRED) { 
+	      dotFormatCharSeq[pd] = '.';
+	 }
+	 else if(curBaseData->m_index < curBaseData->m_pair) {
+	      dotFormatCharSeq[pd] = '(';
+	 }
+	 else { 
+	      dotFormatCharSeq[pd] = ')';
+	 }
+     }
+     dotFormatCharSeq[charSeqSize] = '\0';
+}
+
 const char* RNAStructure::GetFilename() const
 {
     // Get the base file name                             
@@ -437,10 +569,10 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 {
     if(!m_ctDisplayString || !m_ctDisplayFormatString || 
        !m_seqDisplayString || !m_seqDisplayFormatString) { 
-        Delete(m_ctDisplayString);
-	Delete(m_ctDisplayFormatString);
-	Delete(m_seqDisplayString);
-	Delete(m_seqDisplayFormatString);
+        Free(m_ctDisplayString);
+	Free(m_ctDisplayFormatString);
+	Free(m_seqDisplayString);
+	Free(m_seqDisplayFormatString);
         GenerateString();
     }
 
@@ -510,6 +642,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 	m_seqTextBuffer->text(m_seqDisplayString);
 	m_seqTextDisplay->buffer(m_seqTextBuffer);
 	m_seqTextDisplay->textfont(LOCAL_BFFONT);
+	m_seqTextDisplay->textsize(LOCAL_TEXT_SIZE);
 	m_seqTextDisplay->color(GUI_CTFILEVIEW_COLOR);
 	m_seqTextDisplay->textcolor(GUI_TEXT_COLOR);
 	m_seqTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
@@ -561,8 +694,9 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 	m_ctViewerNotationBox->box(noteBoxType);
 
     }
+    m_contentWindow->user_data((void *) this);
+    m_contentWindow->callback(CloseCTViewerContentWindowCallback);
     m_contentWindow->show();
-    //m_contentWindow->make_current();
 
 }
 
@@ -571,7 +705,7 @@ void RNAStructure::GenerateString()
     /*
 	   <id> [ACGU] - [ACGU] <id>
     */
-    int size = (m_sequenceLength + 2) * 30;
+    int size = (m_sequenceLength + 2) * 38;
     m_ctDisplayString = (char*)malloc(sizeof(char) * (size + 1));
     m_ctDisplayFormatString = (char*)malloc(sizeof(char) * (size + 1));
     
@@ -585,13 +719,12 @@ void RNAStructure::GenerateString()
 		   "   BaseId  |  Pair  (PairId) \n-------------------------------------\n");
     snprintf(formatPosn, remainingSize, "%s\n", 
              Util::GetRepeatedString(TBUFSTYLE_DEFAULT_STRFMT, 
-		                     charsWritten + 1).c_str());
-    formatPosn[25] = '\n';
+		                     charsWritten).c_str());
     currentPosn += charsWritten;
     formatPosn += charsWritten;
     remainingSize -= charsWritten;
     
-    for (int i = 0; i < (int)m_sequenceLength; ++i)
+    for (int i = 0; i < (int) m_sequenceLength; ++i)
     {
 		const char* baseStr = "X";
 		switch ((int) m_sequence[i].m_base)
@@ -604,11 +737,15 @@ void RNAStructure::GenerateString()
 		    	break;
 		    case U: baseStr = "U";
 			    break;
+		    case X: baseStr = "X";
+			    break;
+		    default:
+			    break;
 		}
 		if (m_sequence[i].m_pair == UNPAIRED)
 		{
 		    charsWritten = snprintf(currentPosn, remainingSize, 
-				            "   %6d  | %s\n", i + 1, baseStr);
+				            "   % 6d  | %s\n", i + 1, baseStr);
 		    snprintf(formatPosn, remainingSize, "   AAAAAA  | %c\n", 
 		             Util::GetBaseStringFormat(baseStr));
 
@@ -631,11 +768,16 @@ void RNAStructure::GenerateString()
 			    case U: 
 			        pairStr = "U";
 			        break;
+		            case X: 
+				pairStr = "X";
+			        break;
+		            default:
+			        break;
 		    }
 		    charsWritten = snprintf(
 			    currentPosn,
 			    remainingSize,
-			    " %c %6d  | %s - %s  (%d)\n",
+			    " %c % 6d  | %s - %s  (%d)\n",
 			    (i <= pairID) ? '*' : ' ', 
 			    i + 1,
 			    baseStr,
@@ -670,10 +812,11 @@ void RNAStructure::GenerateString()
 		                             DEFAULT_BUFFER_SIZE);
     if(seqDSLen + 1 < DEFAULT_BUFFER_SIZE) { 
         m_seqDisplayString = (char *) realloc(m_seqDisplayString, (seqDSLen + 1) * sizeof(char));
+	m_seqDisplayString[seqDSLen] = '\0';
     }
     else {
-         strcat(m_seqDisplayString, " ...");
-	 seqDSLen += 4;
+	 m_seqDisplayString[DEFAULT_BUFFER_SIZE - 5] = '\0';
+	 strcat(m_seqDisplayString, " ...");
     }
     m_seqDisplayFormatString = (char *) malloc((seqDSLen + 1) * sizeof(char));
     strcpy(m_seqDisplayFormatString, m_seqDisplayString);
@@ -717,7 +860,7 @@ size_t RNAStructure::GenerateFASTAFormatString(char *strBuf,
      }
      char commentLine[DEFAULT_BUFFER_SIZE];
      size_t cmtLineLen = snprintf(commentLine, DEFAULT_BUFFER_SIZE, 
-		         "> CT File Source: %s\n\0", 
+		         "> CT File Source: %s\n", 
 		         GetFilename());
      if(cmtLineLen + charSeqSize + 1 > maxChars) { 
           return 0;
@@ -738,11 +881,10 @@ size_t RNAStructure::GenerateDotBracketFormatString(char *strBuf,
      if(fastaFileSize + charSeqSize + 2 > maxChars) { 
           return 0;
      }
-     strncpy(strBuf, fastaFileStr, fastaFileSize + 1);
+     strcpy(strBuf, fastaFileStr);
      strcat(strBuf, "\n");
-     strncat(strBuf, dotFormatCharSeq, charSeqSize);
-     strBuf[fastaFileSize + charSeqSize] = '\0';
-     return fastaFileSize + charSeqSize;
+     strcat(strBuf, dotFormatCharSeq);
+     return fastaFileSize + 1 + charSeqSize;
 }
 
 void RNAStructure::ExportFASTAFileCallback(Fl_Widget *btn, void *udata) {
@@ -751,8 +893,8 @@ void RNAStructure::ExportFASTAFileCallback(Fl_Widget *btn, void *udata) {
      size_t fdataContentStrMaxLen = 2 * rnaStructBaseObj->charSeqSize + 
 	                            DEFAULT_BUFFER_SIZE;
      char fastaData[fdataContentStrMaxLen + 1];
-     size_t fdataLength = rnaStructBaseObj->GenerateFASTAFormatString(
-		                            fastaData, fdataContentStrMaxLen);
+     int fdataLength = rnaStructBaseObj->GenerateFASTAFormatString(
+		                         fastaData, fdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
      snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.fasta\0", 
 	      CTFILE_SEARCH_DIRECTORY, 
@@ -773,8 +915,8 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
      size_t dbdataContentStrMaxLen = 2 * rnaStructBaseObj->charSeqSize + 
 	                             DEFAULT_BUFFER_SIZE;
      char dotData[dbdataContentStrMaxLen + 1];
-     size_t dotDataLength = rnaStructBaseObj->GenerateDotBracketFormatString(
-		                              dotData, dbdataContentStrMaxLen);
+     int dotDataLength = rnaStructBaseObj->GenerateDotBracketFormatString(
+		                           dotData, dbdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
      snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.dot\0", 
 	      CTFILE_SEARCH_DIRECTORY, 
@@ -787,6 +929,12 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
           fl_alert("Unable to write output DOT file \"%s\" to disk! If you have a permissions error saving the file to disk, try saving to a location in your home directory.", 
 	           exportPath);
      }
+}
+
+void RNAStructure::CloseCTViewerContentWindowCallback(Fl_Widget *noWidget, void *udata) {
+     Fl_Double_Window *dwin = (Fl_Double_Window *) noWidget;
+     RNAStructure *rnaStruct = (RNAStructure *) dwin->user_data();
+     rnaStruct->DeleteContentWindow();
 }
 
 void RNAStructure::DeleteContentWindow() {
@@ -803,6 +951,10 @@ void RNAStructure::DeleteContentWindow() {
 	Delete(m_ctSubwindowBox);
 	Delete(m_exportFASTABtn);
 	Delete(m_exportDBBtn);
+	Free(m_ctDisplayString);
+	Free(m_ctDisplayFormatString);
+	Free(m_seqDisplayString);
+	Free(m_seqDisplayFormatString);
     }
 }
 
@@ -841,7 +993,7 @@ int RNAStructure::Util::GetNumDigitsBase10(int x) {
 bool RNAStructure::Util::ExportStringToPlaintextFile(
 		         const char *baseOutPath, 
 			 const char *srcData, 
-			 size_t srcDataLength, 
+			 int srcDataLength, 
 			 const char *fileExtText) { 
      if(baseOutPath == NULL || srcData == NULL || fileExtText == NULL) { 
           return false;
@@ -854,11 +1006,15 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
           snprintf(outputFilePath, DEFAULT_BUFFER_SIZE, 
 		   "%s.%s\0", baseOutPath, fileExtText);
      }
-     FILE *fpOutFile = fopen(outputFilePath, "w");
-     size_t bytesWrittenToFile = 0;
+     FILE *fpOutFile = fopen(outputFilePath, "w+");
+     if(fpOutFile == NULL) {
+          fprintf(stderr, "ERROR: Opening export file \"%s\" : $s\n", outputFilePath, strerror(errno));
+	  return false;
+     }
+     int bytesWrittenToFile = 0;
      while(bytesWrittenToFile < srcDataLength && !ferror(fpOutFile)) { 
-          bytesWrittenToFile += fwrite(srcData, sizeof(char), srcDataLength, 
-			               fpOutFile);
+          bytesWrittenToFile += fwrite(srcData + bytesWrittenToFile, sizeof(char), 
+			               srcDataLength - bytesWrittenToFile, fpOutFile);
      }
      bool operationStatus = true;
      if(ferror(fpOutFile)) { 

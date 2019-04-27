@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     Fl_File_Icon::load_system_icons();
     Fl::scheme((char *) FLTK_THEME);
     MainWindow::ResetThemeColormaps();
-    fl_font(LOCAL_RMFONT, LOCAL_TEXT_SIZE);
+    fl_font(LOCAL_BFFONT, LOCAL_TEXT_SIZE);
 
     if(DISPLAY_FIRSTRUN_MESSAGE) {
          MainWindow::GetInstance()->DisplayFirstTimeUserInstructions();

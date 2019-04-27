@@ -535,10 +535,11 @@ bool MainWindow::CreateFileChooser()
         return false;
     }
     m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
-    m_fileChooser->label("Select RNA Sequences From File(s) ...");
+    m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
 			"CT Files (*.{ct,nopct})\t"
 		        "SEQ Files (*.bpseq)\t"
+			"DOT Bracket Files (*.{dot,bracket,dbn})\t"
 			"All Files (*)"
 		    );
     m_fileChooser->directory(currentWD);

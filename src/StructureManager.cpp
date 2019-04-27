@@ -63,20 +63,21 @@ void StructureManager::AddFile(const char* filename)
     const char* extension = strrchr(basename, '.');
     extension = extension ? extension : "";
     RNAStructure* structure = NULL;
-    if (extension && !strncmp(extension, ".bpseq", 6))
-    {
-		structure = RNAStructure::CreateFromFile(localCopy, true);
+    if (extension && !strncasecmp(extension, ".bpseq", 6)) {
+        structure = RNAStructure::CreateFromFile(localCopy, true);
     }
-    else if (extension && !strncmp(extension, ".ct", 3))
-    {
-		structure = RNAStructure::CreateFromFile(localCopy, false);
+    else if (extension && !strncasecmp(extension, ".ct", 3)) {
+	structure = RNAStructure::CreateFromFile(localCopy, false);
     }
-    else if (extension && !strncmp(extension, ".nopct", 6))
-    {
-		structure = RNAStructure::CreateFromFile(localCopy, false);
+    else if (extension && !strncasecmp(extension, ".nopct", 6)) {
+	structure = RNAStructure::CreateFromFile(localCopy, false);
     }
-    else
-    {
+    else if(extension && (!strncasecmp(extension, ".dot", 4) || 
+			  !strncasecmp(extension, ".bracket", 8) || 
+			  !strncasecmp(extension, ".dbn", 4))) {
+	structure = RNAStructure::CreateFromDotBracketFile(localCopy);
+    }
+    else {
 		if (strlen(filename) > 1000)
 		    fl_message("Unknown file type: <file name too long>");
 		else
@@ -138,7 +139,11 @@ void StructureManager::AddFile(const char* filename)
         }
 
     }
-    free(localCopy); localCopy = NULL;
+    else {
+         fl_alert("Error adding structure \"%s\"! Could not parse the specified format for this file.\n", 
+	          localCopy);
+    }
+    Free(localCopy); 
 
 }
 
