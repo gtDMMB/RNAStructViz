@@ -209,7 +209,7 @@ void MainWindow::DisplayFirstTimeUserInstructions() {
 	  "the \"Do not show again\" button below.\n", 
 	  "If you need help while running RNAStructViz, click on the help button\n", 
 	  "(circled question mark) at the top-right corner of the left main window pane.\n\n"
-	  "Thank you for using our application and good luck!" 
+	  "Thank you for using our application!" 
      };
      char fullInstText[4 * MAX_BUFFER_SIZE];
      fullInstText[0] = '\0';
