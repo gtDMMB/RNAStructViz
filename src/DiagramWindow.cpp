@@ -275,7 +275,7 @@ void DiagramWindow::resize(int x, int y, int w, int h) {
     Fl_Window::resize(x, y, w, h);
 }
 
-void DiagramWindow::drawWidgets(bool fillWin = true) {
+void DiagramWindow::drawWidgets(cairo_t *crDraw = NULL) {
     
     if(exportButton) { 
          exportButton->redraw();
@@ -297,11 +297,16 @@ void DiagramWindow::drawWidgets(bool fillWin = true) {
 	    m_menus[m]->redraw();
 	}
     }
-    if(fillWin) {
-         Fl_Color priorColor = fl_color();
-	 fl_color(GUI_WINDOW_BGCOLOR);
-    	 fl_rectf(0, 0, w(), h());
-         fl_color(priorColor);
+    if(crDraw != NULL) {
+	 cairo_save(crDraw);
+	 CairoColor_t::FromFLColorType(GUI_WINDOW_BGCOLOR).ApplyRGBAColor(crDraw);
+	 cairo_rectangle(crDraw, 0, 0, w(), h());
+	 cairo_fill(crDraw);
+	 cairo_restore(crDraw);
+	 //Fl_Color priorColor = fl_color();
+	 //fl_color(GUI_WINDOW_BGCOLOR);
+    	 //fl_rectf(0, 0, w(), h());
+         //fl_color(priorColor);
     }
     Fl_Double_Window::draw();
 
@@ -389,7 +394,7 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
 
     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
-    thisWindow->drawWidgets(true);
+    thisWindow->drawWidgets(cr);
 
     Fl_Color priorColor = fl_color();
     int priorFont = fl_font();
@@ -1864,7 +1869,7 @@ void DiagramWindow::setAsCurrentDiagramWindow() const {
 void DiagramWindow::RedrawWidgetsTimerCallback(void *udata) {
      DiagramWindow *dwin = (DiagramWindow *) DiagramWindow::currentDiagramWindowInstance;
      if(dwin != NULL && dwin->visible() && dwin->shown()) {
-          dwin->drawWidgets(false);
+          dwin->drawWidgets(NULL);
           dwin->redraw();
      }
      Fl::repeat_timeout(DWIN_REDRAW_REFRESH, DiagramWindow::RedrawWidgetsTimerCallback);

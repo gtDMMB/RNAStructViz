@@ -101,7 +101,7 @@ protected:
 	Draws the contents of the window.
     */
     bool computeDrawKeyParams(RNAStructure **sequences, int *numToDraw, int *keyA, int *keyB);
-    void drawWidgets(bool fillWin);
+    void drawWidgets(cairo_t *crDraw);
     static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
 
     void resize(int x, int y, int w, int h);
