@@ -840,7 +840,7 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
      }
      char *strBufActivePtr = strBuf, *destPos = NULL;
      size_t charsCopied = 0, csize = 0;
-     for(int strpos = 0; strpos < MIN(charSeqSize, maxChars); strpos += clusterSize) { 
+     for(int strpos = 0; strpos < MIN(charSeqSize, maxChars - 1); strpos += clusterSize + 1) { 
           strncpy(strBufActivePtr, charSeq + strpos, clusterSize);
 	  csize = (strpos / clusterSize <= numSpaces) ? clusterSize : 
 		  charSeqSize % clusterSize;
@@ -848,7 +848,7 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
 	  strBufActivePtr += csize + 1;
 	  charsCopied += csize + 1;
      }
-     strBufActivePtr--;
+     //strBufActivePtr--;
      strBufActivePtr[0] = '\0';
      return MAX(0, charsCopied - 1);
 }
