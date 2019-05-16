@@ -706,8 +706,8 @@ void RNAStructure::GenerateString()
 	   <id> [ACGU] - [ACGU] <id>
     */
     int size = (m_sequenceLength + 2) * 38;
-    m_ctDisplayString = (char*)malloc(sizeof(char) * (size + 1));
-    m_ctDisplayFormatString = (char*)malloc(sizeof(char) * (size + 1));
+    m_ctDisplayString = (char*) malloc(sizeof(char) * (size + 1));
+    m_ctDisplayFormatString = (char*) malloc(sizeof(char) * (size + 1));
     
     int remainingSize = size;
     int charsWritten = 0;
@@ -1033,8 +1033,10 @@ int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
           Fl::wait();
      }
      if(ctFileSelectionWin->isCanceled() || ctFileSelectionWin->getFileSelectionIndex() < 0) {
+          Delete(ctFileSelectionWin);
           return -1;
      }
+     ctFileSelectionWin->hide();
      StructureManager *rnaStructManager = RNAStructViz::GetInstance()->GetStructureManager();
      int fileSelectionIndex = ctFileSelectionWin->getFileSelectionIndex();
      int structIndex = rnaStructManager->GetFolderAt(structureFolderIndex)->
@@ -1051,6 +1053,7 @@ int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
 	  rnaStructManager->DisplayFileContents(structIndex, arcIndexDisplaySuffix);
 	  return structIndex;
      }
+     Delete(ctFileSelectionWin);
      return -1;
 }
 

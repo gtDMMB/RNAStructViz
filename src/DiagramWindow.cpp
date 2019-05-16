@@ -1476,7 +1476,8 @@ int DiagramWindow::handle(int flEvent) {
 		              Fl::wait();
 			 }
 			 if(ctFileSelectWin->isCanceled() || ctFileSelectWin->getFileSelectionIndex() < 0) {
-			      break;
+			      Delete(ctFileSelectWin);
+			      return 1; 
 			 }
 			 StructureManager *structManager = RNAStructViz::GetInstance()->
 				                           GetStructureManager();
