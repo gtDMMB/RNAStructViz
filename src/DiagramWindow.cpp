@@ -79,7 +79,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
         redrawRefreshTimerSet = true;
     }
 
-    title = (char *) malloc(sizeof(char) * 64);
+    title = (char *) malloc(128 * sizeof(char));
     SetStructures(structures);
  
     crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
@@ -159,8 +159,9 @@ void DiagramWindow::SetFolderIndex(int folderIndex) {
 			      GetStructure(folderIndex);
     int basePairCount = (rnaStruct != NULL) ? rnaStruct->GetLength() : 0;
     this->sequenceLength = basePairCount;
-    sprintf(title, "Comparison of Arc Diagrams: %-.48s  -- % 5d Bases", 
+    snprintf(title, 128, "Comparison of Arc Diagrams: %-.48s  -- % 5d Bases", 
 	    structureNameFull, basePairCount);
+    title[127] = '\0';
     label(title);
 }
 
