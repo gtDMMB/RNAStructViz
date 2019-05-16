@@ -1081,4 +1081,5 @@ bool RNAStructure::ScrollOpenCTFileViewerWindow(int structIndex, int pairIndex) 
      }
      rnaStruct->m_ctTextDisplay->scroll(pairIndex + 2, 1);
      rnaStruct->m_contentWindow->show();
+     return true;
 }
