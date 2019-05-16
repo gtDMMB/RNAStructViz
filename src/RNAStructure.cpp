@@ -942,12 +942,13 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
 
 void RNAStructure::CloseCTViewerContentWindowCallback(Fl_Widget *noWidget, void *udata) {
      Fl_Double_Window *dwin = (Fl_Double_Window *) noWidget;
+     dwin->hide();
      RNAStructure *rnaStruct = (RNAStructure *) dwin->user_data();
      rnaStruct->DeleteContentWindow();
 }
 
 void RNAStructure::DeleteContentWindow() {
-    /*if(m_contentWindow) {
+    if(m_contentWindow) {
         m_contentWindow->hide();
 	while(m_contentWindow->visible()) {
              Fl::wait();
@@ -967,7 +968,7 @@ void RNAStructure::DeleteContentWindow() {
 	Free(m_ctDisplayFormatString);
 	Free(m_seqDisplayString);
 	Free(m_seqDisplayFormatString);
-    }*/
+    }
 }
 
 void RNAStructure::HideContentWindowCallback(Fl_Widget *cwin, void *udata) {
