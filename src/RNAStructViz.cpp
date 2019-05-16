@@ -38,12 +38,7 @@ void RNAStructViz::Shutdown()
 {
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     MainWindow::Shutdown();
-    if (ms_instance)
-    {
-	    delete ms_instance;
-	    ms_instance = 0;
-    }
-    exit(0);
+    //exit(0);
 }
 void RNAStructViz::AddDiagramWindow(int index)
 {

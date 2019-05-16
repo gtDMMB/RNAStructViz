@@ -12,18 +12,22 @@
 static inline void DeletePointerCheck(void *ptr) {
      if(ptr != NULL) {
           delete ptr;
+	  ptr = NULL;
      }
 }
 
 #define Delete(p)                       ({ DeletePointerCheck(p); p = NULL; })
+//#define Delete(p)                        (DeletePointerCheck(p))
 
 static inline void FreePointerCheck(void *ptr) {
      if(ptr != NULL) {
           free(ptr);
+	  ptr = NULL;
      }
 }
 
 #define Free(p)                         ({ FreePointerCheck(p); p = NULL; })
+//#define Free(p)                          (FreePointerCheck(p))
 
 typedef bool (*PredicateFunc_t)(char);
 

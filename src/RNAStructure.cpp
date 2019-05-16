@@ -589,14 +589,12 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 	snprintf(contentWinTitleString, MAX_BUFFER_SIZE, "%s%s%s\0", 
 	         GetFilenameNoExtension(), titleSuffix == NULL ? "" : " : ", 
 		 titleSuffix == NULL ? "" : titleSuffix);
-	m_contentWindow = new Fl_Double_Window(subwinWidth, 
-			      subwinTotalHeight, contentWinTitleString);
+	m_contentWindow = new Fl_Double_Window(subwinWidth, subwinTotalHeight);
+	m_contentWindow->copy_label(contentWinTitleString);
 	Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
 			               subwinTotalHeight - subwinResizeSpacing);
 	m_contentWindow->resizable(resizeBox);
 	m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
-        m_contentWindow->user_data((void *) this);
-	m_contentWindow->callback(HideContentWindowCallback);
 	subwinWidth -= subwinResizeSpacing;
 
 	m_exportExtFilesBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
@@ -840,15 +838,18 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
      }
      char *strBufActivePtr = strBuf, *destPos = NULL;
      size_t charsCopied = 0, csize = 0;
-     for(int strpos = 0; strpos < MIN(charSeqSize, maxChars - 1); strpos += clusterSize) { 
-          int charSeqCopySize = (charSeqSize - strpos - clusterSize > 0) ? clusterSize : charSeqSize - strpos;
-	  strncpy(strBufActivePtr, charSeq + strpos, charSeqCopySize);
+     for(int strpos = 0; charsCopied + clusterSize < MIN(charSeqSize, maxChars - 1); strpos += clusterSize) { 
+	  strncpy(strBufActivePtr, charSeq + strpos, clusterSize);
 	  csize = (strpos / clusterSize <= numSpaces) ? clusterSize : 
 		  charSeqSize % clusterSize;
-	  strBufActivePtr[csize] = ' ';
-	  strBufActivePtr += csize + 1;
-	  charsCopied += csize + 1;
-	  if(charsCopied >= MIN(charSeqSize, maxChars - 1)) {
+	  if(charsCopied + clusterSize < MIN(charSeqSize, maxChars - 1)) {
+	       strBufActivePtr[csize] = ' ';
+	       strBufActivePtr += csize + 1;
+	       charsCopied += csize + 1;
+	  }
+	  else {
+	       strBufActivePtr[MIN(charSeqSize, maxChars - 1)] = '\0';
+	       charsCopied += csize;
 	       break;
 	  }
      }
@@ -946,8 +947,11 @@ void RNAStructure::CloseCTViewerContentWindowCallback(Fl_Widget *noWidget, void 
 }
 
 void RNAStructure::DeleteContentWindow() {
-    if(m_contentWindow) {
+    /*if(m_contentWindow) {
         m_contentWindow->hide();
+	while(m_contentWindow->visible()) {
+             Fl::wait();
+	}
 	Delete(m_contentWindow);
     	Delete(m_ctTextDisplay);
 	Delete(m_ctTextBuffer);
@@ -963,7 +967,7 @@ void RNAStructure::DeleteContentWindow() {
 	Free(m_ctDisplayFormatString);
 	Free(m_seqDisplayString);
 	Free(m_seqDisplayFormatString);
-    }
+    }*/
 }
 
 void RNAStructure::HideContentWindowCallback(Fl_Widget *cwin, void *udata) {

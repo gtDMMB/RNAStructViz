@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
          MainWindow::GetInstance()->DisplayFirstTimeUserInstructions();
     }
     while(MainWindow::IsRunning()) {
-        Fl::wait(0.5);
+        Fl::wait();
     }
     RNAStructViz::Shutdown();
     

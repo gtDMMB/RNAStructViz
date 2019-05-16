@@ -183,7 +183,7 @@ bool MainWindow::Initialize(int argc, char **argv) {
 }
 
 void MainWindow::Shutdown() {
-    if (ms_instance) {
+    if(ms_instance) {
         Delete(ms_instance);
     }
 }
@@ -292,8 +292,9 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     ms_instance->CreateFileChooser();
     ms_instance->m_fileChooser->show();
     while(ms_instance->m_fileChooser->visible()) {
-        Fl::wait(0.5);
+        Fl::wait();
     }
+    ms_instance->m_fileChooser->hide();
 
     const char *nextWorkingDir = ms_instance->m_fileChooser->directory();
     if(nextWorkingDir != NULL && strcmp(nextWorkingDir, (char *) CTFILE_SEARCH_DIRECTORY)) { 

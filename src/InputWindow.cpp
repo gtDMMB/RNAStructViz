@@ -107,7 +107,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    displayButton->color(GUI_BGCOLOR);
 	    displayButton->labelcolor(GUI_BTEXT_COLOR);
 	    displayButton->set_active();
-	    //displayButton->shortcut(FL_Enter);
+	    displayButton->shortcut(FL_Enter);
 	    Fl_Button *cancelButton = new Fl_Button(310, 100, 75, 30, "Cancel @1+");
             cancelButton->callback(CancelCallback); 
 	    cancelButton->color(GUI_BGCOLOR);
