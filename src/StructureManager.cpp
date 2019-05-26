@@ -62,20 +62,29 @@ void StructureManager::AddFile(const char* filename)
     // Figure out what kind of file we have and try to load it.
     const char* extension = strrchr(basename, '.');
     extension = extension ? extension : "";
-    RNAStructure* structure = NULL;
+    RNAStructure **structures = (RNAStructure **) malloc(sizeof(RNAStructure *));
+    int newStructCount = 0;
     if (extension && !strncasecmp(extension, ".bpseq", 6)) {
-        structure = RNAStructure::CreateFromFile(localCopy, true);
+        *structures = RNAStructure::CreateFromFile(localCopy, true);
+	newStructCount = 1;
     }
     else if (extension && !strncasecmp(extension, ".ct", 3)) {
-	structure = RNAStructure::CreateFromFile(localCopy, false);
+	*structures = RNAStructure::CreateFromFile(localCopy, false);
+	newStructCount = 1;
     }
     else if (extension && !strncasecmp(extension, ".nopct", 6)) {
-	structure = RNAStructure::CreateFromFile(localCopy, false);
+	*structures = RNAStructure::CreateFromFile(localCopy, false);
+	newStructCount = 1;
     }
     else if(extension && (!strncasecmp(extension, ".dot", 4) || 
 			  !strncasecmp(extension, ".bracket", 8) || 
 			  !strncasecmp(extension, ".dbn", 4))) {
-	structure = RNAStructure::CreateFromDotBracketFile(localCopy);
+	*structures = RNAStructure::CreateFromDotBracketFile(localCopy);
+	newStructCount = 1;
+    }
+    else if(extension && (!strncasecmp(extension, ".helix", 6) || 
+			  !strncasecmp(extension, ".hlx", 4))) {
+	structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
     }
     else {
 		if (strlen(filename) > 1000)
@@ -85,65 +94,71 @@ void StructureManager::AddFile(const char* filename)
 		return;
     }
 
-    if (structure)
+    if (structures)
     {
-    	int count = (int)folders.size();
-	AddFirstEmpty(structure);
-        if(count == (int) folders.size()-1)
-        {
-            InputWindow* input_window = new InputWindow(400, 150, 
-			 "New Folder Added", folders[count]->folderName, 
-			 InputWindow::FOLDER_INPUT);
-            while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES)
-            {
-                Fl::wait();
-            }
+    	for(int s = 0; s < newStructCount; s++) { 
+	    
+	     int count = (int)folders.size();
+	     RNAStructure *structure = structures[s];
+	     if(!structure) { 
+	          continue;
+	     }
+	     AddFirstEmpty(structure);
+             if(count == (int) folders.size()-1)
+             {
+                 InputWindow* input_window = new InputWindow(400, 150, 
+		     	      "New Folder Added", folders[count]->folderName, 
+			      InputWindow::FOLDER_INPUT);
+                 while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
+                       Fl::wait();
+                 }
             
-            bool same = false;
-            for(unsigned int ui = 0; ui < folders.size(); ui++)
-            {
-            	if (!strcmp(folders[ui]->folderName,input_window->getName())
-                    && strcmp(input_window->getName(),""))
-            	{
-            		same = true;
-            		break;
-            	}
-            }
+                 bool same = false;
+                 for(unsigned int ui = 0; ui < folders.size(); ui++)
+                 {
+            	     if (!strcmp(folders[ui]->folderName,input_window->getName())
+                         && strcmp(input_window->getName(),""))
+            	     {
+                          same = true;
+            		  break;
+            	     }
+                 }
             
-            while (same) {
-                fl_message("Already have a folder with the name: %s, please choose another name.", 
-                           input_window->getName());
-                delete input_window;
-                input_window = new InputWindow(400, 150, "New Folder Added", 
-	            	               folders[count]->folderName, InputWindow::FOLDER_INPUT);
-                while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES)
-                {
-                    Fl::wait();
-                }
-                same = false;
-                for(unsigned int ui = 0; ui < folders.size(); ui++)
-            	{
-            		if (!strcmp(folders[ui]->folderName, input_window->getName()))
-	            	{
-    	        		same = true;
-        	    		break;
-            		}
-	            }
-            }
+                 while(same) {
+                     fl_message("Already have a folder with the name: %s, please choose another name.", 
+                                input_window->getName());
+                     delete input_window;
+                     input_window = new InputWindow(400, 150, "New Folder Added", 
+	            	            folders[count]->folderName, InputWindow::FOLDER_INPUT);
+                     while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
+                          Fl::wait();
+                     }
+                     same = false;
+                     for(unsigned int ui = 0; ui < folders.size(); ui++)
+            	     {
+            		   if (!strcmp(folders[ui]->folderName, input_window->getName()))
+	            	   {
+    	        		 same = true;
+        	    		 break;
+            		   }
+	             }
+                 }
                         
-            if(strcmp(input_window->getName(), ""))
-            	strcpy(folders[count]->folderName, input_window->getName());
+                 if(strcmp(input_window->getName(), ""))
+            	     strcpy(folders[count]->folderName, input_window->getName());
 
-            MainWindow::AddFolder(folders[count]->folderName, count, false);
-	    delete input_window;
-        }
+                 MainWindow::AddFolder(folders[count]->folderName, count, false);
+	         delete input_window;
+             }
 
+	}
     }
     else {
          fl_alert("Error adding structure \"%s\"! Could not parse the specified format for this file.\n", 
 	          localCopy);
     }
     Free(localCopy); 
+    Free(structures);
 
 }
 

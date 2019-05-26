@@ -539,8 +539,9 @@ bool MainWindow::CreateFileChooser()
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
 			"CT Files (*.{ct,nopct})\t"
-		        "SEQ Files (*.bpseq)\t"
 			"DOT Bracket Files (*.{dot,bracket,dbn})\t"
+		        "Helix Triple Format Files (*.{helix,hlx})\t"
+			"SEQ Files (*.bpseq)\t"
 			"All Files (*)"
 		    );
     m_fileChooser->directory(currentWD);

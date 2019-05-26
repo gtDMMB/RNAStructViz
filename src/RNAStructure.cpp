@@ -443,6 +443,152 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      return rnaStruct;
 }
 
+RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filename, int *arrayCount) {
+
+     if(arrayCount == NULL) {
+          return NULL;
+     }
+     *arrayCount = 0;
+     
+     FILE *fpDotBracketFile = fopen(filename, "r+");
+     if(fpDotBracketFile == NULL) {
+          fprintf(stderr, "ERROR: Opening file \"%s\" : %s\n", filename, strerror(errno));
+     }
+     char lineBuf[MAX_SEQUENCE_SIZE + 1];
+     char baseDataBuf[MAX_SEQUENCE_SIZE + 1], pairingDataBuf[MAX_SEQUENCE_SIZE + 1];
+     bool haveBaseData = false, searchingPairData = false;
+     RNAStructure **rnaStructsArray = (RNAStructure **) malloc(RNASTRUCT_ARRAY_SIZE * sizeof(RNAStructure *));
+     int rnaStructArraySize = RNASTRUCT_ARRAY_SIZE;
+     while(true) {
+          char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
+	  if(lineReturn == NULL && feof(fpDotBracketFile)) { 
+	       break;
+	  }
+	  else if(lineReturn == NULL) {
+	       fprintf(stderr, "ERROR: Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
+	       break;
+	  }
+	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
+	       continue;
+	  }
+	  int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
+	  if(lineBuf[lineLength - 1] == '\n') {
+               lineBuf[lineLength - 1] = '\0';
+	  }
+	  if(!haveBaseData) {
+	       strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+	       haveBaseData = true;
+	       continue;
+	  }
+	  else if(!searchingPairData) {
+	       searchingPairData = true;
+	  }
+	  strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+     
+	  int seqLength = strlen(baseDataBuf);
+          stack<int> unpairedBasePairs;
+          RNAStructure *rnaStruct = new RNAStructure();
+          rnaStructsArray[*arrayCount] = rnaStruct;
+	  rnaStruct->m_sequenceLength = seqLength;
+          rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
+          for(int baseIdx = 0; baseIdx < seqLength; baseIdx++) { 
+               RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
+	       switch(baseDataBuf[baseIdx]) {
+	            case 'a':
+	            case 'A':
+	                 curBaseData->m_base = A;
+		         break;
+	            case 'c':
+	            case 'C':
+		         curBaseData->m_base = C;
+		         break;
+	            case 'g':
+	            case 'G':
+		         curBaseData->m_base = G;
+		         break;
+	            case 'u':
+	            case 'U':
+		         curBaseData->m_base = U;
+		         break;
+	            default:
+		         curBaseData->m_base = X;
+		         break;
+	       }
+	       curBaseData->m_index = baseIdx + 1;
+	       if(pairingDataBuf[baseIdx] == '.') {
+	            curBaseData->m_pair = UNPAIRED;
+	       }
+	       else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
+		       pairingDataBuf[baseIdx] == '{') {
+	            unpairedBasePairs.push(baseIdx + 1);
+	       }
+	       else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
+		       pairingDataBuf[baseIdx] == '}') {
+	            int pairIndex = unpairedBasePairs.top();
+	            unpairedBasePairs.pop();
+	            curBaseData->m_pair = pairIndex;
+	            RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
+	            pairedBaseData->m_pair = baseIdx + 1;
+	       }
+	       else {
+                    fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+		            pairingDataBuf[baseIdx]);
+	            Delete(rnaStruct);
+	            for(int s = 0; s < *arrayCount; s++) { 
+	                 Delete(rnaStructsArray[s]);
+	            }
+	            Free(rnaStructsArray);
+	            return NULL;
+	       }
+          }
+          #if PERFORM_BRANCH_TYPE_ID
+          rnaStruct->branchType = (RNABranchType_t*) malloc( 
+                                   sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
+          #endif
+
+	  // we will have multiple samples in this files, need to append a sample number suffix to 
+	  // distinguish between them for the users in the GUI: 
+	  int nextFileIdentifierLen = strlen(filename) + 16;
+          rnaStruct->m_pathname = (char *) malloc(nextFileIdentifierLen * sizeof(char));
+	  rnaStruct->m_pathname[0] = '\0';
+	  char *fileExtPos = strrchr((char *) filename, '.');
+	  fprintf(stderr, "File Names: [%s] (%s) -- %d, %d\n", rnaStruct->m_pathname, filename, nextFileIdentifierLen, fileExtPos - rnaStruct->m_pathname);
+          if(fileExtPos == NULL) {
+               fileExtPos = ((char *) filename) + strlen(filename);
+	  }
+	  strncpy(rnaStruct->m_pathname, filename, fileExtPos - filename);
+	  rnaStruct->m_pathname[fileExtPos - filename] = '\0';
+	  char sampleSuffix[MAX_BUFFER_SIZE];
+	  snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", *arrayCount + 1);
+	  strcat(rnaStruct->m_pathname, sampleSuffix);
+	  strcat(rnaStruct->m_pathname, fileExtPos);
+	  //rnaStruct->m_pathname = strdup(filename);
+
+          rnaStruct->charSeqSize = seqLength;
+          rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
+          strncpy(rnaStruct->charSeq, baseDataBuf, seqLength + 1);
+          rnaStruct->charSeq[rnaStruct->charSeqSize] = '\0';
+          rnaStruct->GenerateDotFormatDataFromPairings();
+          #if PERFORM_BRANCH_TYPE_ID    
+          RNABranchType_t::PerformBranchClassification(rnaStruct, rnaStruct->m_sequenceLength);
+          #endif
+     
+          *arrayCount += 1;
+	  if(*arrayCount >= rnaStructArraySize) {
+               rnaStructArraySize *= 2;
+	       rnaStructsArray = (RNAStructure **) 
+		                  realloc(rnaStructsArray, sizeof(RNAStructure *) * rnaStructArraySize);
+	  }
+     
+     }
+     fclose(fpDotBracketFile);
+     if(!haveBaseData || !searchingPairData) {
+          return NULL;
+     }
+     return rnaStructsArray;
+
+}
+
 void RNAStructure::GenerateDotFormatDataFromPairings() {
      if(dotFormatCharSeq != NULL) {
           free(dotFormatCharSeq);
