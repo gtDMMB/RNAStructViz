@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <iostream>
 #include <vector>
+#include <string>
+using std::string;
 
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
@@ -19,12 +21,17 @@
 #include "pixmaps/RNAStructVizLogo.c"
 #include "pixmaps/RNAWindowIcon.xbm"
 #include "pixmaps/HelpIcon.c"
+#include "pixmaps/InfoButton.c"
 
 MainWindow* MainWindow::ms_instance = NULL;
 
 Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
 	       HelpIcon.pixel_data, 
 	       HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
+
+Fl_RGB_Image * MainWindow::infoButtonImage = new Fl_RGB_Image( 
+	       InfoButton.pixel_data, 
+	       InfoButton.width, InfoButton.height, InfoButton.bytes_per_pixel);
 
 MainWindow::MainWindow(int argc, char **argv)
           : m_fileChooser(NULL), selectedFolderBtn(NULL), 
@@ -65,6 +72,23 @@ MainWindow::MainWindow(int argc, char **argv)
 	    helpButton->box(FL_NO_BOX);
 	    helpButton->callback(HelpButtonCallback);
             helpButton->redraw();
+
+            int infoButtonDims = 26;
+	    int infoButtonOffsetX = 300 - helpButtonDims - 3 * NAVBUTTONS_SPACING / 2 - helpButton->w();
+	    Fl_Button *infoButton = new Fl_Button(infoButtonOffsetX, NAVBUTTONS_SPACING / 2, 
+			                          infoButtonDims, infoButtonDims, "");
+	    infoButton->color(GUI_WINDOW_BGCOLOR);
+	    infoButton->labelcolor(GUI_BTEXT_COLOR);
+	    infoButton->labelsize(2 * LOCAL_TEXT_SIZE);
+	    infoButton->image(infoButtonImage);
+	    infoButton->deimage(infoButtonImage);
+	    infoButton->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	    infoButton->labeltype(_FL_ICON_LABEL);
+	    infoButton->shortcut(FL_CTRL + 'i');
+	    infoButton->box(FL_NO_BOX);
+	    infoButton->callback(InfoButtonCallback);
+            infoButton->redraw();
+
 
 	// consistent alignment with the folder window display:
 	int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
@@ -384,6 +408,45 @@ void MainWindow::HelpButtonCallback(Fl_Widget *btn, void *udata) {
 
 }
 
+void MainWindow::InfoButtonCallback(Fl_Widget *btn, void *udata) {
+     
+     string infoWelcomeMsg = string("The next table summarizes the compile time data associated with this build \nof RNAStructViz, ") + 
+	                     string("e.g., GitHub revision information for the souce code and key library versions.\n\n");
+     string infoTableOrigData[] = {
+	   ApplicationBuildInfo::GitRevisionInfo(), 
+	   ApplicationBuildInfo::GitRevisionDate(), 
+	   ApplicationBuildInfo::FLTKVersionString(), 
+	   ApplicationBuildInfo::BuildFLTKConfig(), 
+	   ApplicationBuildInfo::CairoVersionString(), 
+	   ApplicationBuildInfo::BuildPlatform(), 
+	   ApplicationBuildInfo::LocalBuildDateTime(),
+     };
+     string spaces = string("...............................................................");
+     int tableHeaderWidth = 25;
+     string infoMsg = infoWelcomeMsg;
+     for(int data = 0; data < GetArrayLength(infoTableOrigData); data++) {
+          string curInfoStr = infoTableOrigData[data];
+	  size_t headerPos = curInfoStr.find_first_of(":");
+	  string headerPrefix = curInfoStr.substr(0, headerPos);
+	  string tableData = curInfoStr.substr(headerPos + 2);
+	  string headerSpacing = spaces.substr(0, MAX(0, tableHeaderWidth - headerPrefix.length()));
+	  char fullLineData[MAX_BUFFER_SIZE];
+	  snprintf(fullLineData, MAX_BUFFER_SIZE - 1, "> %s %s %s\n", headerPrefix.c_str(), headerSpacing.c_str(), tableData.c_str());
+	  fullLineData[MAX_BUFFER_SIZE - 1] = '\0';
+          infoMsg += string(fullLineData);
+     }
+
+     fl_message_title("About the Application (RNAStructViz Build Information)");
+     fl_message_icon()->image(MainWindow::infoButtonImage);
+     fl_message_icon()->label("");
+     fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));
+     fl_message_icon()->box(FL_NO_BOX);
+     fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+     fl_message_font(FL_SCREEN, 12);
+     fl_message(infoMsg.c_str());
+
+}
+
 void MainWindow::CollapseMainMenu()
 {
     Fl_Group* mainMenu = ms_instance->mainMenuPane;
@@ -538,7 +601,8 @@ bool MainWindow::CreateFileChooser()
     m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
-			"CT Files (*.{ct,nopct})\t"
+			"All Supported Formats (*.{ct,nopct,dot,bracket,dbn,helix,hlx})\t"
+		        "CT Files (*.{ct,nopct})\t"
 			"DOT Bracket Files (*.{dot,bracket,dbn})\t"
 		        "Helix Triple Format Files (*.{helix,hlx})\t"
 			"SEQ Files (*.bpseq)\t"

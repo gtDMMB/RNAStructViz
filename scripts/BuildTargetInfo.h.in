@@ -51,7 +51,7 @@
 #define FLTK_USE_CAIRO 1
 #define FLTK_HAVE_CAIRO 1
 
-#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.6.4-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.6.5-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
@@ -79,7 +79,7 @@ class ApplicationBuildInfo {
                return string("User Manual: https://github.com/gtDMMB/RNAStructViz/wiki");
 	  }
 
-	  static inline string GitRevisionInfo() {
+	  static inline string GitRevisionInfoFull() {
                char revString[HUGE_BUFFER_LINE_SIZE];
                snprintf(revString, HUGE_BUFFER_LINE_SIZE, 
 	                "Git Revision: %s (%s) [%s]", 
@@ -88,6 +88,14 @@ class ApplicationBuildInfo {
                return string(revString);
           }
 
+	  static inline string GitRevisionInfo() {
+               char revString[HUGE_BUFFER_LINE_SIZE];
+               snprintf(revString, HUGE_BUFFER_LINE_SIZE, 
+	                "Git Revision: %s [%s]", 
+	                GIT_COMMIT_HASH_SHORT, GIT_BRANCH_REVSTRING);
+               revString[HUGE_BUFFER_LINE_SIZE - 1] = '\0';
+               return string(revString);
+          }
           static inline string GitRevisionDate() {
                return string("Revision Date: ") + string(GIT_COMMIT_DATE);
           }
@@ -101,12 +109,12 @@ class ApplicationBuildInfo {
 	  }
 
 	  static inline string BuildFLTKConfig() {
-               return string("Compile-Time FLTK-Config: ") + 
+               return string("FLTK-Config: ") + 
 		      string(BUILD_FLTK_CONFIG);
 	  }
 
 	  static inline string CairoVersionString() {
-               return string("Cairo Library Version: ") + string(CAIRO_VERSION_STRING);
+               return string("Cairo Library: ") + string(CAIRO_VERSION_STRING);
 	  }
 
 	  static inline string FLTKVersionString() {
@@ -115,7 +123,7 @@ class ApplicationBuildInfo {
 			"%d.%d.%d (API #%d)", 
 			FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION, FL_API_VERSION);
 	       fltkVersionStr[HUGE_BUFFER_LINE_SIZE - 1] = '\0';
-	       return string("FLTK Library Version: ") + string(fltkVersionStr);
+	       return string("FLTK Library: ") + string(fltkVersionStr);
 	  }
 
 	  static inline void PrintAboutListing(FILE *whichOut = stderr) {
@@ -125,7 +133,7 @@ class ApplicationBuildInfo {
 	       fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
 	       fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
                fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
-			  UserManualWikiLink().c_str(), GitRevisionInfo().c_str(), 
+			  UserManualWikiLink().c_str(), GitRevisionInfoFull().c_str(), 
 			  GitRevisionDate().c_str(), FLTKVersionString().c_str(),
 			  BuildFLTKConfig().c_str(),  
 			  CairoVersionString().c_str(), BuildPlatform().c_str(), 

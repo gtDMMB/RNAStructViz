@@ -125,7 +125,9 @@ class MainWindow
     
 	/* Callback for displaying the help dialog */
         static void HelpButtonCallback(Fl_Widget *btn, void *userData);
-        static Fl_RGB_Image *helpIconImage;
+        static void InfoButtonCallback(Fl_Widget *btn, void *userData);
+	static Fl_RGB_Image *helpIconImage;
+        static Fl_RGB_Image *infoButtonImage;
 
 	/*
         Callbacks for collapsing the two sides of the window.

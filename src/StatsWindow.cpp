@@ -140,25 +140,25 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 int leg1w = leg1_group->w();
                 int leg1h = leg1_group->h();
                 
-				Fl_Box* leg_label = new Fl_Box(leg1x+10,leg1y+ 10, leg1w-15, 30, 
+				Fl_Box* leg_label = new Fl_Box(leg1x + 10, leg1y + 10, leg1w, 30, 
                                                "Legend");
 				leg_label->labelcolor(GUI_TEXT_COLOR);
 				
-				leg_label = new Fl_Box(leg1x+10,leg1y+ 60, leg1w-15, 30, "Reference Structure");
+				leg_label = new Fl_Box(leg1x+10,leg1y+ 60, leg1w, 30, "Reference Structure");
 				leg_label->labelcolor(GUI_TEXT_COLOR);
 				
-				leg1_ref = new Fl_Box(FL_FLAT_BOX,leg1x+10,leg1y+90, leg1w-15, 20,"");
+				leg1_ref = new Fl_Box(FL_FLAT_BOX,leg1x+10,leg1y+90, leg1w, 20,"");
 				leg1_ref->color(GUI_TEXT_COLOR);
 				leg1_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 				leg1_ref->align(FL_ALIGN_INSIDE|FL_ALIGN_LEFT);
 				leg1_ref->hide();
 				
-				leg_label = new Fl_Box(leg1x+10,leg1y+ 120, leg1w-15, 30, "Predicted Structures");
+				leg_label = new Fl_Box(leg1x+10,leg1y+ 120, leg1w, 30, "Predicted Structures");
 				leg_label->labelcolor(GUI_TEXT_COLOR);
 				
-				leg1_scroll = new Fl_Scroll(leg1x+10,leg1y+ 150, leg1w-15, leg1h-200);
+				leg1_scroll = new Fl_Scroll(leg1x+10,leg1y+ 150, leg1w, leg1h-200);
 				{	
-					leg1_pack = new Fl_Pack(leg1x+10,leg1y+150,leg1w-15,leg1h-200);
+					leg1_pack = new Fl_Pack(leg1x+10,leg1y+150,leg1w,leg1h-200);
 					leg1_pack->type(Fl_Pack::VERTICAL);
 					leg1_pack->end();
                     leg1_pack->color(GUI_WINDOW_BGCOLOR);
@@ -1234,19 +1234,21 @@ void StatsWindow::ComputeStats()
 	buff->append(reference->GetFilename());
 	buff->append("\n\n");
 	buff->append(
-                 "Filename\t\t\tPairs\tTPs\tFPs\tFNs\tSensi.\tSelec.\tPPV\tConfl.\tContr.\tCompa.\tG-C\tA-U\tG-U\tOther\n"
+                 "Filename\t\t\t\tPairs\tTPs\tFPs\tFNs\tSensi.\tSelec.\tPPV\tConfl.\tContr.\tCompa.\tG-C\tA-U\tG-U\tOther\n"
                  );
 	
 	for (unsigned int ui=0; ui<numStats; ui++)
 	{
 		
-		char tempc [25];
-		strncpy(tempc,statistics[ui].filename,24);
-		tempc[24] = '\0';
+		char tempc[50];
+		strncpy(tempc, statistics[ui].filename, 49);
+		tempc[49] = '\0';
 		buff->append(tempc);
-		if (strlen(statistics[ui].filename) > 24) 
+		if (strlen(statistics[ui].filename) > 49) 
 		{
-			buff->append("...\t");
+			buff->append("...");
+			buff->append(statistics[ui].filename + strlen(statistics[ui].filename) - 5);
+			buff->append("\t");
 		}
 		else
 		{

@@ -34,7 +34,7 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	#CXX=g++-8
 	#LD=g++-8
 else
-	FLTKCONFIG=fltk-config
+	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=readlink
 	LDFLAGS+= -Wl,--no-as-needed
 endif
@@ -108,6 +108,8 @@ install: default
 	cp -ap $(BINARY_OUTPUT) $(INSTALL_PREFIX)/bin/;\
 	cp -ap ../sample_structures/* \
 		$(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
+	chmod 555 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
+	chmod 555 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/*
 
 profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	./RNAStructViz #--inuse_space --inuse_objects --alloc_space --alloc_objects

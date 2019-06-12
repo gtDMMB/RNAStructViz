@@ -130,7 +130,7 @@ void RNAStructViz::AddStatsWindow(int index)
     
     char* title = (char*)malloc(sizeof(char) * 64);
     snprintf(title, 64, "Structure Statistics %lu", m_statsWindows.size() + 1);
-    stats = new StatsWindow(1000, 700, title, structures);
+    stats = new StatsWindow(1250, 700, title, structures);
     free(title); //title = NULL;
     
     stats->SetFolderIndex(index);

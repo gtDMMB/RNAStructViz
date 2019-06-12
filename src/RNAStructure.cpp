@@ -552,7 +552,6 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
           rnaStruct->m_pathname = (char *) malloc(nextFileIdentifierLen * sizeof(char));
 	  rnaStruct->m_pathname[0] = '\0';
 	  char *fileExtPos = strrchr((char *) filename, '.');
-	  fprintf(stderr, "File Names: [%s] (%s) -- %d, %d\n", rnaStruct->m_pathname, filename, nextFileIdentifierLen, fileExtPos - rnaStruct->m_pathname);
           if(fileExtPos == NULL) {
                fileExtPos = ((char *) filename) + strlen(filename);
 	  }
@@ -614,8 +613,7 @@ const char* RNAStructure::GetFilename() const
 {
     // Get the base file name                             
     const char* basename = strrchr(m_pathname, '/');        
-    if (!basename)
-    {
+    if (!basename) {
         return m_pathname;
     }
     return ++basename;
