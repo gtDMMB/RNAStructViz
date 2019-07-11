@@ -111,6 +111,7 @@ class RNAStructure
         static RNAStructure* CreateFromDotBracketFile(const char *filename); 
 	
         #define RNASTRUCT_ARRAY_SIZE        (16)
+	static RNAStructure** CreateFromGTBoltzmannFormatFile(const char *filename, int *arrayCount);
 	static RNAStructure** CreateFromHelixTripleFormatFile(const char *filename, int *arrayCount);
 
     private:

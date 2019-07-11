@@ -443,7 +443,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      return rnaStruct;
 }
 
-RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filename, int *arrayCount) {
+RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filename, int *arrayCount) {
 
      if(arrayCount == NULL) {
           return NULL;
@@ -561,7 +561,6 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 	  snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", *arrayCount + 1);
 	  strcat(rnaStruct->m_pathname, sampleSuffix);
 	  strcat(rnaStruct->m_pathname, fileExtPos);
-	  //rnaStruct->m_pathname = strdup(filename);
 
           rnaStruct->charSeqSize = seqLength;
           rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
@@ -583,6 +582,168 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
      fclose(fpDotBracketFile);
      if(!haveBaseData || !searchingPairData) {
           return NULL;
+     }
+     return rnaStructsArray;
+
+}
+
+RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filename, int *arrayCount) {
+
+     if(arrayCount == NULL) {
+          return NULL;
+     }
+     *arrayCount = 0;
+     
+     FILE *fpHelixFile = fopen(filename, "r+");
+     if(fpHelixFile == NULL) {
+          fprintf(stderr, "ERROR: Opening file \"%s\" : %s\n", filename, strerror(errno));
+     }
+     char lineBuf[MAX_SEQUENCE_SIZE + 1];
+     char baseDataBuf[MAX_SEQUENCE_SIZE + 1], pairingDataBuf[MAX_SEQUENCE_SIZE + 1];
+     bool haveBaseData = false, multiLineTriples = false, parserError = false;
+     RNAStructure **rnaStructsArray = (RNAStructure **) malloc(RNASTRUCT_ARRAY_SIZE * sizeof(RNAStructure *));
+     int rnaStructArraySize = RNASTRUCT_ARRAY_SIZE;
+     while(true) {
+          char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpHelixFile);
+	  if(lineReturn == NULL && feof(fpHelixFile)) { 
+	       break;
+	  }
+	  else if(lineReturn == NULL) {
+	       fprintf(stderr, "ERROR: Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
+	       break;
+	  }
+	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
+	       continue;
+	  }
+	  int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
+	  if(lineBuf[lineLength - 1] == '\n') {
+               lineBuf[lineLength - 1] = '\0';
+	  }
+	  if(!haveBaseData && lineLength > 0 && isalpha(lineBuf[0])) {
+               strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+	       haveBaseData = true;
+	       int seqLength = strlen(baseDataBuf);
+	       memset(pairingDataBuf, '.', seqLength);
+	       continue;
+	  }
+	  else if(!haveBaseData) {
+	       fprintf(stderr, "ERROR: Unable to parse helix triple file line \"%s\"\n", lineBuf);
+               parserError = true;
+	       break;
+	  }
+	  char *commaSplice = strchr(lineBuf, ','); 
+	  do {
+               ++commaSplice;
+	       if(*commaSplice == '\0') {
+	            fprintf(stderr, "ERROR: Unexpected comma delimiter\n");
+		    parserError = true;
+		    break;
+	       }
+	       else if(*commaSplice == ' ') {
+	            ++commaSplice;
+	       }
+	       int helixLength = strchr(commaSplice, ',') == NULL ? strlen(commaSplice) : 
+		                 strchr(commaSplice, ',') - commaSplice;
+	       char helixDataBuf[MAX_SEQUENCE_SIZE + 1];
+	       strncpy(helixDataBuf, commaSplice, MIN(helixLength, MAX_SEQUENCE_SIZE));
+               helixDataBuf[MAX_SEQUENCE_SIZE] = '\0';
+	       int i, j, k;
+	       int helixParseStatus = sscanf(helixDataBuf, "%d %d %d", &i, &j, &k);
+	       if(helixParseStatus) {
+                    fprintf(stderr, "ERROR: Error parsing helix triple \"%s\" : %s\n", 
+			    helixDataBuf, strerror(helixParseStatus));
+		    parserError = true;
+		    break;
+	       }
+	       for(int kidx = 0; kidx < k; kidx++) {
+                    int startIdx = i + kidx - 1;
+		    int endIdx = j - kidx - 1;
+		    pairingDataBuf[startIdx] = '(';
+                    pairingDataBuf[endIdx] = ')';
+	       }
+               commaSplice = strchr(commaSplice + 1, ',');
+	  } while(commaSplice != NULL);
+     }
+     fclose(fpHelixFile);
+     if(parserError || !haveBaseData) {
+          Delete(rnaStructsArray);
+	  return NULL;
+     }
+     // otherwise we need to create the structure from the bases and DB pairing data obtained above:
+     int seqLength = strlen(baseDataBuf);
+     stack<int> unpairedBasePairs;
+     RNAStructure *rnaStruct = new RNAStructure();
+     rnaStructsArray[*arrayCount] = rnaStruct;
+     rnaStruct->m_sequenceLength = seqLength;
+     rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
+     for(int baseIdx = 0; baseIdx < seqLength; baseIdx++) { 
+          RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
+	  switch(baseDataBuf[baseIdx]) {
+	       case 'a':
+	       case 'A':
+	            curBaseData->m_base = A;
+		    break;
+	       case 'c':
+	       case 'C':
+		    curBaseData->m_base = C;
+		    break;
+	       case 'g':
+	       case 'G':
+		    curBaseData->m_base = G;
+		    break;
+	       case 'u':
+	       case 'U':
+		    curBaseData->m_base = U;
+		    break;
+	       default:
+		    curBaseData->m_base = X;
+		    break;
+	  }
+	  curBaseData->m_index = baseIdx + 1;
+	  if(pairingDataBuf[baseIdx] == '.') {
+	       curBaseData->m_pair = UNPAIRED;
+	  }
+	  else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
+	       pairingDataBuf[baseIdx] == '{') {
+	       unpairedBasePairs.push(baseIdx + 1);
+	  }
+	  else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
+		  pairingDataBuf[baseIdx] == '}') {
+	       int pairIndex = unpairedBasePairs.top();
+	       unpairedBasePairs.pop();
+	       curBaseData->m_pair = pairIndex;
+	       RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
+	       pairedBaseData->m_pair = baseIdx + 1;
+	  }
+	  else {
+               fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+		       pairingDataBuf[baseIdx]);
+	       Delete(rnaStruct);
+	       for(int s = 0; s < *arrayCount; s++) { 
+	            Delete(rnaStructsArray[s]);
+	       }
+	       Free(rnaStructsArray);
+	       return NULL;
+	  }
+     }
+     #if PERFORM_BRANCH_TYPE_ID
+     rnaStruct->branchType = (RNABranchType_t*) malloc( 
+                              sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
+     #endif
+     rnaStruct->m_pathname = strdup(filename);
+     rnaStruct->charSeqSize = seqLength;
+     rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
+     strncpy(rnaStruct->charSeq, baseDataBuf, seqLength + 1);
+     rnaStruct->charSeq[rnaStruct->charSeqSize] = '\0';
+     rnaStruct->GenerateDotFormatDataFromPairings();
+     #if PERFORM_BRANCH_TYPE_ID    
+     RNABranchType_t::PerformBranchClassification(rnaStruct, rnaStruct->m_sequenceLength);
+     #endif
+     *arrayCount += 1;
+     if(*arrayCount < rnaStructArraySize) {
+          rnaStructArraySize = *arrayCount;
+	  rnaStructsArray = (RNAStructure **) 
+		             realloc(rnaStructsArray, sizeof(RNAStructure *) * rnaStructArraySize);
      }
      return rnaStructsArray;
 
