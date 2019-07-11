@@ -108,8 +108,8 @@ install: default
 	cp -ap $(BINARY_OUTPUT) $(INSTALL_PREFIX)/bin/;\
 	cp -ap ../sample_structures/* \
 		$(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
-	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
-	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/*
+	chmod 555 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
+	chmod 555 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/*
 
 profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	./RNAStructViz #--inuse_space --inuse_objects --alloc_space --alloc_objects
