@@ -633,23 +633,25 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 	  }
 	  char *commaSplice = strchr(lineBuf, ','); 
 	  do {
-               ++commaSplice;
-	       if(*commaSplice == '\0') {
+	       if(commaSplice && ++commaSplice && *commaSplice == '\0') {
 	            fprintf(stderr, "ERROR: Unexpected comma delimiter\n");
 		    parserError = true;
 		    break;
 	       }
-	       else if(*commaSplice == ' ') {
+	       else if(commaSplice && *commaSplice == ' ') {
 	            ++commaSplice;
+	       }
+	       if(commaSplice == NULL) {
+	            commaSplice = lineBuf;
 	       }
 	       int helixLength = strchr(commaSplice, ',') == NULL ? strlen(commaSplice) : 
 		                 strchr(commaSplice, ',') - commaSplice;
 	       char helixDataBuf[MAX_SEQUENCE_SIZE + 1];
-	       strncpy(helixDataBuf, commaSplice, MIN(helixLength, MAX_SEQUENCE_SIZE));
+	       strncpy(helixDataBuf, commaSplice, MIN(helixLength, MAX_SEQUENCE_SIZE) + 1);
                helixDataBuf[MAX_SEQUENCE_SIZE] = '\0';
 	       int i, j, k;
 	       int helixParseStatus = sscanf(helixDataBuf, "%d %d %d", &i, &j, &k);
-	       if(helixParseStatus) {
+	       if(helixParseStatus != 3) {
                     fprintf(stderr, "ERROR: Error parsing helix triple \"%s\" : %s\n", 
 			    helixDataBuf, strerror(helixParseStatus));
 		    parserError = true;
