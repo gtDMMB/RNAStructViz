@@ -404,7 +404,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 		    curBaseData->m_base = X;
 		    break;
 	  }
-	  curBaseData->m_index = baseIdx + 1;
+	  curBaseData->m_index = baseIdx;
 	  if(pairingDataBuf[baseIdx] == '.') {
 	       curBaseData->m_pair = UNPAIRED;
 	  }
@@ -418,7 +418,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 	       unpairedBasePairs.pop();
 	       curBaseData->m_pair = pairIndex;
 	       RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
-	       pairedBaseData->m_pair = baseIdx + 1;
+	       pairedBaseData->m_pair = baseIdx;
 	  }
 	  else {
                fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
@@ -514,7 +514,7 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
 		         curBaseData->m_base = X;
 		         break;
 	       }
-	       curBaseData->m_index = baseIdx + 1;
+	       curBaseData->m_index = baseIdx;
 	       if(pairingDataBuf[baseIdx] == '.') {
 	            curBaseData->m_pair = UNPAIRED;
 	       }
@@ -528,7 +528,7 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
 	            unpairedBasePairs.pop();
 	            curBaseData->m_pair = pairIndex;
 	            RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
-	            pairedBaseData->m_pair = baseIdx + 1;
+	            pairedBaseData->m_pair = baseIdx;
 	       }
 	       else {
                     fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
@@ -701,7 +701,7 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 		    curBaseData->m_base = X;
 		    break;
 	  }
-	  curBaseData->m_index = baseIdx + 1;
+	  curBaseData->m_index = baseIdx;
 	  if(pairingDataBuf[baseIdx] == '.') {
 	       curBaseData->m_pair = UNPAIRED;
 	  }
@@ -715,7 +715,7 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 	       unpairedBasePairs.pop();
 	       curBaseData->m_pair = pairIndex;
 	       RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
-	       pairedBaseData->m_pair = baseIdx + 1;
+	       pairedBaseData->m_pair = baseIdx;
 	  }
 	  else {
                fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 

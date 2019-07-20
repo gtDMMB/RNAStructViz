@@ -31,6 +31,14 @@
 
 #include "pixmaps/StatsFormula.c"
 #include "pixmaps/StatsWindowIcon.xbm"
+#include "pixmaps/StatsOverviewLegend.c"
+
+Fl_RGB_Image * StatsWindow::overviewLegendImage = new Fl_RGB_Image(
+               StatsOverviewLegend.pixel_data, 
+	       StatsOverviewLegend.width, 
+	       StatsOverviewLegend.height, 
+	       StatsOverviewLegend.bytes_per_pixel
+	      );
 
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
@@ -101,28 +109,28 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 int ovcy = ov_charts_group->y();
                 int ovcw = ov_charts_group->w();
                 int ovch = ov_charts_group->h();
-				bp_chart = new Fl_Group(ovcx+10,ovcy+10,(ovcw-60)/2,(ovch-60)/2, "Base Pairs");
+				bp_chart = new Fl_Group(ovcx+10,ovcy+10,(ovcw-60)/2,(ovch-60)/2, "Base Pairs (BP)");
 				bp_chart->box(FL_BORDER_BOX);
 				bp_chart->align(FL_ALIGN_BOTTOM);
 				bp_chart->labelcolor(GUI_TEXT_COLOR);
                                 bp_chart->color(GUI_WINDOW_BGCOLOR);
 				bp_chart->end();
 				
-				tp_chart = new Fl_Group(ovcx+50+(ovcw-60)/2,ovcy+10,(ovcw-60)/2,(ovch-60)/2,"True Positives");
+				tp_chart = new Fl_Group(ovcx+50+(ovcw-60)/2,ovcy+10,(ovcw-60)/2,(ovch-60)/2,"True Positives (TP)");
 				tp_chart->box(FL_BORDER_BOX);
 				tp_chart->align(FL_ALIGN_BOTTOM);
 				tp_chart->labelcolor(GUI_TEXT_COLOR);
                                 tp_chart->color(GUI_WINDOW_BGCOLOR);
 				tp_chart->end();
 				
-				fp_chart = new Fl_Group(ovcx+10,ovcy+40+(ovch-60)/2,(ovcw-60)/2,(ovch-60)/2,"False Positives");
+				fp_chart = new Fl_Group(ovcx+10,ovcy+40+(ovch-60)/2,(ovcw-60)/2,(ovch-60)/2,"False Positives (FP)");
 				fp_chart->box(FL_BORDER_BOX);
 				fp_chart->align(FL_ALIGN_BOTTOM);
 				fp_chart->labelcolor(GUI_TEXT_COLOR);
                                 fp_chart->color(GUI_WINDOW_BGCOLOR);
 				fp_chart->end();
 				
-				fn_chart = new Fl_Group(ovcx+50+(ovcw-60)/2,ovcy+40+(ovch-60)/2,(ovcw-60)/2,(ovch-60)/2, "False Negatives");
+				fn_chart = new Fl_Group(ovcx+50+(ovcw-60)/2,ovcy+40+(ovch-60)/2,(ovcw-60)/2,(ovch-60)/2, "False Negatives (FN)");
 				fn_chart->box(FL_BORDER_BOX);
 				fn_chart->align(FL_ALIGN_BOTTOM);
 				fn_chart->labelcolor(GUI_TEXT_COLOR);
@@ -135,10 +143,10 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 			
 			leg1_group = new Fl_Group(w-200,30,195,h-40,"");
 			{
-                int leg1x = leg1_group->x();
-                int leg1y = leg1_group->y();
-                int leg1w = leg1_group->w();
-                int leg1h = leg1_group->h();
+                                int leg1x = leg1_group->x();
+                                int leg1y = leg1_group->y();
+                                int leg1w = leg1_group->w();
+                                int leg1h = leg1_group->h();
                 
 				Fl_Box* leg_label = new Fl_Box(leg1x + 10, leg1y + 10, leg1w, 30, 
                                                "Legend");
@@ -161,13 +169,15 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 					leg1_pack = new Fl_Pack(leg1x+10,leg1y+150,leg1w,leg1h-200);
 					leg1_pack->type(Fl_Pack::VERTICAL);
 					leg1_pack->end();
-                    leg1_pack->color(GUI_WINDOW_BGCOLOR);
+                                        leg1_pack->color(GUI_WINDOW_BGCOLOR);
 				}
 				leg1_scroll->type(Fl_Scroll::VERTICAL);
 				leg1_scroll->box(FL_FLAT_BOX);
 				leg1_scroll->end();
-                leg1_scroll->color(GUI_WINDOW_BGCOLOR);
+                                leg1_scroll->color(GUI_WINDOW_BGCOLOR);
                 
+			        Fl_Box *legendExplImageBox = new Fl_Box(leg1x, leg1y + 115, leg1w, leg1h - 50);
+			        legendExplImageBox->image(overviewLegendImage);
 			}
 			leg1_group->end();
 			leg1_group->resizable(leg1_scroll);
@@ -1034,7 +1044,8 @@ void StatsWindow::ComputeStats()
 	
 	// Find the reference structure
 	RNAStructure* reference = 
-    structureManager->GetStructure(m_structures[referenceIndex]);
+                      structureManager->GetStructure(m_structures[referenceIndex]);
+        SetReferenceStructure(referenceIndex);
 	
 	// Compute the number of base pairs in the reference structure
 	unsigned int ref_base_pair_count = 0;
@@ -1049,9 +1060,9 @@ void StatsWindow::ComputeStats()
 	
 	// Compute statistics for selected structures
 	int statsIndex;
-    int counter = 1; 
-    // Use a different counter so statsIndex will be 0 if it's the reference and counter otherwise
-	for (int i=0; i< comp_pack->children(); i++)
+        int counter = 1; 
+        // Use a different counter so statsIndex will be 0 if it's the reference and counter otherwise
+	for (int i = 0; i < comp_pack->children(); i++)
 	{
 		Fl_Check_Button* button = 
                 (Fl_Check_Button*)comp_pack->child(i);
@@ -1060,20 +1071,20 @@ void StatsWindow::ComputeStats()
 			// Find the corresponding structure
 			// index corresponds to index of checkbox
 			RNAStructure* predicted = 
-            structureManager->GetStructure(m_structures[i]);
+                                      structureManager->GetStructure(m_structures[i]);
 			
 			// Initialize values
-			if (strcmp(predicted->GetFilename(),reference->GetFilename()))
+			if (strcmp(predicted->GetFilename(), reference->GetFilename()))
 			{
-                statsIndex = counter;
+                                statsIndex = counter;
 				statistics[statsIndex].ref = false;
 			}
 			else
 			{
-                statsIndex = 0;
+                                statsIndex = 0;
 				statistics[statsIndex].ref = true;
 			}
-            statistics[statsIndex].filename = predicted->GetFilename();
+                        statistics[statsIndex].filename = predicted->GetFilename();
 			statistics[statsIndex].base_pair_count = 0;
 			statistics[statsIndex].gc_count = 0;
 			statistics[statsIndex].au_count = 0;
@@ -1089,13 +1100,15 @@ void StatsWindow::ComputeStats()
 			statistics[statsIndex].selectivity = 0;
 			statistics[statsIndex].pos_pred_value = 0;
 			
+                        fprintf(stderr, "Alt Seq Len: %d; Ref Seq Len: %d;\n", reference->GetLength(), predicted->GetLength());
+
 			// Compute counts
 			// Go through reference strand, comparing to predicted
-			for (unsigned int uj = 0; uj< reference->GetLength(); uj++)
+			for (unsigned int uj = 0; uj < reference->GetLength(); uj++)
 			{
 				// Increment if there is a base pair in predicted
 				if(predicted->GetBaseAt(uj)->m_pair != RNAStructure::UNPAIRED &&
-                   predicted->GetBaseAt(uj)->m_pair > uj)
+                                   predicted->GetBaseAt(uj)->m_pair > uj)
 				{
 					statistics[statsIndex].base_pair_count++;
 					
@@ -1423,7 +1436,7 @@ void StatsWindow::DrawHistograms()
 			Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].true_pos_count),
                                      col_w,
-                                     (int)(hscale*statistics[ui].true_pos_count),statistics[ui].tp_char);
+                                     (int)(hscale*statistics[ui].true_pos_count), statistics[ui].tp_char);
 			box->color(statistics[ui].color);
 			box->align(FL_ALIGN_TOP);
 		}

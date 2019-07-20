@@ -165,6 +165,9 @@ private:
     Fl_Group *roc_tab; // Group for the ROC plot
     Fl_Group *table_tab; // Group for the statistics table
     
+    /* Overview tab legend explanation image */
+    static Fl_RGB_Image *overviewLegendImage;
+
     /* Holds the set of structures being compared */
     std::vector<int> m_structures;
     
