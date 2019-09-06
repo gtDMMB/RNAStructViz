@@ -352,6 +352,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 	       fprintf(stderr, "ERROR: Reading DotBracket file \"%s\" : %s\n", filename, strerror(errno));
 	       break;
 	  }
+	  fprintf(stderr, "LINE: [%s]\n", lineReturn);
 	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
 	       continue;
 	  }
@@ -360,12 +361,12 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
                lineBuf[lineLength - 1] = '\0';
 	  }
 	  if(!haveBaseData) {
-	       strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+	       strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE);
 	       haveBaseData = true;
 	       continue;
 	  }
 	  else if(!havePairData) {
-	       strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+	       strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE);
 	       havePairData = true;
 	  }
 	  if(haveBaseData && havePairData) {
@@ -374,16 +375,20 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      }
      fclose(fpDotBracketFile);
      if(!haveBaseData || !havePairData || strlen(baseDataBuf) != strlen(pairingDataBuf)) {
-          return NULL;
+          fprintf(stderr, "ERROR: Error parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
+          //fprintf(stderr, "BDBUF: [%s]\n", baseDataBuf);
+	  //fprintf(stderr, "PDBUF: [%s]\n", pairingDataBuf);
+	  return NULL;
      }
      int seqLength = strlen(baseDataBuf);
      stack<int> unpairedBasePairs;
      RNAStructure *rnaStruct = new RNAStructure();
      rnaStruct->m_sequenceLength = seqLength;
      rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
-     for(int baseIdx = 0; baseIdx < seqLength; baseIdx++) { 
+     int baseIdx = 0;
+     for(int bufIdx = 0; bufIdx < seqLength; bufIdx++) { 
           RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
-	  switch(baseDataBuf[baseIdx]) {
+	  switch(baseDataBuf[bufIdx]) {
 	       case 'a':
 	       case 'A':
 	            curBaseData->m_base = A;
@@ -404,29 +409,40 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 		    curBaseData->m_base = X;
 		    break;
 	  }
+	  if(baseDataBuf[bufIdx] == ' ' || pairingDataBuf[bufIdx] == ' ') {
+	       continue;
+	  }
 	  curBaseData->m_index = baseIdx;
-	  if(pairingDataBuf[baseIdx] == '.') {
+	  if(pairingDataBuf[bufIdx] == '.') {
 	       curBaseData->m_pair = UNPAIRED;
 	  }
-	  else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
-		  pairingDataBuf[baseIdx] == '{') {
+	  else if(pairingDataBuf[bufIdx] == '(' || pairingDataBuf[bufIdx] == '<' || 
+		  pairingDataBuf[bufIdx] == '{') {
 	       unpairedBasePairs.push(baseIdx + 1);
 	  }
-	  else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
-		  pairingDataBuf[baseIdx] == '}') {
+	  else if((pairingDataBuf[bufIdx] == ')' || pairingDataBuf[bufIdx] == '>' || 
+		  pairingDataBuf[bufIdx] == '}') && unpairedBasePairs.size() > 0) {
 	       int pairIndex = unpairedBasePairs.top();
 	       unpairedBasePairs.pop();
-	       curBaseData->m_pair = pairIndex;
+	       curBaseData->m_pair = pairIndex - 1;
 	       RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
 	       pairedBaseData->m_pair = baseIdx;
 	  }
 	  else {
                fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
-		       pairingDataBuf[baseIdx]);
+		       pairingDataBuf[bufIdx]);
 	       Delete(rnaStruct);
 	       return NULL;
 	  }
+	  baseIdx++;
      }
+     if(unpairedBasePairs.size() > 0) {
+          fprintf(stderr, "ERROR: DOT parser syntax error; There are unpaired open braces remaining ...\n");
+	  Delete(rnaStruct);
+	  return NULL;
+     }
+     seqLength = baseIdx; // allows for space characters in the parsing
+     rnaStruct->m_sequenceLength = seqLength;    
      #if PERFORM_BRANCH_TYPE_ID
      rnaStruct->branchType = (RNABranchType_t*) malloc( 
                              sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
