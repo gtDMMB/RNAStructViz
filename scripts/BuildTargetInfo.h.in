@@ -51,7 +51,7 @@
 #define FLTK_USE_CAIRO 1
 #define FLTK_HAVE_CAIRO 1
 
-#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.6.9-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.7.0-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
