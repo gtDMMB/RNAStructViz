@@ -40,12 +40,12 @@ using std::max_element;
 #define STRAND_MARKER_IMAGE_HEIGHT   (25)
 #define PNG_FOOTER_HEIGHT            (100)
 
-#define GLWIN_TRANSLATEX             (50)
+#define GLWIN_TRANSLATEX             (85)
 #define GLWIN_TRANSLATEY             (110)
 
 #define WIDGET_SPACING               (35)
 #define EXPORT_BUTTON_WIDTH          (115)
-#define WINW_EXTENSION               (EXPORT_BUTTON_WIDTH + 3 * WIDGET_SPACING)
+#define WINW_EXTENSION               (EXPORT_BUTTON_WIDTH + 5 * WIDGET_SPACING)
 
 #define ZOOM_WIDTH                   (200)
 #define ZOOM_HEIGHT                  (200)
@@ -56,6 +56,9 @@ using std::max_element;
 
 #define DWINARC_MAX_TICKS            (12)
 #define DWINARC_LABEL_PCT            (0.0833)
+
+#define STRUCTURE_INCLBL_XOFFSET     (10)
+#define BASE_LINE_FONT_SIZE          (8)
 
 class DiagramWindow : public Fl_Cairo_Window, public RadialLayoutWindowCallbackInterface {
 

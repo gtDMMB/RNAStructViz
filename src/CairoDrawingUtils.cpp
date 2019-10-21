@@ -218,9 +218,10 @@ CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor
         case CR_YELLOW:
 	    return GetCairoColor(196, 160, 0);
         case CR_MAGENTA:
-	    return GetCairoColor(239, 41, 159);
-        case CR_CYAN:
-	    return GetCairoColor(0, 195, 215);
+	    //return GetCairoColor(239, 41, 159);
+            return GetCairoColor(249, 0, 201);
+	case CR_CYAN:
+	    return GetCairoColor(32, 195, 215);
         case CR_BRANCH1:
             return GetCairoColor(92, 160, 215);
         case CR_BRANCH2:
@@ -251,7 +252,7 @@ CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor
 	    return GetCairoColor(2, 32, 75);
 	default:
             fprintf(stderr, "ERROR: Unknown named Cairo color %d\n", namedCairoColor);
-	    return GetCairoColor(245, 121, 0, 128);
+	    return GetCairoColor(206, 92, 0, 128);
     }
 }
 
