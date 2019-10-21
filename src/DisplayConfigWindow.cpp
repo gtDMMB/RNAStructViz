@@ -76,9 +76,13 @@
 
 bool DisplayConfigWindow::SetupInitialConfig() { 
 
-     strncpy((char *) CTFILE_SEARCH_DIRECTORY, DEFAULT_CTFILE_SEARCH_DIRECTORY, 
-             MAX_BUFFER_SIZE - 1);
-     ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY); 
+     getcwd((char *) CTFILE_SEARCH_DIRECTORY, MAX_BUFFER_SIZE - 1);
+     ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY);
+     if(CTFILE_SEARCH_DIRECTORY == NULL) {
+          strncpy((char *) CTFILE_SEARCH_DIRECTORY, DEFAULT_CTFILE_SEARCH_DIRECTORY, 
+                  MAX_BUFFER_SIZE - 1);
+          ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY);
+     } 
      strncpy((char *) PNG_OUTPUT_DIRECTORY, DEFAULT_PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1); 
      ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
      strncpy((char *) PNG_OUTPUT_PATH, DEFAULT_PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);

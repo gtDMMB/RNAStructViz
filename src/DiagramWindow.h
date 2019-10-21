@@ -128,6 +128,7 @@ private:
                              CairoColorSpec_t fallbackColorFlag);
     void SetCairoColor(cairo_t *cr, int colorFlag); 
     void SetCairoToFLColor(cairo_t *cr, Fl_Color flc);
+    void SetCairoToExactFLColor(cairo_t *cr, Fl_Color flc);
 
     inline void CairoRectangle(cairo_t *cr, int x, int y, int w, int h) {
          double rectX = (double) x / this->w();

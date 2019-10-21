@@ -404,25 +404,15 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     RNAStructure *sequences[3];
     int numToDraw, keyA, keyB;
     thisWindow->computeDrawKeyParams(sequences, &numToDraw, &keyA, &keyB);
-    
-    if(numToDraw == 1) {
-        thisWindow->DrawKey1(keyA);
-    }
-    else if(numToDraw == 2) {
-        thisWindow->DrawKey2(keyA, keyB);
-    }
-    else if(numToDraw == 3) {
-        thisWindow->DrawKey3();
-    }
-   
+      
     if (thisWindow->m_redrawStructures) {
 	    // __Draw the actual arc diagram pixels and frame 
 	    //   them in a circular frame:__ 
 	    cairo_identity_matrix(thisWindow->crDraw);
-            thisWindow->SetCairoToFLColor(thisWindow->crDraw, thisWindow->color());
+            thisWindow->SetCairoToExactFLColor(thisWindow->crDraw, thisWindow->color());
 	    cairo_rectangle(thisWindow->crDraw, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
             cairo_fill(thisWindow->crDraw);
-	    thisWindow->SetCairoToFLColor(thisWindow->crBasePairsOverlay, thisWindow->color());
+	    thisWindow->SetCairoToExactFLColor(thisWindow->crBasePairsOverlay, thisWindow->color());
 	    cairo_rectangle(thisWindow->crBasePairsOverlay, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
 	    cairo_fill(thisWindow->crBasePairsOverlay);
 	    cairo_push_group(thisWindow->crDraw);
@@ -454,6 +444,17 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     cairo_rectangle(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, 
 		    IMAGE_WIDTH, IMAGE_HEIGHT);    
     cairo_fill(cr);
+    
+    if(numToDraw == 1) {
+        thisWindow->DrawKey1(keyA);
+    }
+    else if(numToDraw == 2) {
+        thisWindow->DrawKey2(keyA, keyB);
+    }
+    else if(numToDraw == 3) {
+        thisWindow->DrawKey3();
+    }
+    
     thisWindow->RedrawStrandEdgeMarker(cr);
     thisWindow->RedrawCairoZoomBuffer(cr);
     
@@ -489,11 +490,17 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     fl_font(priorFont, priorFontSize);
 }
 
+Fl_Color MatchKeyDrawColorToCairo(Fl_Color flc) {
+     CairoColor_t cc = CairoColor_t::FromNamedConstant(CairoColor_t::ConvertFromFLColor(flc));
+     cc.ToOpaque();
+     return cc.ToFLColorType();
+}
+
 void DiagramWindow::DrawKey3() {
     int yPosn = 55;
     char mystr[10] = "";
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[2][0]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][0]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
@@ -501,7 +508,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[2][5]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][5]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_line_style(FL_DOT);
     fl_xyline(m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
@@ -510,7 +517,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[2][4]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][4]));
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_line_style(FL_DOT);
     fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
@@ -519,7 +526,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[2][2]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][2]));
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     fl_line_style(FL_DOT);
     fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
@@ -528,7 +535,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[2][1]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][1]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_line_style(FL_DOT);
@@ -537,7 +544,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[2][3]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][3]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     fl_line_style(FL_DOT);
@@ -546,7 +553,7 @@ void DiagramWindow::DrawKey3() {
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[2][6]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][6]));
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     fl_line_style(FL_DOT);
@@ -560,20 +567,20 @@ void DiagramWindow::DrawKey2(const int a, const int b) {
     int yPosn = 55;
     char mystr[10] = "";
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[1][0]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[1][0]));
     fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
     fl_rectf(m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
     sprintf(mystr, "%d", numPairs[0]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[1][1]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[1][1]));
     fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
     sprintf(mystr, "%d", numPairs[1]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     yPosn += 10;
 
-    fl_color(STRUCTURE_DIAGRAM_COLORS[1][2]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[1][2]));
     fl_rectf(m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
     sprintf(mystr, "%d", numPairs[2]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
@@ -581,7 +588,7 @@ void DiagramWindow::DrawKey2(const int a, const int b) {
 }
 
 void DiagramWindow::DrawKey1(const int a) {
-    fl_color(STRUCTURE_DIAGRAM_COLORS[0][0]);
+    fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[0][0]));
     fl_rectf(m_menus[a]->x(), 55, m_menus[a]->w(), 3);
     char mystr[10] = "";
     sprintf(mystr, "%d", numPairs[0]);
@@ -623,8 +630,18 @@ void DiagramWindow::SetCairoToFLColor(cairo_t *cr, Fl_Color flc) {
      if(cr == NULL) {
           return;
      }
+     //CairoColor_t::FromFLColorType(flc).ToOpaque().ApplyRGBAColor(cr);
+     CairoColor_t::CairoColorSpec_t crEquivColor = CairoColor_t::ConvertFromFLColor(flc);
+     CairoColor_t::FromNamedConstant(crEquivColor).ApplyRGBAColor(cr);
+}
+
+void DiagramWindow::SetCairoToExactFLColor(cairo_t *cr, Fl_Color flc) {
+     if(cr == NULL) {
+          return;
+     }
      CairoColor_t::FromFLColorType(flc).ToOpaque().ApplyRGBAColor(cr);
 }
+
 
 void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int resolution) {
     float centerX = 0.0f;

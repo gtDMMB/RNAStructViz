@@ -16,7 +16,7 @@
 #define INRANGEPCT(alpha)           (alpha >= 0.0 && alpha <= 1.0)
 #define TRUNCPCT(alpha)             ((alpha < 0.0 ? 0.0 : (alpha > 1.0 ? 1.0 : alpha)))
 
-CairoColorSpec_t CairoColor_t::ConvertFromFLColor(const Fl_Color &flColor) const {
+CairoColorSpec_t CairoColor_t::ConvertFromFLColor(const Fl_Color &flColor) {
      switch(flColor) {
           case FL_BLACK:
 	       return CR_BLACK;
@@ -39,7 +39,7 @@ CairoColorSpec_t CairoColor_t::ConvertFromFLColor(const Fl_Color &flColor) const
      }
 } 
 
-Fl_Color CairoColor_t::ConvertToFLColor(CairoColorSpec_t &namedCairoColor) const {
+Fl_Color CairoColor_t::ConvertToFLColor(CairoColorSpec_t &namedCairoColor) {
      switch(namedCairoColor) {
           case CR_BLACK:
 	       return FL_BLACK;
@@ -174,20 +174,23 @@ unsigned int CairoColor_t::ToHexInteger() const {
      return ColorUtil::GetRGBColor(R, G, B);
 }
 
-CairoColor_t & CairoColor_t::FromHexInteger(unsigned int hexColor) {
-     SetRed(ColorUtil::RGBGetRed(hexColor));
-     SetGreen(ColorUtil::RGBGetGreen(hexColor));
-     SetBlue(ColorUtil::RGBGetBlue(hexColor));
-     return *this;
+CairoColor_t CairoColor_t::FromHexInteger(unsigned int hexColor) {
+     CairoColor_t cc(0, 0, 0);
+     cc.SetRed(ColorUtil::RGBGetRed(hexColor));
+     cc.SetGreen(ColorUtil::RGBGetGreen(hexColor));
+     cc.SetBlue(ColorUtil::RGBGetBlue(hexColor));
+     cc.SetAlpha(CAIRO_COLOR_OPAQUE);
+     return cc;
 }
 
-CairoColor_t & CairoColor_t::FromNamedConstant(const CairoColorSpec_t &namedConstant) {
+CairoColor_t CairoColor_t::FromNamedConstant(const CairoColorSpec_t &namedConstant) {
      CairoColor_t namedColor = GetCairoColor(namedConstant);
-     SetRed(namedColor.Red());
-     SetGreen(namedColor.Green());
-     SetBlue(namedColor.Blue());
-     SetAlpha(namedColor.Alpha());
-     return *this;
+     CairoColor_t cc(0, 0, 0);
+     cc.SetRed(namedColor.Red());
+     cc.SetGreen(namedColor.Green());
+     cc.SetBlue(namedColor.Blue());
+     cc.SetAlpha(namedColor.Alpha());
+     return cc;
 }
 
 CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor) {
@@ -297,13 +300,13 @@ CairoColor_t CairoColor_t::ToGrayscale() {
 }
 
 CairoColor_t CairoColor_t::ToTransparent() {
-     CairoColor_t nextColor = *this;
+     CairoColor_t nextColor(*this);
      nextColor.A = CAIRO_COLOR_TRANSPARENT;
      return nextColor;
 }
 
 CairoColor_t CairoColor_t::ToOpaque() {
-     CairoColor_t nextColor = *this;
+     CairoColor_t nextColor(*this);
      nextColor.A = CAIRO_COLOR_OPAQUE;
      return nextColor;
 }

@@ -48,8 +48,8 @@ class CairoContext_t {
                          CR_LIGHT_GRAY  = 16, 
                     } CairoColorSpec_t;
 
-		    CairoColorSpec_t ConvertFromFLColor(const Fl_Color &flColor) const;
-                    Fl_Color ConvertToFLColor(CairoColorSpec_t &namedCairoColor) const;
+		    static CairoColorSpec_t ConvertFromFLColor(const Fl_Color &flColor);
+                    static Fl_Color ConvertToFLColor(CairoColorSpec_t &namedCairoColor);
 
 	       private:
                     CairoRGBA_t R, G, B, A;
@@ -83,8 +83,8 @@ class CairoContext_t {
 		    Fl_Color ToFLColorType() const;
 		    static CairoColor_t FromFLColorType(Fl_Color flColor);
 		    unsigned int ToHexInteger() const;
-		    CairoColor_t & FromHexInteger(unsigned int hexColor);
-                    CairoColor_t & FromNamedConstant(const CairoColorSpec_t &namedConstant);
+		    static CairoColor_t FromHexInteger(unsigned int hexColor);
+                    static CairoColor_t FromNamedConstant(const CairoColorSpec_t &namedConstant);
 
 		    static CairoColor_t GetCairoColor(const CairoColorSpec_t &namedConstant);
 		    static CairoColor_t GetCairoColor(CairoRGBA_t red, CairoRGBA_t green, 
