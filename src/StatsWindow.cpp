@@ -1100,7 +1100,6 @@ void StatsWindow::ComputeStats()
 			statistics[statsIndex].selectivity = 0;
 			statistics[statsIndex].pos_pred_value = 0;
 			
-                        fprintf(stderr, "Alt Seq Len: %d; Ref Seq Len: %d;\n", reference->GetLength(), predicted->GetLength());
 
 			// Compute counts
 			// Go through reference strand, comparing to predicted

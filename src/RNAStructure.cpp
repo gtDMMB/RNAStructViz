@@ -1344,7 +1344,7 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
      }
      FILE *fpOutFile = fopen(outputFilePath, "w+");
      if(fpOutFile == NULL) {
-          fprintf(stderr, "ERROR: Opening export file \"%s\" : $s\n", outputFilePath, strerror(errno));
+          fprintf(stderr, "ERROR: Opening export file \"%s\" : %s\n", outputFilePath, strerror(errno));
 	  return false;
      }
      int bytesWrittenToFile = 0;

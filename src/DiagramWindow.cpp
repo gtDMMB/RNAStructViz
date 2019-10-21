@@ -304,10 +304,6 @@ void DiagramWindow::drawWidgets(cairo_t *crDraw = NULL) {
 	 cairo_rectangle(crDraw, 0, 0, w(), h());
 	 cairo_fill(crDraw);
 	 cairo_restore(crDraw);
-	 //Fl_Color priorColor = fl_color();
-	 //fl_color(GUI_WINDOW_BGCOLOR);
-    	 //fl_rectf(0, 0, w(), h());
-         //fl_color(priorColor);
     }
     Fl_Double_Window::draw();
 

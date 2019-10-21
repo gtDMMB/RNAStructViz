@@ -17,7 +17,7 @@
  */
 #define FL_LOCAL_DARK_GRAY                     (36)
 #define FL_LOCAL_MEDIUM_GREEN                  (60)
-#define FL_LOCAL_DARK_RED                      (88)
+#define FL_LOCAL_DARK_RED                      (64)
 #define FL_LOCAL_BRIGHT_YELLOW                 (93)
 #define FL_LOCAL_LIGHT_PURPLE                  (192)
 #define FL_LOCAL_DEEP_BLUE                     (219)

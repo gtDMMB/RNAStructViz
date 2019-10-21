@@ -22,7 +22,7 @@ class CairoContext_t {
           class CairoColor_t {
 
 	       public:
-		    typedef unsigned short CairoRGBA_t;
+		    typedef uint8_t CairoRGBA_t;
                     static const CairoRGBA_t CAIRO_COLOR_DEFAULT_ALPHA = 0x99;
 		    static const CairoRGBA_t CAIRO_COLOR_TRANSPARENT = 0x00;
 		    static const CairoRGBA_t CAIRO_COLOR_OPAQUE = 0xff;
@@ -46,7 +46,12 @@ class CairoContext_t {
                          CR_SOLID_BLACK = 14,
                          CR_SOLID_WHITE = 15, 
                          CR_LIGHT_GRAY  = 16, 
-                    } CairoColorSpec_t;
+                         CR_MEDIUM_GREEN, 
+			 CR_DARK_RED, 
+			 CR_BRIGHT_YELLOW,
+			 CR_LIGHT_PURPLE,
+			 CR_DEEP_BLUE,
+		    } CairoColorSpec_t;
 
 		    static CairoColorSpec_t ConvertFromFLColor(const Fl_Color &flColor);
                     static Fl_Color ConvertToFLColor(CairoColorSpec_t &namedCairoColor);

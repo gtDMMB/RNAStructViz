@@ -108,22 +108,18 @@ bool DisplayConfigWindow::SetupInitialConfig() {
 		     FL_BLACK
 	     },
 	     {
-		     //FL_BLACK, 
-		     FL_LOCAL_DARK_GRAY,
-		     //FL_RED,
+		     FL_BLACK, 
 		     FL_MAGENTA,
 		     FL_GREEN,
 	     },
 	     {
-		     //FL_BLACK, 
+		     FL_BLACK, 
 		     FL_LOCAL_DEEP_BLUE,
 		     FL_LOCAL_BRIGHT_YELLOW,
-		     FL_LOCAL_DARK_GRAY,
 		     FL_MAGENTA,
 		     FL_GREEN,
 		     FL_RED,
 		     FL_CYAN
-
 	     },
      };
      for(int s = 0; s < 3; s++) {

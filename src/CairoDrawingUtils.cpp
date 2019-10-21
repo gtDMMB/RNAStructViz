@@ -10,6 +10,7 @@
 #include "CairoDrawingUtils.h"
 #include "ConfigOptions.h"
 #include "RNAStructure.h"
+#include "ThemesConfig.h"
 
 #define TRUNCRGBA(comp)             ((comp < 0 ? 0 : \
 			             (comp > CAIRO_COLOR_RGBA_MAXVAL ? CAIRO_COLOR_RGBA_MAXVAL : comp)))
@@ -28,12 +29,24 @@ CairoColorSpec_t CairoColor_t::ConvertFromFLColor(const Fl_Color &flColor) {
 	       return CR_BLUE;
 	  case FL_YELLOW:
 	       return CR_YELLOW;
-	  case CR_MAGENTA:
+	  case FL_MAGENTA:
 	       return CR_MAGENTA;
 	  case FL_CYAN:
 	       return CR_CYAN;
 	  case FL_WHITE:
 	       return CR_WHITE;
+	  case FL_LOCAL_DARK_GRAY:
+	       return CR_LIGHT_GRAY;
+	  case FL_LOCAL_MEDIUM_GREEN:
+	       return CR_MEDIUM_GREEN;
+	  case FL_LOCAL_DARK_RED:
+	       return CR_DARK_RED;
+	  case FL_LOCAL_BRIGHT_YELLOW:
+	       return CR_BRIGHT_YELLOW;
+	  case FL_LOCAL_LIGHT_PURPLE:
+	       return CR_LIGHT_PURPLE;
+	  case FL_LOCAL_DEEP_BLUE:
+	       return CR_DEEP_BLUE;
 	  default:
 	       return CR_UNDEFINED;
      }
@@ -159,14 +172,13 @@ double CairoColor_t::GetAlphaRatio() const {
 }
 
 Fl_Color CairoColor_t::ToFLColorType() const {
-     return ColorUtil::GetRGBColor(R, G, B);
+     return fl_rgb_color(R, G, B);
 }
 
 CairoColor_t CairoColor_t::FromFLColorType(Fl_Color flColor) {
      uchar r, g, b;
      Fl::get_color(flColor, r, g, b);     
-     CairoColor_t crColor(0, 0, 0);
-     crColor.SetRGBA(r, g, b, CAIRO_COLOR_OPAQUE);
+     CairoColor_t crColor(r, g, b, CAIRO_COLOR_OPAQUE);
      return crColor;
 }
 
@@ -227,8 +239,19 @@ CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor
 	    return GetCairoColor(255, 255, 255, 255);
 	case CR_LIGHT_GRAY:
 	    return GetCairoColor(46, 52, 54);
+	case CR_MEDIUM_GREEN:
+	    return GetCairoColor(115, 210, 22);
+	case CR_DARK_RED:
+	    return GetCairoColor(147, 38, 38);
+	case CR_BRIGHT_YELLOW:
+	    return GetCairoColor(252, 233, 79);
+	case CR_LIGHT_PURPLE:
+	    return GetCairoColor(173, 127, 168);
+	case CR_DEEP_BLUE:
+	    return GetCairoColor(2, 32, 75);
 	default:
-            return GetCairoColor(0, 0, 0, 255);
+            fprintf(stderr, "ERROR: Unknown named Cairo color %d\n", namedCairoColor);
+	    return GetCairoColor(245, 121, 0, 128);
     }
 }
 
@@ -300,13 +323,19 @@ CairoColor_t CairoColor_t::ToGrayscale() {
 }
 
 CairoColor_t CairoColor_t::ToTransparent() {
-     CairoColor_t nextColor(*this);
+     CairoColor_t nextColor;
+     nextColor.R = this->R;
+     nextColor.G = this->G;
+     nextColor.B = this->B;
      nextColor.A = CAIRO_COLOR_TRANSPARENT;
      return nextColor;
 }
 
 CairoColor_t CairoColor_t::ToOpaque() {
-     CairoColor_t nextColor(*this);
+     CairoColor_t nextColor; 
+     nextColor.R = this->R;
+     nextColor.G = this->G;
+     nextColor.B = this->B;
      nextColor.A = CAIRO_COLOR_OPAQUE;
      return nextColor;
 }
@@ -350,15 +379,15 @@ Fl_Color CairoContext_t::CairoColor_t::ColorUtil::Contrast(Fl_Color flColor) {
 }
 
 uint32_t CairoContext_t::CairoColor_t::ColorUtil::RGBGetRed(uint32_t rgbHexColor) { 
-     return((rgbHexColor >> ColorUtil::RGBHEX_RED_RSHIFT) & 0x000000ff);
+     return((rgbHexColor & 0xff000000) >> ColorUtil::RGBHEX_RED_RSHIFT);
 }
 
 uint32_t CairoContext_t::CairoColor_t::ColorUtil::RGBGetGreen(uint32_t rgbHexColor) { 
-     return((rgbHexColor >> ColorUtil::RGBHEX_GREEN_RSHIFT) & 0x000000ff);
+     return((rgbHexColor & 0x00ff0000) >> ColorUtil::RGBHEX_GREEN_RSHIFT);
 }
 
 uint32_t CairoContext_t::CairoColor_t::ColorUtil::RGBGetBlue(uint32_t rgbHexColor) { 
-     return((rgbHexColor >> ColorUtil::RGBHEX_BLUE_RSHIFT) & 0x000000ff);
+     return((rgbHexColor & 0x0000ff00) >> ColorUtil::RGBHEX_BLUE_RSHIFT);
 }
 
 uint32_t ColorUtil::RGBHexTupleFromFLColor(Fl_Color flColor) {
