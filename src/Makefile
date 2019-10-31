@@ -30,12 +30,12 @@ TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
-	CXXFLAGS+= -Wno-c++11-narrowing -Wno-c++17-narrowing
-	#CXX=g++-8
-	#LD=g++-8
+	CXXFLAGS+= -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include
+	LDFLAGS+= -L/usr/local/opt/openssl/lib
 else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=readlink
+	CXXFLAGS+= -I/usr/include
 	LDFLAGS+= -Wl,--no-as-needed
 endif
 
@@ -64,7 +64,7 @@ CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS)
 
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
-LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG)
+LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto
 LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = \
@@ -128,7 +128,7 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 gitadd:
 	git add ./*.{c,cpp,h} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
 
-BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h BaseSequenceIDs.cpp
+BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h TerminalPrinting.h BaseSequenceIDs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c BaseSequenceIDs.cpp
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
@@ -201,7 +201,7 @@ RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
 
 StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
 	FolderWindow.h MainWindow.h RNAStructViz.h InputWindow.h\
-	RNAStructure.h StructureManager.cpp
+	RNAStructure.h TerminalPrinting.h StructureManager.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp
 
 TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h TerminalPrinting.cpp

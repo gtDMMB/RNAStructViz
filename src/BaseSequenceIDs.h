@@ -23,18 +23,23 @@
 
 #define FOLDER_NAME_DIVIDER                     (" -- ")
 #define DEFAULT_STICKY_FOLDERNAME_CFGFILE       ("sequence-folder-names.dat")
+#define GetStickyFolderConfigPath(cfgFile)      ((USER_CONFIG_DIR + string(cfgFile)).c_str())
+
+#define BSHASH_BYTES                            (48)
+std::string HashBaseSequence(const char *baseSeq); 
 
 char * LookupStickyFolderNameForSequence(const char *cfgFilePath, const char *baseSeqSpec);
-char * LookupStickyFolderNameForSequence(const char *cfgFilePath, const RNAStructure *rnaStructSpec);
+char * LookupStickyFolderNameForSequence(const char *cfgFilePath, RNAStructure *rnaStructSpec);
 char * LookupStickyFolderNameForSequence(const char *cfgFilePath, off_t fnameFileOffset);
 
 #define LSEEK_NOT_FOUND                         ((off_t) -1)
 
-off_t FolderNameForSequenceExists(const char *baseSeqSpec);
-off_t FolderNameForSequenceExists(const RNAStructure *rnaStructSpec);
+off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSpec);
+off_t FolderNameForSequenceExists(const char *cfgFilePath, RNAStructure *rnaStructSpec);
 
 std::string ExtractSequenceNameFromButtonLabel(const char *buttonLabel);
-int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string folderName, 
+int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, 
+		                     std::string baseSeq, std::string folderName, 
 		                     off_t replacePos = LSEEK_NOT_FOUND);
 
 typedef enum {
@@ -44,7 +49,7 @@ typedef enum {
      FILETYPE_BPSEQ,
      FILETYPE_GTB,
      FILETYPE_HLXTRIPLE,
-     FILETYPE_FASTA,
+     FILETYPE_NONE,
 } InputFileTypeSpec;
 
 InputFileTypeSpec ClassifyInputFileTypeByExtension(const char *fileExt);

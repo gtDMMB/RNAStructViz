@@ -12,6 +12,7 @@
 #include "RNAStructViz.h"
 #include "InputWindow.h"
 #include "BaseSequenceIDs.h"
+#include "TerminalPrinting.h"
 
 StructureManager::StructureManager()
     : m_structureCount(0), m_structures(0) {}
@@ -157,9 +158,13 @@ void StructureManager::AddFile(const char* filename)
 			  std::string seqFolderUniqueName = ExtractSequenceNameFromButtonLabel(
 					                         input_window->getName()
 						            );
-			  off_t existingEntry = FolderNameForSequenceExists(baseSeq);
-			  int saveStatus = SaveStickyFolderNametoConfigFile(
+			  off_t existingEntry = FolderNameForSequenceExists(
+					             DEFAULT_STICKY_FOLDERNAME_CFGFILE,
+					             baseSeq
+						);
+			  int saveStatus = SaveStickyFolderNameToConfigFile(
 			       DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+			       std::string(baseSeq), 
 			       seqFolderUniqueName, 
 			       existingEntry
 			  );

@@ -95,7 +95,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    cbUseDefaultNames->value(GUI_USE_DEFAULT_FOLDER_NAMES);
 	    const char *stickyFoldersCBText = "Save folder names for known organisms";
-	    cbKeepStickyFolders = new Fl_CheckButton(30, 145, 375, 30, stickyFoldersCBText);
+	    cbKeepStickyFolders = new Fl_Check_Button(30, 145, 375, 30, stickyFoldersCBText);
             cbKeepStickyFolders->box(FL_ROUND_UP_BOX);
 	    cbKeepStickyFolders->color(GUI_BGCOLOR);
 	    cbKeepStickyFolders->labelcolor(GUI_BTEXT_COLOR);

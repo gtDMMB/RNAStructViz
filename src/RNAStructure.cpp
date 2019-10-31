@@ -381,7 +381,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      }
      fclose(fpDotBracketFile);
      if(!haveBaseData || !havePairData || strlen(baseDataBuf) != strlen(pairingDataBuf)) {
-	  TerminalText::PrintError(Error parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
+	  TerminalText::PrintError("Problem parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
 	  return NULL;
      }
      int seqLength = strlen(baseDataBuf);
@@ -839,12 +839,15 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
           return m_suggestedFolderName;
      }
      else if(GUI_KEEP_STICKY_FOLDER_NAMES && 
-	     (savedFolderNameFileOffset = FolderNameForSequenceExists(this)) != LSEEK_NOT_FOUND) {
+	     (savedFolderNameFileOffset = 
+	      FolderNameForSequenceExists(DEFAULT_STICKY_FOLDERNAME_CFGFILE, this)) != LSEEK_NOT_FOUND) {
           m_suggestedFolderName = LookupStickyFolderNameForSequence(
 			               DEFAULT_STICKY_FOLDERNAME_CFGFILE,
 				       savedFolderNameFileOffset
 				  );
-	  return m_suggestedFolderName;
+	  if(m_suggestedFolderName != NULL && m_suggestedFolderName[0] != '\0') {
+	       return m_suggestedFolderName;
+	  }
      }
      else {
           m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
