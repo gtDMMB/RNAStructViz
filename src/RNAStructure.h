@@ -168,6 +168,7 @@ class RNAStructure
         const char* GetFilename() const;
         const char* GetFilenameNoExtension();
 	const char* GetInitialFileComment() const;
+	void SetFileCommentLines(std::string commentLineData);
 	const char* GetSuggestedStructureFolderName();
 
         /*

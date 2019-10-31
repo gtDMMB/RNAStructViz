@@ -1,14 +1,17 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include <FL/fl_ask.H>
+
 #include "StructureManager.h"
 #include "FolderStructure.h"
 #include "FolderWindow.h"
 #include "MainWindow.h"
 #include "RNAStructViz.h"
 #include "InputWindow.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "BaseSequenceIDs.h"
 
 StructureManager::StructureManager()
     : m_structureCount(0), m_structures(0) {}
@@ -147,8 +150,25 @@ void StructureManager::AddFile(const char* filename)
 	             }
                  }
                         
-                 if(strcmp(input_window->getName(), ""))
+                 if(strcmp(input_window->getName(), "")) {
             	     strcpy(folders[count]->folderName, input_window->getName());
+		     if(GUI_KEEP_STICKY_FOLDER_NAMES) {
+                          const char *baseSeq = structure->GetSequenceString();
+			  std::string seqFolderUniqueName = ExtractSequenceNameFromButtonLabel(
+					                         input_window->getName()
+						            );
+			  off_t existingEntry = FolderNameForSequenceExists(baseSeq);
+			  int saveStatus = SaveStickyFolderNametoConfigFile(
+			       DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+			       seqFolderUniqueName, 
+			       existingEntry
+			  );
+			  if(saveStatus) {
+			       TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
+					                  seqFolderUniqueName.c_str());
+			  }
+		     }
+		 }
 
                  MainWindow::AddFolder(folders[count]->folderName, count, false);
 	         delete input_window;

@@ -15,6 +15,7 @@
 #include "RNAStructViz.h"
 #include "StructureManager.h"
 #include "FolderStructure.h"
+#include "BaseSequenceIDs.h"
 
 int InputWindow::distinctStructureCount = 0;
 
@@ -62,7 +63,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
     }
     else if(type == InputWindow::FOLDER_INPUT) {    
 	    std::string actualStructName = 
-		        ExtractStructureNameFromCTName(defaultName);
+		        ExtractStructureNameFromFile(defaultName);
             const char *actualStructNameCStr = actualStructName.c_str();
             strncpy(inputText, actualStructNameCStr, actualStructName.size() + 1);
             ConfigParser::nullTerminateString(inputText, actualStructName.size());
@@ -92,6 +93,15 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
 	    cbUseDefaultNames->down_color(GUI_WINDOW_BGCOLOR);
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	    cbUseDefaultNames->value(GUI_USE_DEFAULT_FOLDER_NAMES);
+	    const char *stickyFoldersCBText = "Save folder names for known organisms";
+	    cbKeepStickyFolders = new Fl_CheckButton(30, 145, 375, 30, stickyFoldersCBText);
+            cbKeepStickyFolders->box(FL_ROUND_UP_BOX);
+	    cbKeepStickyFolders->color(GUI_BGCOLOR);
+	    cbKeepStickyFolders->labelcolor(GUI_BTEXT_COLOR);
+	    cbKeepStickyFolders->down_color(GUI_WINDOW_BGCOLOR);
+	    cbKeepStickyFolders->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	    cbKeepStickyFolders->value(GUI_KEEP_STICKY_FOLDER_NAMES);
 	    callback(CloseCallback);
 	}
         else { 
@@ -139,9 +149,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
 
 InputWindow::~InputWindow() {
     delete input;
-    if(cbUseDefaultNames != NULL) {
-        delete cbUseDefaultNames;
-    }
+    Delete(cbUseDefaultNames);
+    Delete(cbKeepStickyFolders);
     free(inputText);
 }
 
@@ -176,6 +185,9 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
         if(window->cbUseDefaultNames->value()) {
             GUI_USE_DEFAULT_FOLDER_NAMES = true;
         }
+	if(window->cbKeepStickyFolders->value()) {
+	    GUI_KEEP_STICKY_FOLDER_NAMES = true;
+	}
     }    
     free(window->string);
     window->hide();
@@ -208,14 +220,22 @@ void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
      iwin->hide();
 }
 
-std::string InputWindow::ExtractStructureNameFromCTName(const char *ctPath) {
+std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
     RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
-	                      LookupStructureByCTPath(ctPath);
-    const char *suggestedFolderName = rnaStruct ? rnaStruct->GetSuggestedStructureFolderName() : NULL;
-    const char *folderNumberDivider = suggestedFolderName ? " -- " : "";
+	                      LookupStructureByCTPath(seqFilePath);
+    InputFileTypeSpec inputFileType = ClassifyInputFileType(seqFilePath);
+    std::string fileHeaderLines = GetSequenceFileHeaderLines(seqFilePath, inputFileType);
+    if(fileHeaderLines.size() > 0) {
+         rnaStruct->SetFileCommentLines(fileHeaderLines);
+    }
+    const char *suggestedFolderName = rnaStruct ? 
+	                              rnaStruct->GetSuggestedStructureFolderName() : NULL;
+    const char *folderNumberDivider = suggestedFolderName ? FOLDER_NAME_DIVIDER : "";
     char suggestedShortName[MAX_BUFFER_SIZE];
-    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d%s%s\0", ++InputWindow::distinctStructureCount, 
+    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d%s%s", 
+	     ++InputWindow::distinctStructureCount, 
 	     folderNumberDivider, suggestedFolderName ? suggestedFolderName : "");
+    suggestedShortName[MAX_BUFFER_SIZE - 1] = '\0';
     return std::string(suggestedShortName);
 }
 

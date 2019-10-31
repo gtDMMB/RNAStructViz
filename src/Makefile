@@ -164,7 +164,9 @@ StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
 GLWindow.$(OBJEXT): GLWindow.h
 	$(CXX) $(CXXFLAGS_FULL) -c GLWindow.cpp
 
-InputWindow.$(OBJEXT): InputWindow.h InputWindow.cpp
+InputWindow.$(OBJEXT): InputWindow.h MainWindow.h ConfigOptions.h \
+	ConfigParser.h RNAStructViz.h StructureManager.h \
+	FolderStructure.h BaseSequenceIDs.h InputWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
 
 Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
@@ -189,7 +191,7 @@ RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h
 
 RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
 	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c\
-	ThemesConfig.h TerminalPrinting.h RNAStructure.cpp
+	ThemesConfig.h TerminalPrinting.h BaseSequenceIDs.h RNAStructure.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
 
 RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\

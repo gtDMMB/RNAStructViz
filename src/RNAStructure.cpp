@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include <fstream>
 #include <vector>
@@ -15,6 +16,7 @@ using std::stack;
 #include "ConfigOptions.h"
 #include "ThemesConfig.h"
 #include "TerminalPrinting.h"
+#include "BaseSequenceIDs.h"
 
 #if PERFORM_BRANCH_TYPE_ID
 #include "BranchTypeIdentification.h"
@@ -53,7 +55,7 @@ RNAStructure & RNAStructure::operator=(const RNAStructure &rhs) {
 }
 
 void RNAStructure::copyRNAStructure(const RNAStructure &rnaStruct) { 
-     fprintf(stderr, "TODO: NOT YET IMPLEMENTED!!\n");
+     TerminalText::PrintInfo("TODO: NOT YET IMPLEMENTED!!\n");
 }
 
 RNAStructure::~RNAStructure()
@@ -80,7 +82,7 @@ RNAStructure::~RNAStructure()
     }
     #endif
     DeleteContentWindow();
-    Delete(m_fileCommentLine); m_fileCommentLine = NULL;
+    Free(m_fileCommentLine); m_fileCommentLine = NULL;
     Delete(m_suggestedFolderName); m_suggestedFolderName = NULL;
 }
 
@@ -111,11 +113,11 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     {
 		if (strlen(filename) > 1000)
 		{
-		    fprintf(stderr, "Unable to open file: <file name too long>");
+		    TerminalText::PrintError("Unable to open file: <file name too long>");
 		}
 		else
 		{
-		    fprintf(stderr, "Unable to open file: %s", filename);
+		    TerminalText::PrintError("Unable to open file: %s", filename);
 		}
 		inStream.close();
 		return 0;
@@ -185,15 +187,17 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
 			    break;
 		    default: {
 			    if (strlen(filename) > 980)
-		    	{
-			        fprintf(stderr, "Bad base: id %d, <file name too long>", result->m_sequenceLength + 1);
+		    	    {
+				TerminalText::PrintError("Bad base: id %d, <file name too long>", 
+						         result->m_sequenceLength + 1);
 			    }
 			    else
 			    {
-			        fprintf(stderr, "Bad base: id %d, file %s", result->m_sequenceLength + 1, filename);
+				TerminalText::PrintError("Bad base: id %d, file %s", 
+						         result->m_sequenceLength + 1, filename);
 			    }
 			    delete result;
-		    	inStream.close();
+		    	    inStream.close();
 			    return 0;
 		    }
 		}
@@ -204,12 +208,13 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
 		    {
 				if (strlen(filename) > 980)
 				{
-				    fprintf(stderr, "Bad prev id: id %d, <file name too long>", result->m_sequenceLength + 1);
+			             TerminalText::PrintError("Bad prev id: id %d, <file name too long>", 
+							      result->m_sequenceLength + 1);
 				}
 				else
 				{
-				    fprintf(stderr, "Bad prev id: id %d, file %s", 
-				    	    result->m_sequenceLength + 1, filename);
+			             TerminalText::PrintError("Bad prev id: id %d, file %s", 
+				    	                      result->m_sequenceLength + 1, filename);
 				}
 				delete result;
 				inStream.close();
@@ -220,13 +225,13 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
 		    {
 				if (strlen(filename) > 980) 
 				{
-				    fprintf(stderr, "Bad next id: id %d, <file name too long>", 
-				    	    result->m_sequenceLength + 1);
+				    TerminalText::PrintError("Bad next id: id %d, <file name too long>", 
+				    	                     result->m_sequenceLength + 1);
 				}
 				else
 				{
-				    fprintf(stderr, "Bad next id: id %d, file %s", 
-				    	    result->m_sequenceLength + 1, filename);
+				    TerminalText::PrintError("Bad next id: id %d, file %s", 
+				    	                     result->m_sequenceLength + 1, filename);
 				}
 				delete result;
 				inStream.close();
@@ -238,13 +243,13 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
 		{
 		    if (strlen(filename) > 980) 
 		    {
-				fprintf(stderr, "Bad pair: id %d, <file name too long>", 
-					result->m_sequenceLength + 1);
+			    TerminalText::PrintError("Bad pair: id %d, <file name too long>", 
+					             result->m_sequenceLength + 1);
 		    }
 		    else
 		    {
-				fprintf(stderr, "Bad pair: id %d, file %s", 
-					result->m_sequenceLength + 1, filename);
+			    TerminalText::PrintError("Bad pair: id %d, file %s", 
+					             result->m_sequenceLength + 1, filename);
 		    }
 		    delete result;
 		    inStream.close();
@@ -266,13 +271,13 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
 		    {
 				if (strlen(filename) > 980)
 				{
-				    fprintf(stderr, "Bad trailing id: id %d, <file name too long>", 
-				    	    result->m_sequenceLength + 1);
+				    TerminalText::PrintError("Bad trailing id: id %d, <file name too long>", 
+				    	                     result->m_sequenceLength + 1);
 				}
 				else
 				{
-				    fprintf(stderr, "Bad trailing id: id %d, file %s", 
-				    	    result->m_sequenceLength + 1, filename);
+				    TerminalText::PrintError("Bad trailing id: id %d, file %s", 
+				    	                     result->m_sequenceLength + 1, filename);
 				}
 				delete result;
 				inStream.close();
@@ -293,9 +298,9 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     if (result->m_sequenceLength == 0)
     {
 		if (strlen(filename) > 990) 
-		    fprintf(stderr, "Empty or malformed file: <file name too long>");
+		    TerminalText::PrintError("Empty or malformed file: <file name too long>");
 		else
-		    fprintf(stderr, "Empty or malformed file: %s", filename);
+		    TerminalText::PrintError("Empty or malformed file: %s", filename);
 		delete result;
 		return 0;
     }
@@ -339,7 +344,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      
      FILE *fpDotBracketFile = fopen(filename, "r+");
      if(fpDotBracketFile == NULL) {
-          fprintf(stderr, "ERROR: Opening file \"%s\" : %s\n", filename, strerror(errno));
+         TerminalText::PrintError("Opening file \"%s\" : %s\n", filename, strerror(errno));
      }
      char lineBuf[MAX_SEQUENCE_SIZE + 1];
      char baseDataBuf[MAX_SEQUENCE_SIZE + 1], pairingDataBuf[MAX_SEQUENCE_SIZE + 1];
@@ -350,10 +355,10 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 	       break;
 	  }
 	  else if(lineReturn == NULL) {
-	       fprintf(stderr, "ERROR: Reading DotBracket file \"%s\" : %s\n", filename, strerror(errno));
+	       TerminalText::PrintError("Reading DotBracket file \"%s\" : %s\n", filename, strerror(errno));
 	       break;
 	  }
-	  fprintf(stderr, "LINE: [%s]\n", lineReturn);
+	  TerminalText::PrintError("ON LINE: [%s]\n", lineReturn);
 	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
 	       continue;
 	  }
@@ -376,7 +381,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      }
      fclose(fpDotBracketFile);
      if(!haveBaseData || !havePairData || strlen(baseDataBuf) != strlen(pairingDataBuf)) {
-          fprintf(stderr, "ERROR: Error parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
+	  TerminalText::PrintError(Error parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
 	  return NULL;
      }
      int seqLength = strlen(baseDataBuf);
@@ -428,7 +433,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 	       pairedBaseData->m_pair = baseIdx;
 	  }
 	  else {
-               fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+               TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
 		       pairingDataBuf[bufIdx]);
 	       Delete(rnaStruct);
 	       return NULL;
@@ -436,7 +441,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 	  baseIdx++;
      }
      if(unpairedBasePairs.size() > 0) {
-          fprintf(stderr, "ERROR: DOT parser syntax error; There are unpaired open braces remaining ...\n");
+          TerminalText::PrintError("DOT parser syntax error; There are unpaired open braces remaining ...\n");
 	  Delete(rnaStruct);
 	  return NULL;
      }
@@ -467,7 +472,7 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
      
      FILE *fpDotBracketFile = fopen(filename, "r+");
      if(fpDotBracketFile == NULL) {
-          fprintf(stderr, "ERROR: Opening file \"%s\" : %s\n", filename, strerror(errno));
+          TerminalText::PrintError("Opening file \"%s\" : %s\n", filename, strerror(errno));
      }
      char lineBuf[MAX_SEQUENCE_SIZE + 1];
      char baseDataBuf[MAX_SEQUENCE_SIZE + 1], pairingDataBuf[MAX_SEQUENCE_SIZE + 1];
@@ -480,7 +485,7 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
 	       break;
 	  }
 	  else if(lineReturn == NULL) {
-	       fprintf(stderr, "ERROR: Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
+	       TerminalText::PrintError("Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
 	       break;
 	  }
 	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
@@ -546,7 +551,7 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
 	            pairedBaseData->m_pair = baseIdx;
 	       }
 	       else {
-                    fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+                    TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
 		            pairingDataBuf[baseIdx]);
 	            Delete(rnaStruct);
 	            for(int s = 0; s < *arrayCount; s++) { 
@@ -611,7 +616,7 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
      
      FILE *fpHelixFile = fopen(filename, "r+");
      if(fpHelixFile == NULL) {
-          fprintf(stderr, "ERROR: Opening file \"%s\" : %s\n", filename, strerror(errno));
+          TerminalText::PrintError("Opening file \"%s\" : %s\n", filename, strerror(errno));
      }
      char lineBuf[MAX_SEQUENCE_SIZE + 1];
      char baseDataBuf[MAX_SEQUENCE_SIZE + 1], pairingDataBuf[MAX_SEQUENCE_SIZE + 1];
@@ -624,7 +629,7 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 	       break;
 	  }
 	  else if(lineReturn == NULL) {
-	       fprintf(stderr, "ERROR: Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
+	       TerminalText::PrintError("Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
 	       break;
 	  }
 	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
@@ -642,14 +647,14 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 	       continue;
 	  }
 	  else if(!haveBaseData) {
-	       fprintf(stderr, "ERROR: Unable to parse helix triple file line \"%s\"\n", lineBuf);
+	       TerminalText::PrintError("Unable to parse helix triple file line \"%s\"\n", lineBuf);
                parserError = true;
 	       break;
 	  }
 	  char *commaSplice = strchr(lineBuf, ','); 
 	  do {
 	       if(commaSplice && ++commaSplice && *commaSplice == '\0') {
-	            fprintf(stderr, "ERROR: Unexpected comma delimiter\n");
+	            TerminalText::PrintError("Unexpected comma delimiter\n");
 		    parserError = true;
 		    break;
 	       }
@@ -667,7 +672,7 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 	       int i, j, k;
 	       int helixParseStatus = sscanf(helixDataBuf, "%d %d %d", &i, &j, &k);
 	       if(helixParseStatus != 3) {
-                    fprintf(stderr, "ERROR: Error parsing helix triple \"%s\" : %s\n", 
+                    TerminalText::PrintError("Error parsing helix triple \"%s\" : %s\n", 
 			    helixDataBuf, strerror(helixParseStatus));
 		    parserError = true;
 		    break;
@@ -733,7 +738,7 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 	       pairedBaseData->m_pair = baseIdx;
 	  }
 	  else {
-               fprintf(stderr, "ERROR: Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+               TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
 		       pairingDataBuf[baseIdx]);
 	       Delete(rnaStruct);
 	       for(int s = 0; s < *arrayCount; s++) { 
@@ -816,10 +821,30 @@ const char* RNAStructure::GetFilenameNoExtension() {
 const char* RNAStructure::GetInitialFileComment() const {
      return m_fileCommentLine;
 }
+
+void RNAStructure::SetFileCommentLines(std::string commentLineData) {
+     if(m_fileCommentLine != NULL) {
+          Free(m_fileCommentLine);
+     }
+     int clineDataLen = strlen(commentLineData.c_str());
+     m_fileCommentLine = (char *) malloc((clineDataLen + 1) * sizeof(char));
+     strncpy(m_fileCommentLine, commentLineData.c_str(), clineDataLen);
+     m_fileCommentLine[clineDataLen] = '\0';
+}
+
 const char* RNAStructure::GetSuggestedStructureFolderName() {
      
+     off_t savedFolderNameFileOffset = LSEEK_NOT_FOUND;
      if(m_suggestedFolderName) { // we have already computed this data:
           return m_suggestedFolderName;
+     }
+     else if(GUI_KEEP_STICKY_FOLDER_NAMES && 
+	     (savedFolderNameFileOffset = FolderNameForSequenceExists(this)) != LSEEK_NOT_FOUND) {
+          m_suggestedFolderName = LookupStickyFolderNameForSequence(
+			               DEFAULT_STICKY_FOLDERNAME_CFGFILE,
+				       savedFolderNameFileOffset
+				  );
+	  return m_suggestedFolderName;
      }
      else {
           m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
@@ -1343,7 +1368,7 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
      }
      FILE *fpOutFile = fopen(outputFilePath, "w+");
      if(fpOutFile == NULL) {
-          fprintf(stderr, "ERROR: Opening export file \"%s\" : %s\n", outputFilePath, strerror(errno));
+          TerminalText::PrintError("Opening export file \"%s\" : %s\n", outputFilePath, strerror(errno));
 	  return false;
      }
      int bytesWrittenToFile = 0;

@@ -69,6 +69,7 @@
      volatile Fl_Color STRUCTURE_DIAGRAM_COLORS[3][7];
 
      bool GUI_USE_DEFAULT_FOLDER_NAMES;
+     bool GUI_KEEP_STICKY_FOLDER_NAMES;
      bool DEBUGGING_ON;
      bool DISPLAY_FIRSTRUN_MESSAGE;
 
@@ -129,6 +130,7 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      }
 
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
+     GUI_KEEP_STICKY_FOLDER_NAMES = true;
      DEBUGGING_ON = false;
      DISPLAY_FIRSTRUN_MESSAGE = true;
 

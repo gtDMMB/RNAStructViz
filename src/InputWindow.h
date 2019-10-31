@@ -77,11 +77,12 @@ class InputWindow : public Fl_Window
         static void DisplayCTFileCallback(Fl_Widget *w, void *udata);
 	static void CancelCallback(Fl_Widget *w, void *udata);
 
-	static std::string ExtractStructureNameFromCTName(const char *ctPath);
+	static std::string ExtractStructureNameFromFile(const char *ctPath);
 
     private:
         Fl_Input *input; // Text field where the user types in the input
         Fl_Check_Button *cbUseDefaultNames;
+	Fl_Check_Button *cbKeepStickyFolders;
 	Fl_Choice *ctFileChooser;
 	InputWindowType windowType;
 	char *name; // The input; if the user types nothing, is the empty string
