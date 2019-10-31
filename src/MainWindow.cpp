@@ -3,6 +3,7 @@
 #include "DisplayConfigWindow.h"
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
+#include "CommonDialogs.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -70,6 +71,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	    helpButton->labeltype(_FL_ICON_LABEL);
 	    helpButton->shortcut(FL_CTRL + 'h');
 	    helpButton->box(FL_NO_BOX);
+	    helpButton->copy_tooltip("Click for help");
 	    helpButton->callback(HelpButtonCallback);
             helpButton->redraw();
 
@@ -86,6 +88,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	    infoButton->labeltype(_FL_ICON_LABEL);
 	    infoButton->shortcut(FL_CTRL + 'i');
 	    infoButton->box(FL_NO_BOX);
+	    infoButton->copy_tooltip("Click for information about RNAStructViz");
 	    infoButton->callback(InfoButtonCallback);
             infoButton->redraw();
 
@@ -221,50 +224,7 @@ MainWindow* MainWindow::GetInstance() {
 }
 
 void MainWindow::DisplayFirstTimeUserInstructions() {
- 
-     const char *instTextBuffer[] = {
-          "Welcome to RNAStructViz!\n\n", 
-	  "A user manual is available on the project WIKI:\n", 
-	  "https://github.com/gtDMMB/RNAStructViz/wiki\n\n",
-	  "Instructions to help new users first running the application\n", 
-	  "is found online at:\n",  
-	  "https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions\n\n", 
-	  "You can turn off this message when RNAStructViz launches by clicking\n" 
-	  "the \"Do not show again\" button below.\n", 
-	  "If you need help while running RNAStructViz, click on the help button\n", 
-	  "(circled question mark) at the top-right corner of the left main window pane.\n\n"
-	  "Thank you for using our application!" 
-     };
-     char fullInstText[4 * MAX_BUFFER_SIZE];
-     fullInstText[0] = '\0';
-     for(int bufline = 0; bufline < GetArrayLength(instTextBuffer); bufline++) {
-          strcat(fullInstText, instTextBuffer[bufline]); 
-     }
-     fl_message_title("Welcome to RNAStructViz ...");
-     fl_message_icon()->image(MainWindow::helpIconImage);
-     fl_message_icon()->label("");
-     fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));
-     fl_message_icon()->box(FL_NO_BOX);
-     fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-     int userHelpSelection = fl_choice(fullInstText, 
-		                       "Copy First-Time Launch Link", "Dismiss", 
-				       "Do not show again");
-     switch(userHelpSelection) {
-	  case 0: {
-               const char *firstTimeRunLink = 
-		           "https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions";
-	       Fl::copy(firstTimeRunLink, strlen(firstTimeRunLink), 1, Fl::clipboard_plain_text);
-	       break;
-          }
-	  case 2: {
-               DISPLAY_FIRSTRUN_MESSAGE = false;
-	       ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
-	       break;
-	  }
-	  default:
-	       break;
-     }
-
+     CommonDialogs::DisplayFirstRunInstructions();
 }
 
 void MainWindow::AddFolder(const char* foldername, const int index, 
@@ -354,6 +314,12 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 
 }
 
+void MainWindow::OpenFileCallback() {
+     if(MainWindow::ms_instance != NULL) {
+          MainWindow::OpenFileCallback(NULL, NULL);
+     }
+}
+
 void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
      DisplayConfigWindow *cfgWindow = new DisplayConfigWindow(); 
      cfgWindow->show();
@@ -362,89 +328,23 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
      delete cfgWindow;
 }
 
+void MainWindow::ConfigOptionsCallback() {
+     if(MainWindow::ms_instance != NULL) {
+          MainWindow::ConfigOptionsCallback(NULL, NULL);
+     }
+}
+
 void MainWindow::TestCallback(Fl_Widget* widget, void* userData)
 {
     RNAStructViz::GetInstance()->TestFolders();
 }
 
 void MainWindow::HelpButtonCallback(Fl_Widget *btn, void *udata) {
-     
-     const char *helpTextBuffer[] = {
-          "A detailed user manual is available on the project WIKI:\n", 
-	  "https://github.com/gtDMMB/RNAStructViz/wiki\n\n", 
-	  "Diagnostic information about the application can be obtained by\n", 
-	  "running: RNAStructViz --about\n\n",
-	  "If you are new to RNAStructViz, see the following link:\n"
-	  "https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions"
-     };
-     char fullHelpText[4 * MAX_BUFFER_SIZE];
-     fullHelpText[0] = '\0';
-     for(int bufline = 0; bufline < GetArrayLength(helpTextBuffer); bufline++) {
-          strcat(fullHelpText, helpTextBuffer[bufline]); 
-     }
-     fl_message_title("RNAStructViz Help ...");
-     fl_message_icon()->image(MainWindow::helpIconImage);
-     fl_message_icon()->label("");
-     fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));
-     fl_message_icon()->box(FL_NO_BOX);
-     fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-     int userHelpSelection = fl_choice(fullHelpText, "Copy WIKI Link", 
-		                       "Copy First-Time Launch Link", "OK", NULL);
-     switch(userHelpSelection) {
-          case 0: { // copy the WIKI link to the clipboard:
-               const char *wikiLink = "https://github.com/gtDMMB/RNAStructViz/wiki";
-               Fl::copy(wikiLink, strlen(wikiLink), 1, Fl::clipboard_plain_text);
-	       break;
-          }
-	  case 1: {
-               const char *firstTimeRunLink = 
-		           "https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions";
-	       Fl::copy(firstTimeRunLink, strlen(firstTimeRunLink), 1, Fl::clipboard_plain_text);
-	       break;
-          }
-	  default:
-	       break;
-     }
-
+     CommonDialogs::DisplayHelpDialog();
 }
 
 void MainWindow::InfoButtonCallback(Fl_Widget *btn, void *udata) {
-     
-     string infoWelcomeMsg = string("The next table summarizes the compile time data associated with this build \nof RNAStructViz, ") + 
-	                     string("e.g., GitHub revision information for the souce code and key library versions.\n\n");
-     string infoTableOrigData[] = {
-	   ApplicationBuildInfo::GitRevisionInfo(), 
-	   ApplicationBuildInfo::GitRevisionDate(), 
-	   ApplicationBuildInfo::FLTKVersionString(), 
-	   ApplicationBuildInfo::BuildFLTKConfig(), 
-	   ApplicationBuildInfo::CairoVersionString(), 
-	   ApplicationBuildInfo::BuildPlatform(), 
-	   ApplicationBuildInfo::LocalBuildDateTime(),
-     };
-     string spaces = string("...............................................................");
-     int tableHeaderWidth = 25;
-     string infoMsg = infoWelcomeMsg;
-     for(int data = 0; data < GetArrayLength(infoTableOrigData); data++) {
-          string curInfoStr = infoTableOrigData[data];
-	  size_t headerPos = curInfoStr.find_first_of(":");
-	  string headerPrefix = curInfoStr.substr(0, headerPos);
-	  string tableData = curInfoStr.substr(headerPos + 2);
-	  string headerSpacing = spaces.substr(0, MAX(0, tableHeaderWidth - headerPrefix.length()));
-	  char fullLineData[MAX_BUFFER_SIZE];
-	  snprintf(fullLineData, MAX_BUFFER_SIZE - 1, "> %s %s %s\n", headerPrefix.c_str(), headerSpacing.c_str(), tableData.c_str());
-	  fullLineData[MAX_BUFFER_SIZE - 1] = '\0';
-          infoMsg += string(fullLineData);
-     }
-
-     fl_message_title("About the Application (RNAStructViz Build Information)");
-     fl_message_icon()->image(MainWindow::infoButtonImage);
-     fl_message_icon()->label("");
-     fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));
-     fl_message_icon()->box(FL_NO_BOX);
-     fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-     fl_message_font(FL_SCREEN, 12);
-     fl_message(infoMsg.c_str());
-
+     CommonDialogs::DisplayInfoAboutDialog();
 }
 
 void MainWindow::CollapseMainMenu()

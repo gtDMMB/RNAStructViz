@@ -17,10 +17,10 @@
 #include <vector>
 #include <string>
 
+#include "ConfigOptions.h"
+
 class RNABranchType_t;
 
-#define MAX(x, y)                    (x <= y ? (y) : (x))
-#define MIN(x, y)                    (x <= y ? (x) : (y))
 #define MIN3(x, y, z)                MIN(x, MIN(y, z))
 #define ABS(x)                       (x >= 0 ? (x) : -1 * (x))
 

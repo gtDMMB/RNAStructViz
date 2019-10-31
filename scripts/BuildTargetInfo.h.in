@@ -15,8 +15,8 @@
      #define __TARGETOS_APPLE__
      #define TARGETOS "Mac/OSX"
      #define __APPLE__
-     /* Mac OSX apparently does not support the strchrnul function: */
      #include <string.h>
+     /* Mac OSX apparently does not support the strchrnul function: */
      static inline char* strchrnul(const char *s, int ch) {
           if(s == NULL) {
                return NULL;
@@ -27,7 +27,7 @@
                return (char *) (s + slen);
 	  }
           return strchrResult;
-     }	  
+     }	   
 #endif
 
 #ifdef TARGETOS_GENERIC_UNIX
@@ -48,10 +48,13 @@
      #define __STDC_NO_THREADS__ (1)
 #endif
 
-#define FLTK_USE_CAIRO 1
+#define FLTK_USE_CAIRO  1
 #define FLTK_HAVE_CAIRO 1
 
-#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.7.4-testing -- RNA Secondary Structure Comparison Multi-Tool")
+//#define ERRORS_TO_ISO8859_1   1      /* FLTK Unicode character encoding */
+//#define ERRORS_TO_CP1252      1
+
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.7.5-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
@@ -138,7 +141,7 @@ class ApplicationBuildInfo {
 			  BuildFLTKConfig().c_str(),  
 			  CairoVersionString().c_str(), BuildPlatform().c_str(), 
 			  LocalBuildDateTime().c_str());
-	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. New issues with the application can be submitted at https://github.com/gtDMMB/RNAStructViz/issues.";
+	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. New issues with the application can be submitted by following the instructions at https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors.";
 	       fprintf(whichOut, "BUG REPORT INFORMATION:\n**%s**\n", bugReportMsg);
 	  }
 

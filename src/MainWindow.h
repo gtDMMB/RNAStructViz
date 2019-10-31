@@ -98,9 +98,15 @@ class MainWindow
 	    Callback for file loading.
         */
         static void OpenFileCallback(Fl_Widget* widget, void* userData);
+    public:
+	static void OpenFileCallback();
+    protected:
 
         /* Callback for options / config setup. */
         static void ConfigOptionsCallback(Fl_Widget *widget, void *userData);
+    public:
+	static void ConfigOptionsCallback();
+    protected:
 
         /*
          Callback to show/hide a folder

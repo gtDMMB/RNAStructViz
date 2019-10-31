@@ -48,6 +48,9 @@ extern const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT];
 extern const char *FLTK_THEME_HELP[FLTK_THEME_COUNT];
 extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 
+#define MAX(x, y)                    ((x) <= (y) ? (y) : (x))
+#define MIN(x, y)                    ((x) <= (y) ? (x) : (y))
+
 /* Some basic color operations for getting shades of color: */
 #define RGBColor(r, g, b)               ColorUtil::GetRGBColor(r, g, b)
 #define Lighter(color, alpha)           ColorUtil::Lighter(color, alpha)
@@ -81,6 +84,10 @@ extern volatile Fl_Color STRUCTURE_DIAGRAM_COLORS[3][7];
 extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
 extern bool DEBUGGING_ON;
 extern bool DISPLAY_FIRSTRUN_MESSAGE;
+
+extern char rnaStructVizExecPath[MAX_BUFFER_SIZE];
+extern char runtimeCWDPath[MAX_BUFFER_SIZE];
+extern char activeSystemUserFromEnv[MAX_BUFFER_SIZE];
 
 /* Helper functions and inline utilities we do not place elsewhere: */
 #include "RNACUtils.cpp"

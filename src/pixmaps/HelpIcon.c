@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (HelpIcon.c) */
 
+#ifndef __PIXMAPS_HELPICON_C__
+#define __PIXMAPS_HELPICON_C__
+
 static const struct {
   unsigned int 	 width;
   unsigned int 	 height;
@@ -172,3 +175,4 @@ static const struct {
   "EEE\006\001\001\001\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
 
+#endif

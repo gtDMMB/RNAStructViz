@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (InfoButton.c) */
 
+#ifndef __PIXMAPS_INFO_BUTTON_C__
+#define __PIXMAPS_INFO_BUTTON_C__
+
 static const struct {
   unsigned int 	 width;
   unsigned int 	 height;
@@ -197,3 +200,4 @@ static const struct {
   "\000\024\024\024\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
 
+#endif

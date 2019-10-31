@@ -2,7 +2,7 @@
  *                 but essential misc utility functions that do not fit elsewhere 
  *                 in the source code. Note that this file gets included for 
  *                 convenience by "ConfigOptions.h" -- SO EVERYTHING THAT GETS 
- *                 DEFINED HERE SHOULD BE STATIC AND LINKED INLINE -- OR ELSE!!
+ *                 DEFINED HERE SHOULD BE STATIC AND LINKED INLINE!
  * Author: Maxie D. Schmidt (maxieds@gmail.com)
  * Created: Assembled from existing source 2019.03.01
  */
@@ -17,7 +17,6 @@ static inline void DeletePointerCheck(void *ptr) {
 }
 
 #define Delete(p)                       ({ DeletePointerCheck(p); p = NULL; })
-//#define Delete(p)                        (DeletePointerCheck(p))
 
 static inline void FreePointerCheck(void *ptr) {
      if(ptr != NULL) {
@@ -27,7 +26,6 @@ static inline void FreePointerCheck(void *ptr) {
 }
 
 #define Free(p)                         ({ FreePointerCheck(p); p = NULL; })
-//#define Free(p)                          (FreePointerCheck(p))
 
 typedef bool (*PredicateFunc_t)(char);
 
@@ -138,5 +136,61 @@ static inline char * GetSubstringFromRange(const char *baseStr, size_t startPos,
      strncpy(substrBuf, baseStr + startPos, substrBufLen);
      substrBuf[substrBufLen] = '\0';
      return substrBuf;
+}
+
+#include <time.h>
+
+static inline unsigned int GetRandomNaturalNumberInRange(unsigned int upperBound) {
+     volatile time_t srandomSeed = time(NULL); 
+     srand(srandomSeed); 
+     if(upperBound > 0) {
+          return rand() % upperBound;
+     }
+     return rand();
+}
+
+static inline char * UnicodeUTF8ToAscii(const char *srcUnicodeStr) {
+     if(srcUnicodeStr == NULL) {
+          return NULL;
+     }
+     unsigned int srcLength = strlen(srcUnicodeStr);
+     unsigned int maxUnicodeDestSize = 4 * srcLength + 1;
+     char *destAsciiStr = (char *) malloc(maxUnicodeDestSize * sizeof(char));
+     if(destAsciiStr == NULL) {
+          return NULL;
+     }
+     unsigned int bytesWritten = fl_utf8toa(srcUnicodeStr, srcLength, destAsciiStr, maxUnicodeDestSize);
+     destAsciiStr[bytesWritten] = '\0';
+     if(bytesWritten < maxUnicodeDestSize - 1) {
+          destAsciiStr = (char *) realloc(destAsciiStr, bytesWritten + 1);
+     }
+     return destAsciiStr;
+}
+
+static inline char *getUserNameFromEnv(const char *envVarName, char *unameBuf, unsigned int bufLength) {
+     if(envVarName == NULL || unameBuf == NULL) {
+          return NULL;
+     }
+     char *envNameResult = getenv(envVarName);
+     int envNameLength = strnlen(envNameResult, bufLength);
+     int copyLength = bufLength > envNameLength + 1 ? envNameLength : bufLength;
+     strncpy(unameBuf, envNameResult, copyLength);
+     unameBuf[copyLength] = '\0';
+     return unameBuf;
+}
+
+static inline char *getUserNameFromEnv(char *unameBuf, unsigned int bufLength) {
+     char *unameQueryResult = getUserNameFromEnv("USER", unameBuf, bufLength);
+     if(unameQueryResult != NULL) {
+          return unameQueryResult;
+     }
+     unameQueryResult = getUserNameFromEnv("USERNAME", unameBuf, bufLength);
+     if(unameQueryResult != NULL) {
+          return unameQueryResult;
+     }
+     else if(bufLength > 0) {
+          unameBuf[0] = '\0';
+     }
+     return NULL;
 }
 

@@ -5,6 +5,9 @@
 #ifndef RNASTRUCTVIZ_H
 #define RNASTRUCTVIZ_H
 
+#include <FL/Fl.H>
+#include <FL/Enumerations.H>
+
 #include <vector>
 using std::vector;
 
@@ -12,7 +15,8 @@ using std::vector;
 #include "MainWindow.h"
 #include "DiagramWindow.h"
 #include "StatsWindow.h"
-
+#include "CommonDialogs.h"
+	
 class RNAStructViz
 {
     public:
@@ -21,6 +25,9 @@ class RNAStructViz
 
         static bool Initialize(int argc, char** argv);
         static void Shutdown();
+
+	static void ExitApplication(bool promptUser = true);
+        static void ExitApplication() { RNAStructViz::ExitApplication(true); }
 
         inline static RNAStructViz* GetInstance()
         {
@@ -47,6 +54,10 @@ class RNAStructViz
 	void AddStatsWindow(int index);
         void TestFolders();
 
+
+    public:
+	static int HandleGlobalKeypressEvent(int eventCode);
+
     private:
         static RNAStructViz* ms_instance;
         StructureManager* m_structureManager;
@@ -54,5 +65,21 @@ class RNAStructViz
         std::vector<StatsWindow*> m_statsWindows;
 
 };
+
+typedef struct {
+	     
+     const char *keyPressIntentDesc;
+     const char *keyPressComboDesc;
+     int modifierStateKey; 
+     int keyPressValue;
+     int charKeyValue;
+     bool checkOnlyFirstTextChar;
+     void (*onPressActionFunc)();
+	
+} GlobalKeyPressHandlerData_t;
+
+const int MODKEY_NONE   = ((unsigned int) -1);
+const int KEYVALUE_NONE = ((unsigned int) -1);
+const int CHARKEY_NONE  = ((unsigned int) -1);
 
 #endif //RNASTRUCTVIZ_H

@@ -1,11 +1,81 @@
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
+
+#include <FL/names.h>
 
 #include "StructureManager.h"
 #include "RNAStructViz.h"
 #include "MainWindow.h"
 #include "FolderStructure.h"
 #include "ConfigParser.h"
+#include "TerminalPrinting.h"
+
+static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
+             {
+	          "Standard help key shortcut", 
+		  "[F1]", 
+		  MODKEY_NONE, 
+		  FL_F + 1,
+		  CHARKEY_NONE, 
+		  false,
+		  CommonDialogs::DisplayHelpDialog,
+	     },
+	     {
+		  "Close window shortcut", 
+		  "[ALT]+[F4]", 
+		  FL_ALT, 
+		  FL_F + 4,
+		  CHARKEY_NONE,
+		  false, 
+		  RNAStructViz::ExitApplication,
+	     },
+	     {
+		  "Close window shortcut (standard terminal key combo)",
+		  "[CTRL]+c",
+		  FL_CTRL,
+		  KEYVALUE_NONE,
+		  (unsigned int) 'c', 
+		  true,
+		  RNAStructViz::ExitApplication,
+	     },
+	     {
+		  "Help command shortcut II", 
+		  "[CTRL]+h", 
+		  FL_CTRL,
+		  KEYVALUE_NONE,
+		  (unsigned int) 'h', 
+		  true, 
+		  CommonDialogs::DisplayHelpDialog,
+	     },
+	     {
+		  "Open file dialog shortcut", 
+		  "[CTRL]+o", 
+		  FL_CTRL,
+		  KEYVALUE_NONE,
+		  (unsigned int) 'o',
+		  true,
+		  MainWindow::OpenFileCallback,
+	     },
+	     {
+		  "About the application shortcut", 
+		  "[CTRL]+i", 
+		  FL_CTRL,
+		  KEYVALUE_NONE,
+		  (unsigned int) 'i',
+		  true,
+		  CommonDialogs::DisplayInfoAboutDialog,
+	     },
+	     {
+		  "Configuration settings shortcut", 
+		  "[HOME] | [WINDOWS KEY]", 
+                  FL_META,
+		  FL_Home,
+		  CHARKEY_NONE,
+		  false,
+		  MainWindow::ConfigOptionsCallback,
+	     },
+};
 
 RNAStructViz* RNAStructViz::ms_instance = NULL;
 
@@ -20,7 +90,7 @@ RNAStructViz::~RNAStructViz()
 {
     for (unsigned int i = 0; i < m_diagramWindows.size(); ++i)
 	delete m_diagramWindows[i];
-	for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
+    for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
 	delete m_statsWindows[i];
     delete m_structureManager;
 }
@@ -38,8 +108,27 @@ void RNAStructViz::Shutdown()
 {
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     MainWindow::Shutdown();
-    //exit(0);
+    //exit(EXIT_SUCCESS);
 }
+
+void RNAStructViz::ExitApplication(bool promptUser) {
+     if(!promptUser) {
+          RNAStructViz::Shutdown();
+	  return;
+     }
+     const char *promptQMsg = "Are you really sure you want to quit? All unsaved data and loaded structures will be lost!";
+     int userResp = fl_choice(promptQMsg, "Yes, QUIT!", "No, CANCEL", NULL);
+     switch(userResp) {
+          case 0:
+	       RNAStructViz::Shutdown();
+	       return;
+	  case 1:
+	  default:
+	       break;
+     }
+     return;
+}
+
 void RNAStructViz::AddDiagramWindow(int index)
 {
     std::vector<int> structures;
@@ -146,5 +235,33 @@ void RNAStructViz::TestFolders()
             m_diagramWindows.size(), m_statsWindows.size());
 }
 
+int RNAStructViz::HandleGlobalKeypressEvent(int eventCode) {
+     
+     if(eventCode == FL_FOCUS || eventCode == FL_UNFOCUS) {
+          return 1;
+     }
+     else if(eventCode != FL_KEYBOARD) {
+	  TerminalText::PrintDebug("Non-keyboard event triggered (%s).\n", fl_eventnames[eventCode]);
+          return 0;
+     }
 
+     const char *keyCharText = Fl::event_text();
+     int charTextLength = Fl::event_length();
+     int keyPressed = Fl::event_original_key();
+     int keyState = Fl::event_state();
+     for(int kp = 0; kp < GetArrayLength(GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA); kp++) {
+          GlobalKeyPressHandlerData_t kpHandler = GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[kp];
+	  if((kpHandler.modifierStateKey != MODKEY_NONE && kpHandler.modifierStateKey == keyState) && 
+	     (kpHandler.keyPressValue != KEYVALUE_NONE && kpHandler.keyPressValue == keyPressed) && 
+	     (kpHandler.charKeyValue != CHARKEY_NONE && 
+	      kpHandler.checkOnlyFirstTextChar && charTextLength > 0 && (int) keyCharText[0] == kpHandler.charKeyValue)) {
+	       TerminalText::PrintDebug("Global keypress recognized %s : %s\n", 
+			                kpHandler.keyPressComboDesc, kpHandler.keyPressIntentDesc);
+	       kpHandler.onPressActionFunc();
+	       break;
+	  }
+     }
+     TerminalText::PrintDebug("Non-globally handled key pressed (#%d)\n", keyPressed);
+     return 1;
 
+}

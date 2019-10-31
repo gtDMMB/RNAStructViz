@@ -3,7 +3,7 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -pedantic -O0 -march=native #-fsanitize=address
+CXXFLAGS= -g -Wall -Wextra -pedantic -O1 -march=native #-fsanitize=address
 
 LD=g++
 LDFLAGS=-Wall -Wextra -g1 -lm #-fsanitize=address
@@ -68,13 +68,13 @@ LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG)
 LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = \
-	BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
-	ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
+	BaseSequenceIDs.$(OBJEXT) BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
+	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
 	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
 	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
-	StructureManager.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT)\
-	rocbox.$(OBJEXT) 
+	StructureManager.$(OBJEXT) TerminalPrinting.$(OBJEXT) \
+	Fl_Rotated_Text.$(OBJEXT) rocbox.$(OBJEXT) 
 
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
@@ -126,7 +126,10 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	xreader RNAStructViz-HeapProfile.pdf
 
 gitadd:
-	git add ./*.{cpp,h} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
+	git add ./*.{c,cpp,h} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
+
+BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h BaseSequenceIDs.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c BaseSequenceIDs.cpp
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp
@@ -134,6 +137,9 @@ BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 
 CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h CairoDrawingUtils.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CairoDrawingUtils.cpp
+
+CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h CommonDialogs.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
 
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h ConfigParser.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
@@ -194,6 +200,9 @@ StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
 	FolderWindow.h MainWindow.h RNAStructViz.h InputWindow.h\
 	RNAStructure.h StructureManager.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp
+
+TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h TerminalPrinting.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c TerminalPrinting.cpp
 
 rocbox.$(OBJEXT): rocbox.h rocbox.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c rocbox.cpp

@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <locale.h>
 
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
@@ -14,14 +16,28 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "DisplayConfigWindow.h"
+#include "TerminalPrinting.h"
+
+char rnaStructVizExecPath[MAX_BUFFER_SIZE];
+char runtimeCWDPath[MAX_BUFFER_SIZE];
+char activeSystemUserFromEnv[MAX_BUFFER_SIZE];
 
 int main(int argc, char **argv) {
 
     #ifdef WITHGPERFTOOLS
     HeapProfilerStart("RNAStructViz.log");
     #endif
-    
+   
+    TerminalText::PrintError("Emsg %d\n", 10);
+
     DisplayConfigWindow::SetupInitialConfig();
+    strncpy(rnaStructVizExecPath, argv[0], MAX_BUFFER_SIZE);
+    rnaStructVizExecPath[MAX_BUFFER_SIZE - 1] = '\0';
+    getcwd(runtimeCWDPath, MAX_BUFFER_SIZE);
+    runtimeCWDPath[MAX_BUFFER_SIZE - 1] = '\0';
+    getUserNameFromEnv(activeSystemUserFromEnv, MAX_BUFFER_SIZE);
+    
+    // TODO: --quiet, --help, --about, --new-config, --no-ansi-color, --no-unicode, ... 
     if(argc > 1 && 
        (!strcmp(argv[1], "--about") || !strcmp(argv[0], "--help") || 
 	!strcmp(argv[1], "-h"))) {
@@ -47,6 +63,7 @@ int main(int argc, char **argv) {
     Fl::scheme((char *) FLTK_THEME);
     MainWindow::ResetThemeColormaps();
     fl_font(LOCAL_BFFONT, LOCAL_TEXT_SIZE);
+    Fl::add_handler(RNAStructViz::HandleGlobalKeypressEvent);
 
     if(DISPLAY_FIRSTRUN_MESSAGE) {
          MainWindow::GetInstance()->DisplayFirstTimeUserInstructions();
@@ -54,13 +71,14 @@ int main(int argc, char **argv) {
     while(MainWindow::IsRunning()) {
         Fl::wait();
     }
+    Fl::remove_handler(RNAStructViz::HandleGlobalKeypressEvent);
     RNAStructViz::Shutdown();
     
     #ifdef WITHGPERFTOOLS
     HeapProfilerStop();
     #endif
     
-    return 0;
+    return EXIT_SUCCESS;
 
 }
 
