@@ -58,8 +58,9 @@ class InputWindow : public Fl_Window
 	~InputWindow();
 
 	    /* Returns the user input from the window*/
-        inline char* getName() const {
-            return name;
+        inline const char* getName() const {
+            //return name;
+	    return inputText;
         }
         
 	int getFileSelectionIndex() const;

@@ -130,7 +130,7 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      }
 
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
-     GUI_KEEP_STICKY_FOLDER_NAMES = true;
+     GUI_KEEP_STICKY_FOLDER_NAMES = false;
      DEBUGGING_ON = false;
      DISPLAY_FIRSTRUN_MESSAGE = true;
 

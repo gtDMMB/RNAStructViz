@@ -3,8 +3,10 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include <experimental/filesystem>
-namespace stdfs = std::experimental::filesystem;
+//#include <experimental/filesystem>
+//namespace stdfs = std::experimental::filesystem;
+#include <filesystem>
+namespace stdfs = std::filesystem;
 
 #include <FL/names.h>
 
@@ -113,7 +115,6 @@ void RNAStructViz::Shutdown()
 {
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     MainWindow::Shutdown();
-    //exit(EXIT_SUCCESS);
 }
 
 void RNAStructViz::ExitApplication(bool promptUser) {
@@ -310,8 +311,9 @@ int RNAStructViz::CopySampleStructures() {
 			          USER_SAMPLE_STRUCTS_PATH.c_str());
      }
      else {
-          const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	  const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+          mode_t mkdirModes = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
+	  const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), mkdirModes);
+	  const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      mkdirModes); 
 	  if(mkdirStatus1 == -1 || mkdirStatus2 == -1) {
 	       TerminalText::PrintError("Unable to create user home sample directory: \"%s\"\n", 
 			                USER_SAMPLE_STRUCTS_PATH.c_str());

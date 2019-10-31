@@ -23,7 +23,7 @@
 
 #define FOLDER_NAME_DIVIDER                     (" -- ")
 #define DEFAULT_STICKY_FOLDERNAME_CFGFILE       ("sequence-folder-names.dat")
-#define GetStickyFolderConfigPath(cfgFile)      ((USER_CONFIG_DIR + string(cfgFile)).c_str())
+#define GetStickyFolderConfigPath(cfgFile)      (std::string(USER_CONFIG_DIR) + std::string(cfgFile))
 
 #define BSHASH_BYTES                            (48)
 std::string HashBaseSequence(const char *baseSeq); 
@@ -38,6 +38,8 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSp
 off_t FolderNameForSequenceExists(const char *cfgFilePath, RNAStructure *rnaStructSpec);
 
 std::string ExtractSequenceNameFromButtonLabel(const char *buttonLabel);
+int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, 
+		                          std::string baseSeq, std::string folderName);
 int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, 
 		                     std::string baseSeq, std::string folderName, 
 		                     off_t replacePos = LSEEK_NOT_FOUND);

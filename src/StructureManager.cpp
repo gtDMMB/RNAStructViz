@@ -113,12 +113,32 @@ void StructureManager::AddFile(const char* filename)
 	     AddFirstEmpty(structure);
              if(count == (int) folders.size()-1)
              {
-                 InputWindow* input_window = new InputWindow(400, 150, 
+                 
+		 off_t stickyFolderExists = FolderNameForSequenceExists(
+				                 DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+						 structure
+				            );
+		 if(stickyFolderExists != LSEEK_NOT_FOUND && GUI_KEEP_STICKY_FOLDER_NAMES) {
+		      char *stickyFolderName = LookupStickyFolderNameForSequence(
+				                    DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+						    stickyFolderExists
+					       );
+                      if(!FolderNameExists(stickyFolderName)) {
+		           strcpy(folders[count]->folderName, stickyFolderName);
+		           Free(stickyFolderName);
+                           MainWindow::AddFolder(folders[count]->folderName, count, false);
+			   continue;
+		      }
+		      Free(stickyFolderName);
+		 }
+		     
+		 InputWindow* input_window = new InputWindow(525, 210, 
 		     	      "New Folder Added", folders[count]->folderName, 
 			      InputWindow::FOLDER_INPUT);
                  while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
                        Fl::wait();
                  }
+		 input_window->hide();
             
                  bool same = false;
                  for(unsigned int ui = 0; ui < folders.size(); ui++)
@@ -134,13 +154,14 @@ void StructureManager::AddFile(const char* filename)
                  while(same) {
                      fl_message("Already have a folder with the name: %s, please choose another name.", 
                                 input_window->getName());
-                     delete input_window;
-                     input_window = new InputWindow(400, 150, "New Folder Added", 
+                     Delete(input_window);
+                     input_window = new InputWindow(525, 210, "New Folder Added", 
 	            	            folders[count]->folderName, InputWindow::FOLDER_INPUT);
                      while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
                           Fl::wait();
                      }
-                     same = false;
+                     input_window->hide();
+		     same = false;
                      for(unsigned int ui = 0; ui < folders.size(); ui++)
             	     {
             		   if (!strcmp(folders[ui]->folderName, input_window->getName()))
@@ -156,7 +177,7 @@ void StructureManager::AddFile(const char* filename)
 		     if(GUI_KEEP_STICKY_FOLDER_NAMES) {
                           const char *baseSeq = structure->GetSequenceString();
 			  std::string seqFolderUniqueName = ExtractSequenceNameFromButtonLabel(
-					                         input_window->getName()
+					                         folders[count]->folderName
 						            );
 			  off_t existingEntry = FolderNameForSequenceExists(
 					             DEFAULT_STICKY_FOLDERNAME_CFGFILE,
@@ -176,7 +197,7 @@ void StructureManager::AddFile(const char* filename)
 		 }
 
                  MainWindow::AddFolder(folders[count]->folderName, count, false);
-	         delete input_window;
+		 Delete(input_window);
              }
 
 	}
@@ -259,7 +280,7 @@ void StructureManager::RemoveFolder(const int folder, const int index)
 
 void StructureManager::AddFolder(RNAStructure* structure, const int index)
 {
-	Folder *temp = (Folder*)malloc(sizeof(Folder));
+    Folder *temp = (Folder*)malloc(sizeof(Folder));
     temp->folderName = (char*)malloc(sizeof(char)*64);
     if(strlen(structure->GetFilename()) < 60) {
         strcpy(temp->folderName,structure->GetFilename());
@@ -291,8 +312,8 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
 		m_structures[0] = structure;
 		m_structureCount = 1;
 		added = true;
-	    AddFolder(structure, 0);
-	    found = true;
+	        AddFolder(structure, 0);
+	        found = true;
 		return 0;
     }
     for (int i = 0; i < m_structureCount; ++i)

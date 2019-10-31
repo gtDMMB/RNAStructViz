@@ -48,6 +48,8 @@
      #define __STDC_NO_THREADS__ (1)
 #endif
 
+#define _GNU_SOURCE
+
 #define FLTK_USE_CAIRO  1
 #define FLTK_HAVE_CAIRO 1
 

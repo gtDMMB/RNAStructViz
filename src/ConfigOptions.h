@@ -28,7 +28,7 @@ using std::string;
      #define PERFORM_BRANCH_TYPE_ID          (false)
 #endif
 
-#define MAX_BUFFER_SIZE                 (768)
+#define MAX_BUFFER_SIZE                 (384)
 #define MAX_SEQUENCE_SIZE               (12000)
 
 #define DEFAULT_CTFILE_SEARCH_DIRECTORY (GetUserHome())

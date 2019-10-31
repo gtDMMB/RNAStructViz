@@ -21,7 +21,7 @@ int InputWindow::distinctStructureCount = 0;
 
 InputWindow::InputWindow(int w, int h, const char *label, 
 	const char *defaultName, InputWindowType type, int folderIndex) : 
-	Fl_Window(MAX(w, 445), h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
+	Fl_Window(w, h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
 	userWindowStatus(OK), fileSelectionIndex(-1)
 {	
     string = (char*)malloc(sizeof(char)*90);
@@ -65,29 +65,29 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    std::string actualStructName = 
 		        ExtractStructureNameFromFile(defaultName);
             const char *actualStructNameCStr = actualStructName.c_str();
-            strncpy(inputText, actualStructNameCStr, actualStructName.size() + 1);
+            strcpy(inputText, actualStructNameCStr);
             ConfigParser::nullTerminateString(inputText, actualStructName.size());
 
-	    sprintf(string, "Creating new folder for the CT structure %s", defaultName);
-	    input = new Fl_Input(160, 50, 250, 30, "@fileopen  New Folder Name:");
+	    sprintf(string, "Creating new folder for the sample structure %s", defaultName);
+	    input = new Fl_Input(160, 50, 360, 30, "@fileopen  New Folder Name:");
 	    input->when(FL_WHEN_ENTER_KEY);
             input->maximum_size(60);
 	    input->value(inputText);
 	    input->color(GUI_BGCOLOR);
 	    input->textcolor(GUI_BTEXT_COLOR);
-	    Fl_Box *box = new Fl_Box(50, 1, 350, 40, (const char*) string);
+	    Fl_Box *box = new Fl_Box(100, 1, 350, 40, (const char*) string);
 	    box->box(FL_OSHADOW_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 	    box->color(GUI_BGCOLOR);
 	    box->labelcolor(GUI_BTEXT_COLOR);
-	    Fl_Button *button = new Fl_Button(340, 50, 100, 30, "Add Folder @|>");
+	    Fl_Button *button = new Fl_Button(410, 165, 100, 30, "Add Folder @|>");
 	    button->callback(InputCallback, (void*)0);
 	    button->labelcolor(GUI_BTEXT_COLOR);
 	    button->set_active();
 	    input->callback(InputCallback, (void*)0);
 	    input->labelcolor(GUI_TEXT_COLOR);
 	    const char *cbText = " Use only default names for structure folders";
-	    cbUseDefaultNames = new Fl_Check_Button(30, 100, 375, 30, cbText);
+	    cbUseDefaultNames = new Fl_Check_Button(16, 100, 375, 30, cbText);
 	    cbUseDefaultNames->box(FL_ROUND_UP_BOX);
 	    cbUseDefaultNames->color(GUI_BGCOLOR);
 	    cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
@@ -95,7 +95,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    cbUseDefaultNames->value(GUI_USE_DEFAULT_FOLDER_NAMES);
 	    const char *stickyFoldersCBText = "Save folder names for known organisms";
-	    cbKeepStickyFolders = new Fl_Check_Button(30, 145, 375, 30, stickyFoldersCBText);
+	    cbKeepStickyFolders = new Fl_Check_Button(16, 145, 375, 30, stickyFoldersCBText);
             cbKeepStickyFolders->box(FL_ROUND_UP_BOX);
 	    cbKeepStickyFolders->color(GUI_BGCOLOR);
 	    cbKeepStickyFolders->labelcolor(GUI_BTEXT_COLOR);
@@ -106,7 +106,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	}
         else { 
 	    
-	    const char *windowDisplayMsg = "Which CT file structure for the organism\ndo you want to display?";
+	    const char *windowDisplayMsg = "Which sample file for the organism\ndo you want to display?";
 	    Fl_Box *box = new Fl_Box(75, 5, 300, 40, windowDisplayMsg);
 	    box->box(FL_RSHADOW_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
@@ -123,7 +123,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cancelButton->color(GUI_BGCOLOR);
 	    cancelButton->labelcolor(GUI_BTEXT_COLOR);
             
-	    ctFileChooser = new Fl_Choice(175, 55, 215, 30, "Choose CT Structure: ");
+	    ctFileChooser = new Fl_Choice(175, 55, 215, 30, "Choose Sample Structure: ");
             ctFileChooser->color(GUI_BGCOLOR);
 	    ctFileChooser->labelcolor(GUI_BTEXT_COLOR);
 
@@ -148,10 +148,10 @@ InputWindow::InputWindow(int w, int h, const char *label,
 }
 
 InputWindow::~InputWindow() {
-    delete input;
+    Delete(input);
     Delete(cbUseDefaultNames);
     Delete(cbKeepStickyFolders);
-    free(inputText);
+    Free(inputText);
 }
 
 int InputWindow::getFileSelectionIndex() const {
@@ -171,17 +171,19 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 	 snprintf(exportSaveDir, dirTextLen, "%s", window->inputText);
 	 snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s/%s.csv", 
 	          exportSaveDir, window->input->value());
-         window->name = window->inputText;
+         window->name = "<UNDEFINED>";
+	 //window->name = window->inputText;
     }
     else {
-        if(window->inputText != (char*)window->input->value()) {
-            strcpy(window->inputText, (char*)window->input->value());
-        }
-        if(!MainWindow::CheckDistinctFolderName(window->inputText)) {
-	    fl_alert("The folder name for the structure \"%s\" already exists!", window->inputText);
-	    return;
-	}
-	window->name = window->inputText;
+        //if(window->inputText != (char*)window->input->value()) {
+        //    strcpy(window->inputText, (char*)window->input->value());
+        //}
+        //if(!MainWindow::CheckDistinctFolderName(window->inputText)) {
+	//    fl_alert("The folder name for the structure \"%s\" already exists!", window->inputText);
+	//    return;
+	//}
+	//window->name = window->inputText;
+	window->name = "<UNDEFINED>";
         if(window->cbUseDefaultNames->value()) {
             GUI_USE_DEFAULT_FOLDER_NAMES = true;
         }
@@ -195,9 +197,11 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 
 void InputWindow::CloseCallback(Fl_Widget* widget, void* userData) {
     InputWindow *window = (InputWindow*)widget;
-    window->name = "";
-    free(window->string);
-    window->hide();
+    if(window != NULL) {
+         window->name = "";
+         Free(window->string);
+         window->hide();
+    }
 }
 
 void InputWindow::DisplayCTFileCallback(Fl_Widget *w, void *udata) {
@@ -215,16 +219,44 @@ void InputWindow::DisplayCTFileCallback(Fl_Widget *w, void *udata) {
 
 void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
      InputWindow *iwin = (InputWindow *) w->parent();
-     iwin->userWindowStatus = CANCELED;
-     iwin->fileSelectionIndex = -1;
-     iwin->hide();
+     if(iwin != NULL) {
+          iwin->userWindowStatus = CANCELED;
+          iwin->fileSelectionIndex = -1;
+          iwin->hide();
+     }
 }
 
 std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
+    
     RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
 	                      LookupStructureByCTPath(seqFilePath);
+    
+    // see if there is a sticky folder name already saved to display:
+    off_t stickyFolderExists = FolderNameForSequenceExists(
+		                    DEFAULT_STICKY_FOLDERNAME_CFGFILE,
+				    rnaStruct
+			       );
+    if(stickyFolderExists != LSEEK_NOT_FOUND) {
+         char *stickyFolderName = LookupStickyFolderNameForSequence(
+			               DEFAULT_STICKY_FOLDERNAME_CFGFILE,
+				       stickyFolderExists
+				  );
+	 if(stickyFolderName != NULL) {
+	      char suggestedStickyName[MAX_BUFFER_SIZE];
+              snprintf(suggestedStickyName, MAX_BUFFER_SIZE, "No. #% 2d%s%s", 
+	               ++InputWindow::distinctStructureCount, 
+	               FOLDER_NAME_DIVIDER, stickyFolderName);
+              suggestedStickyName[MAX_BUFFER_SIZE - 1] = '\0';
+	      Free(stickyFolderName);
+	      return std::string(suggestedStickyName);
+	 }
+    }
+    
+    // otherwise, use file name and file header comments to guess at a good name for the sequence:
     InputFileTypeSpec inputFileType = ClassifyInputFileType(seqFilePath);
-    std::string fileHeaderLines = GetSequenceFileHeaderLines(seqFilePath, inputFileType);
+    std::string fullSeqFilePath = std::string((char *) CTFILE_SEARCH_DIRECTORY) + std::string("/") + 
+	                          std::string(seqFilePath);
+    std::string fileHeaderLines = GetSequenceFileHeaderLines(fullSeqFilePath.c_str(), inputFileType);
     if(fileHeaderLines.size() > 0) {
          rnaStruct->SetFileCommentLines(fileHeaderLines);
     }
@@ -237,5 +269,6 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
 	     folderNumberDivider, suggestedFolderName ? suggestedFolderName : "");
     suggestedShortName[MAX_BUFFER_SIZE - 1] = '\0';
     return std::string(suggestedShortName);
+
 }
 

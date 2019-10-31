@@ -2,10 +2,10 @@
 #### Author: Maxie D. Schmidt (maxieds@gmail.com)
 #### Updated: 2019.03.05 (V2)
 
-CXX=g++
+CXX=g++-8
 CXXFLAGS= -g -Wall -Wextra -pedantic -O0 -march=native #-fsanitize=address
 
-LD=g++
+LD=g++-8
 LDFLAGS=-Wall -Wextra -g1 -lm -lstdc++fs #-fsanitize=address
 
 .DEFAULT: default
@@ -57,7 +57,7 @@ OBJEXT=o
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
-	       -std=gnu++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
+	       -std=c++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
 	       -D_LARGEFILE64_SOURCE -funsigned-char 
 
 CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
@@ -129,7 +129,8 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 gitadd:
 	git add ./*.{c,cpp,h} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
 
-BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h TerminalPrinting.h BaseSequenceIDs.cpp
+BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h TerminalPrinting.h \
+	ConfigParser.h BaseSequenceIDs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c BaseSequenceIDs.cpp
 
 BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\

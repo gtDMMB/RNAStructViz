@@ -11,6 +11,7 @@
 
 #include "BaseSequenceIDs.h"
 #include "TerminalPrinting.h"
+#include "ConfigParser.h"
 
 /* Hash Scheme: [FIRST 8 BYTES OF BSEQ + LAST 8 BYTES OF BSEQ + 256/8=32 BYTES OF SHA256 HASH] */
 std::string HashBaseSequence(const char *baseSeq) {
@@ -32,7 +33,7 @@ std::string HashBaseSequence(const char *baseSeq) {
      }
      std::string hashBytes = ss.str();
      std::string baseSeqStr = string(baseSeq);
-     hashBytes = baseSeqStr.substr(0, 8) + hashBytes + baseSeqStr.substr(baseSeqLen - 9, 8);
+     hashBytes = baseSeqStr.substr(0, 8) + hashBytes + baseSeqStr.substr(baseSeqLen - 8, 8);
      
      return hashBytes;
 
@@ -55,13 +56,14 @@ char * LookupStickyFolderNameForSequence(const char *cfgFilePath, RNAStructure *
 }
 
 char * LookupStickyFolderNameForSequence(const char *cfgFilePath, off_t fnameFileOffset) {
+     
      if(cfgFilePath == NULL || fnameFileOffset == LSEEK_NOT_FOUND) {
           return NULL;
      }
-     cfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
-     FILE *fpCfgFile = fopen(cfgFilePath, "r+");
+     std::string fullCfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
+     FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r+");
      if(!fpCfgFile) {
-	  TerminalText::PrintError("Unable to open \"%s\" : %s\n", fpCfgFile, strerror(errno));
+	  TerminalText::PrintError("Unable to open \"%s\" : %s I\n", fullCfgFilePath.c_str(), strerror(errno));
           return NULL;
      }
      int fdCfgFile = fileno(fpCfgFile);
@@ -72,12 +74,12 @@ char * LookupStickyFolderNameForSequence(const char *cfgFilePath, off_t fnameFil
      std::string stickyStrEntry = std::string(lineBuf);
      fclose(fpCfgFile);
 
-     size_t firstQuotePos = stickyStrEntry.find_first_of("\"");
-     size_t lastQuotePos = stickyStrEntry.find_last_of("\"");
+     size_t firstQuotePos = stickyStrEntry.find_first_of('\"');
+     size_t lastQuotePos = stickyStrEntry.find_last_of('\"');
      if(firstQuotePos == std::string::npos || lastQuotePos == std::string::npos) {
           return NULL;
      }
-     std::string savedFolderName = stickyStrEntry.substr(firstQuotePos + 1, lastQuotePos - 1);
+     std::string savedFolderName = stickyStrEntry.substr(firstQuotePos + 1, lastQuotePos - firstQuotePos - 1);
      char *rstr = (char *) malloc((savedFolderName.size() + 1) * sizeof(char));
      strcpy(rstr, savedFolderName.c_str());
      rstr[savedFolderName.size()] = '\0';
@@ -89,10 +91,10 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSp
      if(cfgFilePath == NULL || baseSeqSpec == NULL) {
           return LSEEK_NOT_FOUND;
      }
-     cfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
-     FILE *fpCfgFile = fopen(cfgFilePath, "r+");
+     std::string fullCfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
+     FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r+");
      if(!fpCfgFile) {
-          TerminalText::PrintError("Unable to open \"%s\" : %s\n", cfgFilePath, strerror(errno));
+          TerminalText::PrintDebug("Unable to open \"%s\" : %s II\n", fullCfgFilePath.c_str(), strerror(errno));
 	  return LSEEK_NOT_FOUND;
      }
      int fdCfgFile = fileno(fpCfgFile);
@@ -131,17 +133,44 @@ std::string ExtractSequenceNameFromButtonLabel(const char *buttonLabel) {
      return blabelStr.substr(sepPos + strlen(FOLDER_NAME_DIVIDER));
 }
 
+int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string baseSeq, 
+		                          std::string folderName) {
+
+     FILE *fpCfgFile = fopen(cfgFilePath, "w+");
+     if(!fpCfgFile) {
+          TerminalText::PrintError("Unable to open \"%s\": %s IV\n", cfgFilePath, strerror(errno));
+	  fclose(fpCfgFile);
+	  return errno;
+     }
+
+     std::string saveFolderName = ExtractSequenceNameFromButtonLabel(folderName.c_str());
+     if(saveFolderName.size() == 0) {
+          return EINVAL;
+     }
+     std::string baseSeqHash = HashBaseSequence(baseSeq.c_str());
+     
+     fprintf(fpCfgFile, "%s;\"%s\"\n", baseSeqHash.c_str(), saveFolderName.c_str());
+     fclose(fpCfgFile);
+     
+     return EXIT_SUCCESS;
+
+}
+
+				     
 int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSeq, 
 		                     std::string folderName, off_t replacePos) {
      
      if(cfgFilePath == NULL) {
           return EINVAL;
      }
-     cfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
-     
-     FILE *fpCfgFile = fopen(cfgFilePath, "r+");
+     std::string fullCfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
+     if(!ConfigParser::fileExists(fullCfgFilePath.c_str())) {
+          return SaveStickyFolderNameToFirstConfigFile(fullCfgFilePath.c_str(), baseSeq, folderName);
+     }
+
+     FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r+");
      if(!fpCfgFile) {
-          TerminalText::PrintError("Unable to open \"%s\" : %s\n", cfgFilePath, strerror(errno));
+          TerminalText::PrintError("Unable to open \"%s\" : %s III\n", fullCfgFilePath.c_str(), strerror(errno));
 	  return errno;
      }
      int fdCfgFile = fileno(fpCfgFile);
@@ -150,7 +179,7 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      strcat(tempFilePath, ".temp");
      FILE *fpTempFile = fopen(tempFilePath, "w+");
      if(!fpTempFile) {
-          TerminalText::PrintError("Unable to open \"%s\": %s\n", tempFilePath, strerror(errno));
+          TerminalText::PrintError("Unable to open \"%s\": %s IV\n", tempFilePath, strerror(errno));
 	  fclose(fpCfgFile);
 	  return errno;
      }
@@ -225,7 +254,7 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
      }
      FILE *fpInputSeq = fopen(filePath, "r+");
      if(!fpInputSeq) {
-          TerminalText::PrintError("Unable to open file \"%s\" : %s\n", filePath, strerror(errno));
+          TerminalText::PrintError("Unable to open file \"%s\" : %s V\n", filePath, strerror(errno));
 	  return "";
      }
      std::string headerLines;

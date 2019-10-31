@@ -62,6 +62,21 @@ class StructureManager
 	     return NULL;
 	}
 
+	/* 
+	 * Check if a folder with the same name already exists:
+	 */
+	inline bool FolderNameExists(const char *newFolderName) {
+             if(newFolderName == NULL || !strcmp(newFolderName, "")) {
+	          return true;
+	     }
+	     for(unsigned int fi = 0; fi < folders.size(); fi++) {
+                  if(!strcmp(folders[fi]->folderName, newFolderName)) {
+		       return true;
+		  }
+	     }
+             return false;
+	}
+
         /*
 	    Popup (or bring to front) a window displaying the file contents.
         */
