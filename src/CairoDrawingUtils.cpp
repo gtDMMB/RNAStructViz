@@ -11,6 +11,7 @@
 #include "ConfigOptions.h"
 #include "RNAStructure.h"
 #include "ThemesConfig.h"
+#include "TerminalPrinting.h"
 
 #define TRUNCRGBA(comp)             ((comp < 0 ? 0 : \
 			             (comp > CAIRO_COLOR_RGBA_MAXVAL ? CAIRO_COLOR_RGBA_MAXVAL : comp)))
@@ -251,7 +252,7 @@ CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor
 	case CR_DEEP_BLUE:
 	    return GetCairoColor(2, 32, 75);
 	default:
-            fprintf(stderr, "ERROR: Unknown named Cairo color %d\n", namedCairoColor);
+	    TerminalText::PrintError("Unknown named Cairo color %d\n", namedCairoColor);
 	    return GetCairoColor(206, 92, 0, 128);
     }
 }

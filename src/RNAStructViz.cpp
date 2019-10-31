@@ -231,8 +231,8 @@ void RNAStructViz::AddStatsWindow(int index)
 void RNAStructViz::TestFolders()
 {
     m_structureManager->PrintFolders();
-    fprintf(stderr, "Number of Diagram/Stats Windows: %d/%d\n\n", 
-            m_diagramWindows.size(), m_statsWindows.size());
+    TerminalText::PrintDebug("Number of Diagram/Stats Windows: %d/%d\n\n", 
+                             m_diagramWindows.size(), m_statsWindows.size());
 }
 
 int RNAStructViz::HandleGlobalKeypressEvent(int eventCode) {

@@ -14,6 +14,7 @@ using std::stack;
 #include "StructureManager.h"
 #include "ConfigOptions.h"
 #include "ThemesConfig.h"
+#include "TerminalPrinting.h"
 
 #if PERFORM_BRANCH_TYPE_ID
 #include "BranchTypeIdentification.h"
@@ -376,8 +377,6 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      fclose(fpDotBracketFile);
      if(!haveBaseData || !havePairData || strlen(baseDataBuf) != strlen(pairingDataBuf)) {
           fprintf(stderr, "ERROR: Error parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
-          //fprintf(stderr, "BDBUF: [%s]\n", baseDataBuf);
-	  //fprintf(stderr, "PDBUF: [%s]\n", pairingDataBuf);
 	  return NULL;
      }
      int seqLength = strlen(baseDataBuf);

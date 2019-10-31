@@ -16,6 +16,7 @@
 #include "pixmaps/WelcomeButton.c"
 #include "pixmaps/HelpIcon.c"
 #include "pixmaps/InfoButton.c"
+#include "pixmaps/TourIcon.c"
 
 namespace CommonDialogs {
 
@@ -40,11 +41,17 @@ namespace CommonDialogs {
 	       InfoButton.bytes_per_pixel
      );
 
-     void DisplayFirstRunInstructions(Fl_RGB_Image *dialogIcon = CommonDialogs::welcomeIconImage);
+     static Fl_RGB_Image *tourIconImage = new Fl_RGB_Image( 
+	       TourIcon.pixel_data, 
+	       TourIcon.width, 
+	       TourIcon.height, 
+	       TourIcon.bytes_per_pixel
+     );
+
+     void DisplayFirstRunInstructions();
      void DisplayHelpDialog();
      void DisplayTourDialog();
      void DisplayInfoAboutDialog();
-     void DisplayContactDialog();
      void DisplayKeyboardShortcutsDialog();
 
 };

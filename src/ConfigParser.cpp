@@ -13,6 +13,7 @@
 
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
+#include "TerminalPrinting.h"
 
 ConfigParser::ConfigParser() { 
      setDefaults(); 
@@ -32,8 +33,8 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 
      FILE *fpCfgFile = fopen(userCfgFile, "r+");
      if(fpCfgFile == NULL && !silenceErrors) {
-          fprintf(stderr, "Unable to open file \"%s\": %s\n", 
-	          userCfgFile, strerror(errno));
+	     TerminalText::PrintError("Unable to open file \"%s\": %s\n", 
+	                              userCfgFile, strerror(errno));
 	  return errno;
      }
      else if(fpCfgFile == NULL) {
@@ -60,8 +61,8 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 		    nullTerminateString(ctFileSearchDirectory);
 	       }
 	       else {
-	            fprintf(stderr, "No such directory \"%s\" ... skipping this init.\n", 
-		            parsedLine.cfgValue);
+		       TerminalText::PrintError("No such directory \"%s\" ... skipping the init.\n", 
+		                                parsedLine.cfgValue);
 	       }
 	  }
 	  else if(!strcmp(parsedLine.cfgOption, "PNGOUT_DIR")) {
@@ -70,8 +71,8 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 		    nullTerminateString(pngOutputDirectory);
 	       }
 	       else {
-	            fprintf(stderr, "Unknown PNG output dir \"%s\" ... skipping.\n", 
-		            parsedLine.cfgValue);
+		       TerminalText::PrintError("Unknown PNG output dir \"%s\" ... skipping.\n", 
+		                                parsedLine.cfgValue);
 	       }
 	  }
 	  else if(!strcmp(parsedLine.cfgOption, "PNGOUT_PATH")) {
@@ -106,8 +107,8 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 	          strlen(parsedLine.cfgOption) == 19) {
                int structIndex = atoi(parsedLine.cfgOption + 18) - 1;
 	       if(structIndex < 0 || structIndex >= 3) {
-                    fprintf(stderr, "Unknown structure index \"%s\" ... skipping\n", 
-			    parsedLine.cfgOption + 18);
+		       TerminalText::PrintError("Unknown structure index \"%s\" ... skipping\n", 
+			                        parsedLine.cfgOption + 18);
                     continue;
 	       }
 	       char *commaDelimPos = strchrnul(parsedLine.cfgValue, ',');
@@ -132,8 +133,8 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 	       guiStructureDiagramColorsCount[structIndex] = colorIdx;
 	  }
 	  else {
-	       fprintf(stderr, "Unknown config option \"%s\" ... skipping.\n", 
-	               parsedLine.cfgOption);
+		  TerminalText::PrintError("Unknown config option \"%s\" ... skipping.\n", 
+	                                   parsedLine.cfgOption);
 	  }
      }
      fclose(fpCfgFile);
@@ -177,9 +178,9 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 
      FILE *fpCfgFile = fopen(userCfgFile, "w+"); 
      if(fpCfgFile == NULL && !silenceErrors) { 
-          fprintf(stderr, "Unable to open config file \"%s\" for writing: ",
-	          userCfgFile);
-	  fprintf(stderr, "%s\n", strerror(errno)); 
+	  TerminalText::PrintError("Unable to open config file \"%s\" for writing: ",
+	                           userCfgFile);
+	  TerminalText::PrintError("%s\n", strerror(errno)); 
 	  return errno;
      }
      else if(fpCfgFile == NULL) {
@@ -192,8 +193,8 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 	                   cfgOptions[line], cfgValues[line]); 
 	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
           if(!fwrite(nextOutputLine, sizeof(char), lineLength, fpCfgFile)) { 
-               fprintf(stderr, "Error writing line #%d to file: %s\n", 
-	               line + 1, strerror(errno));
+	       TerminalText::PrintError("Error writing line #%d to file: %s\n", 
+	                                line + 1, strerror(errno));
 	       fclose(fpCfgFile); 
 	       return errno;
 	  }
@@ -205,8 +206,8 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 	                   cfgColorOptions[line], cfgColorValues[line]); 
 	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
           if(!fwrite(nextOutputLine, sizeof(char), lineLength, fpCfgFile)) { 
-               fprintf(stderr, "Error writing line #%d to file: %s\n", 
-	               line + sizeof(cfgValues) + 1, strerror(errno));
+	       TerminalText::PrintError("Error writing line #%d to file: %s\n", 
+	                                line + sizeof(cfgValues) + 1, strerror(errno));
 	       fclose(fpCfgFile); 
 	       return errno;
 	  }
@@ -226,7 +227,7 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 	  strcat(colorListLine, "\n");
 	  curLineNum++;
 	  if(!fwrite(colorListLine, sizeof(char), strlen(colorListLine), fpCfgFile)) {
-               fprintf(stderr, "Error writing line #%d to file: %s\n", curLineNum, strerror(errno));
+	       TerminalText::PrintError("Error writing line #%d to file: %s\n", curLineNum, strerror(errno));
 	       fclose(fpCfgFile);
 	       return errno;
 	  }
@@ -237,8 +238,8 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 	                    guiDisplayFirstRunMessage ? "true" : "false");
      nullTerminateString(lastOutputLine, MAX_BUFFER_SIZE - 1);
      if(!fwrite(lastOutputLine, sizeof(char), lineLen, fpCfgFile)) {
-          fprintf(stderr, "Error writing line #%d to file: %s\n", 
-	          curLineNum, strerror(errno));
+	  TerminalText::PrintError("Error writing line #%d to file: %s\n", 
+	                           curLineNum, strerror(errno));
 	  fclose(fpCfgFile);
 	  return errno;
      }
@@ -303,8 +304,8 @@ void ConfigParser::WriteUserConfigFile(const char *fpath) {
      if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
           int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	  if(dirCreateErr == -1) { 
-               fprintf(stderr, "Unable to create directory \"%s\" ... Aborting\n", 
-		       USER_CONFIG_DIR);
+	       TerminalText::PrintError("Unable to create directory \"%s\" ... Aborting\n", 
+		                        USER_CONFIG_DIR);
 	       perror("Directory Creation Error");
 	       writeCfgFile = false;
 	  }

@@ -135,17 +135,18 @@ BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c BranchTypeIdentification.cpp
 
-CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h CairoDrawingUtils.cpp
+CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h TerminalPrinting.h CairoDrawingUtils.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CairoDrawingUtils.cpp
 
 CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h CommonDialogs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
 
-ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h ConfigParser.cpp
+ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
+	TerminalPrinting.h ConfigParser.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
 
 DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
-	BranchTypeIdentification.h RNAStructure.h\
+	BranchTypeIdentification.h RNAStructure.h TerminalPrinting.h \
 	pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c DiagramWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
 
@@ -156,7 +157,7 @@ DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
 
 StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
-	RNAStructViz.h RNAStructure.h InputWindow.h \
+	RNAStructViz.h RNAStructure.h InputWindow.h TerminalPrinting.h \
 	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm StatsWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
 
@@ -175,7 +176,7 @@ FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
 Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
-	Debugging.h Main.cpp
+	TerminalPrinting.h Debugging.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
@@ -188,12 +189,12 @@ RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h
 
 RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
 	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c\
-	ThemesConfig.h RNAStructure.cpp
+	ThemesConfig.h TerminalPrinting.h RNAStructure.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
 
 RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
 	MainWindow.h FolderStructure.h DiagramWindow.h\
-	StatsWindow.h RNAStructViz.cpp
+	StatsWindow.h TerminalPrinting.h RNAStructViz.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructViz.cpp
 
 StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\

@@ -21,6 +21,7 @@
 #include "ThemesConfig.h"
 #include "CairoDrawingUtils.h"
 #include "DisplayConfigWindow.h"
+#include "TerminalPrinting.h"
 
 #include "pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c"
 #include "pixmaps/BaseColorPaletteButtonImage.c"
@@ -1927,6 +1928,6 @@ void DiagramWindow::DisplayErrorDialogTimerCallback(void *handlerRef) {
      string errorMsg = errorMsgQueue.back();
      errorMsgQueue.pop_back();
      Fl::unlock();
-     fprintf(stderr, "RUNTIME ERROR: %s\n", errorMsg.c_str());
+     TerminalText::PrintError("%s\n", errorMsg.c_str());
      fl_alert(errorMsg.c_str());
 }

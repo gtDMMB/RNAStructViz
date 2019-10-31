@@ -28,8 +28,6 @@ int main(int argc, char **argv) {
     HeapProfilerStart("RNAStructViz.log");
     #endif
    
-    TerminalText::PrintError("Emsg %d\n", 10);
-
     DisplayConfigWindow::SetupInitialConfig();
     strncpy(rnaStructVizExecPath, argv[0], MAX_BUFFER_SIZE);
     rnaStructVizExecPath[MAX_BUFFER_SIZE - 1] = '\0';
@@ -46,10 +44,11 @@ int main(int argc, char **argv) {
     }
     else if(argc > 1 && !strcmp(argv[1], "--debug")) {
         DEBUGGING_ON = true;
-	fprintf(stderr, "THEME WINDOW BGCOLOR: 0x%08x\n", GUI_WINDOW_BGCOLOR);
-	fprintf(stderr, "THEME WIDGET COLOR:   0x%08x\n", GUI_BGCOLOR);
-	fprintf(stderr, "THEME BTEXT COLOR:    0x%08x\n", GUI_BTEXT_COLOR);
-	fprintf(stderr, "THEME TEXT COLOR:     0x%08x\n", GUI_TEXT_COLOR);
+	CFG_DEBUG_MODE = CFG_VERBOSE_MODE = true;
+	TerminalText::PrintDebug("THEME WINDOW BGCOLOR: 0x%08x\n", GUI_WINDOW_BGCOLOR);
+	TerminalText::PrintDebug("THEME WIDGET COLOR:   0x%08x\n", GUI_BGCOLOR);
+	TerminalText::PrintDebug("THEME BTEXT COLOR:    0x%08x\n", GUI_BTEXT_COLOR);
+	TerminalText::PrintDebug("THEME TEXT COLOR:     0x%08x\n", GUI_TEXT_COLOR);
 	argv[1] = argv[0]; // remove our custom option before parsing 
 	++argv; --argc;
     }	
@@ -63,7 +62,7 @@ int main(int argc, char **argv) {
     Fl::scheme((char *) FLTK_THEME);
     MainWindow::ResetThemeColormaps();
     fl_font(LOCAL_BFFONT, LOCAL_TEXT_SIZE);
-    Fl::add_handler(RNAStructViz::HandleGlobalKeypressEvent);
+    //Fl::add_handler(RNAStructViz::HandleGlobalKeypressEvent);
 
     if(DISPLAY_FIRSTRUN_MESSAGE) {
          MainWindow::GetInstance()->DisplayFirstTimeUserInstructions();
@@ -71,7 +70,7 @@ int main(int argc, char **argv) {
     while(MainWindow::IsRunning()) {
         Fl::wait();
     }
-    Fl::remove_handler(RNAStructViz::HandleGlobalKeypressEvent);
+    //Fl::remove_handler(RNAStructViz::HandleGlobalKeypressEvent);
     RNAStructViz::Shutdown();
     
     #ifdef WITHGPERFTOOLS
