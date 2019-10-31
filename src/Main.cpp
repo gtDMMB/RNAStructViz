@@ -17,6 +17,7 @@
 #include "ConfigParser.h"
 #include "DisplayConfigWindow.h"
 #include "TerminalPrinting.h"
+#include "OptionParser.h"
 
 char rnaStructVizExecPath[MAX_BUFFER_SIZE];
 char runtimeCWDPath[MAX_BUFFER_SIZE];
@@ -35,7 +36,6 @@ int main(int argc, char **argv) {
     runtimeCWDPath[MAX_BUFFER_SIZE - 1] = '\0';
     getUserNameFromEnv(activeSystemUserFromEnv, MAX_BUFFER_SIZE);
     
-    // TODO: --quiet, --help, --about, --new-config, --no-ansi-color, --no-unicode, ... 
     if(argc > 1 && 
        (!strcmp(argv[1], "--about") || !strcmp(argv[0], "--help") || 
 	!strcmp(argv[1], "-h"))) {

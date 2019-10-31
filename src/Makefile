@@ -3,10 +3,10 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -pedantic -O1 -march=native #-fsanitize=address
+CXXFLAGS= -g -Wall -Wextra -pedantic -O0 -march=native #-fsanitize=address
 
 LD=g++
-LDFLAGS=-Wall -Wextra -g1 -lm #-fsanitize=address
+LDFLAGS=-Wall -Wextra -g1 -lm -lstdc++fs #-fsanitize=address
 
 .DEFAULT: default
 
@@ -72,6 +72,7 @@ RNASTRUCTVIZ_OBJECTS = \
 	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
 	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
+	OptionParser.$(OBJEXT) \
 	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
 	StructureManager.$(OBJEXT) TerminalPrinting.$(OBJEXT) \
 	Fl_Rotated_Text.$(OBJEXT) rocbox.$(OBJEXT) 
@@ -138,7 +139,8 @@ BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h TerminalPrinting.h CairoDrawingUtils.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CairoDrawingUtils.cpp
 
-CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h CommonDialogs.cpp
+CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
+	RNAStructViz.h CommonDialogs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
 
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
@@ -178,12 +180,16 @@ FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
 Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
-	TerminalPrinting.h Debugging.h Main.cpp
+	TerminalPrinting.h OptionParser.h Debugging.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
+
+OptionParser.$(OBJEXT): OptionParser.h ConfigOptions.h TerminalPrinting.h \
+	OptionParser.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c OptionParser.cpp
 
 RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h\
 	RadialLayoutImage.h RadialLayoutImage.cpp
@@ -196,7 +202,7 @@ RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
 
 RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
 	MainWindow.h FolderStructure.h DiagramWindow.h\
-	StatsWindow.h TerminalPrinting.h RNAStructViz.cpp
+	StatsWindow.h TerminalPrinting.h BaseSequenceIDs.h RNAStructViz.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructViz.cpp
 
 StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\

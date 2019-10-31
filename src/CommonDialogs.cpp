@@ -8,6 +8,7 @@
 #include "CommonDialogs.h"
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
+#include "RNAStructViz.h"
 
 void CommonDialogs::DisplayFirstRunInstructions() {
 
@@ -44,7 +45,8 @@ void CommonDialogs::DisplayFirstRunInstructions() {
      fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
      fl_message_font(FL_COURIER_BOLD, 11);
      int userHelpSelection = fl_choice("%s",
-                                       "Copy WIKI link to clipboard", "Dismiss", 
+                                       "Copy WIKI link to clipboard", 
+				       "Copy sample structures to your home directory", 
                                        "Do not show again at start-up", fullInstText);
      switch(userHelpSelection) {
           case 0: {
@@ -53,7 +55,10 @@ void CommonDialogs::DisplayFirstRunInstructions() {
                Fl::copy(firstTimeRunLink, strlen(firstTimeRunLink), 1, Fl::clipboard_plain_text);
                break;
           }
-          case 2: {
+          case 1: 
+	       RNAStructViz::CopySampleStructures();
+	       break;
+	  case 2: {
                DISPLAY_FIRSTRUN_MESSAGE = false;
                ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
                break;
@@ -99,7 +104,8 @@ void CommonDialogs::DisplayHelpDialog() {
      fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
      fl_message_font(FL_COURIER_BOLD, 11);
      int userHelpSelection = fl_choice("%s",
-                                       "Copy WIKI link to clipboard", "Dismiss", 
+                                       "Copy WIKI link to clipboard", 
+				       "Copy sample structures to your home directory", 
                                        "Display a tour of RNAStructViz", fullInstText);
      switch(userHelpSelection) {
           case 0: {
@@ -108,6 +114,9 @@ void CommonDialogs::DisplayHelpDialog() {
                Fl::copy(firstTimeRunLink, strlen(firstTimeRunLink), 1, Fl::clipboard_plain_text);
                break;
           }
+	  case 1: 
+	       RNAStructViz::CopySampleStructures();
+	       break;
           case 2: {
 	       CommonDialogs::DisplayTourDialog();
 	       break;

@@ -57,6 +57,10 @@ class RNAStructViz
 
     public:
 	static int HandleGlobalKeypressEvent(int eventCode);
+	
+	static std::string LocateSampleStructuresOnSystem();
+	static int CopySampleStructures();
+        static int BackupAndUnlinkLocalConfigFiles();
 
     private:
         static RNAStructViz* ms_instance;

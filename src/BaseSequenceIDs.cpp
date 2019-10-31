@@ -124,7 +124,7 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, RNAStructure *rnaStru
 
 std::string ExtractSequenceNameFromButtonLabel(const char *buttonLabel) {
      std::string blabelStr = std::string(buttonLabel);
-     size_t sepPos = blabelStr.find_first_of(FOLDER_NAME_DIVIDER);
+     size_t sepPos = blabelStr.find(FOLDER_NAME_DIVIDER);
      if(sepPos == std::string::npos) {
           return blabelStr;
      }

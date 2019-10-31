@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/stat.h>
+
+#include <experimental/filesystem>
+namespace stdfs = std::experimental::filesystem;
 
 #include <FL/names.h>
 
@@ -9,6 +13,7 @@
 #include "MainWindow.h"
 #include "FolderStructure.h"
 #include "ConfigParser.h"
+#include "BaseSequenceIDs.h"
 #include "TerminalPrinting.h"
 
 static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
@@ -265,3 +270,89 @@ int RNAStructViz::HandleGlobalKeypressEvent(int eventCode) {
      return 1;
 
 }
+
+std::string RNAStructViz::LocateSampleStructuresOnSystem() {
+     bool isApplePlatform = false;
+     #ifdef __TARGETOS_APPLE__
+          isApplePlatform = true; // brew folders are easy to locate!
+     #endif
+     if(isApplePlatform) {
+	  const char *brewStructDir = "/usr/local/opt/rnastructviz/sample_structures";
+          if(ConfigParser::directoryExists(brewStructDir)) {
+               return std::string(brewStructDir);
+	  }
+     }
+     char curCWDPath[MAX_BUFFER_SIZE];
+     getcwd(curCWDPath, MAX_BUFFER_SIZE);
+     std::string cwdPath = std::string(curCWDPath);
+     size_t srcDirPos = cwdPath.find("src");
+     if(srcDirPos == std::string::npos) {
+          TerminalText::PrintWarning("Unable to locate sample structures on platform I [%s]\n", TARGETOS);
+	  return "";
+     }
+     std::string prefixPath = cwdPath.substr(0, srcDirPos - 1);
+     prefixPath += std::string("/sample_structures");
+     if(ConfigParser::directoryExists(prefixPath.c_str())) {
+          return prefixPath;
+     }	  
+     TerminalText::PrintWarning("Unable to locate sample structures on platform II [%s] : %s\n", TARGETOS, prefixPath.c_str());
+     return "";
+}
+
+int RNAStructViz::CopySampleStructures() {
+     
+     std::string sampleStructDir = RNAStructViz::LocateSampleStructuresOnSystem();
+     if(sampleStructDir.size() == 0) {
+          return EINVAL;
+     }
+     if(ConfigParser::directoryExists(USER_SAMPLE_STRUCTS_PATH.c_str())) {
+          TerminalText::PrintInfo("User home sample structure directory already exists: \"%s\"\n", 
+			          USER_SAMPLE_STRUCTS_PATH.c_str());
+     }
+     else {
+          const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	  const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	  if(mkdirStatus1 == -1 || mkdirStatus2 == -1) {
+	       TerminalText::PrintError("Unable to create user home sample directory: \"%s\"\n", 
+			                USER_SAMPLE_STRUCTS_PATH.c_str());
+	       return -1;
+	  }
+     }
+     
+     // have system path, made local directory, now copy the files:
+     stdfs::copy(sampleStructDir.c_str(), USER_SAMPLE_STRUCTS_PATH, 
+		 stdfs::copy_options::overwrite_existing);
+     strcpy((char *) CTFILE_SEARCH_DIRECTORY, USER_SAMPLE_STRUCTS_PATH.c_str());
+     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+     std::string successMsg = std::string("Successfully copied the sample structure files! ") + 
+	                      std::string("They are now located in \n« ") + 
+			      std::string(USER_SAMPLE_STRUCTS_PATH) + 
+			      std::string(" ». \nClick on the \"Load Files\" button to start selecting ") + 
+			      std::string("the sample \nstructures we just copied!");
+     fl_message("%s", successMsg.c_str());
+
+     return EXIT_SUCCESS;
+
+}
+
+int RNAStructViz::BackupAndUnlinkLocalConfigFiles() {
+     time_t timeOutput = time(NULL);
+     struct tm *curTimeStruct = localtime(&timeOutput);
+     char dateStampSuffix[MAX_BUFFER_SIZE];
+     if(strftime(dateStampSuffix, MAX_BUFFER_SIZE, "-%F-%H%M%S.bak", curTimeStruct)) {
+          return EINVAL;
+     }
+     std::string configPath = std::string(USER_CONFIG_PATH);
+     std::string configBackupPath = std::string(USER_CONFIG_PATH) + std::string(dateStampSuffix);
+     std::string stickyFolderPath = std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE));
+     std::string stickyFolderBackupPath = 
+	         std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE)) + 
+		 std::string(dateStampSuffix);
+     if(rename(configPath.c_str(), configBackupPath.c_str()) || 
+	rename(stickyFolderPath.c_str(), stickyFolderBackupPath.c_str())) {
+          TerminalText::PrintError("Unable to rename backup config files \"%s\" and/or \"%s\"\n", 
+			           configBackupPath.c_str(), stickyFolderPath.c_str());
+	  return errno;
+     }
+}
+
