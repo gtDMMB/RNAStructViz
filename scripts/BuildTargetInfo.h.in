@@ -56,7 +56,7 @@
 //#define ERRORS_TO_ISO8859_1   1      /* FLTK Unicode character encoding */
 //#define ERRORS_TO_CP1252      1
 
-#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.7.7-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.7.8-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
