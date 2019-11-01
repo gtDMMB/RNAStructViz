@@ -60,7 +60,7 @@
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #endif
 
-#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.7.8-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.7.9-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
