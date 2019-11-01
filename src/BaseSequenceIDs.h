@@ -27,7 +27,7 @@ class RNAStructure;
 #define GetStickyFolderConfigPath(cfgFile)      (std::string(USER_CONFIG_DIR) + std::string(cfgFile))
 
 #define BSHASH_BYTES                            (48)
-#define MAX_BYTES_TO_HASH                       (1024)
+#define MAX_BYTES_TO_HASH                       (256)
 std::string HashBaseSequence(const char *baseSeq); 
 
 char * LookupStickyFolderNameForSequence(const char *cfgFilePath, const char *baseSeqSpec);
