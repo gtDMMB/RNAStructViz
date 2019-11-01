@@ -861,7 +861,6 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
 		    }
 	       }
 	  }
-	  fprintf(stderr, "%s / %s\n", orgName.c_str(), accNo.c_str());
 	  std::string sfNameStr;
 	  if(orgName.length() > 0 && accNo.length() > 0) {
 		  sfNameStr = orgName + std::string(" (") + accNo + std::string(")");
@@ -876,17 +875,6 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
 	  strcpy(m_suggestedFolderName, sfNameStr.c_str());
           return m_suggestedFolderName;
      }
-     //else if(GUI_KEEP_STICKY_FOLDER_NAMES && 
-     //	     (savedFolderNameFileOffset = 
-     //	      FolderNameForSequenceExists(DEFAULT_STICKY_FOLDERNAME_CFGFILE, this)) != LSEEK_NOT_FOUND) {
-     //     m_suggestedFolderName = LookupStickyFolderNameForSequence(
-     //			               DEFAULT_STICKY_FOLDERNAME_CFGFILE,
-     //				       savedFolderNameFileOffset
-     //				  );
-     //	  if(m_suggestedFolderName != NULL && m_suggestedFolderName[0] != '\0') {
-     //	       return m_suggestedFolderName;
-     //	  }
-     //}
      m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
      
      vector<string> searchForStructStrings;

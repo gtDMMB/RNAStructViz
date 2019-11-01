@@ -166,7 +166,7 @@ DisplayConfigWindow::DisplayConfigWindow() :
                                   CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
 				  imageStride);
      crDraw = cairo_create(crSurface);   
-     Fl::cairo_cc(crDraw, false);
+     //Fl::cairo_cc(crDraw, false);
 
      label(CONFIG_WINDOW_TITLE);
      color(GUI_WINDOW_BGCOLOR); 

@@ -1256,12 +1256,18 @@ void DiagramWindow::RebuildMenus() {
         this->begin();
 
         Fl_Box *label = new Fl_Box(ms_menu_minx[0], 0, ms_menu_width, 25,
-                                   "Structure 1");
+                                   "Sample Structure 1");
         label->labelcolor(GUI_TEXT_COLOR);
-        label = new Fl_Box(ms_menu_minx[1], 0, ms_menu_width, 25, "Structure 2");
+	label->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	label->labelsize(11);
+        label = new Fl_Box(ms_menu_minx[1], 0, ms_menu_width, 25, "Sample Structure 2");
         label->labelcolor(GUI_TEXT_COLOR);
-        label = new Fl_Box(ms_menu_minx[2], 0, ms_menu_width, 25, "Structure 3");
+        label->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	label->labelsize(11);
+	label = new Fl_Box(ms_menu_minx[2], 0, ms_menu_width, 25, "Sample Structure 3");
         label->labelcolor(GUI_TEXT_COLOR);
+	label->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	label->labelsize(11);
         for(int m = 0; m < 3; m++) { 
 	    m_menus[m] = new Fl_Choice(ms_menu_minx[m], 25, ms_menu_width, 25);
             m_menus[m]->callback(MenuCallback);
@@ -1425,7 +1431,8 @@ void DiagramWindow::ChangeBaseColorPaletteCallback(Fl_Widget *btn, void *udata) 
      cfgWindow->redraw();
      while(!cfgWindow->isDone() && cfgWindow->visible()) 
           Fl::wait();
-     delete cfgWindow;
+     cfgWindow->hide();
+     Delete(cfgWindow);
      DiagramWindow *dwin = (DiagramWindow *) btn->parent();
      dwin->m_redrawStructures = true;
      dwin->redraw();
