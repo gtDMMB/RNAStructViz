@@ -312,7 +312,7 @@ void DiagramWindow::drawWidgets(cairo_t *crDraw = NULL) {
     if(crDraw != NULL) {
 	 cairo_save(crDraw);
 	 CairoColor_t::FromFLColorType(GUI_WINDOW_BGCOLOR).ApplyRGBAColor(crDraw);
-	 cairo_rectangle(crDraw, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, w(), h());
+	 cairo_rectangle(crDraw, 0, 0, w(), h());
 	 cairo_fill(crDraw);
 	 cairo_restore(crDraw);
     }
