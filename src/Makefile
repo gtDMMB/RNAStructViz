@@ -28,6 +28,8 @@ endif
 # OSX-specific locations and utility names:
 TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
+	CXX=clang++
+	LD=clang++
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
 	CXXFLAGS+= -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include
