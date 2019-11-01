@@ -9,6 +9,9 @@
 #ifndef IS_DIR
      #define IS_DIR(mode)     ((mode & S_IFMT) == S_IFDIR)
 #endif
+#ifndef IS_FILE
+     #define IS_FILE(mode)    ((mode & S_IFMT) == S_IFREG)
+#endif
 
 class ConfigParser {
 

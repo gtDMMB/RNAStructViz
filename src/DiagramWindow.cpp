@@ -224,7 +224,7 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
 	bool userImageSaved = false;
 	std::string exportFilePath = thisWindow->GetExportPNGFilePath();
-	if(exportFilePath.size() == 0) {
+	if(exportFilePath.length() == 0) {
 	     buttonPressed->clear_changed();     
              return;
 	}

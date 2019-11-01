@@ -18,6 +18,7 @@
 #include <string>
 
 #include "ConfigOptions.h"
+#include "BaseSequenceIDs.h"
 
 class RNABranchType_t;
 
@@ -168,7 +169,7 @@ class RNAStructure
         const char* GetFilename() const;
         const char* GetFilenameNoExtension();
 	const char* GetInitialFileComment() const;
-	void SetFileCommentLines(std::string commentLineData);
+	void SetFileCommentLines(std::string commentLineData, InputFileTypeSpec fileType);
 	const char* GetSuggestedStructureFolderName();
 
         /*
@@ -224,6 +225,7 @@ class RNAStructure
         // The full path name of the file from which this sequence came.
         char *m_pathname, *m_pathname_noext;
 	char *m_fileCommentLine, *m_suggestedFolderName;
+	InputFileTypeSpec m_fileType;
 
         // Info for displaying the file contents
         Fl_Double_Window *m_contentWindow;

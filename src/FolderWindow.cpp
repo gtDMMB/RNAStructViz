@@ -144,18 +144,19 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     label->callback(FolderWindow::ShowFileCallback);
     label->user_data((void*)index);
     label->labelcolor(GUI_BTEXT_COLOR);
+    label->labelsize(10);
+    label->labelfont(FL_HELVETICA_BOLD_ITALIC);
     char labelWithIcon[MAX_BUFFER_SIZE];
 
     std::string spaceBuffer = string("                                                    ");
     int curLabelLen = 0;
     char filePrefix[MAX_BUFFER_SIZE];
     size_t fileNameBytes = strlen(filename);
-    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.20s%s", filename, 
+    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.30s%s", filename, 
 	     fileNameBytes > MAX_FOLDER_LABEL_CHARS ? "..." : "");
     snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s", 
 	     filePrefix, spaceBuffer.substr(0, 
              MAX(0, MAX_FOLDER_LABEL_CHARS - ((int ) strlen(filePrefix)))).c_str());
-    //strcat(labelWithIcon, "   @|>");
     label->copy_label(labelWithIcon);
     label->tooltip(filename); 
     

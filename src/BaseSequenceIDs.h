@@ -19,13 +19,15 @@
 #include <string>
 
 #include "ConfigOptions.h"
-#include "RNAStructure.h"
+
+class RNAStructure;
 
 #define FOLDER_NAME_DIVIDER                     (" -- ")
 #define DEFAULT_STICKY_FOLDERNAME_CFGFILE       ("sequence-folder-names.dat")
 #define GetStickyFolderConfigPath(cfgFile)      (std::string(USER_CONFIG_DIR) + std::string(cfgFile))
 
 #define BSHASH_BYTES                            (48)
+#define MAX_BYTES_TO_HASH                       (1024)
 std::string HashBaseSequence(const char *baseSeq); 
 
 char * LookupStickyFolderNameForSequence(const char *cfgFilePath, const char *baseSeqSpec);
@@ -37,7 +39,6 @@ char * LookupStickyFolderNameForSequence(const char *cfgFilePath, off_t fnameFil
 off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSpec);
 off_t FolderNameForSequenceExists(const char *cfgFilePath, RNAStructure *rnaStructSpec);
 
-std::string ExtractSequenceNameFromButtonLabel(const char *buttonLabel);
 int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, 
 		                          std::string baseSeq, std::string folderName);
 int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, 

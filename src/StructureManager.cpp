@@ -123,7 +123,7 @@ void StructureManager::AddFile(const char* filename)
 				                    DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
 						    stickyFolderExists
 					       );
-                      if(!FolderNameExists(stickyFolderName)) {
+                      if(stickyFolderName != NULL && !FolderNameExists(stickyFolderName)) {
 		           strcpy(folders[count]->folderName, stickyFolderName);
 		           Free(stickyFolderName);
                            MainWindow::AddFolder(folders[count]->folderName, count, false);
@@ -176,22 +176,15 @@ void StructureManager::AddFile(const char* filename)
             	     strcpy(folders[count]->folderName, input_window->getName());
 		     if(GUI_KEEP_STICKY_FOLDER_NAMES) {
                           const char *baseSeq = structure->GetSequenceString();
-			  std::string seqFolderUniqueName = ExtractSequenceNameFromButtonLabel(
-					                         folders[count]->folderName
-						            );
-			  off_t existingEntry = FolderNameForSequenceExists(
-					             DEFAULT_STICKY_FOLDERNAME_CFGFILE,
-					             baseSeq
-						);
 			  int saveStatus = SaveStickyFolderNameToConfigFile(
 			       DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
 			       std::string(baseSeq), 
-			       seqFolderUniqueName, 
-			       existingEntry
+			       std::string(folders[count]->folderName), 
+			       LSEEK_NOT_FOUND
 			  );
 			  if(saveStatus) {
 			       TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
-					                  seqFolderUniqueName.c_str());
+					                  folders[count]->folderName);
 			  }
 		     }
 		 }

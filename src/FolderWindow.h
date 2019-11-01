@@ -17,7 +17,7 @@
 
 #include "ConfigOptions.h"
 
-#define MAX_FOLDER_LABEL_CHARS           (20)
+#define MAX_FOLDER_LABEL_CHARS           (30)
 
 class FolderWindow : public Fl_Group
 {

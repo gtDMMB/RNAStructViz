@@ -243,12 +243,15 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     label->callback(MainWindow::ShowFolderCallback);
     label->user_data((void*)foldername);
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
-    sprintf(folder->folderNameFileCount, "(+% 2d) %-.48s", 
-            folder->structCount, folder->folderName);
+    sprintf(folder->folderNameFileCount, "(+% 2d) %-.25s%s", 
+            folder->structCount, folder->folderName, 
+	    strlen(folder->folderName) > 25 ? "..." : "");
     label->label(folder->folderNameFileCount);
     label->labelcolor(GUI_BTEXT_COLOR);
     label->tooltip(foldername);
-    
+    label->labelsize(10);
+    label->labelfont(FL_HELVETICA_BOLD_ITALIC);
+
     ms_instance->folderDataBtns.push_back(label);
 
     Fl_Button* moveUpButton = new Fl_Button(pack->x()+pack->w() - 60, vertPosn + 5, 20, 20, "@8>");

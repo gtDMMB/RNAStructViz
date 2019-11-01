@@ -16,7 +16,6 @@ using std::stack;
 #include "ConfigOptions.h"
 #include "ThemesConfig.h"
 #include "TerminalPrinting.h"
-#include "BaseSequenceIDs.h"
 
 #if PERFORM_BRANCH_TYPE_ID
 #include "BranchTypeIdentification.h"
@@ -27,7 +26,7 @@ const RNAStructure::BasePair RNAStructure::UNPAIRED = ~0x0;
 RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(NULL), 
       charSeq(NULL), dotFormatCharSeq(NULL), charSeqSize(0), 
-      m_pathname(NULL), m_pathname_noext(NULL), 
+      m_pathname(NULL), m_pathname_noext(NULL), m_fileType(FILETYPE_NONE), 
       m_fileCommentLine(NULL), m_suggestedFolderName(NULL), 
       m_ctDisplayString(NULL), m_ctDisplayFormatString(NULL), 
       m_seqDisplayString(NULL), m_seqDisplayFormatString(NULL), 
@@ -358,7 +357,6 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
 	       TerminalText::PrintError("Reading DotBracket file \"%s\" : %s\n", filename, strerror(errno));
 	       break;
 	  }
-	  TerminalText::PrintError("ON LINE: [%s]\n", lineReturn);
 	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
 	       continue;
 	  }
@@ -822,7 +820,7 @@ const char* RNAStructure::GetInitialFileComment() const {
      return m_fileCommentLine;
 }
 
-void RNAStructure::SetFileCommentLines(std::string commentLineData) {
+void RNAStructure::SetFileCommentLines(std::string commentLineData, InputFileTypeSpec fileType) {
      if(m_fileCommentLine != NULL) {
           Free(m_fileCommentLine);
      }
@@ -830,28 +828,66 @@ void RNAStructure::SetFileCommentLines(std::string commentLineData) {
      m_fileCommentLine = (char *) malloc((clineDataLen + 1) * sizeof(char));
      strncpy(m_fileCommentLine, commentLineData.c_str(), clineDataLen);
      m_fileCommentLine[clineDataLen] = '\0';
+     m_fileType = fileType;
 }
 
 const char* RNAStructure::GetSuggestedStructureFolderName() {
      
-     off_t savedFolderNameFileOffset = LSEEK_NOT_FOUND;
      if(m_suggestedFolderName) { // we have already computed this data:
           return m_suggestedFolderName;
      }
-     else if(GUI_KEEP_STICKY_FOLDER_NAMES && 
-	     (savedFolderNameFileOffset = 
-	      FolderNameForSequenceExists(DEFAULT_STICKY_FOLDERNAME_CFGFILE, this)) != LSEEK_NOT_FOUND) {
-          m_suggestedFolderName = LookupStickyFolderNameForSequence(
-			               DEFAULT_STICKY_FOLDERNAME_CFGFILE,
-				       savedFolderNameFileOffset
-				  );
-	  if(m_suggestedFolderName != NULL && m_suggestedFolderName[0] != '\0') {
-	       return m_suggestedFolderName;
+     else if(m_fileType == FILETYPE_NOPCT && m_fileCommentLine != NULL) {
+	  std::string commentLines = std::string(m_fileCommentLine);
+	  std::string orgName, accNo;
+	  size_t orgNamePos = commentLines.find("Organism: ");
+	  if(orgNamePos != std::string::npos) {
+	       size_t newlinePos = commentLines.find_first_of("\n", orgNamePos);
+	       if(newlinePos != std::string::npos) {
+		    size_t orgNameStartPos = orgNamePos + strlen("Organism: ");
+	            orgName = commentLines.substr(orgNameStartPos, newlinePos - orgNameStartPos);
+	       }
 	  }
+	  size_t accNoPos = commentLines.find("Accession");
+	  if(accNoPos != std::string::npos) {
+               size_t colonPos = commentLines.find_first_of(":", accNoPos);
+	       if(colonPos != std::string::npos) {
+                    size_t accNoStart = colonPos + 2;
+		    size_t newlinePos = commentLines.find_first_of("\n", accNoStart);
+		    if(newlinePos == std::string::npos) {
+		         accNo = commentLines.substr(accNoStart);
+		    }
+		    else {
+                         accNo = commentLines.substr(accNoStart, newlinePos - accNoStart);
+		    }
+	       }
+	  }
+	  fprintf(stderr, "%s / %s\n", orgName.c_str(), accNo.c_str());
+	  std::string sfNameStr;
+	  if(orgName.length() > 0 && accNo.length() > 0) {
+		  sfNameStr = orgName + std::string(" (") + accNo + std::string(")");
+	  }
+	  else if(orgName.length() > 0) {
+	       sfNameStr = orgName;
+	  }
+	  else if(accNo.length() > 0) {
+	       sfNameStr = accNo;
+	  }
+	  m_suggestedFolderName = (char *) malloc((sfNameStr.length() + 1) * sizeof(char));
+	  strcpy(m_suggestedFolderName, sfNameStr.c_str());
+          return m_suggestedFolderName;
      }
-     else {
-          m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
-     }
+     //else if(GUI_KEEP_STICKY_FOLDER_NAMES && 
+     //	     (savedFolderNameFileOffset = 
+     //	      FolderNameForSequenceExists(DEFAULT_STICKY_FOLDERNAME_CFGFILE, this)) != LSEEK_NOT_FOUND) {
+     //     m_suggestedFolderName = LookupStickyFolderNameForSequence(
+     //			               DEFAULT_STICKY_FOLDERNAME_CFGFILE,
+     //				       savedFolderNameFileOffset
+     //				  );
+     //	  if(m_suggestedFolderName != NULL && m_suggestedFolderName[0] != '\0') {
+     //	       return m_suggestedFolderName;
+     //	  }
+     //}
+     m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
      
      vector<string> searchForStructStrings;
      if(m_fileCommentLine != NULL) { // file we loaded contained a comment:

@@ -273,6 +273,7 @@ int RNAStructViz::HandleGlobalKeypressEvent(int eventCode) {
 }
 
 std::string RNAStructViz::LocateSampleStructuresOnSystem() {
+     
      bool isApplePlatform = false;
      #ifdef __TARGETOS_APPLE__
           isApplePlatform = true; // brew folders are easy to locate!
@@ -281,6 +282,12 @@ std::string RNAStructViz::LocateSampleStructuresOnSystem() {
 	  const char *brewStructDir = "/usr/local/opt/rnastructviz/sample_structures";
           if(ConfigParser::directoryExists(brewStructDir)) {
                return std::string(brewStructDir);
+	  }
+     }
+     else {
+	  const char *unixSudoInstallDir = "/usr/local/share/RNAStructViz/sample_structures";
+	  if(ConfigParser::directoryExists(unixSudoInstallDir)) {
+	       return std::string(unixSudoInstallDir);
 	  }
      }
      char curCWDPath[MAX_BUFFER_SIZE];
@@ -298,12 +305,13 @@ std::string RNAStructViz::LocateSampleStructuresOnSystem() {
      }	  
      TerminalText::PrintWarning("Unable to locate sample structures on platform II [%s] : %s\n", TARGETOS, prefixPath.c_str());
      return "";
+
 }
 
 int RNAStructViz::CopySampleStructures() {
      
      std::string sampleStructDir = RNAStructViz::LocateSampleStructuresOnSystem();
-     if(sampleStructDir.size() == 0) {
+     if(sampleStructDir.length() == 0) {
           return EINVAL;
      }
      if(ConfigParser::directoryExists(USER_SAMPLE_STRUCTS_PATH.c_str())) {

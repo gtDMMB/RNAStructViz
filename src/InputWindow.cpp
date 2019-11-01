@@ -171,19 +171,10 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 	 snprintf(exportSaveDir, dirTextLen, "%s", window->inputText);
 	 snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s/%s.csv", 
 	          exportSaveDir, window->input->value());
-         window->name = "<UNDEFINED>";
-	 //window->name = window->inputText;
+         window->name = "";
     }
     else {
-        //if(window->inputText != (char*)window->input->value()) {
-        //    strcpy(window->inputText, (char*)window->input->value());
-        //}
-        //if(!MainWindow::CheckDistinctFolderName(window->inputText)) {
-	//    fl_alert("The folder name for the structure \"%s\" already exists!", window->inputText);
-	//    return;
-	//}
-	//window->name = window->inputText;
-	window->name = "<UNDEFINED>";
+	window->name = "";
         if(window->cbUseDefaultNames->value()) {
             GUI_USE_DEFAULT_FOLDER_NAMES = true;
         }
@@ -242,13 +233,12 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
 				       stickyFolderExists
 				  );
 	 if(stickyFolderName != NULL) {
-	      char suggestedStickyName[MAX_BUFFER_SIZE];
-              snprintf(suggestedStickyName, MAX_BUFFER_SIZE, "No. #% 2d%s%s", 
-	               ++InputWindow::distinctStructureCount, 
-	               FOLDER_NAME_DIVIDER, stickyFolderName);
-              suggestedStickyName[MAX_BUFFER_SIZE - 1] = '\0';
+	      //// executive decision: save space on the small button labels by not 
+	      //// prepending a folder number if there is a saved sticky folder label 
+	      //// already there to go from the local user config files:
+	      std::string suggestedStickyName = std::string(stickyFolderName);
 	      Free(stickyFolderName);
-	      return std::string(suggestedStickyName);
+	      return suggestedStickyName;
 	 }
     }
     
@@ -258,15 +248,15 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
 	                          std::string(seqFilePath);
     std::string fileHeaderLines = GetSequenceFileHeaderLines(fullSeqFilePath.c_str(), inputFileType);
     if(fileHeaderLines.size() > 0) {
-         rnaStruct->SetFileCommentLines(fileHeaderLines);
+         rnaStruct->SetFileCommentLines(fileHeaderLines, inputFileType);
     }
     const char *suggestedFolderName = rnaStruct ? 
 	                              rnaStruct->GetSuggestedStructureFolderName() : NULL;
-    const char *folderNumberDivider = suggestedFolderName ? FOLDER_NAME_DIVIDER : "";
+    if(suggestedFolderName != NULL) {
+         return std::string(suggestedFolderName);
+    }
     char suggestedShortName[MAX_BUFFER_SIZE];
-    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d%s%s", 
-	     ++InputWindow::distinctStructureCount, 
-	     folderNumberDivider, suggestedFolderName ? suggestedFolderName : "");
+    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d", ++InputWindow::distinctStructureCount); 
     suggestedShortName[MAX_BUFFER_SIZE - 1] = '\0';
     return std::string(suggestedShortName);
 

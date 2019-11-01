@@ -288,7 +288,7 @@ bool ConfigParser::fileExists(const char *filePath) {
           return false;
      }
      struct stat fileInfo;
-     return stat(filePath, &fileInfo) == 0 && !IS_DIR(fileInfo.st_mode);
+     return stat(filePath, &fileInfo) == 0 && IS_FILE(fileInfo.st_mode);
 }
 
 bool ConfigParser::directoryExists(const char *dirPath) { 
