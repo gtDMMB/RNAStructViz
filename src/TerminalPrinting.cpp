@@ -10,11 +10,11 @@
 #include "ConfigOptions.h"
 #include "TerminalPrinting.h"
 
-bool PRINT_ANSI_COLOR = true;
-bool PRINT_TERMINAL_UNICODE = true;
-bool CFG_QUIET_MODE = false;
-bool CFG_DEBUG_MODE = DEBUGGING_ON;
-bool CFG_VERBOSE_MODE = DEBUGGING_ON;
+int PRINT_ANSI_COLOR = true;
+int PRINT_TERMINAL_UNICODE = true;
+int CFG_QUIET_MODE = false;
+int CFG_DEBUG_MODE = DEBUGGING_ON;
+int CFG_VERBOSE_MODE = DEBUGGING_ON;
 
 unsigned int TerminalText::SelectUnicodeIconIndex(UnicodeSymbolTypeClass iconType, bool randomize) {
      if(!randomize && iconType >= 0 && iconType < SYMBOLS_ARRAY_LENGTH) {

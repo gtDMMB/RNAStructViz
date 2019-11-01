@@ -105,7 +105,7 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSp
 	       foundMatch = true;
 	       break;
 	  }
-	  curFileOffset = fseek(fpCfgFile, 0, SEEK_CUR);
+	  curFileOffset = ftell(fpCfgFile);
      }
      fclose(fpCfgFile);
      if(foundMatch) {
@@ -128,7 +128,6 @@ int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string b
      FILE *fpCfgFile = fopen(cfgFilePath, "w+");
      if(!fpCfgFile) {
           TerminalText::PrintError("Unable to open \"%s\": %s IV\n", cfgFilePath, strerror(errno));
-	  fclose(fpCfgFile);
 	  return errno;
      }
      std::string baseSeqHash = HashBaseSequence(baseSeq.c_str());
@@ -158,7 +157,7 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      }
      int fdCfgFile = fileno(fpCfgFile);
      char tempFilePath[MAX_BUFFER_SIZE];
-     strcpy(tempFilePath, cfgFilePath);
+     strcpy(tempFilePath, fullCfgFilePath.c_str());
      strcat(tempFilePath, ".temp");
      FILE *fpTempFile = fopen(tempFilePath, "w+");
      if(!fpTempFile) {
@@ -166,14 +165,13 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
 	  fclose(fpCfgFile);
 	  return errno;
      }
-     int fdTempFile = fileno(fpTempFile);
 
      std::string baseSeqHash = HashBaseSequence(baseSeq.c_str());
 
      char lineBuf[MAX_BUFFER_SIZE];
      off_t curCfgFileOffset = 0;
      while(fgets(lineBuf, MAX_BUFFER_SIZE, fpCfgFile)) {
-          off_t nextOffset = fseek(fpCfgFile, 0, SEEK_CUR);
+	  off_t nextOffset = ftell(fpCfgFile);
 	  if(curCfgFileOffset != replacePos) {
                fprintf(fpTempFile, "%s", lineBuf);
 	  }
@@ -182,15 +180,16 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
 	  }
 	  curCfgFileOffset = nextOffset;
      }
-     if(replacePos == LSEEK_NOT_FOUND) {
-          fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
-     }
+     //if(replacePos == LSEEK_NOT_FOUND) {
+     //     fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
+     //}
 
      fclose(fpCfgFile);
      fclose(fpTempFile);
-     if(rename(tempFilePath, cfgFilePath)) {
-          TerminalText::PrintError("Unable to move \"%s\" to \"%s\" : %s\n", tempFilePath, cfgFilePath, strerror(errno));
-	  return errno;
+     if(rename(tempFilePath, fullCfgFilePath.c_str())) {
+          TerminalText::PrintError("Unable to move \"%s\" to \"%s\" : %s\n", 
+			           tempFilePath, cfgFilePath, strerror(errno));
+     	  return errno;
      }
 
      return EXIT_SUCCESS;

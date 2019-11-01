@@ -3,10 +3,8 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-//#include <experimental/filesystem>
-//namespace stdfs = std::experimental::filesystem;
-#include <filesystem>
-namespace stdfs = std::filesystem;
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 #include <FL/names.h>
 
@@ -330,8 +328,22 @@ int RNAStructViz::CopySampleStructures() {
      }
      
      // have system path, made local directory, now copy the files:
-     stdfs::copy(sampleStructDir.c_str(), USER_SAMPLE_STRUCTS_PATH, 
-		 stdfs::copy_options::overwrite_existing);
+     fs::directory_iterator ssFile(sampleStructDir.c_str());
+     boost::filesystem::path const & destDir(USER_SAMPLE_STRUCTS_PATH.c_str());
+     while(ssFile != fs::directory_iterator()) {
+          fs::path ssCurPath(ssFile->path());
+	  if(!fs::is_directory(ssCurPath)) {
+	       try {
+                    fs::copy_file(ssCurPath, destDir / ssCurPath.filename());
+	       } catch(boost::filesystem::filesystem_error fse) {
+	            TerminalText::PrintInfo("Cannot copy \"%s\" into home directory (file already exists)\n", 
+				            ssCurPath.filename().c_str());
+	       }
+	  }
+          ++ssFile;
+     }
+     //stdfs::copy(sampleStructDir.c_str(), USER_SAMPLE_STRUCTS_PATH, 
+     //		 stdfs::copy_options::overwrite_existing);
      strcpy((char *) CTFILE_SEARCH_DIRECTORY, USER_SAMPLE_STRUCTS_PATH.c_str());
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      std::string successMsg = std::string("Successfully copied the sample structure files! ") + 

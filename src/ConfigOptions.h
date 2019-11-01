@@ -85,7 +85,7 @@ extern volatile Fl_Color STRUCTURE_DIAGRAM_COLORS[3][7];
 
 extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
 extern bool GUI_KEEP_STICKY_FOLDER_NAMES;
-extern bool DEBUGGING_ON;
+extern int  DEBUGGING_ON;
 extern bool DISPLAY_FIRSTRUN_MESSAGE;
 
 extern char rnaStructVizExecPath[MAX_BUFFER_SIZE];

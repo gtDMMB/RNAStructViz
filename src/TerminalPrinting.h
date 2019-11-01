@@ -88,11 +88,11 @@ namespace ANSIColor {
 
 };
 
-extern bool PRINT_ANSI_COLOR;
-extern bool PRINT_TERMINAL_UNICODE;
-extern bool CFG_QUIET_MODE;
-extern bool CFG_DEBUG_MODE;
-extern bool CFG_VERBOSE_MODE;
+extern int PRINT_ANSI_COLOR;
+extern int PRINT_TERMINAL_UNICODE;
+extern int CFG_QUIET_MODE;
+extern int CFG_DEBUG_MODE;
+extern int CFG_VERBOSE_MODE;
 
 namespace TerminalText {
 
