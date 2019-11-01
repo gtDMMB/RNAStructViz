@@ -310,11 +310,11 @@ void DiagramWindow::drawWidgets(cairo_t *crDraw = NULL) {
 	}
     }
     if(crDraw != NULL) {
-	 cairo_save(crDraw);
+	 //cairo_save(crDraw);
 	 CairoColor_t::FromFLColorType(GUI_WINDOW_BGCOLOR).ApplyRGBAColor(crDraw);
 	 cairo_rectangle(crDraw, 0, 0, w(), h());
 	 cairo_fill(crDraw);
-	 cairo_restore(crDraw);
+	 //cairo_restore(crDraw);
     }
     Fl_Double_Window::draw();
 
@@ -451,7 +451,10 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     cairo_rectangle(cr, GLWIN_TRANSLATEX, GLWIN_TRANSLATEY, 
 		    IMAGE_WIDTH, IMAGE_HEIGHT);    
     cairo_fill(cr);
-    
+     
+    thisWindow->RedrawStrandEdgeMarker(cr);
+    thisWindow->RedrawCairoZoomBuffer(cr);
+   
     if(numToDraw == 1) {
         thisWindow->DrawKey1(keyA);
     }
@@ -461,9 +464,6 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) {
     else if(numToDraw == 3) {
         thisWindow->DrawKey3();
     }
-    
-    thisWindow->RedrawStrandEdgeMarker(cr);
-    thisWindow->RedrawCairoZoomBuffer(cr);
     
     fl_color(priorColor);
     fl_font(priorFont, priorFontSize);
@@ -506,8 +506,9 @@ Fl_Color MatchKeyDrawColorToCairo(Fl_Color flc) {
 void DiagramWindow::DrawKey3() {
     int yPosn = 55;
     char mystr[10] = "";
-    
-    fl_font(LOCAL_BFFONT, BASE_LINE_FONT_SIZE);
+    int dashedLineStyle = FL_DASH | FL_CAP_ROUND | FL_JOIN_MITER;
+
+    fl_font(FL_HELVETICA_BOLD_ITALIC, BASE_LINE_FONT_SIZE);
 
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][0]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
@@ -520,7 +521,7 @@ void DiagramWindow::DrawKey3() {
 
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][5]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
-    fl_line_style(FL_DOT);
+    fl_line_style(dashedLineStyle);
     fl_xyline(m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
     fl_xyline(m_menus[2]->x(), yPosn, m_menus[2]->x() + m_menus[2]->w());
     sprintf(mystr, "%d", numPairs[1]);
@@ -530,7 +531,7 @@ void DiagramWindow::DrawKey3() {
 
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][4]));
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
-    fl_line_style(FL_DOT);
+    fl_line_style(dashedLineStyle);
     fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
     fl_xyline(m_menus[2]->x(), yPosn, m_menus[2]->x() + m_menus[2]->w());
     sprintf(mystr, "%d", numPairs[2]);
@@ -540,7 +541,7 @@ void DiagramWindow::DrawKey3() {
 
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][2]));
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
-    fl_line_style(FL_DOT);
+    fl_line_style(dashedLineStyle);
     fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
     fl_xyline(m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
     sprintf(mystr, "%d", numPairs[6]);
@@ -551,7 +552,7 @@ void DiagramWindow::DrawKey3() {
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][1]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
-    fl_line_style(FL_DOT);
+    fl_line_style(dashedLineStyle);
     fl_xyline(m_menus[2]->x(), yPosn, m_menus[2]->x() + m_menus[2]->w());
     sprintf(mystr, "%d", numPairs[3]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
@@ -561,7 +562,7 @@ void DiagramWindow::DrawKey3() {
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][3]));
     fl_rectf(m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
-    fl_line_style(FL_DOT);
+    fl_line_style(dashedLineStyle);
     fl_xyline(m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
     sprintf(mystr, "%d", numPairs[4]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
@@ -571,7 +572,7 @@ void DiagramWindow::DrawKey3() {
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[2][6]));
     fl_rectf(m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     fl_rectf(m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
-    fl_line_style(FL_DOT);
+    fl_line_style(dashedLineStyle);
     fl_xyline(m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
     sprintf(mystr, "%d", numPairs[5]);
     fl_draw(mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
@@ -583,7 +584,7 @@ void DiagramWindow::DrawKey2(const int a, const int b) {
     int yPosn = 55;
     char mystr[10] = "";
     
-    fl_font(LOCAL_BFFONT, BASE_LINE_FONT_SIZE);
+    fl_font(FL_HELVETICA_BOLD_ITALIC, BASE_LINE_FONT_SIZE);
 
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[1][0]));
     fl_rectf(m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
@@ -609,7 +610,7 @@ void DiagramWindow::DrawKey2(const int a, const int b) {
 }
 
 void DiagramWindow::DrawKey1(const int a) {
-    fl_font(LOCAL_BFFONT, BASE_LINE_FONT_SIZE);
+    fl_font(FL_HELVETICA_BOLD_ITALIC, BASE_LINE_FONT_SIZE);
     fl_color(MatchKeyDrawColorToCairo(STRUCTURE_DIAGRAM_COLORS[0][0]));
     fl_rectf(m_menus[a]->x(), 55, m_menus[a]->w(), 3);
     char mystr[10] = "";
@@ -1184,9 +1185,9 @@ void DiagramWindow::DrawBase(
     cairo_text_extents_t textDims;
     cairo_text_extents(crBasePairsOverlay, baseChar, &textDims);
     baseColor.ApplyRGBAColor(crBasePairsOverlay);
-    cairo_select_font_face(crBasePairsOverlay, "Courier New", 
-		           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size(crBasePairsOverlay, CairoContext_t::FONT_SIZE_SMALL);
+    cairo_select_font_face(crBasePairsOverlay, "monospace", 
+		           CAIRO_FONT_SLANT_OBLIQUE, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(crBasePairsOverlay, CairoContext_t::FONT_SIZE_SMALLER);
     cairo_move_to(crBasePairsOverlay, (int) (xPosn1 - textDims.width / 2), (int) yPosn1);
     cairo_show_text(crBasePairsOverlay, baseChar);
     cairo_restore(crBasePairsOverlay);

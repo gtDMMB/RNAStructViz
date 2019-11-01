@@ -24,9 +24,10 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 {
 
     // label configuration:  
-    //labelcolor(GUI_TEXT_COLOR);
     labelfont(LOCAL_BFFONT);
-    labelsize(LOCAL_TEXT_SIZE);    
+    labelsize(LOCAL_TEXT_SIZE);
+    labeltype(_FL_SHADOW_LABEL);
+    align(FL_ALIGN_CENTER | FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
 
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 

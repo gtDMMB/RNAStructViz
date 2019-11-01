@@ -171,6 +171,7 @@ class CairoContext_t {
 
 	  typedef enum {
 	       FONT_SIZE_TINY      = 6, 
+	       FONT_SIZE_SMALLER   = 7,
 	       FONT_SIZE_SMALL     = 9, 
 	       FONT_SIZE_NORMAL    = 11,
 	       FONT_SIZE_LARGE     = 15, 

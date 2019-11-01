@@ -245,15 +245,14 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
      std::string headerLines;
      char lineBuf[MAX_BUFFER_SIZE];
      bool addToHeaderStr = false, stopParsing = false;
+     int lineCount = 0;
      while(!feof(fpInputSeq) && fgets(lineBuf, MAX_BUFFER_SIZE, fpInputSeq)) {
           int lineLength = strlen(lineBuf);
+	  ++lineCount;
 	  if(lineLength == 0) {
 	       stopParsing = true;
 	       break;
 	  }
-	  //else if(lineBuf[lineLength - 1] == '\n') {
-	  //     lineBuf[lineLength - 1] = ' ';
-	  //}
           switch(fileType) {
 	       case FILETYPE_NOPCT: {
                     std::string searchStr = std::string(lineBuf);
@@ -268,7 +267,7 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
 		    break;
 	       }
 	       case FILETYPE_CT:
-	            if(!isspace(lineBuf[0]) && !isdigit(lineBuf[0])) {
+	            if(lineCount == 1) {
 		         addToHeaderStr = true;
 	            }
 		    else {
