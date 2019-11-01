@@ -32,9 +32,10 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	LD=/usr/local/opt/llvm@8/bin/clang++
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
-	CXXFLAGS+= -Wno-c++11-narrowing -Wno-c++17-narrowing \
+	CXXFLAGS+= -Wno-c++11-narrowing \
 		   -I/usr/local/opt/openssl/include -I/usr/local/opt/llvm@8/include
-	LDFLAGS+= -L/usr/local/opt/openssl/lib -L/usr/local/opt/llvm@8/lib
+	LDFLAGS+= -L/usr/local/opt/openssl/lib -L/usr/local/opt/llvm@8/lib \
+		  -L/usr/local/opt/llvm@8/lib -Wl,-rpath,/usr/local/opt/llvm@8/lib
 else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=readlink
