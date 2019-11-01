@@ -6,6 +6,7 @@
 
 #include <wchar.h>
 #include <stdarg.h>
+#include <locale.h>
 
 #include "ConfigOptions.h"
 #include "TerminalPrinting.h"
