@@ -2,11 +2,11 @@
 #### Author: Maxie D. Schmidt (maxieds@gmail.com)
 #### Updated: 2019.03.05 (V2)
 
-CXX=g++-8
+CXX=g++
 CXXFLAGS= -g -Wall -Wextra -pedantic -O0 -march=native #-fsanitize=address
 
-LD=g++-8
-LDFLAGS=-Wall -Wextra -g1 -lm -lstdc++fs #-fsanitize=address
+LD=g++
+LDFLAGS=-Wall -Wextra -g1 -lm #-fsanitize=address
 
 .DEFAULT: default
 
@@ -28,14 +28,10 @@ endif
 # OSX-specific locations and utility names:
 TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
-	CXX=/usr/local/opt/llvm@8/bin/clang++
-	LD=/usr/local/opt/llvm@8/bin/clang++
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
-	CXXFLAGS+= -Wno-c++11-narrowing \
-		   -I/usr/local/opt/openssl/include -I/usr/local/opt/llvm@8/include
-	LDFLAGS+= -L/usr/local/opt/openssl/lib -L/usr/local/opt/llvm@8/lib \
-		  -L/usr/local/opt/llvm@8/lib -Wl,-rpath,/usr/local/opt/llvm@8/lib
+	CXXFLAGS+= -I/usr/local/opt/openssl/include 
+	LDFLAGS+= -L/usr/local/opt/openssl/lib 
 else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=readlink
@@ -68,12 +64,13 @@ CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS)
 
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
-LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto
+LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto -lboost_system -lboost_filesystem
 LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = \
 	BaseSequenceIDs.$(OBJEXT) BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
-	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) DisplayConfigWindow.$(OBJEXT)\
+	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) \
+	DisplayConfigWindow.$(OBJEXT)\
 	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
 	OptionParser.$(OBJEXT) \
