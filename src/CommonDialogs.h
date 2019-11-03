@@ -51,7 +51,10 @@ namespace CommonDialogs {
      void DisplayFirstRunInstructions();
      void DisplayHelpDialog();
      void DisplayTourDialog();
+     
+     std::string GetInfoAboutMessageString();
      void DisplayInfoAboutDialog();
+     
      void DisplayKeyboardShortcutsDialog();
 
 };

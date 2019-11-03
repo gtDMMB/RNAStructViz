@@ -167,13 +167,8 @@ void CommonDialogs::DisplayTourDialog() {
 
 }
 
-void CommonDialogs::DisplayInfoAboutDialog() {
-
-     string infoWelcomeMsg = string("The next table summarizes the compile and current runtime time stats ") + 
-	                     string("associated with this build of RNAStructViz. A copy \nof the build-time ") + 
-			     string("parameters on your system can be obtained by running the next ") + 
-			     string("command in a terminal:\n") + 
-			     string("$ RNAStructViz --about\n\n");
+std::string CommonDialogs::GetInfoAboutMessageString() {
+     
      string infoTableOrigData[] = {
            ApplicationBuildInfo::GitRevisionInfo(),
            ApplicationBuildInfo::GitRevisionDate(),
@@ -182,14 +177,14 @@ void CommonDialogs::DisplayInfoAboutDialog() {
            ApplicationBuildInfo::CairoVersionString(),
            ApplicationBuildInfo::BuildPlatform(),
            ApplicationBuildInfo::LocalBuildDateTime(),
-	   "",
+	   //"",
 	   (string("RNAStructViz Launch Path Command: ") + string(rnaStructVizExecPath)), 
 	   (string("Current Working Directory (CWD): ") + string(runtimeCWDPath)), 
 	   (string("Active System User (From ENV): ") + string(activeSystemUserFromEnv)),
      };
      string spaces = string("................................................................................");
      int tableHeaderWidth = 42;
-     string infoMsg = infoWelcomeMsg;
+     string infoMsg;
      for(int data = 0; data < GetArrayLength(infoTableOrigData); data++) {
           string curInfoStr = infoTableOrigData[data];
 	  if(!strcmp(curInfoStr.c_str(), "")) {
@@ -206,6 +201,18 @@ void CommonDialogs::DisplayInfoAboutDialog() {
           fullLineData[MAX_BUFFER_SIZE - 1] = '\0';
           infoMsg += string(fullLineData);
      }
+     return infoMsg;
+
+}
+
+void CommonDialogs::DisplayInfoAboutDialog() {
+
+     string infoWelcomeMsg = string("The next table summarizes the compile and current runtime time stats ") + 
+	                     string("associated with this build of RNAStructViz. A copy \nof the build-time ") + 
+			     string("parameters on your system can be obtained by running the next ") + 
+			     string("command in a terminal:\n") + 
+			     string("$ RNAStructViz --about\n\n");
+     std::string infoMsg = infoWelcomeMsg + CommonDialogs::GetInfoAboutMessageString();
 
      fl_message_title("About the Application : RNAStructViz Build and Current Runtime Information");
      fl_message_icon()->image(CommonDialogs::infoIconImage);
@@ -214,7 +221,23 @@ void CommonDialogs::DisplayInfoAboutDialog() {
      fl_message_icon()->box(FL_NO_BOX);
      fl_message_icon()->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
      fl_message_font(FL_COURIER_BOLD, 12);
-     fl_message("%s", infoMsg.c_str());
+     int infoChoiceStatus = fl_choice("%s", "Copy about information to clipboard", 
+		                      "Close dialog", "Copy bug reporting WIKI link", 
+				      infoMsg.c_str());
+     switch(infoChoiceStatus) {
+	  case 0: {
+               Fl::copy(infoMsg.c_str(), infoMsg.length(), 1, Fl::clipboard_plain_text);
+               break;
+          }
+	  case 2: {
+               const char *bugReportingWIKILink =
+                           "https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors";
+               Fl::copy(bugReportingWIKILink, strlen(bugReportingWIKILink), 1, Fl::clipboard_plain_text);
+               break;
+          }
+	  default:
+	       break;
+     }
 
 }
 
