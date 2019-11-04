@@ -312,7 +312,7 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 		 nextFilename);
 	RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
     }
-    Delete(ms_instance->m_fileChooser);
+    //Delete(ms_instance->m_fileChooser);
 
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
@@ -516,6 +516,7 @@ bool MainWindow::CreateFileChooser()
 		    );
     m_fileChooser->directory(currentWD);
     m_fileChooser->preview(true);
+    //m_fileChooser->preview(false);
     m_fileChooser->textcolor(GUI_TEXT_COLOR);
     m_fileChooser->color(GUI_WINDOW_BGCOLOR);
     m_fileChooser->showHiddenButton->value(true); // show hidden files by default

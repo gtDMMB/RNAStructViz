@@ -138,7 +138,7 @@ void StructureManager::AddFile(const char* filename)
                  while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
                        Fl::wait();
                  }
-		 input_window->hide();
+		 //input_window->hide();
             
                  bool same = false;
                  for(unsigned int ui = 0; ui < folders.size(); ui++)
@@ -160,8 +160,8 @@ void StructureManager::AddFile(const char* filename)
                      while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
                           Fl::wait();
                      }
-                     input_window->hide();
-		     same = false;
+                     //input_window->hide();
+		     same = !strcmp(input_window->getName(), "");
                      for(unsigned int ui = 0; ui < folders.size(); ui++)
             	     {
             		   if (!strcmp(folders[ui]->folderName, input_window->getName()))

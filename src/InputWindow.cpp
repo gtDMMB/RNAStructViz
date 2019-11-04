@@ -177,12 +177,8 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
     }
     else {
 	window->name = "";
-        if(window->cbUseDefaultNames->value()) {
-            GUI_USE_DEFAULT_FOLDER_NAMES = true;
-        }
-	if(window->cbKeepStickyFolders->value()) {
-	    GUI_KEEP_STICKY_FOLDER_NAMES = true;
-	}
+        GUI_USE_DEFAULT_FOLDER_NAMES = window->cbUseDefaultNames->value();
+        GUI_KEEP_STICKY_FOLDER_NAMES = window->cbKeepStickyFolders->value();
     }    
     Free(window->string);
     window->hide();

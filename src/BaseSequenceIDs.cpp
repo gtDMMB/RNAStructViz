@@ -180,9 +180,9 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
 	  }
 	  curCfgFileOffset = nextOffset;
      }
-     //if(replacePos == LSEEK_NOT_FOUND) {
-     //     fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
-     //}
+     if(replacePos == LSEEK_NOT_FOUND) {
+          fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
+     }
 
      fclose(fpCfgFile);
      fclose(fpTempFile);
