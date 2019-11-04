@@ -146,7 +146,8 @@ CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
 
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
-	TerminalPrinting.h ConfigParser.cpp
+	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \
+	DisplayConfigWindow.h ConfigParser.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
 
 DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \

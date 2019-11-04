@@ -48,8 +48,10 @@ namespace CommonDialogs {
 	       TourIcon.bytes_per_pixel
      );
 
+     std::string GetHelpInstructionsMessageString();
      void DisplayFirstRunInstructions();
      void DisplayHelpDialog();
+     
      void DisplayTourDialog();
      
      std::string GetInfoAboutMessageString();

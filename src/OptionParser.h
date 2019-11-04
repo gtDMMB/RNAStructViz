@@ -20,10 +20,11 @@
 typedef enum {
      NONE        = 0,
      SETVAR      = 1,
-     PRINT_ABOUT = 2, 
-     PRINT_HELP  = 3,
-     PRINT_DEBUG = 4,
-     NEW_CONFIG  = 5,
+     NOSETVAR    = 2, 
+     PRINT_ABOUT = 3, 
+     PRINT_HELP  = 4,
+     PRINT_DEBUG = 5,
+     NEW_CONFIG  = 6,
 } StructVizOptionAction_t;
 
 static const struct option longarg_options[] = {
@@ -38,6 +39,13 @@ static const struct option longarg_options[] = {
 };
 
 static const char *shortarg_options = "hqvV";
+
+void ProcessAboutOption();
+void ProcessHelpOption();
+void ProcessDebugOption();
+void ProcessNewConfigOption();
+void ProcessQuietOption();
+void ProcessVerboseOption();
 
 int ParseStructVizCommandOptions(int &argc, char ** &argv);
 

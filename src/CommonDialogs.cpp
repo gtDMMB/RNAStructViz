@@ -10,7 +10,7 @@
 #include "ConfigParser.h"
 #include "RNAStructViz.h"
 
-void CommonDialogs::DisplayFirstRunInstructions() {
+std::string CommonDialogs::GetHelpInstructionsMessageString() {
 
      const char *instTextBuffer[] = {
           "Welcome to RNAStructViz!\n\n",
@@ -24,19 +24,25 @@ void CommonDialogs::DisplayFirstRunInstructions() {
           "► Sample structures are available for you to use with the application. You can\n",
           "copy them into your home directory from the install directory using the first-run\n",
           "instructions link above.\n",
-          "► Users may view a summary tour of RNAStructViz features by clicking on the\npath ",
-          "button in the upper right left pane navigation bar\n\n",
+          "► Users may view a summary tour of RNAStructViz features by clicking on the\nhelp ",
+          "button in the upper right left pane navigation bar and then on the left-most button\n\n",
           "Thank you for using our application! ", 
 	  "Please feel free to send us questions, comments, \n",
           "and/or leave us general feedback on your user experience by writing to gtdmmb@@gatech.edu, \n",
           "or by posting a new GitHub issue thread using the instructions at the following link:\n",
           "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »", 
      };
-     char fullInstText[4 * MAX_BUFFER_SIZE];
-     fullInstText[0] = '\0';
+     std::string fullInstText;
      for(int bufline = 0; bufline < GetArrayLength(instTextBuffer); bufline++) {
-          strcat(fullInstText, instTextBuffer[bufline]);
+          fullInstText += std::string(instTextBuffer[bufline]);
      }
+     return fullInstText;
+
+}
+
+void CommonDialogs::DisplayFirstRunInstructions() {
+     
+     std::string fullInstText = CommonDialogs::GetHelpInstructionsMessageString();	
      fl_message_title("╠ ---  Welcome to your first install of RNAStructViz  --- ╣");
      fl_message_icon()->image(CommonDialogs::welcomeIconImage);
      fl_message_icon()->label("");
@@ -47,7 +53,7 @@ void CommonDialogs::DisplayFirstRunInstructions() {
      int userHelpSelection = fl_choice("%s",
                                        "Copy WIKI link to clipboard", 
 				       "Copy sample structures to your home directory", 
-                                       "Do not show again at start-up", fullInstText);
+                                       "Do not show again at start-up", fullInstText.c_str());
      switch(userHelpSelection) {
           case 0: {
                const char *firstTimeRunLink =
@@ -71,31 +77,7 @@ void CommonDialogs::DisplayFirstRunInstructions() {
 
 void CommonDialogs::DisplayHelpDialog() {
      
-     const char *instTextBuffer[] = {
-          "Welcome to RNAStructViz!\n\n",
-          "► A detailed user manual and how-to guide is available on the project WIKI:\n",
-          "« https://github.com/gtDMMB/RNAStructViz/wiki »\n",
-          "► Instructions to help new users first running the application\n",
-          "is found online at:\n",
-          "« https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions »\n",
-          "► If you need help while running RNAStructViz, click on the help button\n",
-          "(circled question mark) at the top-right corner of the left main window pane.\n",
-          "► Sample structures are available for you to use with the application. You can\n",
-          "copy them into your home directory from the install directory using the first-run\n",
-          "instructions link above.\n",
-          "► Users may view a summary tour of RNAStructViz features by clicking on the\nhelp ",
-          "button in the upper right left pane navigation bar\n\n",
-          "Thank you for using our application! ", 
-	  "Please feel free to send us questions, comments, \n",
-          "and/or leave us general feedback on your user experience by writing to gtdmmb@@gatech.edu, \n",
-          "or by posting a new GitHub issue thread using the instructions at the following link:\n",
-          "https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors.", 
-     };
-     char fullInstText[4 * MAX_BUFFER_SIZE];
-     fullInstText[0] = '\0';
-     for(int bufline = 0; bufline < GetArrayLength(instTextBuffer); bufline++) {
-          strcat(fullInstText, instTextBuffer[bufline]);
-     }
+     std::string fullInstText = CommonDialogs::GetHelpInstructionsMessageString();
      fl_message_title("╠ ---  Welcome to your first install of RNAStructViz  --- ╣");
      fl_message_icon()->image(CommonDialogs::helpIconImage);
      fl_message_icon()->label("");
@@ -106,7 +88,7 @@ void CommonDialogs::DisplayHelpDialog() {
      int userHelpSelection = fl_choice("%s",
                                        "Copy WIKI link to clipboard", 
 				       "Copy sample structures to your home directory", 
-                                       "Display a tour of RNAStructViz", fullInstText);
+                                       "Display a tour of RNAStructViz", fullInstText.c_str());
      switch(userHelpSelection) {
           case 0: {
                const char *firstTimeRunLink =
