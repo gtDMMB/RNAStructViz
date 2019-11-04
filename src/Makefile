@@ -183,7 +183,7 @@ FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
 Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
-	TerminalPrinting.h OptionParser.h Debugging.h Main.cpp
+	TerminalPrinting.h OptionParser.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
