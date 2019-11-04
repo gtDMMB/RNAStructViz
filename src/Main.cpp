@@ -83,7 +83,8 @@ int main(int argc, char **argv) {
 void RNAStructViz_SignalHandler(int signum) {
      
      if(signum == SIGINT) {
-          TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
+          fprintf(stderr, "\n");
+	  TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
 	  ConfigParser::WriteUserConfigFile();
      }
      else if(signum == SIGSEGV) {
