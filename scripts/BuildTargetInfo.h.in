@@ -60,6 +60,10 @@
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #endif
 
+#define __STRUCTVIZ_INSTALL_SIGNAL_HANDLERS
+#define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
+#define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
+
 #define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.8.0-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
@@ -135,19 +139,26 @@ class ApplicationBuildInfo {
 	       return string("FLTK Library: ") + string(fltkVersionStr);
 	  }
 
-	  static inline void PrintAboutListing(FILE *whichOut = stderr) {
+	  static inline void PrintAboutListing(const char *aboutStr = NULL, FILE *whichOut = stderr) {
                if(whichOut == NULL) {
                     whichOut = stderr;
 	       }
 	       fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
 	       fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
-               fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
-			  UserManualWikiLink().c_str(), GitRevisionInfoFull().c_str(), 
-			  GitRevisionDate().c_str(), FLTKVersionString().c_str(),
-			  BuildFLTKConfig().c_str(),  
-			  CairoVersionString().c_str(), BuildPlatform().c_str(), 
-			  LocalBuildDateTime().c_str());
-	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. New issues with the application can be submitted by following the instructions at https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors.";
+	       if(aboutStr == NULL) {
+                    fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
+			       UserManualWikiLink().c_str(), GitRevisionInfoFull().c_str(), 
+			       GitRevisionDate().c_str(), FLTKVersionString().c_str(),
+			       BuildFLTKConfig().c_str(),  
+			       CairoVersionString().c_str(), BuildPlatform().c_str(), 
+			       LocalBuildDateTime().c_str());
+	       }
+	       else {
+	            fprintf(whichOut, "%s\n\n", aboutStr);
+	       }
+	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. "
+		                          "New issues with the application can be submitted by following the instructions at " 
+					  "https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors.";
 	       fprintf(whichOut, "BUG REPORT INFORMATION:\n**%s**\n", bugReportMsg);
 	  }
 

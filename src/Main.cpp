@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
-
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
 
@@ -19,6 +18,12 @@
 #include "TerminalPrinting.h"
 #include "OptionParser.h"
 
+#ifdef __STRUCTVIZ_INSTALL_SIGNAL_HANDLERS
+     #include <signal.h>
+#endif
+
+void RNAStructViz_SignalHandler(int signum);
+
 char rnaStructVizExecPath[MAX_BUFFER_SIZE];
 char runtimeCWDPath[MAX_BUFFER_SIZE];
 char activeSystemUserFromEnv[MAX_BUFFER_SIZE];
@@ -26,9 +31,18 @@ char activeSystemUserFromEnv[MAX_BUFFER_SIZE];
 int main(int argc, char **argv) {
 
     #ifdef WITHGPERFTOOLS
-    HeapProfilerStart("RNAStructViz.log");
+         HeapProfilerStart("RNAStructViz.log");
     #endif
    
+    #ifdef __STRUCTVIZ_INSTALL_SIGNAL_HANDLERS
+         if(__STRUCTVIZ_INSTALL_SIGSEGV_HANDLER) {
+	      signal(SIGSEGV, RNAStructViz_SignalHandler);
+	 }
+	 if(__STRUCTVIZ_INSTALL_CTRLC_HANDLER) {
+	      signal(SIGINT, RNAStructViz_SignalHandler);
+	 }
+    #endif
+
     DisplayConfigWindow::SetupInitialConfig();
     strncpy(rnaStructVizExecPath, argv[0], MAX_BUFFER_SIZE);
     rnaStructVizExecPath[MAX_BUFFER_SIZE - 1] = '\0';
@@ -39,7 +53,7 @@ int main(int argc, char **argv) {
     if(argc > 1 && 
        (!strcmp(argv[1], "--about") || !strcmp(argv[0], "--help") || 
 	!strcmp(argv[1], "-h"))) {
-        ApplicationBuildInfo::PrintAboutListing(stdout);
+        ApplicationBuildInfo::PrintAboutListing(NULL, stdout);
         return 0;
     }
     else if(argc > 1 && !strcmp(argv[1], "--debug")) {
@@ -74,10 +88,25 @@ int main(int argc, char **argv) {
     RNAStructViz::Shutdown();
     
     #ifdef WITHGPERFTOOLS
-    HeapProfilerStop();
+         HeapProfilerStop();
     #endif
     
     return EXIT_SUCCESS;
+
+}
+
+void RNAStructViz_SignalHandler(int signum) {
+     
+     if(signum == SIGINT) {
+          TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
+	  ConfigParser::WriteUserConfigFile();
+     }
+     else if(signum == SIGSEGV) {
+          TerminalText::PrintError("Handling unexpected SEGFAULT (SIGSEGV) signal.\n\n");
+          std::string aboutInfoMsg = CommonDialogs::GetInfoAboutMessageString();
+	  ApplicationBuildInfo::PrintAboutListing(aboutInfoMsg.c_str(), stderr);
+     }
+     exit(signum);
 
 }
 
