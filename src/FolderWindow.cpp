@@ -177,6 +177,7 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     removeButton->callback(FolderWindow::RemoveCallback);
     removeButton->user_data((void*)index);
     removeButton->label("@1+");
+    removeButton->tooltip("Remove sample from folder");
     removeButton->labelcolor(GUI_BTEXT_COLOR);
     
     group->resizable(label);

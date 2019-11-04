@@ -141,7 +141,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	
 	}
         show();
-        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && !(cbKeepStickyFolders->value())) { 
+        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && 
+	   (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound)) {
             show();
 	}
 	else {

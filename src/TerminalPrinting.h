@@ -59,30 +59,30 @@ namespace ANSIColor {
     
      typedef const char * ANSIColorCode;
      
-     static ANSIColorCode BLACK           = "\033[0;30m";
-     static ANSIColorCode RED             = "\033[0;31m";
-     static ANSIColorCode GREEN           = "\033[0;32m";
-     static ANSIColorCode BROWN           = "\033[0;33m";
-     static ANSIColorCode BLUE            = "\033[0;34m";
-     static ANSIColorCode PURPLE          = "\033[0;35m";
-     static ANSIColorCode CYAN            = "\033[0;36m";
-     static ANSIColorCode LIGHT_GRAY      = "\033[0;37m";
-     static ANSIColorCode DARK_GRAY       = "\033[1;30m";
-     static ANSIColorCode LIGHT_RED       = "\033[1;31m";
-     static ANSIColorCode LIGHT_GREEN     = "\033[1;32m";
-     static ANSIColorCode YELLOW          = "\033[1;33m";
-     static ANSIColorCode LIGHT_BLUE      = "\033[1;34m";
-     static ANSIColorCode LIGHT_PURPLE    = "\033[1;35m";
-     static ANSIColorCode LIGHT_CYAN      = "\033[1;36m";
-     static ANSIColorCode LIGHT_WHITE     = "\033[1;37m";
-     static ANSIColorCode BOLD            = "\033[1m";
-     static ANSIColorCode FAINT           = "\033[2m";
-     static ANSIColorCode ITALIC          = "\033[3m";
-     static ANSIColorCode UNDERLINE       = "\033[4m";
-     static ANSIColorCode BLINK           = "\033[5m";
-     static ANSIColorCode NEGATIVE        = "\033[7m";
-     static ANSIColorCode CROSSED         = "\033[9m";
-     static ANSIColorCode END             = "\033[0m";
+     static ANSIColorCode BLACK           = "\x1b[0;30m";
+     static ANSIColorCode RED             = "\x1b[0;31m";
+     static ANSIColorCode GREEN           = "\x1b[0;32m";
+     static ANSIColorCode BROWN           = "\x1b[0;33m";
+     static ANSIColorCode BLUE            = "\x1b[0;34m";
+     static ANSIColorCode PURPLE          = "\x1b[0;35m";
+     static ANSIColorCode CYAN            = "\x1b[0;36m";
+     static ANSIColorCode LIGHT_GRAY      = "\x1b[0;37m";
+     static ANSIColorCode DARK_GRAY       = "\x1b[1;30m";
+     static ANSIColorCode LIGHT_RED       = "\x1b[1;31m";
+     static ANSIColorCode LIGHT_GREEN     = "\x1b[1;32m";
+     static ANSIColorCode YELLOW          = "\x1b[1;33m";
+     static ANSIColorCode LIGHT_BLUE      = "\x1b[1;34m";
+     static ANSIColorCode LIGHT_PURPLE    = "\x1b[1;35m";
+     static ANSIColorCode LIGHT_CYAN      = "\x1b[1;36m";
+     static ANSIColorCode LIGHT_WHITE     = "\x1b[1;37m";
+     static ANSIColorCode BOLD            = "\x1b[1m";
+     static ANSIColorCode FAINT           = "\x1b[2m";
+     static ANSIColorCode ITALIC          = "\x1b[3m";
+     static ANSIColorCode UNDERLINE       = "\x1b[4m";
+     static ANSIColorCode BLINK           = "\x1b[5m";
+     static ANSIColorCode NEGATIVE        = "\x1b[7m";
+     static ANSIColorCode CROSSED         = "\x1b[9m";
+     static ANSIColorCode END             = "\x1b[0m";
 
      void PrintColorTextString(const char *textMsg, ANSIColorCode textFGColor, ANSIColorCode textStyle = NULL);
 

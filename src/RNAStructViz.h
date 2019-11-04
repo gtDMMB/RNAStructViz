@@ -60,7 +60,7 @@ class RNAStructViz
 	
 	static std::string LocateSampleStructuresOnSystem();
 	static int CopySampleStructures();
-        static int BackupAndUnlinkLocalConfigFiles();
+        static int BackupAndUnlinkLocalConfigFiles(bool clearStickyFolderNamesOnly = false);
 
     private:
         static RNAStructViz* ms_instance;

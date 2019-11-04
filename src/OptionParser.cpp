@@ -39,7 +39,7 @@ void ProcessDebugOption() {
 }
 
 void ProcessNewConfigOption() {
-     RNAStructViz::BackupAndUnlinkLocalConfigFiles();
+     RNAStructViz::BackupAndUnlinkLocalConfigFiles(false);
      DisplayConfigWindow::SetupInitialConfig();
      DISPLAY_FIRSTRUN_MESSAGE = true;
 }

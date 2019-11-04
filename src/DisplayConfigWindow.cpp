@@ -31,6 +31,7 @@
 #include "pixmaps/ConfigThemesIcon.c"
 #include "pixmaps/PNGNewPathIcon.c"
 #include "pixmaps/ConfigDiagramWindow.c"
+#include "pixmaps/ConfigCheckBoxParams.c"
 
 /* Setup initial definitions of the extern'ed variables here: */
 #ifndef _SETUP_GLOBAL_EXTERNS_
@@ -163,12 +164,13 @@ DisplayConfigWindow::DisplayConfigWindow() :
      imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
      imageData = new uchar[imageStride * CONFIG_WINDOW_WIDTH];
      memset(imageData, 0, imageStride * CONFIG_WINDOW_WIDTH);
-     cairo_surface_t *crSurface = cairo_image_surface_create_for_data( 
+     crSurface = cairo_image_surface_create_for_data( 
 			          imageData, CAIRO_FORMAT_ARGB32, 
                                   CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
-				  imageStride);
+				  imageStride
+                 );
      crDraw = cairo_create(crSurface);   
-     //Fl::cairo_cc(crDraw, false);
+     Fl::cairo_cc(crDraw, false);
 
      label(CONFIG_WINDOW_TITLE);
      color(GUI_WINDOW_BGCOLOR); 
@@ -182,19 +184,18 @@ DisplayConfigWindow::DisplayConfigWindow() :
 }
 
 DisplayConfigWindow::~DisplayConfigWindow() {
-     Fl::remove_timeout(RedrawTimerCallback, (void*) this);
+     //Fl::remove_timeout(RedrawTimerCallback, (void*) this);
      for(int w = 0; w < windowWidgets.size(); w++) {
-          delete windowWidgets[w];
-	  windowWidgets[w] = NULL;
+          Delete(windowWidgets[w]);
      }
-     delete fpathsIcon;
-     delete themesIcon;
-     delete dwinSettingsIcon;
-     if(pngNewPathIcon != NULL) {
-          delete pngNewPathIcon;
-     }
-     delete imageData;
-     imageData = NULL;
+     Delete(fpathsIcon);
+     Delete(themesIcon);
+     Delete(dwinSettingsIcon);
+     Delete(cfgCheckboxesIcon);
+     Delete(pngNewPathIcon);
+     cairo_surface_destroy(crSurface);
+     cairo_destroy(crDraw);
+     Delete(imageData);
 }
 
 void DisplayConfigWindow::ConstructWindow() {
@@ -209,7 +210,7 @@ void DisplayConfigWindow::ConstructWindow() {
 		             fpathsIcon->w(), fpathsIcon->h());
      fpathsIconBox->image(fpathsIcon);
      windowWidgets.push_back(fpathsIconBox);
-     workingYOffset += fpathsIcon->h() + CFGWIN_SPACING;
+     workingYOffset += fpathsIcon->h() + CFGWIN_SPACING / 2;
 
      const char *fieldDesc[] = {
 	"@->   File Search Directory:", 
@@ -277,7 +278,7 @@ void DisplayConfigWindow::ConstructWindow() {
 		                              dwinSettingsIcon->w(), dwinSettingsIcon->h());
      dwinSettingsIconBox->image(dwinSettingsIcon);
      windowWidgets.push_back(dwinSettingsIconBox);
-     workingYOffset += dwinSettingsIcon->h() + CFGWIN_SPACING;
+     workingYOffset += dwinSettingsIcon->h() + CFGWIN_SPACING / 2;
 
      int structColorCounts[3] = { 1, 3, 7 };
      const char *arcColorRowDesc[3] = {
@@ -342,7 +343,7 @@ void DisplayConfigWindow::ConstructWindow() {
 		             themesIcon->w(), themesIcon->h());
      themesIconBox->image(themesIcon);
      windowWidgets.push_back(themesIconBox);
-     workingYOffset += themesIcon->h() + CFGWIN_SPACING;
+     workingYOffset += themesIcon->h() + CFGWIN_SPACING / 2;
 
      Fl_Box *themeDescBox = new Fl_Box(offsetX, workingYOffset, 
 	 	        	       CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
@@ -435,12 +436,65 @@ void DisplayConfigWindow::ConstructWindow() {
 	 workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
 
-     workingYOffset += CFGWIN_SPACING;
+     cfgCheckboxesIcon = new Fl_RGB_Image(ConfigCheckBoxParamsIcon.pixel_data, 
+		                          ConfigCheckBoxParamsIcon.width, 
+					  ConfigCheckBoxParamsIcon.height, 
+		                          ConfigCheckBoxParamsIcon.bytes_per_pixel);
+     Fl_Box *cfgCheckboxesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
+		                               cfgCheckboxesIcon->w(), cfgCheckboxesIcon->h());
+     cfgCheckboxesIconBox->image(cfgCheckboxesIcon);
+     windowWidgets.push_back(cfgCheckboxesIconBox);
+     workingYOffset += cfgCheckboxesIcon->h() + CFGWIN_SPACING / 2;
+
+     const char *checkBoxLabels[] = {
+          "Display first-run message when RNAStructViz starts",
+	  "Use default folder names in load files dialog", 
+	  "Remember structure folder names (use sticky folder names)",
+     };
+     bool includeRHSClearButton[] = { false, false, true };
+     volatile bool *checkBoxParamSettings[] = {
+          &DISPLAY_FIRSTRUN_MESSAGE,
+	  &GUI_USE_DEFAULT_FOLDER_NAMES,
+          &GUI_KEEP_STICKY_FOLDER_NAMES,
+     };
+     for(int cbi = 0; cbi < GetArrayLength(checkBoxLabels); cbi++) {
+	  const int bulletPointBoxWidth = 16;
+          int workingOffsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+	  Fl_Box *bpBox = new Fl_Box(workingOffsetX, workingYOffset, 
+			             bulletPointBoxWidth, CFGWIN_LABEL_HEIGHT, 
+			             "@->  ");
+	  bpBox->labelcolor(GUI_TEXT_COLOR);
+          bpBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	  windowWidgets.push_back(bpBox);
+	  workingOffsetX += bulletPointBoxWidth + CFGWIN_SPACING;
+          Fl_Check_Button *cbParam = new Fl_Check_Button(workingOffsetX, workingYOffset, 
+	                                                 2.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+							 checkBoxLabels[cbi]);
+	  cbParam->type(FL_TOGGLE_BUTTON);
+	  cbParam->labelcolor(GUI_BTEXT_COLOR);
+	  cbParam->selection_color(GUI_TEXT_COLOR);
+	  cbParam->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+	  cbParam->value((int) *(checkBoxParamSettings[cbi]));
+	  cbParam->user_data((void *) checkBoxParamSettings[cbi]);
+	  cbParam->callback(ToggleCheckBoxParamCallback);
+	  windowWidgets.push_back(cbParam);
+	  if(includeRHSClearButton[cbi]) {
+	       workingOffsetX += 2.5 * CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
+	       Fl_Button *clearStickyNamesBtn = new Fl_Button(workingOffsetX, workingYOffset, 
+			                                      1.5 * CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+							      "@undo  Clear Saved Folder Names");
+	       clearStickyNamesBtn->labelcolor(GUI_BTEXT_COLOR);
+               clearStickyNamesBtn->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+               clearStickyNamesBtn->callback(ClearAllStickyFolderNamesCallback);
+               windowWidgets.push_back(clearStickyNamesBtn);
+	  }
+	  workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+     }
 
      // draw bounding box for the two action buttons on the 
      // bottom right of the window:
-     int boundingBoxWidth = 3 * CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING;
-     offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth - CFGWIN_SPACING / 2;
+     int boundingBoxWidth = 3 * CFGWIN_BUTTON_WIDTH + 7 * CFGWIN_SPACING;
+     offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth;
      int bdBoxHeight = (int) (2.0 * CFGWIN_LABEL_HEIGHT);
      int bdBoxYOffset = workingYOffset + CFGWIN_SPACING;
      Fl_Box *btnBoundingBox = new Fl_Box(offsetX, bdBoxYOffset, 
@@ -448,7 +502,6 @@ void DisplayConfigWindow::ConstructWindow() {
      btnBoundingBox->box(FL_RSHADOW_BOX);
      btnBoundingBox->color(GUI_BGCOLOR);
      windowWidgets.push_back(btnBoundingBox);
-     //workingYOffset -= CFGWIN_SPACING / 3;
 
      offsetX = CONFIG_WINDOW_WIDTH - 
 	       (CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING);
@@ -460,7 +513,7 @@ void DisplayConfigWindow::ConstructWindow() {
      writeConfigBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      writeConfigBtn->callback(WriteConfigFileCallback);
      windowWidgets.push_back(writeConfigBtn);
-     offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+     offsetX -= CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING;
 
      Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, offsetY, 
 		                     CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
@@ -469,7 +522,7 @@ void DisplayConfigWindow::ConstructWindow() {
      restoreDefaultsBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      restoreDefaultsBtn->callback(RestoreDefaultsCallback);
      windowWidgets.push_back(restoreDefaultsBtn);
-     offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
+     offsetX -= CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING;
 
      Fl_Button *cancelBtn = new Fl_Button(offsetX, offsetY, 
 		            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
@@ -502,8 +555,6 @@ void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
     			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_scale(thisWin->crDraw, thisWin->w(), thisWin->h());
     cairo_fill(thisWin->crDraw);
-    //fl_color(GUI_WINDOW_BGCOLOR);
-    //fl_rectf(0, 0, thisWin->w(), thisWin->h());
     thisWin->drawWidgets();
 
 }
@@ -609,7 +660,8 @@ void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *u
 
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
-     btn->parent()->hide();
+     DisplayConfigWindow::WindowCloseCallback(btn, NULL);
+     //btn->parent()->hide();
 }
 
 void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
@@ -661,6 +713,16 @@ void DisplayConfigWindow::ChangeDiagramWindowArcColorCallback(Fl_Widget *btn, vo
      *(displayWin->dwinArcColorChangeRefs[structIdx][colorIdx]) = Fl::get_color(nextColor);
      buttonRef->color(Fl::get_color(nextColor));
      buttonRef->redraw();
+}
+
+void DisplayConfigWindow::ToggleCheckBoxParamCallback(Fl_Widget *cbWidget, void *udata) {
+     Fl_Check_Button *cb = (Fl_Check_Button *) cbWidget;
+     bool *cbSetting = (bool *) cbWidget->user_data();
+     *cbSetting = cb->value();
+}
+
+void DisplayConfigWindow::ClearAllStickyFolderNamesCallback(Fl_Widget *btn, void *udata) {
+     RNAStructViz::BackupAndUnlinkLocalConfigFiles(true);
 }
 
 void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {

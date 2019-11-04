@@ -572,7 +572,7 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     DrawWithCairo::fl_rectf(crDraw, m_menus[0]->x(), yPosn, m_menus[0]->w(), 3);
     DrawWithCairo::fl_rectf(crDraw, m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     DrawWithCairo::fl_rectf(crDraw, m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
-    sprintf(mystr, "#%d", numPairs[0]);
+    sprintf(mystr, "← %d", numPairs[0]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[2][0], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -582,7 +582,7 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
     DrawWithCairo::fl_xyline(crDraw, m_menus[2]->x(), yPosn, m_menus[2]->x() + m_menus[2]->w());
-    sprintf(mystr, "#%d", numPairs[1]);
+    sprintf(mystr, "← %d", numPairs[1]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[2][1], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -592,7 +592,7 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
     DrawWithCairo::fl_xyline(crDraw, m_menus[2]->x(), yPosn, m_menus[2]->x() + m_menus[2]->w());
-    sprintf(mystr, "#%d", numPairs[2]);
+    sprintf(mystr, "← %d", numPairs[2]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[2][2], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -602,7 +602,7 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
     DrawWithCairo::fl_xyline(crDraw, m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
-    sprintf(mystr, "#%d", numPairs[6]);
+    sprintf(mystr, "← %d", numPairs[6]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[2][6], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -612,7 +612,7 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     DrawWithCairo::fl_rectf(crDraw, m_menus[1]->x(), yPosn, m_menus[1]->w(), 3);
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[2]->x(), yPosn, m_menus[2]->x() + m_menus[2]->w());
-    sprintf(mystr, "#%d", numPairs[3]);
+    sprintf(mystr, "← %d", numPairs[3]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[2][3], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -622,7 +622,7 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     DrawWithCairo::fl_rectf(crDraw, m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[1]->x(), yPosn, m_menus[1]->x() + m_menus[1]->w());
-    sprintf(mystr, "#%d", numPairs[4]);
+    sprintf(mystr, "← %d", numPairs[4]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 40, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[2][4], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -632,7 +632,7 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     DrawWithCairo::fl_rectf(crDraw, m_menus[2]->x(), yPosn, m_menus[2]->w(), 3);
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[0]->x(), yPosn, m_menus[0]->x() + m_menus[0]->w());
-    sprintf(mystr, "#%d", numPairs[5]);
+    sprintf(mystr, "← %d", numPairs[5]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[2][5], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
    
@@ -656,7 +656,7 @@ void DiagramWindow::DrawKey2(cairo_t *crDraw, const int a, const int b) {
     SetCairoToFLColor(crDraw, STRUCTURE_DIAGRAM_COLORS[1][0]);
     DrawWithCairo::fl_rectf(crDraw, m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
     DrawWithCairo::fl_rectf(crDraw, m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
-    sprintf(mystr, "#%d", numPairs[0]);
+    sprintf(mystr, "← %d", numPairs[0]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[1][0], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -665,7 +665,7 @@ void DiagramWindow::DrawKey2(cairo_t *crDraw, const int a, const int b) {
     DrawWithCairo::fl_rectf(crDraw, m_menus[a]->x(), yPosn, m_menus[a]->w(), 3);
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[b]->x(), yPosn, m_menus[b]->x() + m_menus[b]->w());
-    sprintf(mystr, "#%d", numPairs[1]);
+    sprintf(mystr, "← %d", numPairs[1]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[1][1], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     yPosn += 10;
@@ -674,7 +674,7 @@ void DiagramWindow::DrawKey2(cairo_t *crDraw, const int a, const int b) {
     DrawWithCairo::fl_rectf(crDraw, m_menus[b]->x(), yPosn, m_menus[b]->w(), 3);
     DrawWithCairo::fl_line_style(crDraw, dashedLineStyle);
     DrawWithCairo::fl_xyline(crDraw, m_menus[a]->x(), yPosn, m_menus[a]->x() + m_menus[a]->w());
-    sprintf(mystr, "#%d", numPairs[2]);
+    sprintf(mystr, "← %d", numPairs[2]);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[1][2], STRUCTURE_INCLBL_XOFFSET, yPosn + 3);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, yPosn + 3);
 
@@ -694,7 +694,7 @@ void DiagramWindow::DrawKey1(cairo_t *crDraw, const int a) {
     SetCairoToFLColor(crDraw, STRUCTURE_DIAGRAM_COLORS[0][0]);
     DrawWithCairo::fl_rectf(crDraw, m_menus[a]->x(), 55, m_menus[a]->w(), 3);
     char mystr[10] = "";
-    sprintf(mystr, "#%d", numPairs[0]);
+    sprintf(mystr, "← %d", numPairs[0]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, 55 + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[0][0], STRUCTURE_INCLBL_XOFFSET, 55 + 3);
 

@@ -251,7 +251,7 @@ CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor
 	case CR_DEEP_BLUE:
 	    return GetCairoColor(2, 32, 75);
 	default:
-	    TerminalText::PrintError("Unknown named Cairo color %d\n", namedCairoColor);
+	    TerminalText::PrintDebug("Unknown named Cairo color %d\n", namedCairoColor);
 	    return GetCairoColor(206, 92, 0, 128);
     }
 }

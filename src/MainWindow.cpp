@@ -260,16 +260,19 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     ms_instance->folderDataBtns.push_back(label);
 
     Fl_Button* moveUpButton = new Fl_Button(pack->x()+pack->w() - 60, vertPosn + 5, 20, 20, "@8>");
+    moveUpButton->tooltip("Move folder up in list");
     moveUpButton->callback(MainWindow::MoveFolderUp);
     moveUpButton->labelcolor(GUI_BTEXT_COLOR);
 
     Fl_Button* moveDownButton = new Fl_Button(pack->x()+pack->w() - 40, vertPosn + 5, 20, 20, "@2>");
+    moveDownButton->tooltip("Move folder down in list");
     moveDownButton->callback(MainWindow::MoveFolderDown);
     moveDownButton->labelcolor(GUI_BTEXT_COLOR);
 
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
     removeButton->callback(MainWindow::RemoveFolderCallback);
     removeButton->label("@1+");
+    removeButton->tooltip("Remove folder");
     removeButton->labelcolor(GUI_BTEXT_COLOR);
 
     group->resizable(label);
@@ -348,9 +351,10 @@ void MainWindow::OpenFileCallback() {
 void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
      DisplayConfigWindow *cfgWindow = new DisplayConfigWindow(); 
      cfgWindow->show();
-     while(!cfgWindow->isDone() && cfgWindow->visible()) 
+     while(!cfgWindow->isDone() && cfgWindow->visible()) {
           Fl::wait();
-     delete cfgWindow;
+     }
+     Delete(cfgWindow);
 }
 
 void MainWindow::ConfigOptionsCallback() {

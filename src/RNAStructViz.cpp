@@ -357,23 +357,21 @@ int RNAStructViz::CopySampleStructures() {
 
 }
 
-int RNAStructViz::BackupAndUnlinkLocalConfigFiles() {
+int RNAStructViz::BackupAndUnlinkLocalConfigFiles(bool clearStickyFolderNamesOnly) {
      time_t timeOutput = time(NULL);
      struct tm *curTimeStruct = localtime(&timeOutput);
      char dateStampSuffix[MAX_BUFFER_SIZE];
-     if(strftime(dateStampSuffix, MAX_BUFFER_SIZE, "-%F-%H%M%S.bak", curTimeStruct)) {
-          return EINVAL;
-     }
+     strftime(dateStampSuffix, MAX_BUFFER_SIZE, "-%F-%H%M%S.bak", curTimeStruct);
      std::string configPath = std::string(USER_CONFIG_PATH);
      std::string configBackupPath = std::string(USER_CONFIG_PATH) + std::string(dateStampSuffix);
      std::string stickyFolderPath = std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE));
      std::string stickyFolderBackupPath = 
 	         std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE)) + 
 		 std::string(dateStampSuffix);
-     if(rename(configPath.c_str(), configBackupPath.c_str()) || 
+     if(!clearStickyFolderNamesOnly && rename(configPath.c_str(), configBackupPath.c_str()) || 
 	rename(stickyFolderPath.c_str(), stickyFolderBackupPath.c_str())) {
-          TerminalText::PrintError("Unable to rename backup config files \"%s\" and/or \"%s\"\n", 
-			           configBackupPath.c_str(), stickyFolderPath.c_str());
+          TerminalText::PrintError("Unable to rename backup config files \"%s\" and/or \"%s\" : %s\n", 
+			           configBackupPath.c_str(), stickyFolderPath.c_str(), strerror(errno));
 	  return errno;
      }
 }

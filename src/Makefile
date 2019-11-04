@@ -156,8 +156,9 @@ DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
 
 DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
-	pixmaps/ConfigPathsIcon.c pixmaps/ConfigThemesIcon.c\
-	pixmaps/PNGNewPathIcon.c pixmaps/ConfigWindowIcon.xbm\
+	pixmaps/ConfigPathsIcon.c pixmaps/ConfigThemesIcon.c \
+	pixmaps/PNGNewPathIcon.c pixmaps/ConfigWindowIcon.xbm \
+	pixmaps/ConfigCheckBoxParams.c \
 	ThemesConfig.h DisplayConfigWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
 
