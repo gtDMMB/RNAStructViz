@@ -42,7 +42,7 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 	        static char * TrimFilePathDisplay(const char *path, int maxlen);
 	
 	public:
-		DisplayConfigWindow(); 
+		DisplayConfigWindow();
 		~DisplayConfigWindow();
 
 		void ConstructWindow();

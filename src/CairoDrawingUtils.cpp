@@ -219,7 +219,6 @@ CairoColor_t CairoColor_t::GetCairoColor(const CairoColorSpec_t &namedCairoColor
         case CR_YELLOW:
 	    return GetCairoColor(196, 160, 0);
         case CR_MAGENTA:
-	    //return GetCairoColor(239, 41, 159);
             return GetCairoColor(249, 0, 201);
 	case CR_CYAN:
 	    return GetCairoColor(32, 195, 215);

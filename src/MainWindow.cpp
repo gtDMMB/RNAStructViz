@@ -117,15 +117,17 @@ MainWindow::MainWindow(int argc, char **argv)
 		                   "@search   Load Files @>|");
         openButton->callback(OpenFileCallback);
         openButton->labelcolor(GUI_BTEXT_COLOR);
+	openButton->labelfont(FL_HELVETICA);
 
        	// The button to open configuration settings:
 	configOptionsButton = new Fl_Button( 
 	          NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
 		  NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
 		          NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-		  "@menu   User Config");
+		  "@menu   User Config @>|");
 	configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
+        configOptionsButton->labelfont(FL_HELVETICA);
 
 	const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
         columnLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 

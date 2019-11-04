@@ -46,11 +46,12 @@ void TerminalText::PrintANSITerminalMessage(const char *prefixText, UnicodeSymbo
      }
      wchar_t unicodeLeadingIcon = PRINT_TERMINAL_UNICODE ? 
 	                          TerminalText::GetUnicodeIconString(iconType, randomizeUnicodeIdx) : 0x00;
-     setlocale(LC_ALL, "");
+     setlocale(LC_CTYPE, "");
      fprintf(PRINTFP, "%s%s", prefixColor, ANSIColor::BOLD); 
      fwprintf(PRINTFP, L" %lc ", unicodeLeadingIcon != 0x00 ? unicodeLeadingIcon : L' ');
      fflush(PRINTFP);
      freopen(NULL, "w", PRINTFP);
+     setlocale(LC_CTYPE, "UTF-8");
      fprintf(PRINTFP, "%s%s:%s ", ANSIColor::UNDERLINE, prefixText, ANSIColor::END);
      fprintf(PRINTFP, "%s%s", msgTextColor, ANSIColor::ITALIC);
      vfprintf(PRINTFP, msgFmt, printArgs);

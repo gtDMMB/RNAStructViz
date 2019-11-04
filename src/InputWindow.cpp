@@ -75,7 +75,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    input->value(inputText);
 	    input->color(GUI_BGCOLOR);
 	    input->textcolor(GUI_BTEXT_COLOR);
-	    Fl_Box *box = new Fl_Box(100, 1, 350, 40, (const char*) string);
+	    Fl_Box *box = new Fl_Box(100, 1, 400, 40, (const char*) string);
 	    box->box(FL_OSHADOW_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 	    box->color(GUI_BGCOLOR);
@@ -94,6 +94,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbUseDefaultNames->down_color(GUI_WINDOW_BGCOLOR);
 	    cbUseDefaultNames->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    cbUseDefaultNames->value(GUI_USE_DEFAULT_FOLDER_NAMES);
+	    cbUseDefaultNames->selection_color(GUI_TEXT_COLOR);
 	    const char *stickyFoldersCBText = "Save folder names for known organisms";
 	    cbKeepStickyFolders = new Fl_Check_Button(16, 145, 375, 30, stickyFoldersCBText);
             cbKeepStickyFolders->box(FL_ROUND_UP_BOX);
@@ -102,6 +103,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbKeepStickyFolders->down_color(GUI_WINDOW_BGCOLOR);
 	    cbKeepStickyFolders->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    cbKeepStickyFolders->value(GUI_KEEP_STICKY_FOLDER_NAMES);
+	    cbKeepStickyFolders->selection_color(GUI_TEXT_COLOR);
 	    callback(CloseCallback);
 	}
         else { 

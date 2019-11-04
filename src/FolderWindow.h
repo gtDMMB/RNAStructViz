@@ -17,7 +17,8 @@
 
 #include "ConfigOptions.h"
 
-#define MAX_FOLDER_LABEL_CHARS           (30)
+#define MAX_FOLDER_LABEL_CHARS           (32)
+#define STRUCT_PANE_LABEL_PREFIX         ("\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
 class FolderWindow : public Fl_Group
 {

@@ -23,25 +23,22 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 	      fileOpsLabel(NULL), fileLabel(NULL)
 {
 
-    // label configuration:  
-    labelfont(LOCAL_BFFONT);
-    labelsize(LOCAL_TEXT_SIZE);
-    labeltype(_FL_SHADOW_LABEL);
-    align(FL_ALIGN_CENTER | FL_ALIGN_RIGHT | FL_ALIGN_INSIDE);
+    // label configuration happens inside FolderWindow::AddStructures ... 
 
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
 		    StructureOperationIcon.width, StructureOperationIcon.height, 
 		    StructureOperationIcon.bytes_per_pixel);
+    structureIcon->color_average(FL_WHITE, 0.61);
     Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     
     int dividerTextHeight = 0, spacingHeight = NAVBUTTONS_SPACING;
     int fileOpsLabelHeight = 2 * NAVBUTTONS_BHEIGHT; 
-    int fileOpsLabelWidth = 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING;
-    int initYOffset = NAVBUTTONS_OFFSETY + RNAStructVizLogo.height + 5; // y + 36 + dividerTextHeight
+    int fileOpsLabelWidth = 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING + 4;
+    int initYOffset = NAVBUTTONS_OFFSETY + RNAStructVizLogo.height + 5; 
     const char *fileOpsLabelText = "@reload Structure Operations.\nEach operation opens a new window.";
-    fileOpsLabel = new Fl_Box(x + NAVBUTTONS_SPACING, initYOffset, 
+    fileOpsLabel = new Fl_Box(x - 2 + NAVBUTTONS_SPACING, initYOffset, 
 		              fileOpsLabelWidth, fileOpsLabelHeight, 
 			      fileOpsLabelText);
     fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
@@ -51,13 +48,14 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     fileOpsLabel->labelsize(LOCAL_TEXT_SIZE);
     fileOpsLabel->box(FL_RSHADOW_BOX);
 
-    int opButtonWidth = 110;
+    int opButtonWidth = 128;
     int yOffset = initYOffset + fileOpsLabelHeight;
     Fl_Button* diagramButton = new Fl_Button(x + 20, yOffset + spacingHeight,
 		                             opButtonWidth, 30,
-		                             "Diagram @>|");
+		                             "View Diagram @>|");
     diagramButton->callback(DiagramCallback);
     diagramButton->labelcolor(GUI_BTEXT_COLOR);
+    diagramButton->labelfont(FL_HELVETICA);
 
     Fl_Button* statsButton = new Fl_Button(x + 20 + opButtonWidth + 
 		             spacingHeight, yOffset + spacingHeight, 
@@ -65,9 +63,10 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 		             "Statistics @>|");
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(GUI_BTEXT_COLOR);
+    statsButton->labelfont(FL_HELVETICA);
 
     const char *fileInstText = "@filenew Files.\nClick on the file buttons to view\nCT file contents in new window.";
-    fileLabel = new Fl_Box(x + NAVBUTTONS_SPACING, y + yOffset + spacingHeight, 
+    fileLabel = new Fl_Box(x - 2 + NAVBUTTONS_SPACING, y + yOffset + spacingHeight, 
 			   fileOpsLabelWidth, fileOpsLabelHeight, fileInstText);
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     fileLabel->color(GUI_BGCOLOR);
@@ -122,11 +121,14 @@ void FolderWindow::SetStructures(int folderIndex)
     }
     label(folder->folderName);
     char structLabel[MAX_BUFFER_SIZE];
-    snprintf(structLabel, MAX_BUFFER_SIZE - 1, " \n\n\n\n\n%s", folder->folderName);
+    snprintf(structLabel, MAX_BUFFER_SIZE - 1, "%s%s", STRUCT_PANE_LABEL_PREFIX, folder->folderName);
     ConfigParser::nullTerminateString(structLabel);
     copy_label(structLabel);
+    labelfont(LOCAL_BFFONT);
+    labeltype(_FL_SHADOW_LABEL);
     labelsize(1.25 * LOCAL_TEXT_SIZE);
     align(FL_ALIGN_TOP);
+
 }
 
 void FolderWindow::AddStructure(const char* filename, const int index)
@@ -150,10 +152,20 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     char labelWithIcon[MAX_BUFFER_SIZE];
 
     std::string spaceBuffer = string("                                                    ");
+    char fileNameNoExt[MAX_BUFFER_SIZE];
+    size_t fileNameCopyChars = strlen(filename);
+    const char *fileExtPos = strrchr(filename, '.');
+    if(fileExtPos != NULL) {
+         fileNameCopyChars = (size_t) (fileExtPos - filename);
+    }
+    fileNameCopyChars = MIN(fileNameCopyChars, MAX_BUFFER_SIZE - 1);
+    strncpy(fileNameNoExt, filename, fileNameCopyChars);
+    fileNameNoExt[fileNameCopyChars] = '\0';
+    
     int curLabelLen = 0;
     char filePrefix[MAX_BUFFER_SIZE];
     size_t fileNameBytes = strlen(filename);
-    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.30s%s", filename, 
+    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.32s%s", fileNameNoExt, 
 	     fileNameBytes > MAX_FOLDER_LABEL_CHARS ? "..." : "");
     snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s", 
 	     filePrefix, spaceBuffer.substr(0, 
@@ -165,7 +177,7 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     removeButton->callback(FolderWindow::RemoveCallback);
     removeButton->user_data((void*)index);
     removeButton->label("@1+");
-    removeButton->labelcolor(GUI_TEXT_COLOR);
+    removeButton->labelcolor(GUI_BTEXT_COLOR);
     
     group->resizable(label);
     group->end();
@@ -237,7 +249,7 @@ void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)
     int index;
     for (index = 0; index < folders.size(); ++index)
     {
-        if (!strcmp(folders[index]->folderName, folderGroup->label() + 6))
+        if (!strcmp(folders[index]->folderName, folderGroup->label() + strlen(STRUCT_PANE_LABEL_PREFIX)))
             break;
     }
     RNAStructViz::GetInstance()->AddDiagramWindow(index);
@@ -252,7 +264,7 @@ void FolderWindow::StatsCallback(Fl_Widget* widget, void* userData)
     int index;
     for (index = 0; index < folders.size(); ++index)
     {
-        if (!strcmp(folders[index]->folderName, folderGroup->label() + 6))
+        if (!strcmp(folders[index]->folderName, folderGroup->label() + strlen(STRUCT_PANE_LABEL_PREFIX)))
             break;
     }
     RNAStructViz::GetInstance()->AddStatsWindow(index);

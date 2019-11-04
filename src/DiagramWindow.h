@@ -44,7 +44,7 @@ using std::max_element;
 #define GLWIN_TRANSLATEY             (110)
 
 #define WIDGET_SPACING               (35)
-#define EXPORT_BUTTON_WIDTH          (115)
+#define EXPORT_BUTTON_WIDTH          (140)
 #define WINW_EXTENSION               (EXPORT_BUTTON_WIDTH + 5 * WIDGET_SPACING)
 
 #define ZOOM_WIDTH                   (200)
@@ -58,7 +58,7 @@ using std::max_element;
 #define DWINARC_LABEL_PCT            (0.0833)
 
 #define STRUCTURE_INCLBL_XOFFSET     (10)
-#define BASE_LINE_FONT_SIZE          (8)
+#define BASE_LINE_FONT_SIZE          (9)
 
 class DiagramWindow : public Fl_Cairo_Window, public RadialLayoutWindowCallbackInterface {
 
@@ -120,16 +120,30 @@ private:
 		      const int *structDrawParams, 
     	              const int resolution);
 
-	/* Draws the color legend for the arcs. Input a and b correspond to the
-	   index of the relevant structures*/
-    void DrawKey3(); // if 3 structures are selected
-    void DrawKey2(const int a, const int b); // if 2 selected structures
-    void DrawKey1(const int a); // if 1 selected structure
+    /*
+     * Cairo drawing helper functions to transition from former Fl_draw overlay 
+     * functions directly to drawing all of the window with Cairo library 
+     * functionality:
+     */
+    class DrawWithCairo {
+	 public:
+	      static void fl_rectf(cairo_t *crDraw, int x, int y, int w, int h);
+	      static void fl_draw(cairo_t *crDraw, const char *drawStr, int x, int y);
+              static void fl_line_style(cairo_t *crDraw, int lineStyle);
+	      static void fl_xyline(cairo_t *crDraw, int x, int y, int lineWidth);
+    };
+
+    /* Draws the color legend for the arcs. Input a and b correspond to the
+     * index of the relevant structures 
+     */
+    void DrawKey3(cairo_t *crDraw); // if 3 structures are selected
+    void DrawKey2(cairo_t *crDraw, const int a, const int b); // if 2 selected structures
+    void DrawKey1(cairo_t *crDraw, const int a); // if 1 selected structure
     
     void SetCairoBranchColor(cairo_t *cr, const BranchID_t &branchType, 
 		             int enabled, 
                              CairoColorSpec_t fallbackColorFlag);
-    void SetCairoColor(cairo_t *cr, int colorFlag); 
+    void SetCairoColor(cairo_t *cr, int colorFlag, bool toOpaque = false); 
     void SetCairoToFLColor(cairo_t *cr, Fl_Color flc);
     void SetCairoToExactFLColor(cairo_t *cr, Fl_Color flc);
 

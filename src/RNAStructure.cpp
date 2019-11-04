@@ -832,7 +832,7 @@ void RNAStructure::SetFileCommentLines(std::string commentLineData, InputFileTyp
 }
 
 const char* RNAStructure::GetSuggestedStructureFolderName() {
-     
+      
      if(m_suggestedFolderName) { // we have already computed this data:
           return m_suggestedFolderName;
      }
@@ -845,6 +845,10 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
 	       if(newlinePos != std::string::npos) {
 		    size_t orgNameStartPos = orgNamePos + strlen("Organism: ");
 	            orgName = commentLines.substr(orgNameStartPos, newlinePos - orgNameStartPos);
+		    size_t orgSecondWordPos = orgName.find(" ");
+		    if(orgSecondWordPos != std::string::npos && orgSecondWordPos + 1 < orgName.length()) {
+		         orgName = orgName.substr(0, 1) + std::string(".") + orgName.substr(orgSecondWordPos);
+		    }
 	       }
 	  }
 	  size_t accNoPos = commentLines.find("Accession");
@@ -882,13 +886,13 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
           searchForStructStrings.push_back(string(m_fileCommentLine));
      }
      const char *fileNamePath = strrchr(GetFilenameNoExtension(), '/');
-     fileNamePath = fileNamePath ? fileNamePath : GetFilenameNoExtension();
+     fileNamePath = fileNamePath ? fileNamePath + 1 : GetFilenameNoExtension();
      searchForStructStrings.push_back(string(fileNamePath));
 
      // search for patterns of the form <CAPLETTER>.<LOWERCASELETTERS>, e.g., 
      // E.coli or C.elegans, in the file name for a suggested structure name:
      char filePathReplaceChars[][2] = {
-          {'_', '-'}, 
+          {'_', ' '}, 
      };
      bool foundMatch = false;
      for(int sidx = 0; sidx < searchForStructStrings.size(); sidx++) { 
@@ -899,10 +903,11 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
 			               filePathReplaceChars[rsidx][0], 
 				       filePathReplaceChars[rsidx][1]);
 	}
-	char *dotPos = NULL;
+	char *dotPos = NULL, *checkStr = m_suggestedFolderName;
 	size_t strOffset = 0, sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
-	while(*(dotPos = strchrnul(m_suggestedFolderName + strOffset, '.')) != '\0') {
-	     strOffset = dotPos - m_suggestedFolderName;
+	while(*(dotPos = strchrnul(checkStr, '.')) != '\0') {
+	     strOffset = (size_t) (dotPos - m_suggestedFolderName);
+	     checkStr = dotPos + 1;
 	     if(strOffset > 0 && isupper(m_suggestedFolderName[strOffset - 1])) { 
 	          size_t endingLowerPos = strOffset + 1;
 		  while((endingLowerPos < sfnLen) && islower(m_suggestedFolderName[endingLowerPos])) {
@@ -926,13 +931,12 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
 	}
      }
      if(!foundMatch) {
-          free(m_suggestedFolderName);
-	  m_suggestedFolderName = NULL;
+          Free(m_suggestedFolderName);
 	  return NULL;
      }
      
      size_t sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
-     if(sfnLen < MAX_BUFFER_SIZE) {
+     if(sfnLen + 1 < MAX_BUFFER_SIZE) {
           m_suggestedFolderName = (char *) realloc(m_suggestedFolderName, sfnLen + 1);
 	  m_suggestedFolderName[sfnLen] = '\0';
      }
