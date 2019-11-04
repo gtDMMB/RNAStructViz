@@ -98,12 +98,14 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  char *winTitle;
 	  int vrnaPlotType;
           CairoContext_t *radialLayoutCanvas, *radialLayoutCanvasOrig;
-	  
+          bool haveInitVRNAScroller;
+
 	  Fl_Box *scrollerFillBox;
 	  Fl_Button *scalePlusBtn, *scaleMinusBtn, *resetBtn;
 	  Fl_Scroll *windowScroller;
 	  int buttonToolbarHeight;
 	  int cairoWinTranslateX, cairoWinTranslateY;
+	  int defaultScrollToX, defaultScrollToY;
 	  double winScaleX, winScaleY;
 
 	  static void ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBtn, void *udata);

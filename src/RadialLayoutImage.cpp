@@ -15,6 +15,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 	Fl_Cairo_Window(width, height), RadialLayoutWindowCallbackInterface(), 
 	winTitle(NULL), vrnaPlotType(PLOT_TYPE_SIMPLE), 
 	radialLayoutCanvas(NULL), radialLayoutCanvasOrig(NULL), 
+	haveInitVRNAScroller(false), defaultScrollToX(-1), defaultScrollToY(-1),
 	scrollerFillBox(NULL), windowScroller(NULL), 
 	scalePlusBtn(NULL), scaleMinusBtn(NULL), resetBtn(NULL), 
 	cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
@@ -127,8 +128,6 @@ void RadialLayoutDisplayWindow::ResizeScrollerFillBox() {
      scrollerFillBox = new Fl_Box(0, 0, nextFillerWidth, nextFillerHeight); 
      scrollerFillBox->type(FL_NO_BOX);
      windowScroller->end();
-     //windowScroller->resize(0, buttonToolbarHeight, w(), h() - buttonToolbarHeight);
-     //windowScroller->scroll_to(0, 0);
      windowScroller->redraw();
      redraw();
 }
@@ -148,8 +147,13 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
      fl_xyline(0, thisWindow->buttonToolbarHeight - 2, thisCairoWindow->w());
      fl_line_style(0);
      fl_color(GUI_WINDOW_BGCOLOR);
+     if(!thisWindow->haveInitVRNAScroller) {
+          thisWindow->windowScroller->scroll_to(thisWindow->defaultScrollToX, thisWindow->defaultScrollToY);
+          thisWindow->haveInitVRNAScroller = true;
+     }
      thisWindow->cairoWinTranslateX = thisWindow->windowScroller->xposition();
      thisWindow->cairoWinTranslateY = thisWindow->windowScroller->yposition();
+     
      cairo_surface_t *crSurface = cairo_get_target(thisWindow->radialLayoutCanvas->GetCairoContext());
      cairo_set_source_surface(cr, crSurface, -thisWindow->cairoWinTranslateX, -thisWindow->cairoWinTranslateY);
      cairo_rectangle(cr, 0, thisWindow->buttonToolbarHeight, 
@@ -170,9 +174,6 @@ void RadialLayoutDisplayWindow::ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBt
      float scalingFactor = 1.0 + DEFAULT_SCALING_PERCENT;
      rwin->radialLayoutCanvas->Scale(scalingFactor);
      rwin->ResizeScrollerFillBox();
-     //int nextScrollerX = (int) (scalingFactor * rwin->windowScroller->xposition());
-     //int nextScrollerY = (int) (scalingFactor * rwin->windowScroller->yposition());
-     //rwin->windowScroller->scroll_to(0, 0); 
      rwin->redraw();
 }
 
@@ -181,7 +182,6 @@ void RadialLayoutDisplayWindow::ScaleRadialLayoutMinusCallback(Fl_Widget *scaleB
      float scalingFactor = 1.0 - DEFAULT_SCALING_PERCENT;
      rwin->radialLayoutCanvas->Scale(scalingFactor);
      rwin->ResizeScrollerFillBox();
-     //rwin->windowScroller->scroll_to(0, 0); 
      rwin->redraw();
 }
 
@@ -190,6 +190,7 @@ void RadialLayoutDisplayWindow::RadialLayoutResetCallback(Fl_Widget *resetBtn, v
      CairoContext_t *oldRadialLayoutCanvas = rwin->radialLayoutCanvas;
      rwin->radialLayoutCanvas = new CairoContext_t(*(rwin->radialLayoutCanvasOrig));
      Delete(oldRadialLayoutCanvas);
+     rwin->haveInitVRNAScroller = false;
      rwin->ResizeScrollerFillBox();
      rwin->redraw();
 }
@@ -274,11 +275,11 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      else {
           workingIdx = naview_xy_coordinates(pairTableG, xPosArr, yPosArr);
      }
-     if(workingIdx != rnaSubseqLen) {
-          fl_alert("Warning: Strange things are happening with the ViennaRNA PS plot algorithm ...\n"
-	           " > workingIdx = %d, RNASubseqLen = %d;", 
-		   workingIdx, rnaSubseqLen);
-     }
+     //if(workingIdx != rnaSubseqLen) {
+     //     fl_alert("Warning: Strange things are happening with the ViennaRNA PS plot algorithm ...\n"
+     //	           " > workingIdx = %d, RNASubseqLen = %d;", 
+     // 		   workingIdx, rnaSubseqLen);
+     //}
 
      double xmin, xmax, ymin, ymax, dmin;
      xmin = xmax = xPosArr[0];
@@ -354,7 +355,15 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 	  CairoColor_t baseNodeColor = GetBaseNodeColor(effectiveRNASubseq[idx]);
 	  if(idx + seqIndexOffset < startPos || idx + seqIndexOffset > endPos) {
 	       baseNodeColor = baseNodeColor.ToGrayscale();
-	  } 
+	  }
+	  else {
+               if(defaultScrollToX == -1 || nodeX < defaultScrollToX) {
+	            defaultScrollToX = nodeX;
+	       }
+	       if(defaultScrollToY == -1 || nodeY < defaultScrollToY) {
+		    defaultScrollToY = nodeY;
+	       }
+	  }
 	  char nodeLabel[32];
 	  if(idx % NUMBERING_MODULO == NUMBERING_MODULO - 1) {
 	       snprintf(nodeLabel, 32, "%d\0", idx + seqIndexOffset + 1);
