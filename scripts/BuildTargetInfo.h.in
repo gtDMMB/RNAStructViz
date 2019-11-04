@@ -146,7 +146,7 @@ class ApplicationBuildInfo {
 	       fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
 	       fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
 	       if(aboutStr == NULL) {
-                    fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
+                    fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n", 
 			       UserManualWikiLink().c_str(), GitRevisionInfoFull().c_str(), 
 			       GitRevisionDate().c_str(), FLTKVersionString().c_str(),
 			       BuildFLTKConfig().c_str(),  
@@ -154,7 +154,7 @@ class ApplicationBuildInfo {
 			       LocalBuildDateTime().c_str());
 	       }
 	       else {
-	            fprintf(whichOut, "%s\n\n", aboutStr);
+	            fprintf(whichOut, "%s\n", aboutStr);
 	       }
 	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. "
 		                          "New issues with the application can be submitted by following the instructions at " 

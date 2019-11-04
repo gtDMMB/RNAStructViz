@@ -27,19 +27,6 @@ typedef enum {
      NEW_CONFIG  = 6,
 } StructVizOptionAction_t;
 
-static const struct option longarg_options[] = {
-     { "about",           no_argument,      NULL,                      PRINT_ABOUT },
-     { "debug",           no_argument,      NULL,                      PRINT_DEBUG }, 
-     { "help",            no_argument,      NULL,                      PRINT_HELP  },
-     { "new-config",      no_argument,      NULL,                      NEW_CONFIG  },
-     { "no-ansi-color",   no_argument,      &PRINT_ANSI_COLOR,         SETVAR      },
-     { "no-unicode",      no_argument,      &PRINT_TERMINAL_UNICODE,   SETVAR      },
-     { "quiet",           no_argument,      &CFG_QUIET_MODE,           SETVAR      },
-     { "verbose",         no_argument,      &CFG_VERBOSE_MODE,         SETVAR      },
-};
-
-static const char *shortarg_options = "hqvV";
-
 void ProcessAboutOption();
 void ProcessHelpOption();
 void ProcessDebugOption();

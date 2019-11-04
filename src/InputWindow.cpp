@@ -22,7 +22,7 @@ int InputWindow::distinctStructureCount = 0;
 InputWindow::InputWindow(int w, int h, const char *label, 
 	const char *defaultName, InputWindowType type, int folderIndex) : 
 	Fl_Window(w, h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
-	userWindowStatus(OK), fileSelectionIndex(-1)
+	userWindowStatus(OK), fileSelectionIndex(-1), stickyFolderNameFound(false)
 {	
     string = (char*)malloc(sizeof(char)*90);
     color(GUI_WINDOW_BGCOLOR);
@@ -140,7 +140,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	
 	}
         show();
-        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES) { 
+        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound)) { 
             show();
 	}
 	else {
@@ -184,7 +184,7 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 	    GUI_KEEP_STICKY_FOLDER_NAMES = true;
 	}
     }    
-    free(window->string);
+    Free(window->string);
     window->hide();
 }
 
@@ -240,6 +240,7 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
 	      //// already there to go from the local user config files:
 	      std::string suggestedStickyName = std::string(stickyFolderName);
 	      Free(stickyFolderName);
+	      stickyFolderNameFound = true;
 	      return suggestedStickyName;
 	 }
     }

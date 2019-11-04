@@ -70,15 +70,16 @@ class InputWindow : public Fl_Window
     
     protected:
 
-	/* 	Callbacks for whether the user presses enter, pushes the button,
-	    	or closes the InputWindow
+	/* 	
+	 * Callbacks for whether the user presses enter, pushes the button,
+	 * or closes the InputWindow
         */
         static void InputCallback(Fl_Widget *widget, void *userdata);
         static void CloseCallback(Fl_Widget* widget, void* userData);
         static void DisplayCTFileCallback(Fl_Widget *w, void *udata);
 	static void CancelCallback(Fl_Widget *w, void *udata);
 
-	static std::string ExtractStructureNameFromFile(const char *ctPath);
+	std::string ExtractStructureNameFromFile(const char *ctPath);
 
     private:
         Fl_Input *input; // Text field where the user types in the input
@@ -91,6 +92,7 @@ class InputWindow : public Fl_Window
 	char *inputText;
 	int userWindowStatus;
 	int fileSelectionIndex;
+	bool stickyFolderNameFound;
 };
 
 #endif

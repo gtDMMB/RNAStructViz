@@ -28,6 +28,7 @@ class ConfigParser {
 		Fl_Color guiStructureDiagramColors[3][7];
                 int guiStructureDiagramColorsCount[3];
 		bool guiDisplayFirstRunMessage;
+		bool guiKeepStickyFolderNames;
 
 	public:
 		ConfigParser(); 

@@ -186,6 +186,10 @@ void StructureManager::AddFile(const char* filename)
 			       TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
 					                  folders[count]->folderName);
 			  }
+			  else {
+			       TerminalText::PrintDebug("Saved sticky folder name \"%s\" to local config file\n", 
+					                folders[count]->folderName);
+			  }
 		     }
 		 }
 

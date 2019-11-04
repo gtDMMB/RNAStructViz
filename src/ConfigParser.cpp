@@ -103,6 +103,9 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 	  else if(!strcmp(parsedLine.cfgOption, "DISPLAY_FIRSTRUN_MESSAGE")) {
                guiDisplayFirstRunMessage = !strcasecmp(parsedLine.cfgValue, "true");
 	  }
+	  else if(!strcmp(parsedLine.cfgOption, "GUI_KEEP_STICKY_FOLDER_NAMES")) {
+	       guiKeepStickyFolderNames = !strcasecmp(parsedLine.cfgValue, "true");
+	  }
 	  else if(!strncmp(parsedLine.cfgOption, "DWIN_COLORS_STRUCT", 18) && 
 	          strlen(parsedLine.cfgOption) == 19) {
                int structIndex = atoi(parsedLine.cfgOption + 18) - 1;
@@ -233,15 +236,30 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
 	  }
      }
 
+     const char *BOOLEAN_VALUED_CFGOPTS[] = {
+          "DISPLAY_FIRSTRUN_MESSAGE",
+	  "GUI_KEEP_STICKY_FOLDER_NAMES",
+     };
+     bool BOOLEAN_VALUED_CFGOPTS_VALUES[] = {
+	  guiDisplayFirstRunMessage,
+	  guiKeepStickyFolderNames,
+     };
+     int lineLen;
      char lastOutputLine[MAX_BUFFER_SIZE];
-     int lineLen = snprintf(lastOutputLine, MAX_BUFFER_SIZE, "DISPLAY_FIRSTRUN_MESSAGE=%s", 
-	                    guiDisplayFirstRunMessage ? "true" : "false");
-     nullTerminateString(lastOutputLine, MAX_BUFFER_SIZE - 1);
-     if(!fwrite(lastOutputLine, sizeof(char), lineLen, fpCfgFile)) {
-	  TerminalText::PrintError("Error writing line #%d to file: %s\n", 
-	                           curLineNum, strerror(errno));
-	  fclose(fpCfgFile);
-	  return errno;
+     for(int bi = 0; bi < GetArrayLength(BOOLEAN_VALUED_CFGOPTS); bi++) {
+          const char *newlineStr = bi + 1 < GetArrayLength(BOOLEAN_VALUED_CFGOPTS) ? 
+		                   "\n" : "";
+	  lineLen = snprintf(lastOutputLine, MAX_BUFFER_SIZE, "%s=%s%s", 
+	                     BOOLEAN_VALUED_CFGOPTS[bi], 
+			     BOOLEAN_VALUED_CFGOPTS_VALUES[bi] ? "true" : "false", 
+			     newlineStr);
+          nullTerminateString(lastOutputLine, MAX_BUFFER_SIZE - 1);
+          if(!fwrite(lastOutputLine, sizeof(char), lineLen, fpCfgFile)) {
+	       TerminalText::PrintError("Error writing line #%d to file: %s\n", 
+	                                curLineNum, strerror(errno));
+	       fclose(fpCfgFile);
+	       return errno;
+          }
      }
 
      fclose(fpCfgFile); 
@@ -273,6 +291,7 @@ void ConfigParser::storeVariables() const {
      }
 
      DISPLAY_FIRSTRUN_MESSAGE = guiDisplayFirstRunMessage;
+     GUI_KEEP_STICKY_FOLDER_NAMES = guiKeepStickyFolderNames;
 
 } 
 
@@ -344,6 +363,7 @@ void ConfigParser::setDefaults() {
      }
      
      guiDisplayFirstRunMessage = DISPLAY_FIRSTRUN_MESSAGE;
+     guiKeepStickyFolderNames = GUI_KEEP_STICKY_FOLDER_NAMES;
 
 }
 
