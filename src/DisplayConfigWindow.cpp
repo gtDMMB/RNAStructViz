@@ -245,7 +245,7 @@ void DisplayConfigWindow::ConstructWindow() {
          fpathsSettingBoxes[f] = settingBox;
 	 fpathsUpdateRefs[f] = (char *) *(fieldUpdateVars[f]);
 	 windowWidgets.push_back(settingBox);
-	 offsetX += (int) (2 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING;
+	 offsetX += (int) (2 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING / 2;
 	 if(needsDirChooser[f]) { 
               Fl_Button *chooseDirBtn = new Fl_Button(offsetX, workingYOffset, 
 			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
@@ -316,9 +316,13 @@ void DisplayConfigWindow::ConstructWindow() {
           offsetX += 1.5 * CFGWIN_LABEL_WIDTH + CFGWIN_COLOR_WIDTH + 2 * CFGWIN_SPACING;
           for(int c = 0; c < structColorCounts[s]; c++) { 
 	       Fl_Button *colorButton = new Fl_Button(offsetX, workingYOffset, 
-			                              CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "+");
-	       colorButton->color(*(structColorVarRefs[s][c]));
-	       colorButton->labelcolor(GUI_BTEXT_COLOR);
+			                              CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "[+]");
+	       Fl_Color initDefaultButtonColor = *(structColorVarRefs[s][c]);
+	       colorButton->color(initDefaultButtonColor);
+	       Fl_Color labelTextColor = initDefaultButtonColor == FL_BLACK ? 
+		                         Lighter(initDefaultButtonColor, 0.5) :
+					 Darker(initDefaultButtonColor, 0.5);
+	       colorButton->labelcolor(labelTextColor);
 	       int indexUserData = (s & 0x0000ffff) | ((c << 16) & 0xffff0000);
 	       colorButton->user_data((void *) indexUserData);
 	       colorButton->callback(ChangeDiagramWindowArcColorCallback);
@@ -437,18 +441,19 @@ void DisplayConfigWindow::ConstructWindow() {
      // bottom right of the window:
      int boundingBoxWidth = 3 * CFGWIN_BUTTON_WIDTH + 3 * CFGWIN_SPACING;
      offsetX = CONFIG_WINDOW_WIDTH - boundingBoxWidth - CFGWIN_SPACING / 2;
-     int bdBoxHeight = (int) 1.5 * (CONFIG_WINDOW_HEIGHT - workingYOffset);
-     int bdBoxYOffset = CONFIG_WINDOW_HEIGHT - bdBoxHeight - CFGWIN_SPACING;
+     int bdBoxHeight = (int) (2.0 * CFGWIN_LABEL_HEIGHT);
+     int bdBoxYOffset = workingYOffset + CFGWIN_SPACING;
      Fl_Box *btnBoundingBox = new Fl_Box(offsetX, bdBoxYOffset, 
 		              boundingBoxWidth, bdBoxHeight);
      btnBoundingBox->box(FL_RSHADOW_BOX);
      btnBoundingBox->color(GUI_BGCOLOR);
      windowWidgets.push_back(btnBoundingBox);
-     workingYOffset -= CFGWIN_SPACING / 3;
+     //workingYOffset -= CFGWIN_SPACING / 3;
 
      offsetX = CONFIG_WINDOW_WIDTH - 
 	       (CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING);
-     Fl_Button *writeConfigBtn = new Fl_Button(offsetX, workingYOffset, 
+     int offsetY = bdBoxYOffset + bdBoxHeight / 4;
+     Fl_Button *writeConfigBtn = new Fl_Button(offsetX, offsetY, 
 		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				 "@filenew   Save Settings");
      writeConfigBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
@@ -457,7 +462,7 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(writeConfigBtn);
      offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
 
-     Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, workingYOffset, 
+     Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, offsetY, 
 		                     CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 				     "@redo   Restore Previous");
      restoreDefaultsBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
@@ -466,7 +471,7 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(restoreDefaultsBtn);
      offsetX -= CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
 
-     Fl_Button *cancelBtn = new Fl_Button(offsetX, workingYOffset, 
+     Fl_Button *cancelBtn = new Fl_Button(offsetX, offsetY, 
 		            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
 			    "@1+   Cancel");
      cancelBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
