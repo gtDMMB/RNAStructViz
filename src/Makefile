@@ -187,6 +187,7 @@ Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
+	TerminalPrinting.h \
 	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
 

@@ -92,7 +92,7 @@ class InputWindow : public Fl_Window
 	char *inputText;
 	int userWindowStatus;
 	int fileSelectionIndex;
-	bool stickyFolderNameFound;
+	bool stickyFolderNameFound, suggestedFolderNameFound;
 };
 
 #endif

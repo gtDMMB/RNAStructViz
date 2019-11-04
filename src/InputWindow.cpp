@@ -22,7 +22,8 @@ int InputWindow::distinctStructureCount = 0;
 InputWindow::InputWindow(int w, int h, const char *label, 
 	const char *defaultName, InputWindowType type, int folderIndex) : 
 	Fl_Window(w, h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
-	userWindowStatus(OK), fileSelectionIndex(-1), stickyFolderNameFound(false)
+	userWindowStatus(OK), fileSelectionIndex(-1), 
+	stickyFolderNameFound(false), suggestedFolderNameFound(false)
 {	
     string = (char*)malloc(sizeof(char)*90);
     color(GUI_WINDOW_BGCOLOR);
@@ -102,7 +103,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbKeepStickyFolders->labelcolor(GUI_BTEXT_COLOR);
 	    cbKeepStickyFolders->down_color(GUI_WINDOW_BGCOLOR);
 	    cbKeepStickyFolders->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	    cbKeepStickyFolders->value(GUI_KEEP_STICKY_FOLDER_NAMES);
+	    cbKeepStickyFolders->value(GUI_KEEP_STICKY_FOLDER_NAMES && (stickyFolderNameFound || suggestedFolderNameFound));
 	    cbKeepStickyFolders->selection_color(GUI_TEXT_COLOR);
 	    callback(CloseCallback);
 	}
@@ -140,7 +141,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	
 	}
         show();
-        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound)) { 
+        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && !(cbKeepStickyFolders->value())) { 
             show();
 	}
 	else {
@@ -252,11 +253,29 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
     const char *suggestedFolderName = rnaStruct ? 
 	                              rnaStruct->GetSuggestedStructureFolderName() : NULL;
     if(suggestedFolderName != NULL) {
+         suggestedFolderNameFound = true;
          return std::string(suggestedFolderName);
     }
+    char fileTypeIdStr[MAX_BUFFER_SIZE] = "";
+    const char *extPos = strrchr(seqFilePath, '.');
+    if(extPos != NULL) {
+         fileTypeIdStr[0] = '(';
+	 strcpy(fileTypeIdStr + 1, extPos + 1);
+	 strcat(fileTypeIdStr, ")");
+	 StringTransform(fileTypeIdStr, toupper);
+    }
+    else {
+	 fileTypeIdStr[0] = '\0';
+    }
     char suggestedShortName[MAX_BUFFER_SIZE];
-    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d", ++InputWindow::distinctStructureCount); 
-    suggestedShortName[MAX_BUFFER_SIZE - 1] = '\0';
+    snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d %s", 
+             ++InputWindow::distinctStructureCount, fileTypeIdStr); 
+    if(fileTypeIdStr[0] == '\0') {
+         suggestedShortName[MAX_BUFFER_SIZE - 2] = '\0';
+    }
+    else {
+         suggestedShortName[MAX_BUFFER_SIZE - 1] = '\0';
+    }
     return std::string(suggestedShortName);
 
 }

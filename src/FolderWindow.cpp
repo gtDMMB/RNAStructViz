@@ -165,7 +165,7 @@ void FolderWindow::AddStructure(const char* filename, const int index)
     int curLabelLen = 0;
     char filePrefix[MAX_BUFFER_SIZE];
     size_t fileNameBytes = strlen(filename);
-    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.32s%s", fileNameNoExt, 
+    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.22s%s", fileNameNoExt, 
 	     fileNameBytes > MAX_FOLDER_LABEL_CHARS ? "..." : "");
     snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s", 
 	     filePrefix, spaceBuffer.substr(0, 

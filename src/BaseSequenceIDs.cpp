@@ -237,6 +237,21 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
      if(fileType == FILETYPE_NONE) {
           return "";
      }
+     // have appended sample numbers to the GTB files (need to remove this data to open the files):
+     char actualFilePath[MAX_BUFFER_SIZE];
+     if(fileType == FILETYPE_GTB) {
+	  strcpy(actualFilePath, filePath);
+	  const char *lastDashPos = strrchr(actualFilePath, '-');
+	  const char *extPos = strrchr(actualFilePath, '.');
+	  if(lastDashPos != NULL && extPos != NULL) {
+               const char *origExtPos = strrchr(filePath, '.');
+	       size_t extStrLen = strlen(extPos);
+	       char *lastDashPosWritable = (char *) lastDashPos;
+	       strncpy(lastDashPosWritable, origExtPos, extStrLen);
+	       lastDashPosWritable[extStrLen] = '\0';
+	       filePath = (const char *) actualFilePath;
+	  }
+     }
      FILE *fpInputSeq = fopen(filePath, "r");
      if(!fpInputSeq) {
           TerminalText::PrintError("Unable to open file \"%s\" : %s V\n", filePath, strerror(errno));

@@ -4,12 +4,16 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "CommonDialogs.h"
+#include "TerminalPrinting.h"
 
 #include <unistd.h>
 #include <iostream>
 #include <vector>
 #include <string>
 using std::string;
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
@@ -35,7 +39,8 @@ Fl_RGB_Image * MainWindow::infoButtonImage = new Fl_RGB_Image(
 	       InfoButton.width, InfoButton.height, InfoButton.bytes_per_pixel);
 
 MainWindow::MainWindow(int argc, char **argv)
-          : m_fileChooser(NULL), selectedFolderBtn(NULL), 
+          : m_fileChooser(NULL), m_fileChooserSelectAllBtn(NULL), 
+	    selectedFolderBtn(NULL), 
 	    selectedFolderIndex(-1)
 {
     
@@ -184,11 +189,9 @@ MainWindow::MainWindow(int argc, char **argv)
 
 }
 
-MainWindow::~MainWindow()
-{
-    if (m_fileChooser) {
-        delete m_fileChooser;
-    }
+MainWindow::~MainWindow() {
+    Delete(m_fileChooserSelectAllBtn);    
+    Delete(m_fileChooser);
     Delete(m_packedInfo);
     Delete(m_structureInfo);
     Delete(columnLabel);
@@ -292,27 +295,44 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 	ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY);
     }
 
-    for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i)
-    {
-    	const char *nextFilename = strrchr(ms_instance->m_fileChooser->value(i), '/');
-	nextFilename = nextFilename ? nextFilename : ms_instance->m_fileChooser->value(i);
-	if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
-	   !strcmp(nextFilename, "..") || 
-	   ConfigParser::directoryExists(nextFilename)) { // invalid file to parser, so ignore it:
-	    continue;
-	}
-        if(strlen(nextFilename) + strlen(nextWorkingDir) + 1 >= MAX_BUFFER_SIZE) {
-	     fl_alert("Unable to open file: %s\nTotal file path name exceeds %d bytes.", 
-		      nextFilename, MAX_BUFFER_SIZE);
-	     continue;
-	}
-	char nextFilePath[MAX_BUFFER_SIZE];
-	snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir, 
-	         nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/", 
-		 nextFilename);
-	RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
+    if(ms_instance->m_fileChooserSelectAllBtn->user_data() == (void *) ms_instance->m_fileChooser) {
+        for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i) {
+    	    const char *nextFilename = strrchr(ms_instance->m_fileChooser->value(i), '/');
+	    nextFilename = nextFilename ? nextFilename : ms_instance->m_fileChooser->value(i);
+	    if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
+	       !strcmp(nextFilename, "..") || 
+	       ConfigParser::directoryExists(nextFilename)) { // invalid file to parser, so ignore it:
+	        continue;
+	    }
+            if(strlen(nextFilename) + strlen(nextWorkingDir) + 1 >= MAX_BUFFER_SIZE) {
+	         fl_alert("Unable to open file: %s\nTotal file path name exceeds %d bytes.", 
+		          nextFilename, MAX_BUFFER_SIZE);
+	         continue;
+	    }
+            char nextFilePath[MAX_BUFFER_SIZE];
+	    snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir, 
+	             nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/", 
+		     nextFilename);
+	    RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
+        }
     }
-    //Delete(ms_instance->m_fileChooser);
+    else {
+	const char *fileChooserFilter = (const char *) ms_instance->m_fileChooserSelectAllBtn->user_data();
+	fs::directory_iterator cwdDirIter(nextWorkingDir);
+	while(cwdDirIter != fs::directory_iterator()) {
+             fs::path curFileEntryPath(cwdDirIter->path());
+	     if(!fs::is_directory(curFileEntryPath) && 
+	        fl_filename_match(curFileEntryPath.filename().c_str(), fileChooserFilter)) {
+                  char nextFilePath[MAX_BUFFER_SIZE];
+                  snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir,
+                           nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/",
+                           curFileEntryPath.filename().c_str());
+		  TerminalText::PrintDebug("Adding structure with path \"%s\"\n", nextFilePath);
+                  RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
+	     }
+             ++cwdDirIter;
+	}
+    }
 
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
@@ -491,8 +511,10 @@ void MainWindow::MoveFolderDown(Fl_Widget *widget, void* userData)
 bool MainWindow::CreateFileChooser()
 {
     if(m_fileChooser) {
-	Delete(m_fileChooser);
+	Delete(m_fileChooserSelectAllBtn);
+        Delete(m_fileChooser);
     }
+
     // Get the current working directory.
     char currentWD[MAX_BUFFER_SIZE];
     currentWD[0] = '\0';
@@ -516,13 +538,28 @@ bool MainWindow::CreateFileChooser()
 		    );
     m_fileChooser->directory(currentWD);
     m_fileChooser->preview(true);
-    //m_fileChooser->preview(false);
     m_fileChooser->textcolor(GUI_TEXT_COLOR);
     m_fileChooser->color(GUI_WINDOW_BGCOLOR);
     m_fileChooser->showHiddenButton->value(true); // show hidden files by default
     m_fileChooser->favorites_label = "  @search  Goto Favorites ...";
-    
+     
+    // add select all button:
+    m_fileChooserSelectAllBtn = new Fl_Button(0, 0, NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
+		                              "@filenew  Select All Files");
+    m_fileChooserSelectAllBtn->color(GUI_WINDOW_BGCOLOR);
+    m_fileChooserSelectAllBtn->labelcolor(GUI_BTEXT_COLOR);
+    m_fileChooserSelectAllBtn->user_data((void *) m_fileChooser);
+    m_fileChooserSelectAllBtn->callback(FileChooserSelectAllCallback); 
+    m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
+   
     return true;
+}
+
+void MainWindow::FileChooserSelectAllCallback(Fl_Widget *btn, void *udata) {
+     Fl_File_Chooser *flfc = (Fl_File_Chooser *) btn->user_data();
+     const char *curFileFilter = flfc->filter();
+     btn->user_data((void *) curFileFilter);
+     flfc->hide();
 }
 
 void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)

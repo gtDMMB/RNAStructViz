@@ -173,8 +173,8 @@ class MainWindow
 	    The scrolling group containing the sequence manager info, and the packed 
 	    group inside it.
         */
-	Fl_Scroll* m_structureInfo;
-        Fl_Pack* m_packedInfo;
+	Fl_Scroll *m_structureInfo;
+        Fl_Pack *m_packedInfo;
         Fl_Button *selectedFolderBtn;
         int selectedFolderIndex;
 
@@ -183,7 +183,9 @@ class MainWindow
         /*
 	    The file chooser dialog.
         */
-        Fl_File_Chooser* m_fileChooser;
+        Fl_File_Chooser *m_fileChooser;
+        Fl_Button *m_fileChooserSelectAllBtn;
+	static void FileChooserSelectAllCallback(Fl_Widget *btn, void *udata);
 
 	/* Other widgets that need to be updated when we change the theme settings */
 	Fl_Box *columnLabel, *actionsLabel;
