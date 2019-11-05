@@ -322,8 +322,10 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     else {
 	const char *fileChooserFilter = (const char *) ms_instance->m_fileChooserSelectAllBtn->user_data();
 	fs::directory_iterator cwdDirIter(nextWorkingDir);
-	while(cwdDirIter != fs::directory_iterator()) {
-             fs::path curFileEntryPath(cwdDirIter->path());
+	std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
+        std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
+	for(int fi = 0; fi < sortedFilePaths.size(); fi++) {
+             fs::path curFileEntryPath = sortedFilePaths[fi];
 	     if(!fs::is_directory(curFileEntryPath) && 
 	        fl_filename_match(curFileEntryPath.filename().c_str(), fileChooserFilter)) {
                   char nextFilePath[MAX_BUFFER_SIZE];
@@ -333,7 +335,6 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 		  TerminalText::PrintDebug("Adding structure with path \"%s\"\n", nextFilePath);
                   RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
 	     }
-             ++cwdDirIter;
 	}
     }
 
@@ -533,7 +534,7 @@ bool MainWindow::CreateFileChooser()
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
 			"All Formats (*.{ct,nopct,dot,bracket,dbn,gtb,helix,hlx})\t"
-		        "CT Files (*.{ct,nopct})\t"
+		        "CT Files (*.{nopct,ct})\t"
 			"DOT Bracket (*.{dot,bracket,dbn})\t"
 			"GTBoltzmann Format (*.gtb)\t"
 		        "Helix Triple Format (*.{helix,hlx})\t"

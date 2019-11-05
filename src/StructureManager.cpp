@@ -53,10 +53,10 @@ void StructureManager::AddFile(const char* filename)
     {
         if (m_structures[i])
         {
-            if (!strcmp(m_structures[i]->GetFilename(), basename))
+            if (!strcmp(m_structures[i]->GetFilename(true), basename))
             {
-            	fl_message("Already have a structure loaded with filename: %s", 
-			   basename);
+		TerminalText::PrintInfo("Already have a structure loaded with filename: %s\n", 
+			                basename);
             	free(localCopy);
 		return;
             }
@@ -138,7 +138,6 @@ void StructureManager::AddFile(const char* filename)
                  while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
                        Fl::wait();
                  }
-		 //input_window->hide();
             
                  bool same = false;
                  for(unsigned int ui = 0; ui < folders.size(); ui++)
@@ -154,13 +153,13 @@ void StructureManager::AddFile(const char* filename)
                  while(same) {
                      fl_message("Already have a folder with the name: %s, please choose another name.", 
                                 input_window->getName());
-                     Delete(input_window);
+                     input_window->Cleanup(false);
+		     Delete(input_window);
                      input_window = new InputWindow(525, 210, "New Folder Added", 
 	            	            folders[count]->folderName, InputWindow::FOLDER_INPUT);
                      while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
                           Fl::wait();
                      }
-                     //input_window->hide();
 		     same = !strcmp(input_window->getName(), "");
                      for(unsigned int ui = 0; ui < folders.size(); ui++)
             	     {
@@ -192,8 +191,8 @@ void StructureManager::AddFile(const char* filename)
 			  }
 		     }
 		 }
-
                  MainWindow::AddFolder(folders[count]->folderName, count, false);
+		 input_window->Cleanup(false);
 		 Delete(input_window);
              }
 

@@ -26,7 +26,8 @@ const RNAStructure::BasePair RNAStructure::UNPAIRED = ~0x0;
 RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(NULL), 
       charSeq(NULL), dotFormatCharSeq(NULL), charSeqSize(0), 
-      m_pathname(NULL), m_pathname_noext(NULL), m_fileType(FILETYPE_NONE), 
+      m_pathname(NULL), m_pathname_noext(NULL), m_exactPathName(NULL), 
+      m_fileType(FILETYPE_NONE), 
       m_fileCommentLine(NULL), m_suggestedFolderName(NULL), 
       m_ctDisplayString(NULL), m_ctDisplayFormatString(NULL), 
       m_seqDisplayString(NULL), m_seqDisplayFormatString(NULL), 
@@ -575,6 +576,7 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
 	  }
 	  strncpy(rnaStruct->m_pathname, filename, fileExtPos - filename);
 	  rnaStruct->m_pathname[fileExtPos - filename] = '\0';
+	  rnaStruct->m_exactPathName = rnaStruct->m_pathname;
 	  char sampleSuffix[MAX_BUFFER_SIZE];
 	  snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", *arrayCount + 1);
 	  strcat(rnaStruct->m_pathname, sampleSuffix);
@@ -790,10 +792,11 @@ void RNAStructure::GenerateDotFormatDataFromPairings() {
      dotFormatCharSeq[charSeqSize] = '\0';
 }
 
-const char* RNAStructure::GetFilename() const
+const char* RNAStructure::GetFilename(bool exactPath) const
 {
-    // Get the base file name                             
-    const char* basename = strrchr(m_pathname, '/');        
+    // Get the base file name 
+    char *m_pathNameVersion = exactPath && m_exactPathName ? m_exactPathName : m_pathname;                             
+    const char* basename = strrchr(m_pathNameVersion, '/');        
     if (!basename) {
         return m_pathname;
     }

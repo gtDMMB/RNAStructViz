@@ -12,6 +12,8 @@ using std::vector;
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Choice.H>
 
+#include "ConfigOptions.h"
+
 /* 
 InputWindow is a pop-up window for taking in user input to specify the name of 
 something. There are two types:
@@ -93,6 +95,40 @@ class InputWindow : public Fl_Window
 	int userWindowStatus;
 	int fileSelectionIndex;
 	bool stickyFolderNameFound, suggestedFolderNameFound;
+	
+	/*
+	 * Even when GUI_KEEP_STICKY_FOLDER_NAMES is set to true, the prefered 
+	 * behavior is to uncheck the auto folder naming (and auto hashing to 
+	 * local config file) when no plausible suggestion based on the organism 
+	 * name is found (either in the file path, or file format headers). 
+	 * This is a good default because otherwise unintuitive folder names would 
+	 * persist between StructViz sessions that are otherwise hard for the user to 
+	 * undo. After the user chooses not to hash / store the sticky folder name 
+	 * generated in these cases, however, we want to restore GUI_KEEP_STICKY_FOLDER_NAMES 
+	 * to its original setting to parse other base strings for subsequent files. 
+	 * This class variable keeps track of whether we need to reset the global 
+	 * config. 
+	 *
+	 * Run InputWindow::Cleanup() before deleting the instance of this class to have this 
+	 * check and reset performed automatically for you in client code.
+	 */
+	bool stickyFolderNamesNeedsReset;
+	
+	inline void InitCleanupParams() {
+	     if(cbKeepStickyFolders && GUI_KEEP_STICKY_FOLDER_NAMES && !(cbKeepStickyFolders->value())) {
+	          stickyFolderNamesNeedsReset = true;
+	     }
+	}
+
+    public:
+	inline void Cleanup(bool hideWindow = true) {
+	     if(stickyFolderNamesNeedsReset) {
+	          GUI_KEEP_STICKY_FOLDER_NAMES = true;
+	     }
+	     if(hideWindow) {
+	          hide();
+	     }
+	}
 };
 
 #endif

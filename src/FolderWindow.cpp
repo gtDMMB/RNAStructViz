@@ -5,6 +5,7 @@
 #include <FL/Fl_Button.H>
 
 #include "FolderWindow.h"
+#include "RNAStructure.h"
 #include "StructureManager.h"
 #include "RNAStructViz.h"
 #include "MainWindow.h"

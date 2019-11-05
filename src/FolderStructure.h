@@ -3,13 +3,21 @@
 
 #include "FolderWindow.h"
 
-struct Folder{
+#ifdef __cplusplus
+     extern "C" {
+#endif
+
+typedef struct {
     char* folderName;
     char* folderNameFileCount;
     int* folderStructs;
     int structCount;
     bool selected;
     FolderWindow* folderWindow;
-};
+} Folder;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif

@@ -448,7 +448,7 @@ void DisplayConfigWindow::ConstructWindow() {
 
      const char *checkBoxLabels[] = {
           "Display first-run message when RNAStructViz starts",
-	  "Use default folder names in load files dialog", 
+	  "Use default folder names in load files dialog (not recommended)", 
 	  "Remember structure folder names (use sticky folder names)",
      };
      bool includeRHSClearButton[] = { false, false, true };

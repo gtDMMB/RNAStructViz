@@ -1344,15 +1344,15 @@ void DiagramWindow::RebuildMenus() {
         this->begin();
 
         Fl_Box *label = new Fl_Box(ms_menu_minx[0], 0, ms_menu_width, 25,
-                                   "Sample Structure 1");
+                                   "Structure 1");
         label->labelcolor(GUI_BTEXT_COLOR);
 	label->labelfont(FL_HELVETICA_BOLD_ITALIC);
 	label->labelsize(12);
-        label = new Fl_Box(ms_menu_minx[1], 0, ms_menu_width, 25, "Sample Structure 2");
+        label = new Fl_Box(ms_menu_minx[1], 0, ms_menu_width, 25, "Structure 2");
         label->labelcolor(GUI_BTEXT_COLOR);
         label->labelfont(FL_HELVETICA_BOLD_ITALIC);
 	label->labelsize(12);
-	label = new Fl_Box(ms_menu_minx[2], 0, ms_menu_width, 25, "Sample Structure 3");
+	label = new Fl_Box(ms_menu_minx[2], 0, ms_menu_width, 25, "Structure 3");
         label->labelcolor(GUI_BTEXT_COLOR);
 	label->labelfont(FL_HELVETICA_BOLD_ITALIC);
 	label->labelsize(12);

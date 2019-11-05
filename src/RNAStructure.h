@@ -164,9 +164,14 @@ class RNAStructure
         }
 
         /*
-	    Get the file name for this sequence.
-        */
-        const char* GetFilename() const;
+	 * Get the file name for this sequence.
+         *
+	 * The exactPath parameter specified whether to return the filename as it is 
+	 * used in local StructViz folder accounting, which may be a modified 
+	 * form of the original file path stored on disk, or whether to suppress the 
+	 * suffixes added to files containing multiple samples. 
+         */
+        const char* GetFilename(bool exactPath = false) const;
         const char* GetFilenameNoExtension();
 	const char* GetInitialFileComment() const;
 	void SetFileCommentLines(std::string commentLineData, InputFileTypeSpec fileType);
@@ -223,7 +228,7 @@ class RNAStructure
         BaseData* m_sequence;
 
         // The full path name of the file from which this sequence came.
-        char *m_pathname, *m_pathname_noext;
+        char *m_pathname, *m_pathname_noext, *m_exactPathName;
 	char *m_fileCommentLine, *m_suggestedFolderName;
 	InputFileTypeSpec m_fileType;
 

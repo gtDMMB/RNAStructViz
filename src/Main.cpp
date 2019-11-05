@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 	      signal(SIGINT, RNAStructViz_SignalHandler);
 	 }
     #endif
-
+ 
     DisplayConfigWindow::SetupInitialConfig();
     strncpy(rnaStructVizExecPath, argv[0], MAX_BUFFER_SIZE);
     rnaStructVizExecPath[MAX_BUFFER_SIZE - 1] = '\0';

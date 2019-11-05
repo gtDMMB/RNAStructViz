@@ -23,7 +23,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	const char *defaultName, InputWindowType type, int folderIndex) : 
 	Fl_Window(w, h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
 	userWindowStatus(OK), fileSelectionIndex(-1), 
-	stickyFolderNameFound(false), suggestedFolderNameFound(false)
+	stickyFolderNameFound(false), suggestedFolderNameFound(false), 
+	stickyFolderNamesNeedsReset(false)
 {	
     string = (char*)malloc(sizeof(char)*90);
     color(GUI_WINDOW_BGCOLOR);
@@ -105,6 +106,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    cbKeepStickyFolders->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 	    cbKeepStickyFolders->value(GUI_KEEP_STICKY_FOLDER_NAMES && (stickyFolderNameFound || suggestedFolderNameFound));
 	    cbKeepStickyFolders->selection_color(GUI_TEXT_COLOR);
+	    InitCleanupParams();
 	    callback(CloseCallback);
 	}
         else { 
@@ -152,6 +154,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 }
 
 InputWindow::~InputWindow() {
+    Cleanup(false);
     Delete(input);
     Delete(cbUseDefaultNames);
     Delete(cbKeepStickyFolders);

@@ -194,3 +194,31 @@ static inline char *getUserNameFromEnv(char *unameBuf, unsigned int bufLength) {
      return NULL;
 }
 
+#include <boost/filesystem.hpp>
+
+static inline bool FileFormatSortCmp(boost::filesystem::path filePathV1, boost::filesystem::path filePathV2) {
+     
+     std::string fileV1 = std::string(filePathV1.filename().c_str()), fileV2 = std::string(filePathV2.filename().c_str());
+     size_t f1Ext = fileV1.rfind(".");
+     size_t f2Ext = fileV2.rfind(".");
+     
+     /* 
+      * NopCT files tend to contain more organism / structure naming data we can 
+      * use in picking out good folder names than the other supported file formats. 
+      * Thus, we prefer to process them first to get the most descriptive possible 
+      * folder name suggestions by default. 
+      */ 
+     bool f1IsNopCT = f1Ext != std::string::npos && strcasecmp(fileV1.substr(f1Ext + 1).c_str(), "nopct");
+     bool f2IsNopCT = f2Ext != std::string::npos && strcasecmp(fileV2.substr(f2Ext + 1).c_str(), "nopct");
+     if(f1IsNopCT && f2IsNopCT) {
+          return fileV1 < fileV2;
+     }
+     else if(f1IsNopCT && !f2IsNopCT) {
+	  return false;
+     }
+     else if(f2IsNopCT) {
+	  return true;
+     }
+     return fileV1 < fileV2;
+
+}

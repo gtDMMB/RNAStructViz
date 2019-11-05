@@ -3,7 +3,7 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -pedantic -O0 -march=native #-fsanitize=address
+CXXFLAGS= -g -Wall -Wextra -Wuninitialized -pedantic -O0 -march=native #-pedantic-errors 
 
 LD=g++
 LDFLAGS=-Wall -Wextra -g1 -lm #-fsanitize=address
@@ -30,12 +30,12 @@ TARGET_PLATFORM=$(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=greadlink
-	CXXFLAGS+= -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
+	CXXFLAGS+= -std=gnu++17 -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
 	LDFLAGS+= -L/usr/local/opt/openssl/lib 
 else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=readlink
-	CXXFLAGS+= -I/usr/include
+	CXXFLAGS+= -std=gnu++17 -I/usr/include
 	LDFLAGS+= -Wl,--no-as-needed
 endif
 
@@ -57,7 +57,7 @@ OBJEXT=o
 CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
-	       -std=gnu++17 -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
+	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
 	       -D_LARGEFILE64_SOURCE -funsigned-char 
 
 CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
