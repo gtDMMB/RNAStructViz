@@ -3,7 +3,7 @@
 #### Updated: 2019.03.05 (V2)
 
 CXX=g++
-CXXFLAGS= -g -Wall -Wextra -Wuninitialized -pedantic -O0 -march=native #-pedantic-errors 
+CXXFLAGS= -g -Wall -Wextra -pedantic -O0 -march=native #-pedantic-errors 
 
 LD=g++
 LDFLAGS=-Wall -Wextra -g1 -lm #-fsanitize=address

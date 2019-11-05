@@ -3,10 +3,6 @@
 
 #include "FolderWindow.h"
 
-#ifdef __cplusplus
-     extern "C" {
-#endif
-
 typedef struct {
     char* folderName;
     char* folderNameFileCount;
@@ -15,9 +11,5 @@ typedef struct {
     bool selected;
     FolderWindow* folderWindow;
 } Folder;
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
 
 #endif

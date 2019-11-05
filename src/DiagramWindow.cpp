@@ -13,6 +13,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <numeric>
 
 #include "DiagramWindow.h"
 #include "RNAStructViz.h"
@@ -161,7 +162,7 @@ DiagramWindow::~DiagramWindow() {
 
 void DiagramWindow::SetFolderIndex(int folderIndex) {
     this->structureFolderIndex = this->folderIndex = folderIndex;
-    struct Folder *dwinFolder = RNAStructViz::GetInstance()->
+    Folder *dwinFolder = RNAStructViz::GetInstance()->
 	                        GetStructureManager()->
                                 GetFolderAt(folderIndex);
     const char *structureNameFull = dwinFolder->folderName;
@@ -1648,7 +1649,10 @@ int DiagramWindow::handle(int flEvent) {
 				       RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH);
 			      string errMsg = string("DISABLED FEATURE: We only support radial layout ") + 
 				              string("for sequences <= ") + string(numericBuf) + 
-					      string(" bases."); 
+					      string(" bases (currently ") + 
+					      std::to_string(seqStartPos) + 
+					      string(" to ") + std::to_string(seqEndPos) + 
+					      string(")."); 
 			      AddNewErrorMessageToDisplay(errMsg);
 			      return 1;
 			 }

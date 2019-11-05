@@ -51,7 +51,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 	    snprintf(saveDirInfo, fnameStartPos + 1, "%s", inputText);
 	    sprintf(string, "Export to Directory: %s", saveDirInfo);
 	    input = new Fl_Input(25, 50, 235, 30);
-	    input->when(FL_WHEN_ENTER_KEY);
+	    //input->when(FL_WHEN_ENTER_KEY);
 	    input->value(filenameStartPtr + 1);
 	    Fl_Box *box = new Fl_Box(110, 20, 100, 30, (const char*)string);
 	    box->box(FL_NO_BOX);
@@ -72,7 +72,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
 
 	    sprintf(string, "Creating new folder for the sample structure %s", defaultName);
 	    input = new Fl_Input(160, 50, 360, 30, "@fileopen  New Folder Name:");
-	    input->when(FL_WHEN_ENTER_KEY);
+	    //input->when(FL_WHEN_ENTER_KEY);
             input->maximum_size(60);
 	    input->value(inputText);
 	    input->color(GUI_BGCOLOR);
