@@ -1,3 +1,7 @@
-# Welcome to the RNAStructViz software installation and user documentation!
+# Welcome to RNAStructViz!
 
-In an effort to maintain only one accurate set of user and install docs, we will point users to [our wonderful WIKI site](https://github.com/gtDMMB/RNAStructViz/wiki). This WIKI site contains all relevant information needed for users to get RNAStructViz up and running on their platform of choice along with graphical schematics to guide new users through the inner workings of using this utility. If you have any questions or other suggestions for improving RNAStructViz, please [post a new issue here](https://github.com/gtDMMB/RNAStructViz/issues) or alternately contact one of the active developers [Maxie D. Schmidt](mailto:maxieds@gmail.com) or [gtdmmb@gatech.edu](mailto:gtdmmb@gatech.edu) to obtain support. Thank you for using our software!
+User documentation, including software installation for Mac OSX and Linux/Unix as well as information on core features, is maintained via the RNAStructViz [WIKI site](https://github.com/gtDMMB/RNAStructViz/wiki). 
+
+If you have any questions (not addressed by the WIKI), concerns/bug reports, or suggestions/feature requests, please let us know by [posting a new issue](https://github.com/gtDMMB/RNAStructViz/issues). 
+
+Thank you for using our software!
