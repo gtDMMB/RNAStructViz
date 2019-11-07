@@ -938,7 +938,8 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
             }
             
             pack->remove(pack->child(pack->children()-1));
-            ms_instance->m_structureInfo->redraw();
+	    ms_instance->m_structureInfo->scrollbar.align();
+	    ms_instance->m_structureInfo->redraw();
             break;
         }
     }

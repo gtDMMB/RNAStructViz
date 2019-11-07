@@ -22,10 +22,14 @@
 
 class RNABranchType_t;
 
-#define MIN3(x, y, z)                MIN(x, MIN(y, z))
-#define ABS(x)                       (x >= 0 ? (x) : -1 * (x))
+#ifndef MIN3
+     #define MIN3(x, y, z)                MIN((x), MIN((y), (z)))
+#endif
+#ifndef ABS
+     #define ABS(x)                       ((x) >= 0 ? (x) : -1 * (x))
+#endif
 
-#define RadiansToDegrees(theta)      (theta * 180.0 / M_PI)
+#define RadiansToDegrees(theta)      ((theta) * 180.0 / M_PI)
 #define Square(x)                    ((x) * (x))
 
 #define DEFAULT_BUFFER_SIZE          (384)

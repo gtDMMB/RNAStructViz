@@ -50,8 +50,12 @@ extern const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT];
 extern const char *FLTK_THEME_HELP[FLTK_THEME_COUNT];
 extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 
-#define MAX(x, y)                    ((x) <= (y) ? (y) : (x))
-#define MIN(x, y)                    ((x) <= (y) ? (x) : (y))
+#ifndef MAX
+     #define MAX(x, y)                    ((x) <= (y) ? (y) : (x))
+#endif
+#ifndef MIN
+     #define MIN(x, y)                    ((x) <= (y) ? (x) : (y))
+#endif
 
 /* Some basic color operations for getting shades of color: */
 #define RGBColor(r, g, b)               ColorUtil::GetRGBColor(r, g, b)

@@ -87,6 +87,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 			     290 - 2 * fileOpsLabelHeight - dividerTextHeight - 
 			     2 * spacingHeight - NAVBUTTONS_BHEIGHT);
     folderPack->type(Fl_Pack::VERTICAL);
+    folderPack->align(FL_ALIGN_TOP);
 
     folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
@@ -231,8 +232,20 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
                 }
             }
             Fl_Group* toRemove = (Fl_Group*)pack->child(i); // <--- here
-            pack->remove(toRemove);
-            fwindow->folderScroll->redraw();
+	    int toRemoveHeight = toRemove->h();
+	    int toRemoveYPos = toRemove->y();
+	    for(int j = i + 1; j < pack->children(); j++) {
+                 Fl_Group* groupToMove = (Fl_Group*)pack->child(j);
+		 groupToMove->resize(groupToMove->x(), groupToMove->y() - toRemoveHeight, 
+				     groupToMove->w(), groupToMove->h());
+	    }
+	    pack->remove(toRemove);
+            pack->resize(pack->x(), pack->y(), pack->w(), pack->h() - toRemoveHeight);
+	    fwindow->folderScroll->scroll_to(0, 0);
+	    fwindow->folderScroll->scroll_to(fwindow->folderScroll->xposition(), 
+			                     fwindow->folderScroll->yposition());
+	    fwindow->folderScroll->scrollbar.align();
+	    fwindow->folderScroll->redraw();
             Fl::delete_widget(toRemove);
             
             appInstance->GetStructureManager()->DecreaseStructCount( 
