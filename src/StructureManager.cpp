@@ -86,8 +86,8 @@ void StructureManager::AddFile(const char* filename)
 	*structures = RNAStructure::CreateFromDotBracketFile(localCopy);
 	newStructCount = 1;
     }
-    else if(extension && !strncasecmp(extension, ".gtb", 4)) {
-        structures = RNAStructure::CreateFromGTBoltzmannFormatFile(localCopy, &newStructCount);
+    else if(extension && !strncasecmp(extension, ".boltz", 6)) {
+        structures = RNAStructure::CreateFromBoltzmannFormatFile(localCopy, &newStructCount);
     }
     else if(extension && (!strncasecmp(extension, ".helix", 6) || 
 			  !strncasecmp(extension, ".hlx", 4))) {

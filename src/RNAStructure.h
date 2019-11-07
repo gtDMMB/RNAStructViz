@@ -29,6 +29,7 @@ class RNABranchType_t;
 #define Square(x)                    ((x) * (x))
 
 #define DEFAULT_BUFFER_SIZE          (384)
+#define BOLTZMANN_FORMAT_MAX_SAMPLES (20)
 
 class RNAStructure
 {
@@ -112,7 +113,7 @@ class RNAStructure
         static RNAStructure* CreateFromDotBracketFile(const char *filename); 
 	
         #define RNASTRUCT_ARRAY_SIZE        (16)
-	static RNAStructure** CreateFromGTBoltzmannFormatFile(const char *filename, int *arrayCount);
+	static RNAStructure** CreateFromBoltzmannFormatFile(const char *filename, int *arrayCount);
 	static RNAStructure** CreateFromHelixTripleFormatFile(const char *filename, int *arrayCount);
 
     private:

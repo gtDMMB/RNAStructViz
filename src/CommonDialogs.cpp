@@ -22,14 +22,14 @@ std::string CommonDialogs::GetHelpInstructionsMessageString() {
           "► If you need help while running RNAStructViz, click on the help button\n",
           "(circled question mark) at the top-right corner of the left main window pane.\n",
           "► Sample structures are available for you to use with the application. You can\n",
-          "copy them into your home directory from the install directory using the first-run\n",
-          "instructions link above.\n",
+          "copy them into your home directory by clicking on the middle button below, or \n", 
+	  "directly from the install directory using the first-run instructions link above.\n",
           "► Users may view a summary tour of RNAStructViz features by clicking on the\nhelp ",
-          "button in the upper right left pane navigation bar and then on the left-most button\n\n",
+          "button in the upper right left pane navigation bar and then on the left-most button.\n\n",
           "Thank you for using our application! ", 
 	  "Please feel free to send us questions, comments, \n",
-          "and/or leave us general feedback on your user experience by writing to gtdmmb@@gatech.edu, \n",
-          "or by posting a new GitHub issue thread using the instructions at the following link:\n",
+          "and/or leave us general feedback on your user experience by \n",
+          "by posting a new \nGitHub issue thread using the instructions at the following link:\n",
           "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »", 
      };
      std::string fullInstText;
@@ -43,7 +43,7 @@ std::string CommonDialogs::GetHelpInstructionsMessageString() {
 void CommonDialogs::DisplayFirstRunInstructions() {
      
      std::string fullInstText = CommonDialogs::GetHelpInstructionsMessageString();	
-     fl_message_title("╠ ---  Welcome to your first install of RNAStructViz  --- ╣");
+     fl_message_title("╠  ---  Welcome to your first install of RNAStructViz  ---  ╣");
      fl_message_icon()->image(CommonDialogs::welcomeIconImage);
      fl_message_icon()->label("");
      fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));
@@ -78,7 +78,7 @@ void CommonDialogs::DisplayFirstRunInstructions() {
 void CommonDialogs::DisplayHelpDialog() {
      
      std::string fullInstText = CommonDialogs::GetHelpInstructionsMessageString();
-     fl_message_title("╠ ---  Welcome to your first install of RNAStructViz  --- ╣");
+     fl_message_title("╠  ---  Welcome to your first install of RNAStructViz  ---  ╣");
      fl_message_icon()->image(CommonDialogs::helpIconImage);
      fl_message_icon()->label("");
      fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));
@@ -121,12 +121,12 @@ void CommonDialogs::DisplayTourDialog() {
           "► Generate graphical arc diagrams to compare the overlap in pairings between up to three\n", 
 	  "samples at once. The arc diagram window also lets users zoom and select consecutive\n", 
 	  "sequences of bases to view in a radial layout viewer based on ViennaRNA.\n", 
-	  "► Compute comparitive statistics amongst all samples for the given organism given a \n", 
+	  "► Compute comparitive statistics among all samples for the given organism given a \n", 
 	  "reference structure.\n", 
 	  "► Directly view the secondary structure base pairings in our color-coded integrated\n", 
 	  "CT-file-style file viewer (lower right-hand-side buttons).\n", 
 	  "► Export loaded samples to CT and DOT Bracket file formats starting from any input\n", 
-	  "sequence format RNAStructViz supports\n", 
+	  "sequence format RNAStructViz supports.\n", 
 	  "► Export statistical data and the visual arc diagram representations for the samples,\n", 
 	  "respectively, to the standard text-based CSV and PNG image formats.\n\n", 
 	  "The RNAStructViz WIKI page on GitHub is an excellent reference to get new users started with the\n", 
@@ -138,7 +138,7 @@ void CommonDialogs::DisplayTourDialog() {
      for(int bufline = 0; bufline < GetArrayLength(tourTextBuffer); bufline++) {
           strcat(fullTourText, tourTextBuffer[bufline]);
      }
-     fl_message_title("╠ ---  Tour an overview of the features of RNAStructViz  --- ╣");
+     fl_message_title("╠  ---  Tour an overview of the features of RNAStructViz  ---  ╣");
      fl_message_icon()->image(CommonDialogs::tourIconImage);
      fl_message_icon()->label("");
      fl_message_icon()->color(Lighter(GUI_BGCOLOR, 0.5f));

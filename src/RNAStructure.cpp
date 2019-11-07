@@ -462,7 +462,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      return rnaStruct;
 }
 
-RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filename, int *arrayCount) {
+RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename, int *arrayCount) {
 
      if(arrayCount == NULL) {
           return NULL;
@@ -478,13 +478,19 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
      bool haveBaseData = false, searchingPairData = false;
      RNAStructure **rnaStructsArray = (RNAStructure **) malloc(RNASTRUCT_ARRAY_SIZE * sizeof(RNAStructure *));
      int rnaStructArraySize = RNASTRUCT_ARRAY_SIZE;
+     int sampleNum = 0;
      while(true) {
-          char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
+          if(sampleNum >= BOLTZMANN_FORMAT_MAX_SAMPLES) {
+	       TerminalText::PrintInfo("The number of samples in \"%s\" must not exceed %s. Loading first %d samples only.\n", 
+			               filename, BOLTZMANN_FORMAT_MAX_SAMPLES, BOLTZMANN_FORMAT_MAX_SAMPLES);
+	       break;
+	  }  
+	  char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
 	  if(lineReturn == NULL && feof(fpDotBracketFile)) { 
 	       break;
 	  }
 	  else if(lineReturn == NULL) {
-	       TerminalText::PrintError("Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
+	       TerminalText::PrintError("Reading Boltzmann format file \"%s\" : %s\n", filename, strerror(errno));
 	       break;
 	  }
 	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
@@ -597,6 +603,7 @@ RNAStructure ** RNAStructure::CreateFromGTBoltzmannFormatFile(const char *filena
 	       rnaStructsArray = (RNAStructure **) 
 		                  realloc(rnaStructsArray, sizeof(RNAStructure *) * rnaStructArraySize);
 	  }
+	  ++sampleNum;
      
      }
      fclose(fpDotBracketFile);

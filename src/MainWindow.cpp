@@ -533,10 +533,10 @@ bool MainWindow::CreateFileChooser()
     m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
-			"All Formats (*.{ct,nopct,dot,bracket,dbn,gtb,helix,hlx})\t"
+			"All Formats (*.{boltz,ct,nopct,dot,bracket,dbn,helix,hlx})\t"
 		        "CT Files (*.{nopct,ct})\t"
 			"DOT Bracket (*.{dot,bracket,dbn})\t"
-			"GTBoltzmann Format (*.gtb)\t"
+			"Boltzmann Format (*.boltz)\t"
 		        "Helix Triple Format (*.{helix,hlx})\t"
 			"SEQ Files (*.bpseq)\t"
 			"All Files (*)"
