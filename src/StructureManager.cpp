@@ -135,7 +135,7 @@ void StructureManager::AddFile(const char* filename)
 		 InputWindow* input_window = new InputWindow(525, 210, 
 		     	      "New Folder Added", folders[count]->folderName, 
 			      InputWindow::FOLDER_INPUT);
-                 while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
+                 while (input_window->visible()) {
                        Fl::wait();
                  }
             
@@ -151,13 +151,17 @@ void StructureManager::AddFile(const char* filename)
                  }
             
                  while(same) {
-                     fl_message("Already have a folder with the name: %s, please choose another name.", 
-                                input_window->getName());
+                     int choice = fl_choice("Already have a folder with the name: %s, please choose another name.", 
+                                            "Skip loading file", "Close", NULL, input_window->getName());
                      input_window->Cleanup(false);
 		     Delete(input_window);
+		     if(choice == 0) {
+		          same = false;
+			  break;
+		     }
                      input_window = new InputWindow(525, 210, "New Folder Added", 
 	            	            folders[count]->folderName, InputWindow::FOLDER_INPUT);
-                     while (input_window->visible() && !GUI_USE_DEFAULT_FOLDER_NAMES) {
+                     while (input_window->visible()) {
                           Fl::wait();
                      }
 		     same = !strcmp(input_window->getName(), "");
@@ -171,7 +175,7 @@ void StructureManager::AddFile(const char* filename)
 	             }
                  }
                         
-                 if(strcmp(input_window->getName(), "")) {
+                 if(input_window != NULL && strcmp(input_window->getName(), "")) {
             	     strcpy(folders[count]->folderName, input_window->getName());
 		     if(GUI_KEEP_STICKY_FOLDER_NAMES) {
                           const char *baseSeq = structure->GetSequenceString();
@@ -191,9 +195,11 @@ void StructureManager::AddFile(const char* filename)
 			  }
 		     }
 		 }
-                 MainWindow::AddFolder(folders[count]->folderName, count, false);
-		 input_window->Cleanup(false);
-		 Delete(input_window);
+		 if(input_window != NULL) {
+                      MainWindow::AddFolder(folders[count]->folderName, count, false);
+		      input_window->Cleanup(false);
+		      Delete(input_window);
+		 }
              }
 
 	}

@@ -14,7 +14,9 @@
 #ifdef TARGETOS_MACOSX
      #define __TARGETOS_APPLE__
      #define TARGETOS "Mac/OSX"
-     #define __APPLE__
+     #ifndef __APPLE__
+          #define __APPLE__
+     #endif
      #include <string.h>
      /* Mac OSX apparently does not support the strchrnul function: */
      static inline char* strchrnul(const char *s, int ch) {
