@@ -165,9 +165,10 @@ void RNAStructViz::AddDiagramWindow(int index)
             diagram->SetStructures(structures);
             diagram->SetFolderIndex(index);
             diagram->ResetWindow(true);
-        diagram->setAsCurrentDiagramWindow();
-        diagram->show();
-        return;
+            diagram->setAsCurrentDiagramWindow();
+            diagram->show();
+	    diagram->redraw();
+            return;
         }
     }
     
@@ -175,12 +176,13 @@ void RNAStructViz::AddDiagramWindow(int index)
     snprintf(title, DEFAULT_TITLE_STRING_SIZE, "Structure Diagram %lu", m_diagramWindows.size() + 1);
     diagram = new DiagramWindow(3 * DiagramWindow::ms_menu_width, 
                         IMAGE_HEIGHT + GLWIN_TRANSLATEY + 35, 
-                title, structures);
+                        title, structures);
     diagram->SetFolderIndex(index);
     diagram->setAsCurrentDiagramWindow();
     m_diagramWindows.push_back(diagram);
     diagram->show();
-    free(title); 
+    diagram->redraw();
+    Free(title); 
 }
 
 void RNAStructViz::AddStatsWindow(int index)

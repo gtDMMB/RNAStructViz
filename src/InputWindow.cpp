@@ -73,7 +73,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         sprintf(string, "Creating new folder for the sample structure %s", defaultName);
         input = new Fl_Input(160, 50, 360, 30, "@fileopen  New Folder Name:");
         //input->when(FL_WHEN_ENTER_KEY);
-            input->maximum_size(60);
+        input->maximum_size(60);
         input->value(inputText);
         input->color(GUI_BGCOLOR);
         input->textcolor(GUI_BTEXT_COLOR);
@@ -172,13 +172,12 @@ bool InputWindow::isCanceled() const {
 void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
     InputWindow *window = (InputWindow*) widget->parent();
     if(window->windowType == InputWindow::FILE_INPUT) {
-         char exportSaveDir[MAX_BUFFER_SIZE];
-     char *fileSepPtr = strrchr(window->inputText, '/');
-     int dirTextLen = fileSepPtr - window->inputText + 1;
-     snprintf(exportSaveDir, dirTextLen, "%s", window->inputText);
-     snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s/%s.csv", 
-              exportSaveDir, window->input->value());
-         window->name = "";
+     snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s%s%s.csv", 
+              (char *) PNG_OUTPUT_DIRECTORY, 
+	      PNG_OUTPUT_DIRECTORY[strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' || 
+	      window->inputText[0] == '/' ? "" : "/", 
+	      window->input->value());
+     window->name = "";
     }
     else {
     window->name = "";

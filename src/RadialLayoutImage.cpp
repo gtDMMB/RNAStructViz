@@ -229,10 +229,14 @@ std::string RadialLayoutDisplayWindow::GetExportToPNGOutputPath() {
          return string("");
     default:
          std::string outfilePath = string(fileChooser.filename());
-         strncpy((char *) PNG_OUTPUT_DIRECTORY, fileChooser.directory(), 
-                  MAX_BUFFER_SIZE - 1);
-         ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
-         return outfilePath;
+         const char *outFileFullPath = fileChooser.filename();
+         const char *dirMarkerPos = strrchr(outFileFullPath, '/');
+         if(dirMarkerPos != NULL) {
+              strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath,
+                      dirMarkerPos - outFileFullPath);
+              ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
+         }
+	 return outfilePath;
     }
 }
 

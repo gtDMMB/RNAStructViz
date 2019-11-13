@@ -37,8 +37,10 @@ using std::max_element;
 #define IMAGE_HEIGHT                 (IMAGE_DIM)
 #define DIAGRAM_HEIGHT               (DIAGRAM_TO_IMAGE_RATIO * IMAGE_HEIGHT)
 #define IMAGE_DEPTH                  (3)
+
 #define STRAND_MARKER_IMAGE_HEIGHT   (25)
 #define PNG_FOOTER_HEIGHT            (100)
+#define PNG_IMAGE_PADDING            (35)
 
 #define GLWIN_TRANSLATEX             (85)
 #define GLWIN_TRANSLATEY             (110)
@@ -56,6 +58,7 @@ using std::max_element;
 
 #define DWINARC_MAX_TICKS            (12)
 #define DWINARC_LABEL_PCT            (0.0833)
+#define BASE_PAIRS_AROUND_CIRCLE     (100)
 
 #define STRUCTURE_INCLBL_XOFFSET     (10)
 #define BASE_LINE_FONT_SIZE          (9)
@@ -105,8 +108,9 @@ protected:
     */
     bool computeDrawKeyParams(RNAStructure **sequences, int *numToDraw, int *keyA, int *keyB);
     void drawWidgets(cairo_t *crDraw);
-    static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr);
-
+    static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr, bool drawWidgets);
+    static inline void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) { DiagramWindow::Draw(thisCairoWindow, cr, true); }
+    
     void resize(int x, int y, int w, int h);
 
 public:

@@ -30,7 +30,7 @@ namespace fs = boost::filesystem;
 
 MainWindow* MainWindow::ms_instance = NULL;
 
-Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
+Fl_RGB_Image * MainWindow::    helpIconImage = new Fl_RGB_Image( 
            HelpIcon.pixel_data, 
            HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
 
@@ -54,13 +54,14 @@ MainWindow::MainWindow(int argc, char **argv)
     {
         
         // setup the program logo (for now dynamically loaded):
-            Fl_RGB_Image *appLogo = new Fl_RGB_Image( 
+        Fl_RGB_Image *appLogo = new Fl_RGB_Image( 
               RNAStructVizLogo.pixel_data, 
               RNAStructVizLogo.width, 
               RNAStructVizLogo.height, 
-              RNAStructVizLogo.bytes_per_pixel);
+              RNAStructVizLogo.bytes_per_pixel
+	);
         Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, 
-               NAVBUTTONS_OFFSETY, appLogo->w(), appLogo->h());
+                                         NAVBUTTONS_OFFSETY, appLogo->w(), appLogo->h());
         appLogoCont->image(appLogo);
 
         int helpButtonDims = 26;
@@ -78,12 +79,13 @@ MainWindow::MainWindow(int argc, char **argv)
         helpButton->box(FL_NO_BOX);
         helpButton->copy_tooltip("Click for help");
         helpButton->callback(HelpButtonCallback);
-            helpButton->redraw();
+        //helpButton->cursor(FL_CURSOR_HELP);
+	helpButton->redraw();
 
-            int infoButtonDims = 26;
+        int infoButtonDims = 26;
         int infoButtonOffsetX = 300 - helpButtonDims - 3 * NAVBUTTONS_SPACING / 2 - helpButton->w();
         Fl_Button *infoButton = new Fl_Button(infoButtonOffsetX, NAVBUTTONS_SPACING / 2, 
-                                      infoButtonDims, infoButtonDims, "");
+                                              infoButtonDims, infoButtonDims, "");
         infoButton->color(GUI_WINDOW_BGCOLOR);
         infoButton->labelcolor(GUI_BTEXT_COLOR);
         infoButton->labelsize(2 * LOCAL_TEXT_SIZE);
@@ -95,25 +97,26 @@ MainWindow::MainWindow(int argc, char **argv)
         infoButton->box(FL_NO_BOX);
         infoButton->copy_tooltip("Click for information about RNAStructViz");
         infoButton->callback(InfoButtonCallback);
-            infoButton->redraw();
+        //infoButton->cursor(FL_CURSOR_INSERT);    
+	infoButton->redraw();
 
 
-    // consistent alignment with the folder window display:
-    int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
-    int dividerTextHeight = NAVBUTTONS_SPACING; // 4
+        // consistent alignment with the folder window display:
+        int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
+        int dividerTextHeight = NAVBUTTONS_SPACING; // 4
 
         // make it more user friendly by including some help text: 
-    const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
+        const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
         int navButtonsLabelHeight = 2 * NAVBUTTONS_BHEIGHT;
         actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
                           2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
                               navButtonsLabelHeight, navInstText);     
         actionsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         actionsLabel->color(GUI_BGCOLOR);
-    actionsLabel->labelcolor(GUI_BTEXT_COLOR);
-    actionsLabel->labelfont(LOCAL_BFFONT);
-    actionsLabel->labelsize(LOCAL_TEXT_SIZE);
-    actionsLabel->box(FL_RSHADOW_BOX);
+        actionsLabel->labelcolor(GUI_BTEXT_COLOR);
+        actionsLabel->labelfont(LOCAL_BFFONT);
+        actionsLabel->labelsize(LOCAL_TEXT_SIZE);
+        actionsLabel->box(FL_RSHADOW_BOX);
 
         //Open button
         openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
@@ -122,34 +125,36 @@ MainWindow::MainWindow(int argc, char **argv)
                            "@search   Load Files @>|");
         openButton->callback(OpenFileCallback);
         openButton->labelcolor(GUI_BTEXT_COLOR);
-    openButton->labelfont(FL_HELVETICA);
+        openButton->labelfont(FL_HELVETICA);
 
-           // The button to open configuration settings:
-    configOptionsButton = new Fl_Button( 
+        // The button to open configuration settings:
+        configOptionsButton = new Fl_Button( 
               NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
-          NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
-                  NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-          "@menu   User Config @>|");
-    configOptionsButton->callback(ConfigOptionsCallback);
+              NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
+              NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
+              "@menu   User Config @>|"
+	 );
+        configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
         configOptionsButton->labelfont(FL_HELVETICA);
 
-    const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
+        const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
         columnLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 
-              NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
+                  NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
                   NAVBUTTONS_BHEIGHT + dividerTextHeight, 
-              2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-              navButtonsLabelHeight, foldersInstText);
+                  2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+                  navButtonsLabelHeight, foldersInstText
+        );
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         columnLabel->color(GUI_BGCOLOR);
-    columnLabel->labelcolor(GUI_BTEXT_COLOR);
-    columnLabel->labelfont(LOCAL_BFFONT);
-    columnLabel->labelsize(LOCAL_TEXT_SIZE);
-    columnLabel->box(FL_RSHADOW_BOX);
+        columnLabel->labelcolor(GUI_BTEXT_COLOR);
+        columnLabel->labelfont(LOCAL_BFFONT);
+        columnLabel->labelsize(LOCAL_TEXT_SIZE);
+        columnLabel->box(FL_RSHADOW_BOX);
 
         m_structureInfo = new Fl_Scroll(0, 105 + upperYOffset + navButtonsLabelHeight + 
                           dividerTextHeight + 15, 290, 360 - 
-                      upperYOffset - navButtonsLabelHeight - 
+                          upperYOffset - navButtonsLabelHeight - 
                           dividerTextHeight - 50);
         m_structureInfo->type(Fl_Scroll::VERTICAL_ALWAYS);
         m_packedInfo = new Fl_Pack(0, 105 + upperYOffset + navButtonsLabelHeight + 
@@ -176,8 +181,6 @@ MainWindow::MainWindow(int argc, char **argv)
     folder_collapse->labelcolor(GUI_BTEXT_COLOR);
     
     folderWindowPane = new Fl_Group(330, 0, 320, 450, "");
-    {
-    }
     folderWindowPane->end();
     folderWindowPane->color(GUI_WINDOW_BGCOLOR);
     
@@ -938,8 +941,8 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
             }
             
             pack->remove(pack->child(pack->children()-1));
-        ms_instance->m_structureInfo->scrollbar.align();
-        ms_instance->m_structureInfo->redraw();
+            ms_instance->m_structureInfo->scrollbar.align();
+            ms_instance->m_structureInfo->redraw();
             break;
         }
     }
