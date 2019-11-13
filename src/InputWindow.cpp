@@ -50,14 +50,14 @@ InputWindow::InputWindow(int w, int h, const char *label,
         char saveDirInfo[MAX_BUFFER_SIZE];
         snprintf(saveDirInfo, fnameStartPos + 1, "%s", inputText);
         sprintf(string, "Export to Directory: %s", saveDirInfo);
-        input = new Fl_Input(25, 50, 235, 30);
+        input = new Fl_Input(15, 50, 245, 30);
         //input->when(FL_WHEN_ENTER_KEY);
         input->value(filenameStartPtr + 1);
-        Fl_Box *box = new Fl_Box(110, 20, 100, 30, (const char*)string);
+        Fl_Box *box = new Fl_Box(100, 20, 110, 30, (const char*)string);
         box->box(FL_NO_BOX);
         box->align(FL_ALIGN_CENTER);
-        Fl_Box *fileExtBox = new Fl_Box(260,50,30,30,".csv");
-        Fl_Button *button = new Fl_Button(305, 50, 110, 30, "Export to CSV @->");
+        Fl_Box *fileExtBox = new Fl_Box(255,50,40,30,".csv");
+        Fl_Button *button = new Fl_Button(305, 50, 125, 30, "Export to CSV @->");
         button->callback(InputCallback, (void*)0);
         button->set_active();
         input->callback(InputCallback, (void*)0);

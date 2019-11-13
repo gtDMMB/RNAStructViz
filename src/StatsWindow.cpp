@@ -756,17 +756,17 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 text_display = new Fl_Text_Display(tdx+10,tdy+10,tdw-20,tdh-10);
                 text_display->buffer(buff);
                 text_display->color(GUI_WINDOW_BGCOLOR);
-                text_display->textfont(FL_HELVETICA);
+                text_display->textfont(FL_SCREEN);
                 text_display->textcolor(GUI_TEXT_COLOR);
                 text_display->labelcolor(GUI_TEXT_COLOR);
-                text_display->labelfont(FL_HELVETICA);
+                text_display->labelfont(FL_SCREEN);
                 text_display->labelsize(9);
 		text_display_group->resizable(text_display);
             }
             text_display_group->end();
             
-            exp_button = new Fl_Button(w-160,h-40,160,30, 
-                     "@filesaveas   Export to CSV @->");
+            exp_button = new Fl_Button(w-200,h-40,175,30, 
+                                       "@filesaveas   Export to CSV @->");
             exp_button->callback(ExportCallback);
             exp_button->value(1);
             exp_button->deactivate();
@@ -1289,6 +1289,7 @@ void StatsWindow::ComputeStats()
     buff->append("Reference structure: ");
     buff->append(reference->GetFilenameNoExtension());
     buff->append("\n\n");
+    buff->append("Comparison structures:\n\n");
     buff->append(
                      "Filename\t\t\t\tPairs\tTPs\tFPs\tFNs\tSensi.\tSelec.\tPPV\tConfl.\tContr.\tCompa.\tG-C\tA-U\tG-U\tOther\n" 
                 );
@@ -1303,7 +1304,7 @@ void StatsWindow::ComputeStats()
         {
             strcpy(tempc + 31, "... ");
 	    buff->append(tempc);
-            //buff->append("\t");
+            buff->append("\t");
         }
         else
         {
@@ -2031,10 +2032,12 @@ void StatsWindow::ExportTable()
              "" : "/";
     snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.csv", 
          PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
-    input_window = new InputWindow(425, 150, "Export Table To CSV-Fomatted Plaintext File ...",
-                                       filename, InputWindow::FILE_INPUT);
+    Delete(input_window);
+    input_window = new InputWindow(450, 150, 
+		                   "Export Table To CSV-Fomatted Plaintext File ...",
+                                    filename, InputWindow::FILE_INPUT);
     exp_button->value(1);
-        exp_button->deactivate();
+    exp_button->deactivate();
     while (input_window != NULL && input_window->visible())
     {
         Fl::wait();
@@ -2046,11 +2049,11 @@ void StatsWindow::ExportTable()
         if(strcmp(input_window->getName(), ""))
         {
             strncpy(filename, input_window->getName(), MAX_BUFFER_SIZE - 1);
-        expFile = fopen(filename, "a+");
-    }
+            expFile = fopen(filename, "a+");
+        }
         else {
-        expFile = NULL;
-    }
+            expFile = NULL;
+        }
 
         if (expFile != NULL)
         {
@@ -2097,8 +2100,6 @@ void StatsWindow::ExportTable()
             }
             fclose(expFile);
         }
-        delete input_window;
-        input_window = NULL;
     }
     
     exp_button->value(0);
