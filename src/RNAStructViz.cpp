@@ -18,68 +18,68 @@ namespace fs = boost::filesystem;
 
 static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
              {
-	          "Standard help key shortcut", 
-		  "[F1]", 
-		  MODKEY_NONE, 
-		  FL_F + 1,
-		  CHARKEY_NONE, 
-		  false,
-		  CommonDialogs::DisplayHelpDialog,
-	     },
-	     {
-		  "Close window shortcut", 
-		  "[ALT]+[F4]", 
-		  FL_ALT, 
-		  FL_F + 4,
-		  CHARKEY_NONE,
-		  false, 
-		  RNAStructViz::ExitApplication,
-	     },
-	     {
-		  "Close window shortcut (standard terminal key combo)",
-		  "[CTRL]+c",
-		  FL_CTRL,
-		  KEYVALUE_NONE,
-		  (unsigned int) 'c', 
-		  true,
-		  RNAStructViz::ExitApplication,
-	     },
-	     {
-		  "Help command shortcut II", 
-		  "[CTRL]+h", 
-		  FL_CTRL,
-		  KEYVALUE_NONE,
-		  (unsigned int) 'h', 
-		  true, 
-		  CommonDialogs::DisplayHelpDialog,
-	     },
-	     {
-		  "Open file dialog shortcut", 
-		  "[CTRL]+o", 
-		  FL_CTRL,
-		  KEYVALUE_NONE,
-		  (unsigned int) 'o',
-		  true,
-		  MainWindow::OpenFileCallback,
-	     },
-	     {
-		  "About the application shortcut", 
-		  "[CTRL]+i", 
-		  FL_CTRL,
-		  KEYVALUE_NONE,
-		  (unsigned int) 'i',
-		  true,
-		  CommonDialogs::DisplayInfoAboutDialog,
-	     },
-	     {
-		  "Configuration settings shortcut", 
-		  "[HOME] | [WINDOWS KEY]", 
+              "Standard help key shortcut", 
+          "[F1]", 
+          MODKEY_NONE, 
+          FL_F + 1,
+          CHARKEY_NONE, 
+          false,
+          CommonDialogs::DisplayHelpDialog,
+         },
+         {
+          "Close window shortcut", 
+          "[ALT]+[F4]", 
+          FL_ALT, 
+          FL_F + 4,
+          CHARKEY_NONE,
+          false, 
+          RNAStructViz::ExitApplication,
+         },
+         {
+          "Close window shortcut (standard terminal key combo)",
+          "[CTRL]+c",
+          FL_CTRL,
+          KEYVALUE_NONE,
+          (unsigned int) 'c', 
+          true,
+          RNAStructViz::ExitApplication,
+         },
+         {
+          "Help command shortcut II", 
+          "[CTRL]+h", 
+          FL_CTRL,
+          KEYVALUE_NONE,
+          (unsigned int) 'h', 
+          true, 
+          CommonDialogs::DisplayHelpDialog,
+         },
+         {
+          "Open file dialog shortcut", 
+          "[CTRL]+o", 
+          FL_CTRL,
+          KEYVALUE_NONE,
+          (unsigned int) 'o',
+          true,
+          MainWindow::OpenFileCallback,
+         },
+         {
+          "About the application shortcut", 
+          "[CTRL]+i", 
+          FL_CTRL,
+          KEYVALUE_NONE,
+          (unsigned int) 'i',
+          true,
+          CommonDialogs::DisplayInfoAboutDialog,
+         },
+         {
+          "Configuration settings shortcut", 
+          "[HOME] | [WINDOWS KEY]", 
                   FL_META,
-		  FL_Home,
-		  CHARKEY_NONE,
-		  false,
-		  MainWindow::ConfigOptionsCallback,
-	     },
+          FL_Home,
+          CHARKEY_NONE,
+          false,
+          MainWindow::ConfigOptionsCallback,
+         },
 };
 
 RNAStructViz* RNAStructViz::ms_instance = NULL;
@@ -94,9 +94,9 @@ RNAStructViz::RNAStructViz()
 RNAStructViz::~RNAStructViz()
 {
     for (unsigned int i = 0; i < m_diagramWindows.size(); ++i)
-	delete m_diagramWindows[i];
+    delete m_diagramWindows[i];
     for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
-	delete m_statsWindows[i];
+    delete m_statsWindows[i];
     delete m_structureManager;
 }
 
@@ -118,17 +118,17 @@ void RNAStructViz::Shutdown()
 void RNAStructViz::ExitApplication(bool promptUser) {
      if(!promptUser) {
           RNAStructViz::Shutdown();
-	  return;
+      return;
      }
      const char *promptQMsg = "Are you really sure you want to quit? All unsaved data and loaded structures will be lost!";
      int userResp = fl_choice(promptQMsg, "Yes, QUIT!", "No, CANCEL", NULL);
      switch(userResp) {
           case 0:
-	       RNAStructViz::Shutdown();
-	       return;
-	  case 1:
-	  default:
-	       break;
+           RNAStructViz::Shutdown();
+           return;
+      case 1:
+      default:
+           break;
      }
      return;
 }
@@ -150,7 +150,7 @@ void RNAStructViz::AddDiagramWindow(int index)
         if(folders[index]->folderStructs[(i + shift)] == -1)
             shift++;
         if (m_structureManager->
-        	GetStructure(folders[index]->folderStructs[(i + shift)]))
+            GetStructure(folders[index]->folderStructs[(i + shift)]))
         {
             structures.push_back(folders[index]->folderStructs[(i + shift)]);
         }
@@ -165,17 +165,17 @@ void RNAStructViz::AddDiagramWindow(int index)
             diagram->SetStructures(structures);
             diagram->SetFolderIndex(index);
             diagram->ResetWindow(true);
-	    diagram->setAsCurrentDiagramWindow();
-	    diagram->show();
-	    return;
+        diagram->setAsCurrentDiagramWindow();
+        diagram->show();
+        return;
         }
     }
     
-    char* title = (char*) malloc(sizeof(char) * 64);
-    snprintf(title, 64, "Structure Diagram %lu", m_diagramWindows.size() + 1);
+    char* title = (char*) malloc(DEFAULT_TITLE_STRING_SIZE * sizeof(char));
+    snprintf(title, DEFAULT_TITLE_STRING_SIZE, "Structure Diagram %lu", m_diagramWindows.size() + 1);
     diagram = new DiagramWindow(3 * DiagramWindow::ms_menu_width, 
-		                IMAGE_HEIGHT + GLWIN_TRANSLATEY + 35, 
-				title, structures);
+                        IMAGE_HEIGHT + GLWIN_TRANSLATEY + 35, 
+                title, structures);
     diagram->SetFolderIndex(index);
     diagram->setAsCurrentDiagramWindow();
     m_diagramWindows.push_back(diagram);
@@ -200,7 +200,7 @@ void RNAStructViz::AddStatsWindow(int index)
         if(folders[index]->folderStructs[(i + shift)] == -1)
             shift++;
         if(m_structureManager->
-        	GetStructure(folders[index]->folderStructs[(i + shift)]))
+            GetStructure(folders[index]->folderStructs[(i + shift)]))
         {
             structures.push_back(folders[index]->folderStructs[(i + shift)]);
         }
@@ -211,7 +211,7 @@ void RNAStructViz::AddStatsWindow(int index)
     {
         stats = m_statsWindows[i];
         if ((stats != NULL) && (stats->GetFolderIndex() == index) && 
-	    !stats->visible())
+        !stats->visible())
         {
             stats->SetStructures(structures);
             stats->SetFolderIndex(index);
@@ -221,10 +221,10 @@ void RNAStructViz::AddStatsWindow(int index)
         }
     }
     
-    char* title = (char*)malloc(sizeof(char) * 64);
-    snprintf(title, 64, "Structure Statistics %lu", m_statsWindows.size() + 1);
-    stats = new StatsWindow(1250, 700, title, structures);
-    free(title); //title = NULL;
+    char *title = (char *) malloc(DEFAULT_TITLE_STRING_SIZE * sizeof(char));
+    snprintf(title, DEFAULT_TITLE_STRING_SIZE, "Structure Statistics %lu", m_statsWindows.size() + 1);
+    stats = new StatsWindow(DEFAULT_STATSWIN_WIDTH, DEFAULT_STATSWIN_HEIGHT, title, structures);
+    Free(title); 
     
     stats->SetFolderIndex(index);
     m_statsWindows.push_back(stats);
@@ -235,7 +235,7 @@ void RNAStructViz::AddStatsWindow(int index)
 void RNAStructViz::TestFolders()
 {
     m_structureManager->PrintFolders();
-    TerminalText::PrintDebug("Number of Diagram/Stats Windows: %d/%d\n\n", 
+    TerminalText::PrintDebug("Number of Diagram / Stats Windows: %d/%d\n\n", 
                              m_diagramWindows.size(), m_statsWindows.size());
 }
 
@@ -245,7 +245,7 @@ int RNAStructViz::HandleGlobalKeypressEvent(int eventCode) {
           return 1;
      }
      else if(eventCode != FL_KEYBOARD) {
-	  TerminalText::PrintDebug("Non-keyboard event triggered (%s).\n", fl_eventnames[eventCode]);
+      TerminalText::PrintDebug("Non-keyboard event triggered (%s).\n", fl_eventnames[eventCode]);
           return 0;
      }
 
@@ -255,15 +255,15 @@ int RNAStructViz::HandleGlobalKeypressEvent(int eventCode) {
      int keyState = Fl::event_state();
      for(int kp = 0; kp < GetArrayLength(GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA); kp++) {
           GlobalKeyPressHandlerData_t kpHandler = GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[kp];
-	  if((kpHandler.modifierStateKey != MODKEY_NONE && kpHandler.modifierStateKey == keyState) && 
-	     (kpHandler.keyPressValue != KEYVALUE_NONE && kpHandler.keyPressValue == keyPressed) && 
-	     (kpHandler.charKeyValue != CHARKEY_NONE && 
-	      kpHandler.checkOnlyFirstTextChar && charTextLength > 0 && (int) keyCharText[0] == kpHandler.charKeyValue)) {
-	       TerminalText::PrintDebug("Global keypress recognized %s : %s\n", 
-			                kpHandler.keyPressComboDesc, kpHandler.keyPressIntentDesc);
-	       kpHandler.onPressActionFunc();
-	       break;
-	  }
+      if((kpHandler.modifierStateKey != MODKEY_NONE && kpHandler.modifierStateKey == keyState) && 
+         (kpHandler.keyPressValue != KEYVALUE_NONE && kpHandler.keyPressValue == keyPressed) && 
+         (kpHandler.charKeyValue != CHARKEY_NONE && 
+          kpHandler.checkOnlyFirstTextChar && charTextLength > 0 && (int) keyCharText[0] == kpHandler.charKeyValue)) {
+           TerminalText::PrintDebug("Global keypress recognized %s : %s\n", 
+                            kpHandler.keyPressComboDesc, kpHandler.keyPressIntentDesc);
+           kpHandler.onPressActionFunc();
+           break;
+      }
      }
      TerminalText::PrintDebug("Non-globally handled key pressed (#%d)\n", keyPressed);
      return 1;
@@ -277,16 +277,16 @@ std::string RNAStructViz::LocateSampleStructuresOnSystem() {
           isApplePlatform = true; // brew folders are easy to locate!
      #endif
      if(isApplePlatform) {
-	  const char *brewStructDir = "/usr/local/opt/rnastructviz/sample_structures";
+      const char *brewStructDir = "/usr/local/opt/rnastructviz/sample_structures";
           if(ConfigParser::directoryExists(brewStructDir)) {
                return std::string(brewStructDir);
-	  }
+      }
      }
      else {
-	  const char *unixSudoInstallDir = "/usr/local/share/RNAStructViz/sample_structures";
-	  if(ConfigParser::directoryExists(unixSudoInstallDir)) {
-	       return std::string(unixSudoInstallDir);
-	  }
+      const char *unixSudoInstallDir = "/usr/local/share/RNAStructViz/sample_structures";
+      if(ConfigParser::directoryExists(unixSudoInstallDir)) {
+           return std::string(unixSudoInstallDir);
+      }
      }
      char curCWDPath[MAX_BUFFER_SIZE];
      getcwd(curCWDPath, MAX_BUFFER_SIZE);
@@ -294,13 +294,13 @@ std::string RNAStructViz::LocateSampleStructuresOnSystem() {
      size_t srcDirPos = cwdPath.find("src");
      if(srcDirPos == std::string::npos) {
           TerminalText::PrintWarning("Unable to locate sample structures on platform I [%s]\n", TARGETOS);
-	  return "";
+      return "";
      }
      std::string prefixPath = cwdPath.substr(0, srcDirPos - 1);
      prefixPath += std::string("/sample_structures");
      if(ConfigParser::directoryExists(prefixPath.c_str())) {
           return prefixPath;
-     }	  
+     }      
      TerminalText::PrintWarning("Unable to locate sample structures on platform II [%s] : %s\n", TARGETOS, prefixPath.c_str());
      return "";
 
@@ -314,17 +314,17 @@ int RNAStructViz::CopySampleStructures() {
      }
      if(ConfigParser::directoryExists(USER_SAMPLE_STRUCTS_PATH.c_str())) {
           TerminalText::PrintInfo("User home sample structure directory already exists: \"%s\"\n", 
-			          USER_SAMPLE_STRUCTS_PATH.c_str());
+                      USER_SAMPLE_STRUCTS_PATH.c_str());
      }
      else {
           mode_t mkdirModes = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
-	  const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), mkdirModes);
-	  const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      mkdirModes); 
-	  if(mkdirStatus1 == -1 || mkdirStatus2 == -1) {
-	       TerminalText::PrintError("Unable to create user home sample directory: \"%s\"\n", 
-			                USER_SAMPLE_STRUCTS_PATH.c_str());
-	       return -1;
-	  }
+      const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), mkdirModes);
+      const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      mkdirModes); 
+      if(mkdirStatus1 == -1 || mkdirStatus2 == -1) {
+           TerminalText::PrintError("Unable to create user home sample directory: \"%s\"\n", 
+                            USER_SAMPLE_STRUCTS_PATH.c_str());
+           return -1;
+      }
      }
      
      // have system path, made local directory, now copy the files:
@@ -332,25 +332,25 @@ int RNAStructViz::CopySampleStructures() {
      boost::filesystem::path const & destDir(USER_SAMPLE_STRUCTS_PATH.c_str());
      while(ssFile != fs::directory_iterator()) {
           fs::path ssCurPath(ssFile->path());
-	  if(!fs::is_directory(ssCurPath)) {
-	       try {
+      if(!fs::is_directory(ssCurPath)) {
+           try {
                     fs::copy_file(ssCurPath, destDir / ssCurPath.filename());
-	       } catch(boost::filesystem::filesystem_error fse) {
-	            TerminalText::PrintInfo("Cannot copy \"%s\" into home directory (file already exists)\n", 
-				            ssCurPath.filename().c_str());
-	       }
-	  }
+           } catch(boost::filesystem::filesystem_error fse) {
+                TerminalText::PrintInfo("Cannot copy \"%s\" into home directory (file already exists)\n", 
+                            ssCurPath.filename().c_str());
+           }
+      }
           ++ssFile;
      }
      //stdfs::copy(sampleStructDir.c_str(), USER_SAMPLE_STRUCTS_PATH, 
-     //		 stdfs::copy_options::overwrite_existing);
+     //         stdfs::copy_options::overwrite_existing);
      strcpy((char *) CTFILE_SEARCH_DIRECTORY, USER_SAMPLE_STRUCTS_PATH.c_str());
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      std::string successMsg = std::string("Successfully copied the sample structure files! ") + 
-	                      std::string("They are now located in \n« ") + 
-			      std::string(USER_SAMPLE_STRUCTS_PATH) + 
-			      std::string(" ». \nClick on the \"Load Files\" button to start selecting ") + 
-			      std::string("the sample \nstructures we just copied!");
+                          std::string("They are now located in \n« ") + 
+                  std::string(USER_SAMPLE_STRUCTS_PATH) + 
+                  std::string(" ». \nClick on the \"Load Files\" button to start selecting ") + 
+                  std::string("the sample \nstructures we just copied!");
      fl_message("%s", successMsg.c_str());
 
      return EXIT_SUCCESS;
@@ -366,13 +366,13 @@ int RNAStructViz::BackupAndUnlinkLocalConfigFiles(bool clearStickyFolderNamesOnl
      std::string configBackupPath = std::string(USER_CONFIG_PATH) + std::string(dateStampSuffix);
      std::string stickyFolderPath = std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE));
      std::string stickyFolderBackupPath = 
-	         std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE)) + 
-		 std::string(dateStampSuffix);
+             std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE)) + 
+         std::string(dateStampSuffix);
      if(!clearStickyFolderNamesOnly && rename(configPath.c_str(), configBackupPath.c_str()) || 
-	rename(stickyFolderPath.c_str(), stickyFolderBackupPath.c_str())) {
+    rename(stickyFolderPath.c_str(), stickyFolderBackupPath.c_str())) {
           TerminalText::PrintError("Unable to rename backup config files \"%s\" and/or \"%s\" : %s\n", 
-			           configBackupPath.c_str(), stickyFolderPath.c_str(), strerror(errno));
-	  return errno;
+                       configBackupPath.c_str(), stickyFolderPath.c_str(), strerror(errno));
+      return errno;
      }
 }
 

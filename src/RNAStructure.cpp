@@ -35,7 +35,7 @@ RNAStructure::RNAStructure()
       m_seqTextDisplay(NULL), m_seqStyleBuffer(NULL), 
       m_exportExtFilesBox(NULL), m_seqSubwindowBox(NULL), 
       m_ctSubwindowBox(NULL), m_ctViewerNotationBox(NULL), 
-      m_exportFASTABtn(NULL), m_exportDBBtn(NULL) 	
+      m_exportFASTABtn(NULL), m_exportDBBtn(NULL)     
 {
      #if PERFORM_BRANCH_TYPE_ID
      branchType = NULL; 
@@ -67,10 +67,10 @@ RNAStructure::~RNAStructure()
     free(m_sequence);
     if(charSeqSize > 0) { 
         free((void *) charSeq); 
-	free((void *) dotFormatCharSeq);
+    free((void *) dotFormatCharSeq);
     }
     if(m_pathname != NULL) {
-    	free(m_pathname);
+        free(m_pathname);
     }
     if(m_pathname_noext != NULL) {
         free(m_pathname_noext);
@@ -111,16 +111,16 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     std::ifstream inStream(filename);
     if (!inStream.good())
     {
-		if (strlen(filename) > 1000)
-		{
-		    TerminalText::PrintError("Unable to open file: <file name too long>");
-		}
-		else
-		{
-		    TerminalText::PrintError("Unable to open file: %s", filename);
-		}
-		inStream.close();
-		return 0;
+        if (strlen(filename) > 1000)
+        {
+            TerminalText::PrintError("Unable to open file: <file name too long>");
+        }
+        else
+        {
+            TerminalText::PrintError("Unable to open file: %s", filename);
+        }
+        inStream.close();
+        return 0;
     }
 
     RNAStructure* result = new RNAStructure();
@@ -131,178 +131,178 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     int numElements = 0;
     while (true)
     {
-	numElements++;
+    numElements++;
         unsigned int junk;
 
-		// Check for a number. If not, ignore the line, or maybe the file is 
-		// done.
-		if (!(inStream >> junk))
-		{
-		    if (inStream.eof() || inStream.bad())
-		    {
-		    	break;
-	            }
-		    inStream.clear(); // Try clearing the fail
-		
-		    // Ignore the first line as a comment:
-		    while (!inStream.eof() && inStream.get() != '\n') {
-		         continue;
-		    }
-		}
+        // Check for a number. If not, ignore the line, or maybe the file is 
+        // done.
+        if (!(inStream >> junk))
+        {
+            if (inStream.eof() || inStream.bad())
+            {
+                break;
+                }
+            inStream.clear(); // Try clearing the fail
+        
+            // Ignore the first line as a comment:
+            while (!inStream.eof() && inStream.get() != '\n') {
+                 continue;
+            }
+        }
 
-		// Check for the next ID. If not, ignore the line.
-		if (junk != result->m_sequenceLength + 1)
-		{
-		    while (!inStream.eof() && inStream.get() != '\n');
-		    {
-		    	continue;
-		    }
-		}
+        // Check for the next ID. If not, ignore the line.
+        if (junk != result->m_sequenceLength + 1)
+        {
+            while (!inStream.eof() && inStream.get() != '\n');
+            {
+                continue;
+            }
+        }
 
-		char base = 0;
-		inStream >> base;
-		switch (base)
-		{
-		    case 'a':
-		    case 'A':
-			    result->m_sequence[result->m_sequenceLength].m_base = A;
-	            tempSeq.push_back('a');
-			    break;
-		    case 'c':
-		    case 'C':
-			    result->m_sequence[result->m_sequenceLength].m_base = C;
-	            tempSeq.push_back('c');
-			    break;
-		    case 'g':
-		    case 'G':
-			    result->m_sequence[result->m_sequenceLength].m_base = G;
-	            tempSeq.push_back('g');
-			    break;
-		    case 't':
-		    case 'T':
-		    case 'u':
-		    case 'U':
-			    result->m_sequence[result->m_sequenceLength].m_base = U;
-	            tempSeq.push_back('u');
-			    break;
-		    default: {
-			    if (strlen(filename) > 980)
-		    	    {
-				TerminalText::PrintError("Bad base: id %d, <file name too long>", 
-						         result->m_sequenceLength + 1);
-			    }
-			    else
-			    {
-				TerminalText::PrintError("Bad base: id %d, file %s", 
-						         result->m_sequenceLength + 1, filename);
-			    }
-			    delete result;
-		    	    inStream.close();
-			    return 0;
-		    }
-		}
+        char base = 0;
+        inStream >> base;
+        switch (base)
+        {
+            case 'a':
+            case 'A':
+                result->m_sequence[result->m_sequenceLength].m_base = A;
+                tempSeq.push_back('a');
+                break;
+            case 'c':
+            case 'C':
+                result->m_sequence[result->m_sequenceLength].m_base = C;
+                tempSeq.push_back('c');
+                break;
+            case 'g':
+            case 'G':
+                result->m_sequence[result->m_sequenceLength].m_base = G;
+                tempSeq.push_back('g');
+                break;
+            case 't':
+            case 'T':
+            case 'u':
+            case 'U':
+                result->m_sequence[result->m_sequenceLength].m_base = U;
+                tempSeq.push_back('u');
+                break;
+            default: {
+                if (strlen(filename) > 980)
+                    {
+                TerminalText::PrintError("Bad base: id %d, <file name too long>", 
+                                 result->m_sequenceLength + 1);
+                }
+                else
+                {
+                TerminalText::PrintError("Bad base: id %d, file %s", 
+                                 result->m_sequenceLength + 1, filename);
+                }
+                delete result;
+                    inStream.close();
+                return 0;
+            }
+        }
 
-		if (!isBPSEQ)
-		{
-		    if (!(inStream >> junk))
-		    {
-				if (strlen(filename) > 980)
-				{
-			             TerminalText::PrintError("Bad prev id: id %d, <file name too long>", 
-							      result->m_sequenceLength + 1);
-				}
-				else
-				{
-			             TerminalText::PrintError("Bad prev id: id %d, file %s", 
-				    	                      result->m_sequenceLength + 1, filename);
-				}
-				delete result;
-				inStream.close();
-				return 0;
-		    }
-	
-		    if (!(inStream >> junk))
-		    {
-				if (strlen(filename) > 980) 
-				{
-				    TerminalText::PrintError("Bad next id: id %d, <file name too long>", 
-				    	                     result->m_sequenceLength + 1);
-				}
-				else
-				{
-				    TerminalText::PrintError("Bad next id: id %d, file %s", 
-				    	                     result->m_sequenceLength + 1, filename);
-				}
-				delete result;
-				inStream.close();
-				return 0;
-		    }
-		}
+        if (!isBPSEQ)
+        {
+            if (!(inStream >> junk))
+            {
+                if (strlen(filename) > 980)
+                {
+                         TerminalText::PrintError("Bad prev id: id %d, <file name too long>", 
+                                  result->m_sequenceLength + 1);
+                }
+                else
+                {
+                         TerminalText::PrintError("Bad prev id: id %d, file %s", 
+                                              result->m_sequenceLength + 1, filename);
+                }
+                delete result;
+                inStream.close();
+                return 0;
+            }
+    
+            if (!(inStream >> junk))
+            {
+                if (strlen(filename) > 980) 
+                {
+                    TerminalText::PrintError("Bad next id: id %d, <file name too long>", 
+                                             result->m_sequenceLength + 1);
+                }
+                else
+                {
+                    TerminalText::PrintError("Bad next id: id %d, file %s", 
+                                             result->m_sequenceLength + 1, filename);
+                }
+                delete result;
+                inStream.close();
+                return 0;
+            }
+        }
 
-		if (!(inStream >> result->m_sequence[result->m_sequenceLength].m_pair))
-		{
-		    if (strlen(filename) > 980) 
-		    {
-			    TerminalText::PrintError("Bad pair: id %d, <file name too long>", 
-					             result->m_sequenceLength + 1);
-		    }
-		    else
-		    {
-			    TerminalText::PrintError("Bad pair: id %d, file %s", 
-					             result->m_sequenceLength + 1, filename);
-		    }
-		    delete result;
-		    inStream.close();
-		    return 0;
-		}
-		result->m_sequence[result->m_sequenceLength].m_index = result->m_sequenceLength;
+        if (!(inStream >> result->m_sequence[result->m_sequenceLength].m_pair))
+        {
+            if (strlen(filename) > 980) 
+            {
+                TerminalText::PrintError("Bad pair: id %d, <file name too long>", 
+                                 result->m_sequenceLength + 1);
+            }
+            else
+            {
+                TerminalText::PrintError("Bad pair: id %d, file %s", 
+                                 result->m_sequenceLength + 1, filename);
+            }
+            delete result;
+            inStream.close();
+            return 0;
+        }
+        result->m_sequence[result->m_sequenceLength].m_index = result->m_sequenceLength;
         if (result->m_sequence[result->m_sequenceLength].m_pair == 0)
-		{
-		    result->m_sequence[result->m_sequenceLength].m_pair = UNPAIRED;
-		}
-		else
-		{
-		    result->m_sequence[result->m_sequenceLength].m_pair--;
-		}
-	
-		if (!isBPSEQ)
-		{
-		    if (!(inStream >> junk))
-		    {
-				if (strlen(filename) > 980)
-				{
-				    TerminalText::PrintError("Bad trailing id: id %d, <file name too long>", 
-				    	                     result->m_sequenceLength + 1);
-				}
-				else
-				{
-				    TerminalText::PrintError("Bad trailing id: id %d, file %s", 
-				    	                     result->m_sequenceLength + 1, filename);
-				}
-				delete result;
-				inStream.close();
-				return 0;
-		    }
-		}
-	
-		result->m_sequenceLength++;
-		if (result->m_sequenceLength == maxSize)
-		{
-		    maxSize += 100;
-		    result->m_sequence = (BaseData*)realloc(result->m_sequence, 
+        {
+            result->m_sequence[result->m_sequenceLength].m_pair = UNPAIRED;
+        }
+        else
+        {
+            result->m_sequence[result->m_sequenceLength].m_pair--;
+        }
+    
+        if (!isBPSEQ)
+        {
+            if (!(inStream >> junk))
+            {
+                if (strlen(filename) > 980)
+                {
+                    TerminalText::PrintError("Bad trailing id: id %d, <file name too long>", 
+                                             result->m_sequenceLength + 1);
+                }
+                else
+                {
+                    TerminalText::PrintError("Bad trailing id: id %d, file %s", 
+                                             result->m_sequenceLength + 1, filename);
+                }
+                delete result;
+                inStream.close();
+                return 0;
+            }
+        }
+    
+        result->m_sequenceLength++;
+        if (result->m_sequenceLength == maxSize)
+        {
+            maxSize += 100;
+            result->m_sequence = (BaseData*)realloc(result->m_sequence, 
                                                     sizeof(BaseData) * maxSize);
-		}
+        }
     }
     inStream.close();
 
     if (result->m_sequenceLength == 0)
     {
-		if (strlen(filename) > 990) 
-		    TerminalText::PrintError("Empty or malformed file: <file name too long>");
-		else
-		    TerminalText::PrintError("Empty or malformed file: %s", filename);
-		delete result;
-		return 0;
+        if (strlen(filename) > 990) 
+            TerminalText::PrintError("Empty or malformed file: <file name too long>");
+        else
+            TerminalText::PrintError("Empty or malformed file: %s", filename);
+        delete result;
+        return 0;
     }
 
     result->m_sequence = (BaseData*) realloc(result->m_sequence, 
@@ -316,20 +316,20 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     result->charSeqSize = tempSeq.size();
     result->charSeq = (char *) malloc((result->charSeqSize + 1) * sizeof(char));
     result->dotFormatCharSeq = (char *) 
-	    malloc((result->charSeqSize + 1) * sizeof(char));
+        malloc((result->charSeqSize + 1) * sizeof(char));
     for(unsigned i = 0; i < tempSeq.size(); i++)
     {
         result->charSeq[i] = toupper(tempSeq.at(i));
-	RNAStructure::BaseData *curBaseData = result->GetBaseAt(i);
-	if(curBaseData->m_pair == UNPAIRED) { 
-	     result->dotFormatCharSeq[i] = '.';
-	}
-	else if(curBaseData->m_index < curBaseData->m_pair) {
-	     result->dotFormatCharSeq[i] = '(';
-	}
-	else { 
-	     result->dotFormatCharSeq[i] = ')';
-	}
+    RNAStructure::BaseData *curBaseData = result->GetBaseAt(i);
+    if(curBaseData->m_pair == UNPAIRED) { 
+         result->dotFormatCharSeq[i] = '.';
+    }
+    else if(curBaseData->m_index < curBaseData->m_pair) {
+         result->dotFormatCharSeq[i] = '(';
+    }
+    else { 
+         result->dotFormatCharSeq[i] = ')';
+    }
     }
     result->charSeq[result->charSeqSize] = '\0';
     result->dotFormatCharSeq[result->charSeqSize] = '\0';
@@ -351,37 +351,37 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      bool haveBaseData = false, havePairData = false;
      while(true) {
           char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
-	  if(lineReturn == NULL && feof(fpDotBracketFile)) { 
-	       break;
-	  }
-	  else if(lineReturn == NULL) {
-	       TerminalText::PrintError("Reading DotBracket file \"%s\" : %s\n", filename, strerror(errno));
-	       break;
-	  }
-	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
-	       continue;
-	  }
-	  int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
-	  if(lineBuf[lineLength - 1] == '\n') {
+      if(lineReturn == NULL && feof(fpDotBracketFile)) { 
+           break;
+      }
+      else if(lineReturn == NULL) {
+           TerminalText::PrintError("Reading DotBracket file \"%s\" : %s\n", filename, strerror(errno));
+           break;
+      }
+      if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
+           continue;
+      }
+      int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
+      if(lineBuf[lineLength - 1] == '\n') {
                lineBuf[lineLength - 1] = '\0';
-	  }
-	  if(!haveBaseData) {
-	       strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE);
-	       haveBaseData = true;
-	       continue;
-	  }
-	  else if(!havePairData) {
-	       strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE);
-	       havePairData = true;
-	  }
-	  if(haveBaseData && havePairData) {
-	       break;
-	  }
+      }
+      if(!haveBaseData) {
+           strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE);
+           haveBaseData = true;
+           continue;
+      }
+      else if(!havePairData) {
+           strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE);
+           havePairData = true;
+      }
+      if(haveBaseData && havePairData) {
+           break;
+      }
      }
      fclose(fpDotBracketFile);
      if(!haveBaseData || !havePairData || strlen(baseDataBuf) != strlen(pairingDataBuf)) {
-	  TerminalText::PrintError("Problem parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
-	  return NULL;
+      TerminalText::PrintError("Problem parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
+      return NULL;
      }
      int seqLength = strlen(baseDataBuf);
      stack<int> unpairedBasePairs;
@@ -391,58 +391,58 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      int baseIdx = 0;
      for(int bufIdx = 0; bufIdx < seqLength; bufIdx++) { 
           RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
-	  switch(baseDataBuf[bufIdx]) {
-	       case 'a':
-	       case 'A':
-	            curBaseData->m_base = A;
-		    break;
-	       case 'c':
-	       case 'C':
-		    curBaseData->m_base = C;
-		    break;
-	       case 'g':
-	       case 'G':
-		    curBaseData->m_base = G;
-		    break;
-	       case 'u':
-	       case 'U':
-		    curBaseData->m_base = U;
-		    break;
-	       default:
-		    curBaseData->m_base = X;
-		    break;
-	  }
-	  if(baseDataBuf[bufIdx] == ' ' || pairingDataBuf[bufIdx] == ' ') {
-	       continue;
-	  }
-	  curBaseData->m_index = baseIdx;
-	  if(pairingDataBuf[bufIdx] == '.') {
-	       curBaseData->m_pair = UNPAIRED;
-	  }
-	  else if(pairingDataBuf[bufIdx] == '(' || pairingDataBuf[bufIdx] == '<' || 
-		  pairingDataBuf[bufIdx] == '{') {
-	       unpairedBasePairs.push(baseIdx + 1);
-	  }
-	  else if((pairingDataBuf[bufIdx] == ')' || pairingDataBuf[bufIdx] == '>' || 
-		  pairingDataBuf[bufIdx] == '}') && unpairedBasePairs.size() > 0) {
-	       int pairIndex = unpairedBasePairs.top();
-	       unpairedBasePairs.pop();
-	       curBaseData->m_pair = pairIndex - 1;
-	       RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
-	       pairedBaseData->m_pair = baseIdx;
-	  }
-	  else {
+      switch(baseDataBuf[bufIdx]) {
+           case 'a':
+           case 'A':
+                curBaseData->m_base = A;
+            break;
+           case 'c':
+           case 'C':
+            curBaseData->m_base = C;
+            break;
+           case 'g':
+           case 'G':
+            curBaseData->m_base = G;
+            break;
+           case 'u':
+           case 'U':
+            curBaseData->m_base = U;
+            break;
+           default:
+            curBaseData->m_base = X;
+            break;
+      }
+      if(baseDataBuf[bufIdx] == ' ' || pairingDataBuf[bufIdx] == ' ') {
+           continue;
+      }
+      curBaseData->m_index = baseIdx;
+      if(pairingDataBuf[bufIdx] == '.') {
+           curBaseData->m_pair = UNPAIRED;
+      }
+      else if(pairingDataBuf[bufIdx] == '(' || pairingDataBuf[bufIdx] == '<' || 
+          pairingDataBuf[bufIdx] == '{') {
+           unpairedBasePairs.push(baseIdx + 1);
+      }
+      else if((pairingDataBuf[bufIdx] == ')' || pairingDataBuf[bufIdx] == '>' || 
+          pairingDataBuf[bufIdx] == '}') && unpairedBasePairs.size() > 0) {
+           int pairIndex = unpairedBasePairs.top();
+           unpairedBasePairs.pop();
+           curBaseData->m_pair = pairIndex - 1;
+           RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
+           pairedBaseData->m_pair = baseIdx;
+      }
+      else {
                TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
-		       pairingDataBuf[bufIdx]);
-	       Delete(rnaStruct);
-	       return NULL;
-	  }
-	  baseIdx++;
+               pairingDataBuf[bufIdx]);
+           Delete(rnaStruct);
+           return NULL;
+      }
+      baseIdx++;
      }
      if(unpairedBasePairs.size() > 0) {
           TerminalText::PrintError("DOT parser syntax error; There are unpaired open braces remaining ...\n");
-	  Delete(rnaStruct);
-	  return NULL;
+      Delete(rnaStruct);
+      return NULL;
      }
      seqLength = baseIdx; // allows for space characters in the parsing
      rnaStruct->m_sequenceLength = seqLength;    
@@ -481,112 +481,112 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
      int sampleNum = 0;
      while(true) {
           if(sampleNum >= BOLTZMANN_FORMAT_MAX_SAMPLES) {
-	       TerminalText::PrintInfo("The number of samples in \"%s\" must not exceed %s. Loading first %d samples only.\n", 
-			               filename, BOLTZMANN_FORMAT_MAX_SAMPLES, BOLTZMANN_FORMAT_MAX_SAMPLES);
-	       break;
-	  }  
-	  char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
-	  if(lineReturn == NULL && feof(fpDotBracketFile)) { 
-	       break;
-	  }
-	  else if(lineReturn == NULL) {
-	       TerminalText::PrintError("Reading Boltzmann format file \"%s\" : %s\n", filename, strerror(errno));
-	       break;
-	  }
-	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
-	       continue;
-	  }
-	  int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
-	  if(lineBuf[lineLength - 1] == '\n') {
+           TerminalText::PrintInfo("The number of samples in \"%s\" must not exceed %s. Loading first %d samples only.\n", 
+                           filename, BOLTZMANN_FORMAT_MAX_SAMPLES, BOLTZMANN_FORMAT_MAX_SAMPLES);
+           break;
+      }  
+      char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
+      if(lineReturn == NULL && feof(fpDotBracketFile)) { 
+           break;
+      }
+      else if(lineReturn == NULL) {
+           TerminalText::PrintError("Reading Boltzmann format file \"%s\" : %s\n", filename, strerror(errno));
+           break;
+      }
+      if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
+           continue;
+      }
+      int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
+      if(lineBuf[lineLength - 1] == '\n') {
                lineBuf[lineLength - 1] = '\0';
-	  }
-	  if(!haveBaseData) {
-	       strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
-	       haveBaseData = true;
-	       continue;
-	  }
-	  else if(!searchingPairData) {
-	       searchingPairData = true;
-	  }
-	  strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+      }
+      if(!haveBaseData) {
+           strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+           haveBaseData = true;
+           continue;
+      }
+      else if(!searchingPairData) {
+           searchingPairData = true;
+      }
+      strncpy(pairingDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
      
-	  int seqLength = strlen(baseDataBuf);
+      int seqLength = strlen(baseDataBuf);
           stack<int> unpairedBasePairs;
           RNAStructure *rnaStruct = new RNAStructure();
           rnaStructsArray[*arrayCount] = rnaStruct;
-	  rnaStruct->m_sequenceLength = seqLength;
+      rnaStruct->m_sequenceLength = seqLength;
           rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
           for(int baseIdx = 0; baseIdx < seqLength; baseIdx++) { 
                RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
-	       switch(baseDataBuf[baseIdx]) {
-	            case 'a':
-	            case 'A':
-	                 curBaseData->m_base = A;
-		         break;
-	            case 'c':
-	            case 'C':
-		         curBaseData->m_base = C;
-		         break;
-	            case 'g':
-	            case 'G':
-		         curBaseData->m_base = G;
-		         break;
-	            case 'u':
-	            case 'U':
-		         curBaseData->m_base = U;
-		         break;
-	            default:
-		         curBaseData->m_base = X;
-		         break;
-	       }
-	       curBaseData->m_index = baseIdx;
-	       if(pairingDataBuf[baseIdx] == '.') {
-	            curBaseData->m_pair = UNPAIRED;
-	       }
-	       else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
-		       pairingDataBuf[baseIdx] == '{') {
-	            unpairedBasePairs.push(baseIdx + 1);
-	       }
-	       else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
-		       pairingDataBuf[baseIdx] == '}') {
-	            int pairIndex = unpairedBasePairs.top();
-	            unpairedBasePairs.pop();
-	            curBaseData->m_pair = pairIndex;
-	            RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
-	            pairedBaseData->m_pair = baseIdx;
-	       }
-	       else {
+           switch(baseDataBuf[baseIdx]) {
+                case 'a':
+                case 'A':
+                     curBaseData->m_base = A;
+                 break;
+                case 'c':
+                case 'C':
+                 curBaseData->m_base = C;
+                 break;
+                case 'g':
+                case 'G':
+                 curBaseData->m_base = G;
+                 break;
+                case 'u':
+                case 'U':
+                 curBaseData->m_base = U;
+                 break;
+                default:
+                 curBaseData->m_base = X;
+                 break;
+           }
+           curBaseData->m_index = baseIdx;
+           if(pairingDataBuf[baseIdx] == '.') {
+                curBaseData->m_pair = UNPAIRED;
+           }
+           else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
+               pairingDataBuf[baseIdx] == '{') {
+                unpairedBasePairs.push(baseIdx + 1);
+           }
+           else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
+               pairingDataBuf[baseIdx] == '}') {
+                int pairIndex = unpairedBasePairs.top();
+                unpairedBasePairs.pop();
+                curBaseData->m_pair = pairIndex;
+                RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
+                pairedBaseData->m_pair = baseIdx;
+           }
+           else {
                     TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
-		            pairingDataBuf[baseIdx]);
-	            Delete(rnaStruct);
-	            for(int s = 0; s < *arrayCount; s++) { 
-	                 Delete(rnaStructsArray[s]);
-	            }
-	            Free(rnaStructsArray);
-	            return NULL;
-	       }
+                    pairingDataBuf[baseIdx]);
+                Delete(rnaStruct);
+                for(int s = 0; s < *arrayCount; s++) { 
+                     Delete(rnaStructsArray[s]);
+                }
+                Free(rnaStructsArray);
+                return NULL;
+           }
           }
           #if PERFORM_BRANCH_TYPE_ID
           rnaStruct->branchType = (RNABranchType_t*) malloc( 
                                    sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
           #endif
 
-	  // we will have multiple samples in this files, need to append a sample number suffix to 
-	  // distinguish between them for the users in the GUI: 
-	  int nextFileIdentifierLen = strlen(filename) + 16;
+      // we will have multiple samples in this files, need to append a sample number suffix to 
+      // distinguish between them for the users in the GUI: 
+      int nextFileIdentifierLen = strlen(filename) + 16;
           rnaStruct->m_pathname = (char *) malloc(nextFileIdentifierLen * sizeof(char));
-	  rnaStruct->m_pathname[0] = '\0';
-	  char *fileExtPos = strrchr((char *) filename, '.');
+      rnaStruct->m_pathname[0] = '\0';
+      char *fileExtPos = strrchr((char *) filename, '.');
           if(fileExtPos == NULL) {
                fileExtPos = ((char *) filename) + strlen(filename);
-	  }
-	  strncpy(rnaStruct->m_pathname, filename, fileExtPos - filename);
-	  rnaStruct->m_pathname[fileExtPos - filename] = '\0';
-	  rnaStruct->m_exactPathName = rnaStruct->m_pathname;
-	  char sampleSuffix[MAX_BUFFER_SIZE];
-	  snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", *arrayCount + 1);
-	  strcat(rnaStruct->m_pathname, sampleSuffix);
-	  strcat(rnaStruct->m_pathname, fileExtPos);
+      }
+      strncpy(rnaStruct->m_pathname, filename, fileExtPos - filename);
+      rnaStruct->m_pathname[fileExtPos - filename] = '\0';
+      rnaStruct->m_exactPathName = rnaStruct->m_pathname;
+      char sampleSuffix[MAX_BUFFER_SIZE];
+      snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", *arrayCount + 1);
+      strcat(rnaStruct->m_pathname, sampleSuffix);
+      strcat(rnaStruct->m_pathname, fileExtPos);
 
           rnaStruct->charSeqSize = seqLength;
           rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
@@ -598,12 +598,12 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
           #endif
      
           *arrayCount += 1;
-	  if(*arrayCount >= rnaStructArraySize) {
+      if(*arrayCount >= rnaStructArraySize) {
                rnaStructArraySize *= 2;
-	       rnaStructsArray = (RNAStructure **) 
-		                  realloc(rnaStructsArray, sizeof(RNAStructure *) * rnaStructArraySize);
-	  }
-	  ++sampleNum;
+           rnaStructsArray = (RNAStructure **) 
+                          realloc(rnaStructsArray, sizeof(RNAStructure *) * rnaStructArraySize);
+      }
+      ++sampleNum;
      
      }
      fclose(fpDotBracketFile);
@@ -632,71 +632,71 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
      int rnaStructArraySize = RNASTRUCT_ARRAY_SIZE;
      while(true) {
           char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpHelixFile);
-	  if(lineReturn == NULL && feof(fpHelixFile)) { 
-	       break;
-	  }
-	  else if(lineReturn == NULL) {
-	       TerminalText::PrintError("Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
-	       break;
-	  }
-	  if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
-	       continue;
-	  }
-	  int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
-	  if(lineBuf[lineLength - 1] == '\n') {
+      if(lineReturn == NULL && feof(fpHelixFile)) { 
+           break;
+      }
+      else if(lineReturn == NULL) {
+           TerminalText::PrintError("Reading Helix-Triple-Format file \"%s\" : %s\n", filename, strerror(errno));
+           break;
+      }
+      if(lineBuf[0] == '\n' || lineBuf[0] == '>') { // blank or comment line (skip it): 
+           continue;
+      }
+      int lineLength = strnlen(lineBuf, MAX_SEQUENCE_SIZE);
+      if(lineBuf[lineLength - 1] == '\n') {
                lineBuf[lineLength - 1] = '\0';
-	  }
-	  if(!haveBaseData && lineLength > 0 && isalpha(lineBuf[0])) {
+      }
+      if(!haveBaseData && lineLength > 0 && isalpha(lineBuf[0])) {
                strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
-	       haveBaseData = true;
-	       int seqLength = strlen(baseDataBuf);
-	       memset(pairingDataBuf, '.', seqLength);
-	       continue;
-	  }
-	  else if(!haveBaseData) {
-	       TerminalText::PrintError("Unable to parse helix triple file line \"%s\"\n", lineBuf);
+           haveBaseData = true;
+           int seqLength = strlen(baseDataBuf);
+           memset(pairingDataBuf, '.', seqLength);
+           continue;
+      }
+      else if(!haveBaseData) {
+           TerminalText::PrintError("Unable to parse helix triple file line \"%s\"\n", lineBuf);
                parserError = true;
-	       break;
-	  }
-	  char *commaSplice = strchr(lineBuf, ','); 
-	  do {
-	       if(commaSplice && ++commaSplice && *commaSplice == '\0') {
-	            TerminalText::PrintError("Unexpected comma delimiter\n");
-		    parserError = true;
-		    break;
-	       }
-	       else if(commaSplice && *commaSplice == ' ') {
-	            ++commaSplice;
-	       }
-	       if(commaSplice == NULL) {
-	            commaSplice = lineBuf;
-	       }
-	       int helixLength = strchr(commaSplice, ',') == NULL ? strlen(commaSplice) : 
-		                 strchr(commaSplice, ',') - commaSplice;
-	       char helixDataBuf[MAX_SEQUENCE_SIZE + 1];
-	       strncpy(helixDataBuf, commaSplice, MIN(helixLength, MAX_SEQUENCE_SIZE) + 1);
+           break;
+      }
+      char *commaSplice = strchr(lineBuf, ','); 
+      do {
+           if(commaSplice && ++commaSplice && *commaSplice == '\0') {
+                TerminalText::PrintError("Unexpected comma delimiter\n");
+            parserError = true;
+            break;
+           }
+           else if(commaSplice && *commaSplice == ' ') {
+                ++commaSplice;
+           }
+           if(commaSplice == NULL) {
+                commaSplice = lineBuf;
+           }
+           int helixLength = strchr(commaSplice, ',') == NULL ? strlen(commaSplice) : 
+                         strchr(commaSplice, ',') - commaSplice;
+           char helixDataBuf[MAX_SEQUENCE_SIZE + 1];
+           strncpy(helixDataBuf, commaSplice, MIN(helixLength, MAX_SEQUENCE_SIZE) + 1);
                helixDataBuf[MAX_SEQUENCE_SIZE] = '\0';
-	       int i, j, k;
-	       int helixParseStatus = sscanf(helixDataBuf, "%d %d %d", &i, &j, &k);
-	       if(helixParseStatus != 3) {
+           int i, j, k;
+           int helixParseStatus = sscanf(helixDataBuf, "%d %d %d", &i, &j, &k);
+           if(helixParseStatus != 3) {
                     TerminalText::PrintError("Error parsing helix triple \"%s\" : %s\n", 
-			    helixDataBuf, strerror(helixParseStatus));
-		    parserError = true;
-		    break;
-	       }
-	       for(int kidx = 0; kidx < k; kidx++) {
+                helixDataBuf, strerror(helixParseStatus));
+            parserError = true;
+            break;
+           }
+           for(int kidx = 0; kidx < k; kidx++) {
                     int startIdx = i + kidx - 1;
-		    int endIdx = j - kidx - 1;
-		    pairingDataBuf[startIdx] = '(';
+            int endIdx = j - kidx - 1;
+            pairingDataBuf[startIdx] = '(';
                     pairingDataBuf[endIdx] = ')';
-	       }
+           }
                commaSplice = strchr(commaSplice + 1, ',');
-	  } while(commaSplice != NULL);
+      } while(commaSplice != NULL);
      }
      fclose(fpHelixFile);
      if(parserError || !haveBaseData) {
           Delete(rnaStructsArray);
-	  return NULL;
+      return NULL;
      }
      // otherwise we need to create the structure from the bases and DB pairing data obtained above:
      int seqLength = strlen(baseDataBuf);
@@ -707,53 +707,53 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
      rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
      for(int baseIdx = 0; baseIdx < seqLength; baseIdx++) { 
           RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
-	  switch(baseDataBuf[baseIdx]) {
-	       case 'a':
-	       case 'A':
-	            curBaseData->m_base = A;
-		    break;
-	       case 'c':
-	       case 'C':
-		    curBaseData->m_base = C;
-		    break;
-	       case 'g':
-	       case 'G':
-		    curBaseData->m_base = G;
-		    break;
-	       case 'u':
-	       case 'U':
-		    curBaseData->m_base = U;
-		    break;
-	       default:
-		    curBaseData->m_base = X;
-		    break;
-	  }
-	  curBaseData->m_index = baseIdx;
-	  if(pairingDataBuf[baseIdx] == '.') {
-	       curBaseData->m_pair = UNPAIRED;
-	  }
-	  else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
-	       pairingDataBuf[baseIdx] == '{') {
-	       unpairedBasePairs.push(baseIdx + 1);
-	  }
-	  else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
-		  pairingDataBuf[baseIdx] == '}') {
-	       int pairIndex = unpairedBasePairs.top();
-	       unpairedBasePairs.pop();
-	       curBaseData->m_pair = pairIndex;
-	       RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
-	       pairedBaseData->m_pair = baseIdx;
-	  }
-	  else {
+      switch(baseDataBuf[baseIdx]) {
+           case 'a':
+           case 'A':
+                curBaseData->m_base = A;
+            break;
+           case 'c':
+           case 'C':
+            curBaseData->m_base = C;
+            break;
+           case 'g':
+           case 'G':
+            curBaseData->m_base = G;
+            break;
+           case 'u':
+           case 'U':
+            curBaseData->m_base = U;
+            break;
+           default:
+            curBaseData->m_base = X;
+            break;
+      }
+      curBaseData->m_index = baseIdx;
+      if(pairingDataBuf[baseIdx] == '.') {
+           curBaseData->m_pair = UNPAIRED;
+      }
+      else if(pairingDataBuf[baseIdx] == '(' || pairingDataBuf[baseIdx] == '<' || 
+           pairingDataBuf[baseIdx] == '{') {
+           unpairedBasePairs.push(baseIdx + 1);
+      }
+      else if(pairingDataBuf[baseIdx] == ')' || pairingDataBuf[baseIdx] == '>' || 
+          pairingDataBuf[baseIdx] == '}') {
+           int pairIndex = unpairedBasePairs.top();
+           unpairedBasePairs.pop();
+           curBaseData->m_pair = pairIndex;
+           RNAStructure::BaseData *pairedBaseData = &(rnaStruct->m_sequence[pairIndex - 1]);
+           pairedBaseData->m_pair = baseIdx;
+      }
+      else {
                TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
-		       pairingDataBuf[baseIdx]);
-	       Delete(rnaStruct);
-	       for(int s = 0; s < *arrayCount; s++) { 
-	            Delete(rnaStructsArray[s]);
-	       }
-	       Free(rnaStructsArray);
-	       return NULL;
-	  }
+               pairingDataBuf[baseIdx]);
+           Delete(rnaStruct);
+           for(int s = 0; s < *arrayCount; s++) { 
+                Delete(rnaStructsArray[s]);
+           }
+           Free(rnaStructsArray);
+           return NULL;
+      }
      }
      #if PERFORM_BRANCH_TYPE_ID
      rnaStruct->branchType = (RNABranchType_t*) malloc( 
@@ -771,8 +771,8 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
      *arrayCount += 1;
      if(*arrayCount < rnaStructArraySize) {
           rnaStructArraySize = *arrayCount;
-	  rnaStructsArray = (RNAStructure **) 
-		             realloc(rnaStructsArray, sizeof(RNAStructure *) * rnaStructArraySize);
+      rnaStructsArray = (RNAStructure **) 
+                     realloc(rnaStructsArray, sizeof(RNAStructure *) * rnaStructArraySize);
      }
      return rnaStructsArray;
 
@@ -785,16 +785,16 @@ void RNAStructure::GenerateDotFormatDataFromPairings() {
      dotFormatCharSeq = (char *) malloc((charSeqSize + 1) * sizeof(char));
      for(int pd = 0; pd < charSeqSize; pd++) {
          charSeq[pd] = toupper(charSeq[pd]);
-	 RNAStructure::BaseData *curBaseData = GetBaseAt(pd);
-	 if(curBaseData->m_pair == UNPAIRED) { 
-	      dotFormatCharSeq[pd] = '.';
-	 }
-	 else if(curBaseData->m_index < curBaseData->m_pair) {
-	      dotFormatCharSeq[pd] = '(';
-	 }
-	 else { 
-	      dotFormatCharSeq[pd] = ')';
-	 }
+     RNAStructure::BaseData *curBaseData = GetBaseAt(pd);
+     if(curBaseData->m_pair == UNPAIRED) { 
+          dotFormatCharSeq[pd] = '.';
+     }
+     else if(curBaseData->m_index < curBaseData->m_pair) {
+          dotFormatCharSeq[pd] = '(';
+     }
+     else { 
+          dotFormatCharSeq[pd] = ')';
+     }
      }
      dotFormatCharSeq[charSeqSize] = '\0';
 }
@@ -847,46 +847,46 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
           return m_suggestedFolderName;
      }
      else if(m_fileType == FILETYPE_NOPCT && m_fileCommentLine != NULL) {
-	  std::string commentLines = std::string(m_fileCommentLine);
-	  std::string orgName, accNo;
-	  size_t orgNamePos = commentLines.find("Organism: ");
-	  if(orgNamePos != std::string::npos) {
-	       size_t newlinePos = commentLines.find_first_of("\n", orgNamePos);
-	       if(newlinePos != std::string::npos) {
-		    size_t orgNameStartPos = orgNamePos + strlen("Organism: ");
-	            orgName = commentLines.substr(orgNameStartPos, newlinePos - orgNameStartPos);
-		    size_t orgSecondWordPos = orgName.find(" ");
-		    if(orgSecondWordPos != std::string::npos && orgSecondWordPos + 1 < orgName.length()) {
-		         orgName = orgName.substr(0, 1) + std::string(".") + orgName.substr(orgSecondWordPos);
-		    }
-	       }
-	  }
-	  size_t accNoPos = commentLines.find("Accession");
-	  if(accNoPos != std::string::npos) {
+      std::string commentLines = std::string(m_fileCommentLine);
+      std::string orgName, accNo;
+      size_t orgNamePos = commentLines.find("Organism: ");
+      if(orgNamePos != std::string::npos) {
+           size_t newlinePos = commentLines.find_first_of("\n", orgNamePos);
+           if(newlinePos != std::string::npos) {
+            size_t orgNameStartPos = orgNamePos + strlen("Organism: ");
+                orgName = commentLines.substr(orgNameStartPos, newlinePos - orgNameStartPos);
+            size_t orgSecondWordPos = orgName.find(" ");
+            if(orgSecondWordPos != std::string::npos && orgSecondWordPos + 1 < orgName.length()) {
+                 orgName = orgName.substr(0, 1) + std::string(".") + orgName.substr(orgSecondWordPos);
+            }
+           }
+      }
+      size_t accNoPos = commentLines.find("Accession");
+      if(accNoPos != std::string::npos) {
                size_t colonPos = commentLines.find_first_of(":", accNoPos);
-	       if(colonPos != std::string::npos) {
+           if(colonPos != std::string::npos) {
                     size_t accNoStart = colonPos + 2;
-		    size_t newlinePos = commentLines.find_first_of("\n", accNoStart);
-		    if(newlinePos == std::string::npos) {
-		         accNo = commentLines.substr(accNoStart);
-		    }
-		    else {
+            size_t newlinePos = commentLines.find_first_of("\n", accNoStart);
+            if(newlinePos == std::string::npos) {
+                 accNo = commentLines.substr(accNoStart);
+            }
+            else {
                          accNo = commentLines.substr(accNoStart, newlinePos - accNoStart);
-		    }
-	       }
-	  }
-	  std::string sfNameStr;
-	  if(orgName.length() > 0 && accNo.length() > 0) {
-		  sfNameStr = orgName + std::string(" (") + accNo + std::string(")");
-	  }
-	  else if(orgName.length() > 0) {
-	       sfNameStr = orgName;
-	  }
-	  else if(accNo.length() > 0) {
-	       sfNameStr = accNo;
-	  }
-	  m_suggestedFolderName = (char *) malloc((sfNameStr.length() + 1) * sizeof(char));
-	  strcpy(m_suggestedFolderName, sfNameStr.c_str());
+            }
+           }
+      }
+      std::string sfNameStr;
+      if(orgName.length() > 0 && accNo.length() > 0) {
+          sfNameStr = orgName + std::string(" (") + accNo + std::string(")");
+      }
+      else if(orgName.length() > 0) {
+           sfNameStr = orgName;
+      }
+      else if(accNo.length() > 0) {
+           sfNameStr = accNo;
+      }
+      m_suggestedFolderName = (char *) malloc((sfNameStr.length() + 1) * sizeof(char));
+      strcpy(m_suggestedFolderName, sfNameStr.c_str());
           return m_suggestedFolderName;
      }
      m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
@@ -906,49 +906,49 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
      };
      bool foundMatch = false;
      for(int sidx = 0; sidx < searchForStructStrings.size(); sidx++) { 
-	strncpy(m_suggestedFolderName, searchForStructStrings[sidx].c_str(), MAX_BUFFER_SIZE + 1);
-	m_suggestedFolderName[MAX_BUFFER_SIZE] = '\0';
+    strncpy(m_suggestedFolderName, searchForStructStrings[sidx].c_str(), MAX_BUFFER_SIZE + 1);
+    m_suggestedFolderName[MAX_BUFFER_SIZE] = '\0';
         for(int rsidx = 0; rsidx < GetArrayLength(filePathReplaceChars); rsidx++) { 
-	     StringTranslateCharacters(m_suggestedFolderName, 
-			               filePathReplaceChars[rsidx][0], 
-				       filePathReplaceChars[rsidx][1]);
-	}
-	char *dotPos = NULL, *checkStr = m_suggestedFolderName;
-	size_t strOffset = 0, sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
-	while(*(dotPos = strchrnul(checkStr, '.')) != '\0') {
-	     strOffset = (size_t) (dotPos - m_suggestedFolderName);
-	     checkStr = dotPos + 1;
-	     if(strOffset > 0 && isupper(m_suggestedFolderName[strOffset - 1])) { 
-	          size_t endingLowerPos = strOffset + 1;
-		  while((endingLowerPos < sfnLen) && islower(m_suggestedFolderName[endingLowerPos])) {
-		       endingLowerPos++;
-		  }
-		  size_t orgSubnameLen = endingLowerPos - strOffset - 1;
-		  if(orgSubnameLen > 0) {
-		       char structName[MAX_BUFFER_SIZE + 1];
-		       strncpy(structName, &(m_suggestedFolderName[strOffset - 1]), 2);
-		       structName[2] = ' ';
-		       strncpy(structName + 3, &(m_suggestedFolderName[strOffset + 1]), orgSubnameLen);
-		       structName[orgSubnameLen + 3] = '\0';
-		       strcpy(m_suggestedFolderName, structName);
-		       foundMatch = true;
-		       break;
-		  }
-	     }
+         StringTranslateCharacters(m_suggestedFolderName, 
+                           filePathReplaceChars[rsidx][0], 
+                       filePathReplaceChars[rsidx][1]);
+    }
+    char *dotPos = NULL, *checkStr = m_suggestedFolderName;
+    size_t strOffset = 0, sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
+    while(*(dotPos = strchrnul(checkStr, '.')) != '\0') {
+         strOffset = (size_t) (dotPos - m_suggestedFolderName);
+         checkStr = dotPos + 1;
+         if(strOffset > 0 && isupper(m_suggestedFolderName[strOffset - 1])) { 
+              size_t endingLowerPos = strOffset + 1;
+          while((endingLowerPos < sfnLen) && islower(m_suggestedFolderName[endingLowerPos])) {
+               endingLowerPos++;
+          }
+          size_t orgSubnameLen = endingLowerPos - strOffset - 1;
+          if(orgSubnameLen > 0) {
+               char structName[MAX_BUFFER_SIZE + 1];
+               strncpy(structName, &(m_suggestedFolderName[strOffset - 1]), 2);
+               structName[2] = ' ';
+               strncpy(structName + 3, &(m_suggestedFolderName[strOffset + 1]), orgSubnameLen);
+               structName[orgSubnameLen + 3] = '\0';
+               strcpy(m_suggestedFolderName, structName);
+               foundMatch = true;
+               break;
+          }
+         }
         }
-	if(foundMatch) { 
+    if(foundMatch) { 
              break;
-	}
+    }
      }
      if(!foundMatch) {
           Free(m_suggestedFolderName);
-	  return NULL;
+      return NULL;
      }
      
      size_t sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
      if(sfnLen + 1 < MAX_BUFFER_SIZE) {
           m_suggestedFolderName = (char *) realloc(m_suggestedFolderName, sfnLen + 1);
-	  m_suggestedFolderName[sfnLen] = '\0';
+      m_suggestedFolderName[sfnLen] = '\0';
      }
      return m_suggestedFolderName;
 }
@@ -958,126 +958,126 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     if(!m_ctDisplayString || !m_ctDisplayFormatString || 
        !m_seqDisplayString || !m_seqDisplayFormatString) { 
         Free(m_ctDisplayString);
-	Free(m_ctDisplayFormatString);
-	Free(m_seqDisplayString);
-	Free(m_seqDisplayFormatString);
+    Free(m_ctDisplayFormatString);
+    Free(m_seqDisplayString);
+    Free(m_seqDisplayFormatString);
         GenerateString();
     }
 
     if (!m_contentWindow)
     {
         int subwinWidth = 473, subwinTotalHeight = 675, 
-	    subwinResizeSpacing = 24;
-	int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
-	int labelHeight = 25, btnHeight = 25, btnWidth = 175;
-	Fl_Boxtype labelBoxType = FL_ROUND_DOWN_BOX;
-	Fl_Boxtype noteBoxType = FL_DOWN_BOX;
+        subwinResizeSpacing = 24;
+    int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
+    int labelHeight = 25, btnHeight = 25, btnWidth = 175;
+    Fl_Boxtype labelBoxType = FL_ROUND_DOWN_BOX;
+    Fl_Boxtype noteBoxType = FL_DOWN_BOX;
 
-	char contentWinTitleString[MAX_BUFFER_SIZE];
-	snprintf(contentWinTitleString, MAX_BUFFER_SIZE, "%s%s%s\0", 
-	         GetFilenameNoExtension(), titleSuffix == NULL ? "" : " : ", 
-		 titleSuffix == NULL ? "" : titleSuffix);
-	m_contentWindow = new Fl_Double_Window(subwinWidth, subwinTotalHeight);
-	m_contentWindow->copy_label(contentWinTitleString);
-	Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
-			               subwinTotalHeight - subwinResizeSpacing);
-	m_contentWindow->resizable(resizeBox);
-	m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
-	subwinWidth -= subwinResizeSpacing;
+    char contentWinTitleString[MAX_BUFFER_SIZE];
+    snprintf(contentWinTitleString, MAX_BUFFER_SIZE, "%s%s%s\0", 
+             GetFilenameNoExtension(), titleSuffix == NULL ? "" : " : ", 
+         titleSuffix == NULL ? "" : titleSuffix);
+    m_contentWindow = new Fl_Double_Window(subwinWidth, subwinTotalHeight);
+    m_contentWindow->copy_label(contentWinTitleString);
+    Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
+                           subwinTotalHeight - subwinResizeSpacing);
+    m_contentWindow->resizable(resizeBox);
+    m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
+    subwinWidth -= subwinResizeSpacing;
 
-	m_exportExtFilesBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-				         labelHeight, 
-				         "   >> Export to External Formats:");
-	m_exportExtFilesBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	m_exportExtFilesBox->color(GUI_BGCOLOR);
-	m_exportExtFilesBox->labelcolor(GUI_BTEXT_COLOR);
-	m_exportExtFilesBox->labelfont(LOCAL_BFFONT);
-	m_exportExtFilesBox->labelsize(LOCAL_TEXT_SIZE);
-	m_exportExtFilesBox->box(labelBoxType);
-	curYOffset += labelHeight + windowSpacing;
+    m_exportExtFilesBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+                         labelHeight, 
+                         "   >> Export to External Formats:");
+    m_exportExtFilesBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    m_exportExtFilesBox->color(GUI_BGCOLOR);
+    m_exportExtFilesBox->labelcolor(GUI_BTEXT_COLOR);
+    m_exportExtFilesBox->labelfont(LOCAL_BFFONT);
+    m_exportExtFilesBox->labelsize(LOCAL_TEXT_SIZE);
+    m_exportExtFilesBox->box(labelBoxType);
+    curYOffset += labelHeight + windowSpacing;
 
-	m_exportFASTABtn = new Fl_Button(windowSpacing, curYOffset, 
-			                 btnWidth, btnHeight, 
-			                 "Export FASTA -- @filesaveas");
-	m_exportFASTABtn->user_data((void *) this);
-	m_exportFASTABtn->callback(ExportFASTAFileCallback);
-	m_exportFASTABtn->labelcolor(GUI_BTEXT_COLOR);
-	m_exportDBBtn = new Fl_Button(2 * windowSpacing + btnWidth, curYOffset, 
-			              btnWidth, btnHeight, 
+    m_exportFASTABtn = new Fl_Button(windowSpacing, curYOffset, 
+                             btnWidth, btnHeight, 
+                             "Export FASTA -- @filesaveas");
+    m_exportFASTABtn->user_data((void *) this);
+    m_exportFASTABtn->callback(ExportFASTAFileCallback);
+    m_exportFASTABtn->labelcolor(GUI_BTEXT_COLOR);
+    m_exportDBBtn = new Fl_Button(2 * windowSpacing + btnWidth, curYOffset, 
+                          btnWidth, btnHeight, 
                                       "Export DotBracket -- @filesaveas");
-	m_exportDBBtn->user_data((void *) this);
-	m_exportDBBtn->callback(ExportDotBracketFileCallback);
-	m_exportDBBtn->labelcolor(GUI_BTEXT_COLOR);
-	curYOffset += btnHeight + windowSpacing;
+    m_exportDBBtn->user_data((void *) this);
+    m_exportDBBtn->callback(ExportDotBracketFileCallback);
+    m_exportDBBtn->labelcolor(GUI_BTEXT_COLOR);
+    curYOffset += btnHeight + windowSpacing;
 
-	m_seqSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-		                       labelHeight, 
-			               "   >> Raw Sequence Data:");
+    m_seqSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+                               labelHeight, 
+                           "   >> Raw Sequence Data:");
         m_seqSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	m_seqSubwindowBox->color(GUI_BGCOLOR);
-	m_seqSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
-	m_seqSubwindowBox->labelfont(LOCAL_BFFONT);
-	m_seqSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
-	m_seqSubwindowBox->box(labelBoxType);
-	curYOffset += labelHeight + windowSpacing;
+    m_seqSubwindowBox->color(GUI_BGCOLOR);
+    m_seqSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
+    m_seqSubwindowBox->labelfont(LOCAL_BFFONT);
+    m_seqSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
+    m_seqSubwindowBox->box(labelBoxType);
+    curYOffset += labelHeight + windowSpacing;
 
-	m_seqTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, 
-		                               subwinWidth, 135);	
-	m_seqTextBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
-	m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayFormatString));
-	m_seqTextBuffer->text(m_seqDisplayString);
-	m_seqTextDisplay->buffer(m_seqTextBuffer);
-	m_seqTextDisplay->textfont(LOCAL_BFFONT);
-	m_seqTextDisplay->textsize(LOCAL_TEXT_SIZE);
-	m_seqTextDisplay->color(GUI_CTFILEVIEW_COLOR);
-	m_seqTextDisplay->textcolor(GUI_TEXT_COLOR);
-	m_seqTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
-	m_seqTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
-	m_seqTextDisplay->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-	m_seqStyleBuffer->text(m_seqDisplayFormatString);
-	int stableSize = sizeof(TEXT_BUFFER_STYLE_TABLE) / 
-		         sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
-	m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
-		          TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
-	curYOffset += 135 + windowSpacing;
+    m_seqTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, 
+                                       subwinWidth, 135);    
+    m_seqTextBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
+    m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayFormatString));
+    m_seqTextBuffer->text(m_seqDisplayString);
+    m_seqTextDisplay->buffer(m_seqTextBuffer);
+    m_seqTextDisplay->textfont(LOCAL_BFFONT);
+    m_seqTextDisplay->textsize(LOCAL_TEXT_SIZE);
+    m_seqTextDisplay->color(GUI_CTFILEVIEW_COLOR);
+    m_seqTextDisplay->textcolor(GUI_TEXT_COLOR);
+    m_seqTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
+    m_seqTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
+    m_seqTextDisplay->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+    m_seqStyleBuffer->text(m_seqDisplayFormatString);
+    int stableSize = sizeof(TEXT_BUFFER_STYLE_TABLE) / 
+                 sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
+    m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
+                  TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
+    curYOffset += 135 + windowSpacing;
 
-	m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-			              labelHeight, 
-				      "   >> CT Style Pairing Data:");
-	m_ctSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	m_ctSubwindowBox->color(GUI_BGCOLOR);
-	m_ctSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
-	m_ctSubwindowBox->labelfont(LOCAL_BFFONT);
-	m_ctSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
-	m_ctSubwindowBox->box(labelBoxType);
-	curYOffset += labelHeight + windowSpacing;
+    m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+                          labelHeight, 
+                      "   >> CT Style Pairing Data:");
+    m_ctSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+    m_ctSubwindowBox->color(GUI_BGCOLOR);
+    m_ctSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
+    m_ctSubwindowBox->labelfont(LOCAL_BFFONT);
+    m_ctSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
+    m_ctSubwindowBox->box(labelBoxType);
+    curYOffset += labelHeight + windowSpacing;
                 
-	m_ctTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, subwinWidth, 300);	
-	m_ctTextBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayString));
-	m_ctStyleBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayFormatString));
-	m_ctTextBuffer->text(m_ctDisplayString);
-	m_ctTextDisplay->buffer(m_ctTextBuffer);
-	m_ctTextDisplay->textfont(LOCAL_BFFONT);
-	m_ctTextDisplay->color(GUI_CTFILEVIEW_COLOR);
-	m_ctTextDisplay->textcolor(GUI_TEXT_COLOR);
-	m_ctTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
-	m_ctTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
-	m_ctStyleBuffer->text(m_ctDisplayFormatString);
-	m_ctTextDisplay->labelfont(LOCAL_BFFONT);
-	m_ctTextDisplay->highlight_data(m_ctStyleBuffer, 
-		       TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
+    m_ctTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, subwinWidth, 300);    
+    m_ctTextBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayString));
+    m_ctStyleBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayFormatString));
+    m_ctTextBuffer->text(m_ctDisplayString);
+    m_ctTextDisplay->buffer(m_ctTextBuffer);
+    m_ctTextDisplay->textfont(LOCAL_BFFONT);
+    m_ctTextDisplay->color(GUI_CTFILEVIEW_COLOR);
+    m_ctTextDisplay->textcolor(GUI_TEXT_COLOR);
+    m_ctTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
+    m_ctTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
+    m_ctStyleBuffer->text(m_ctDisplayFormatString);
+    m_ctTextDisplay->labelfont(LOCAL_BFFONT);
+    m_ctTextDisplay->highlight_data(m_ctStyleBuffer, 
+               TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
         curYOffset += 300 + windowSpacing;
 
-	int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
-	const char *notationStr = "@line  Note: An asterisk (*) to the left of a sequence\n entry in the CT viewer above denotes that the\n base pair is the first in its pair.     @line";
+    int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
+    const char *notationStr = "@line  Note: An asterisk (*) to the left of a sequence\n entry in the CT viewer above denotes that the\n base pair is the first in its pair.     @line";
         m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-			                   pairNoteSubwinHeight, notationStr);
+                               pairNoteSubwinHeight, notationStr);
         m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-	m_ctViewerNotationBox->color(GUI_BGCOLOR);
-	m_ctViewerNotationBox->labelcolor(GUI_BTEXT_COLOR);
-	m_ctViewerNotationBox->labelfont(LOCAL_BFFONT);
-	m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE);
-	m_ctViewerNotationBox->box(noteBoxType);
+    m_ctViewerNotationBox->color(GUI_BGCOLOR);
+    m_ctViewerNotationBox->labelcolor(GUI_BTEXT_COLOR);
+    m_ctViewerNotationBox->labelfont(LOCAL_BFFONT);
+    m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE);
+    m_ctViewerNotationBox->box(noteBoxType);
 
     }
     m_contentWindow->user_data((void *) this);
@@ -1089,7 +1089,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 void RNAStructure::GenerateString()
 {
     /*
-	   <id> [ACGU] - [ACGU] <id>
+       <id> [ACGU] - [ACGU] <id>
     */
     int size = (m_sequenceLength + 2) * 38;
     m_ctDisplayString = (char*) malloc(sizeof(char) * (size + 1));
@@ -1102,88 +1102,88 @@ void RNAStructure::GenerateString()
     
     // table header labels:
     charsWritten = snprintf(currentPosn, remainingSize, 
-		   "   BaseId  |  Pair  (PairId) \n-------------------------------------\n");
+           "   BaseId  |  Pair  (PairId) \n-------------------------------------\n");
     snprintf(formatPosn, remainingSize, "%s\n", 
              Util::GetRepeatedString(TBUFSTYLE_DEFAULT_STRFMT, 
-		                     charsWritten).c_str());
+                             charsWritten).c_str());
     currentPosn += charsWritten;
     formatPosn += charsWritten;
     remainingSize -= charsWritten;
     
     for (int i = 0; i < (int) m_sequenceLength; ++i)
     {
-		const char* baseStr = "X";
-		switch ((int) m_sequence[i].m_base)
-		{
-		    case A: baseStr = "A";
-			    break;
-		    case C: baseStr = "C";
-		    	break;
-		    case G: baseStr = "G";
-		    	break;
-		    case U: baseStr = "U";
-			    break;
-		    case X: baseStr = "X";
-			    break;
-		    default:
-			    break;
-		}
-		if (m_sequence[i].m_pair == UNPAIRED)
-		{
-		    charsWritten = snprintf(currentPosn, remainingSize, 
-				            "   % 6d  | %s\n", i + 1, baseStr);
-		    snprintf(formatPosn, remainingSize, "   AAAAAA  | %c\n", 
-		             Util::GetBaseStringFormat(baseStr));
+        const char* baseStr = "X";
+        switch ((int) m_sequence[i].m_base)
+        {
+            case A: baseStr = "A";
+                break;
+            case C: baseStr = "C";
+                break;
+            case G: baseStr = "G";
+                break;
+            case U: baseStr = "U";
+                break;
+            case X: baseStr = "X";
+                break;
+            default:
+                break;
+        }
+        if (m_sequence[i].m_pair == UNPAIRED)
+        {
+            charsWritten = snprintf(currentPosn, remainingSize, 
+                            "   % 6d  | %s\n", i + 1, baseStr);
+            snprintf(formatPosn, remainingSize, "   AAAAAA  | %c\n", 
+                     Util::GetBaseStringFormat(baseStr));
 
-		}
-		else
-		{
-		    RNAStructure::BasePair pairID = m_sequence[i].m_pair;
-		    const char* pairStr = "X";
-		    switch (m_sequence[pairID].m_base)
-		    {
-			    case A: 
-			        pairStr = "A";
-			        break;
-			    case C: 
-			        pairStr = "C";
-			        break;
-			    case G: 
-			        pairStr = "G";
-			        break;
-			    case U: 
-			        pairStr = "U";
-			        break;
-		            case X: 
-				pairStr = "X";
-			        break;
-		            default:
-			        break;
-		    }
-		    charsWritten = snprintf(
-			    currentPosn,
-			    remainingSize,
-			    " %c % 6d  | %s - %s  (%d)\n",
-			    (i <= pairID) ? '*' : ' ', 
-			    i + 1,
-			    baseStr,
-			    pairStr,
-			    pairID + 1);
-		    const char *pairMarkerFmt = ((i <= pairID) ? TBUFSTYLE_BPAIR_START_STRFMT : 
-				                                 TBUFSTYLE_BPAIR_END_STRFMT);
-		    int numDigits = Util::GetNumDigitsBase10(pairID + 1);
-		    std::string numFmtStr = Util::GetRepeatedString(
-				            pairMarkerFmt, numDigits);
-		    snprintf(formatPosn, remainingSize, 
-		             " %c AAAAAA  | %c - %c  (%s)\n", 
-		             (i <= pairID) ? TBUFSTYLE_BPAIR_END : '*', 
-			     Util::GetBaseStringFormat(baseStr), 
-			     Util::GetBaseStringFormat(pairStr), 
-			     numFmtStr.c_str());    
-		}
-		remainingSize -= charsWritten;
-		currentPosn += charsWritten;
-		formatPosn += charsWritten;
+        }
+        else
+        {
+            RNAStructure::BasePair pairID = m_sequence[i].m_pair;
+            const char* pairStr = "X";
+            switch (m_sequence[pairID].m_base)
+            {
+                case A: 
+                    pairStr = "A";
+                    break;
+                case C: 
+                    pairStr = "C";
+                    break;
+                case G: 
+                    pairStr = "G";
+                    break;
+                case U: 
+                    pairStr = "U";
+                    break;
+                    case X: 
+                pairStr = "X";
+                    break;
+                    default:
+                    break;
+            }
+            charsWritten = snprintf(
+                currentPosn,
+                remainingSize,
+                " %c % 6d  | %s - %s  (%d)\n",
+                (i <= pairID) ? '*' : ' ', 
+                i + 1,
+                baseStr,
+                pairStr,
+                pairID + 1);
+            const char *pairMarkerFmt = ((i <= pairID) ? TBUFSTYLE_BPAIR_START_STRFMT : 
+                                                 TBUFSTYLE_BPAIR_END_STRFMT);
+            int numDigits = Util::GetNumDigitsBase10(pairID + 1);
+            std::string numFmtStr = Util::GetRepeatedString(
+                            pairMarkerFmt, numDigits);
+            snprintf(formatPosn, remainingSize, 
+                     " %c AAAAAA  | %c - %c  (%s)\n", 
+                     (i <= pairID) ? TBUFSTYLE_BPAIR_END : '*', 
+                 Util::GetBaseStringFormat(baseStr), 
+                 Util::GetBaseStringFormat(pairStr), 
+                 numFmtStr.c_str());    
+        }
+        remainingSize -= charsWritten;
+        currentPosn += charsWritten;
+        formatPosn += charsWritten;
 
     }
     m_ctDisplayString = (char *) realloc(m_ctDisplayString, 
@@ -1195,14 +1195,14 @@ void RNAStructure::GenerateString()
     
     m_seqDisplayString = (char *) malloc(DEFAULT_BUFFER_SIZE * sizeof(char));
     size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, 
-		                             DEFAULT_BUFFER_SIZE);
+                                     DEFAULT_BUFFER_SIZE);
     if(seqDSLen + 1 < DEFAULT_BUFFER_SIZE) { 
         m_seqDisplayString = (char *) realloc(m_seqDisplayString, (seqDSLen + 1) * sizeof(char));
-	m_seqDisplayString[seqDSLen] = '\0';
+    m_seqDisplayString[seqDSLen] = '\0';
     }
     else {
-	 m_seqDisplayString[DEFAULT_BUFFER_SIZE - 5] = '\0';
-	 strcat(m_seqDisplayString, " ...");
+     m_seqDisplayString[DEFAULT_BUFFER_SIZE - 5] = '\0';
+     strcat(m_seqDisplayString, " ...");
     }
     m_seqDisplayFormatString = (char *) malloc((seqDSLen + 1) * sizeof(char));
     strcpy(m_seqDisplayFormatString, m_seqDisplayString);
@@ -1216,7 +1216,7 @@ void RNAStructure::GenerateString()
 }
 
 size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars, 
-		                            size_t clusterSize) const { 
+                                    size_t clusterSize) const { 
      if(strBuf == NULL || charSeq == NULL) { 
           return 0;
      }
@@ -1227,38 +1227,38 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
      char *strBufActivePtr = strBuf, *destPos = NULL;
      size_t charsCopied = 0, csize = 0;
      for(int strpos = 0; charsCopied + clusterSize < MIN(charSeqSize, maxChars - 1); strpos += clusterSize) { 
-	  strncpy(strBufActivePtr, charSeq + strpos, clusterSize);
-	  csize = (strpos / clusterSize <= numSpaces) ? clusterSize : 
-		  charSeqSize % clusterSize;
-	  if(charsCopied + clusterSize < MIN(charSeqSize, maxChars - 1)) {
-	       strBufActivePtr[csize] = ' ';
-	       strBufActivePtr += csize + 1;
-	       charsCopied += csize + 1;
-	  }
-	  else {
-	       strBufActivePtr[MIN(charSeqSize, maxChars - 1)] = '\0';
-	       charsCopied += csize;
-	       break;
-	  }
+      strncpy(strBufActivePtr, charSeq + strpos, clusterSize);
+      csize = (strpos / clusterSize <= numSpaces) ? clusterSize : 
+          charSeqSize % clusterSize;
+      if(charsCopied + clusterSize < MIN(charSeqSize, maxChars - 1)) {
+           strBufActivePtr[csize] = ' ';
+           strBufActivePtr += csize + 1;
+           charsCopied += csize + 1;
+      }
+      else {
+           strBufActivePtr[MIN(charSeqSize, maxChars - 1)] = '\0';
+           charsCopied += csize;
+           break;
+      }
      }
      if(charsCopied < MIN(charSeqSize, maxChars - 1)) {
           strBufActivePtr[0] = '\0';
      }
      else {
-	  strBufActivePtr[maxChars - 1] = '\0';
+      strBufActivePtr[maxChars - 1] = '\0';
      }
      return MAX(0, charsCopied - 1);
 }
 
 size_t RNAStructure::GenerateFASTAFormatString(char *strBuf, 
-		                               size_t maxChars) const { 
+                                       size_t maxChars) const { 
      if(strBuf == NULL || charSeq == NULL) { 
           return 0;
      }
      char commentLine[DEFAULT_BUFFER_SIZE];
      size_t cmtLineLen = snprintf(commentLine, DEFAULT_BUFFER_SIZE, 
-		         "> CT File Source: %s\n", 
-		         GetFilename());
+                 "> CT File Source: %s\n", 
+                 GetFilename());
      if(cmtLineLen + charSeqSize + 1 > maxChars) { 
           return 0;
      }
@@ -1269,7 +1269,7 @@ size_t RNAStructure::GenerateFASTAFormatString(char *strBuf,
 }
 
 size_t RNAStructure::GenerateDotBracketFormatString(char *strBuf, 
-		                                    size_t maxChars) const { 
+                                            size_t maxChars) const { 
      if(strBuf == NULL || charSeq == NULL) { 
           return 0;
      }
@@ -1288,21 +1288,21 @@ void RNAStructure::ExportFASTAFileCallback(Fl_Widget *btn, void *udata) {
      Fl_Button *btnPtr = (Fl_Button *) btn;
      RNAStructure *rnaStructBaseObj = (RNAStructure *) btnPtr->user_data();
      size_t fdataContentStrMaxLen = 2 * rnaStructBaseObj->charSeqSize + 
-	                            DEFAULT_BUFFER_SIZE;
+                                DEFAULT_BUFFER_SIZE;
      char fastaData[fdataContentStrMaxLen + 1];
      int fdataLength = rnaStructBaseObj->GenerateFASTAFormatString(
-		                         fastaData, fdataContentStrMaxLen);
+                                 fastaData, fdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
      snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.fasta\0", 
-	      CTFILE_SEARCH_DIRECTORY, 
-	      rnaStructBaseObj->GetFilenameNoExtension());
+          CTFILE_SEARCH_DIRECTORY, 
+          rnaStructBaseObj->GetFilenameNoExtension());
      const char *exportPath = fl_file_chooser("Choose FASTA File Location ...", 
-		                              "*.fasta", suggestedOutFile, 0); 
+                                      "*.fasta", suggestedOutFile, 0); 
      bool fileWriteStatus = RNAStructure::Util::ExportStringToPlaintextFile(
           exportPath, fastaData, fdataLength);
      if(!fileWriteStatus) { 
           fl_alert("Unable to write output FASTA file \"%s\" to disk! If you have a permissions error saving the file to disk, try saving to a location in your home directory.", 
-	           exportPath);
+               exportPath);
      }
 }
 
@@ -1310,21 +1310,21 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
      Fl_Button *btnPtr = (Fl_Button *) btn;
      RNAStructure *rnaStructBaseObj = (RNAStructure *) btnPtr->user_data();
      size_t dbdataContentStrMaxLen = 2 * rnaStructBaseObj->charSeqSize + 
-	                             DEFAULT_BUFFER_SIZE;
+                                 DEFAULT_BUFFER_SIZE;
      char dotData[dbdataContentStrMaxLen + 1];
      int dotDataLength = rnaStructBaseObj->GenerateDotBracketFormatString(
-		                           dotData, dbdataContentStrMaxLen);
+                                   dotData, dbdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
      snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.dot\0", 
-	      CTFILE_SEARCH_DIRECTORY, 
-	      rnaStructBaseObj->GetFilenameNoExtension());
+          CTFILE_SEARCH_DIRECTORY, 
+          rnaStructBaseObj->GetFilenameNoExtension());
      const char *exportPath = fl_file_chooser("Choose DOT File Location ...", 
-		                              "*.dot", suggestedOutFile, 0); 
+                                      "*.dot", suggestedOutFile, 0); 
      bool fileWriteStatus = RNAStructure::Util::ExportStringToPlaintextFile(
           exportPath, dotData, dotDataLength);
      if(!fileWriteStatus) { 
           fl_alert("Unable to write output DOT file \"%s\" to disk! If you have a permissions error saving the file to disk, try saving to a location in your home directory.", 
-	           exportPath);
+               exportPath);
      }
 }
 
@@ -1338,24 +1338,24 @@ void RNAStructure::CloseCTViewerContentWindowCallback(Fl_Widget *noWidget, void 
 void RNAStructure::DeleteContentWindow() {
     if(m_contentWindow) {
         m_contentWindow->hide();
-	while(m_contentWindow->visible()) {
+    while(m_contentWindow->visible()) {
              Fl::wait();
-	}
-	Delete(m_contentWindow);
-    	Delete(m_ctTextDisplay);
-	Delete(m_ctTextBuffer);
-	Delete(m_seqTextDisplay);
-	Delete(m_ctTextBuffer);
+    }
+    Delete(m_contentWindow);
+        Delete(m_ctTextDisplay);
+    Delete(m_ctTextBuffer);
+    Delete(m_seqTextDisplay);
+    Delete(m_ctTextBuffer);
         Delete(m_seqStyleBuffer);
-	Delete(m_exportExtFilesBox);
-	Delete(m_seqSubwindowBox);
-	Delete(m_ctSubwindowBox);
-	Delete(m_exportFASTABtn);
-	Delete(m_exportDBBtn);
-	Free(m_ctDisplayString);
-	Free(m_ctDisplayFormatString);
-	Free(m_seqDisplayString);
-	Free(m_seqDisplayFormatString);
+    Delete(m_exportExtFilesBox);
+    Delete(m_seqSubwindowBox);
+    Delete(m_ctSubwindowBox);
+    Delete(m_exportFASTABtn);
+    Delete(m_exportDBBtn);
+    Free(m_ctDisplayString);
+    Free(m_ctDisplayFormatString);
+    Free(m_seqDisplayString);
+    Free(m_seqDisplayFormatString);
     }
 }
 
@@ -1368,13 +1368,13 @@ char RNAStructure::Util::GetBaseStringFormat(const char *baseStr) {
      if(baseStr && !strcasecmp(baseStr, "A")) 
           return TBUFSTYLE_SEQPAIR_A;
      else if(baseStr && !strcasecmp(baseStr, "C"))
-	  return TBUFSTYLE_SEQPAIR_C;
+      return TBUFSTYLE_SEQPAIR_C;
      else if(baseStr && !strcasecmp(baseStr, "G"))
-	  return TBUFSTYLE_SEQPAIR_G;
+      return TBUFSTYLE_SEQPAIR_G;
      else if(baseStr && !strcasecmp(baseStr, "U"))
-	  return TBUFSTYLE_SEQPAIR_U;
+      return TBUFSTYLE_SEQPAIR_U;
      else 
-	  return TBUFSTYLE_DEFAULT;
+      return TBUFSTYLE_DEFAULT;
 }
 
 std::string RNAStructure::Util::GetRepeatedString(const char *str, int ntimes) {
@@ -1392,10 +1392,10 @@ int RNAStructure::Util::GetNumDigitsBase10(int x) {
 }
 
 bool RNAStructure::Util::ExportStringToPlaintextFile(
-		         const char *baseOutPath, 
-			 const char *srcData, 
-			 int srcDataLength, 
-			 const char *fileExtText) { 
+                 const char *baseOutPath, 
+             const char *srcData, 
+             int srcDataLength, 
+             const char *fileExtText) { 
      if(baseOutPath == NULL || srcData == NULL || fileExtText == NULL) { 
           return false;
      }
@@ -1405,17 +1405,17 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
      }
      else { 
           snprintf(outputFilePath, DEFAULT_BUFFER_SIZE, 
-		   "%s.%s\0", baseOutPath, fileExtText);
+           "%s.%s\0", baseOutPath, fileExtText);
      }
      FILE *fpOutFile = fopen(outputFilePath, "w+");
      if(fpOutFile == NULL) {
           TerminalText::PrintError("Opening export file \"%s\" : %s\n", outputFilePath, strerror(errno));
-	  return false;
+      return false;
      }
      int bytesWrittenToFile = 0;
      while(bytesWrittenToFile < srcDataLength && !ferror(fpOutFile)) { 
           bytesWrittenToFile += fwrite(srcData + bytesWrittenToFile, sizeof(char), 
-			               srcDataLength - bytesWrittenToFile, fpOutFile);
+                           srcDataLength - bytesWrittenToFile, fpOutFile);
      }
      bool operationStatus = true;
      if(ferror(fpOutFile)) { 
@@ -1426,10 +1426,10 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
 }
 
 int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex, 
-		                                int minArcIdx, int maxArcIdx) {
-     InputWindow *ctFileSelectionWin = new InputWindow(400, 175, "Select CT File to Highlight ...", 
-		                                       "", InputWindow::CTVIEWER_FILE_INPUT, 
-						       structureFolderIndex);
+                                        int minArcIdx, int maxArcIdx) {
+     InputWindow *ctFileSelectionWin = new InputWindow(400, 175, "Select Structure File to Highlight ...", 
+                                               "", InputWindow::CTVIEWER_FILE_INPUT, 
+                               structureFolderIndex);
      while(ctFileSelectionWin->visible()) {
           Fl::wait();
      }
@@ -1441,18 +1441,18 @@ int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
      StructureManager *rnaStructManager = RNAStructViz::GetInstance()->GetStructureManager();
      int fileSelectionIndex = ctFileSelectionWin->getFileSelectionIndex();
      int structIndex = rnaStructManager->GetFolderAt(structureFolderIndex)->
-	               folderStructs[fileSelectionIndex];
+                   folderStructs[fileSelectionIndex];
      RNAStructure *rnaStructure = rnaStructManager->GetStructure(structIndex);
      if((rnaStructManager != NULL) && (rnaStructure != NULL)) { 
-	  if(minArcIdx <= 0 || maxArcIdx <= 0) { 
-	       minArcIdx = 1;
-	       maxArcIdx = rnaStructure->m_sequenceLength;
-	  }
+      if(minArcIdx <= 0 || maxArcIdx <= 0) { 
+           minArcIdx = 1;
+           maxArcIdx = rnaStructure->m_sequenceLength;
+      }
           char arcIndexDisplaySuffix[MAX_BUFFER_SIZE];
-	  snprintf(arcIndexDisplaySuffix, MAX_BUFFER_SIZE, "#%d -- #%d (of %d)\0", 
-		   minArcIdx, maxArcIdx, rnaStructure->m_sequenceLength); 
-	  rnaStructManager->DisplayFileContents(structIndex, arcIndexDisplaySuffix);
-	  return structIndex;
+      snprintf(arcIndexDisplaySuffix, MAX_BUFFER_SIZE, "#%d -- #%d (of %d)\0", 
+           minArcIdx, maxArcIdx, rnaStructure->m_sequenceLength); 
+      rnaStructManager->DisplayFileContents(structIndex, arcIndexDisplaySuffix);
+      return structIndex;
      }
      Delete(ctFileSelectionWin);
      return -1;
@@ -1460,9 +1460,9 @@ int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
 
 bool RNAStructure::ScrollOpenCTFileViewerWindow(int structIndex, int pairIndex) {
      RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
-	                       GetStructure(structIndex);
+                           GetStructure(structIndex);
      if(rnaStruct == NULL || rnaStruct->m_ctTextDisplay == NULL || 
-	rnaStruct->m_contentWindow == NULL) {
+    rnaStruct->m_contentWindow == NULL) {
           return false;
      }
      else if(pairIndex <= 0 || pairIndex > rnaStruct->GetLength()) {

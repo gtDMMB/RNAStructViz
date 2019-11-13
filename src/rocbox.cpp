@@ -16,5 +16,5 @@ void roc_box_draw(int x, int y, int w, int h, Fl_Color bgcolor) {
 
 void roc_box_init()
 {
-	Fl::set_boxtype(ROC_BOX, roc_box_draw, 1, 1, 2, 2);
+    Fl::set_boxtype(ROC_BOX, roc_box_draw, 1, 1, 2, 2);
 }

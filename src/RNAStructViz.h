@@ -16,7 +16,9 @@ using std::vector;
 #include "DiagramWindow.h"
 #include "StatsWindow.h"
 #include "CommonDialogs.h"
-	
+
+#define DEFAULT_TITLE_STRING_SIZE       (64)
+
 class RNAStructViz
 {
     public:

@@ -36,11 +36,11 @@ int main(int argc, char **argv) {
    
     #ifdef __STRUCTVIZ_INSTALL_SIGNAL_HANDLERS
          if(__STRUCTVIZ_INSTALL_SIGSEGV_HANDLER) {
-	      signal(SIGSEGV, RNAStructViz_SignalHandler);
-	 }
-	 if(__STRUCTVIZ_INSTALL_CTRLC_HANDLER) {
-	      signal(SIGINT, RNAStructViz_SignalHandler);
-	 }
+          signal(SIGSEGV, RNAStructViz_SignalHandler);
+     }
+     if(__STRUCTVIZ_INSTALL_CTRLC_HANDLER) {
+          signal(SIGINT, RNAStructViz_SignalHandler);
+     }
     #endif
  
     DisplayConfigWindow::SetupInitialConfig();
@@ -84,13 +84,13 @@ void RNAStructViz_SignalHandler(int signum) {
      
      if(signum == SIGINT) {
           fprintf(stderr, "\n");
-	  TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
-	  ConfigParser::WriteUserConfigFile();
+      TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
+      ConfigParser::WriteUserConfigFile();
      }
      else if(signum == SIGSEGV) {
           TerminalText::PrintError("Handling unexpected SEGFAULT (SIGSEGV) signal.\n\n");
           std::string aboutInfoMsg = CommonDialogs::GetInfoAboutMessageString();
-	  ApplicationBuildInfo::PrintAboutListing(aboutInfoMsg.c_str(), stderr);
+      ApplicationBuildInfo::PrintAboutListing(aboutInfoMsg.c_str(), stderr);
      }
      exit(signum);
 

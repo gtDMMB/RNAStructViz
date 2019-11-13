@@ -12,7 +12,7 @@
 static inline void DeletePointerCheck(void *ptr) {
      if(ptr != NULL) {
           delete ptr;
-	  ptr = NULL;
+      ptr = NULL;
      }
 }
 
@@ -21,7 +21,7 @@ static inline void DeletePointerCheck(void *ptr) {
 static inline void FreePointerCheck(void *ptr) {
      if(ptr != NULL) {
           free(ptr);
-	  ptr = NULL;
+      ptr = NULL;
      }
 }
 
@@ -37,7 +37,7 @@ static inline const char* RemoveCharsFromStringByPredicate(char *str, PredicateF
      for(chpos = str, chwpos = str; *chpos != '\0'; chpos++) {
           if(!predicateFunc(*chpos)) {
                *chwpos++ = *chpos;
-	  }
+      }
      }
      *chwpos = '\0';
      return str;
@@ -55,12 +55,12 @@ static inline bool IsEqualDefaultCPPCheck(TSpec x, TSpec y) {
 
 template<typename TSpec>
 static inline bool ElementInSet(TSpec universe[], TSpec element, 
-		                bool (*compareFunc)(TSpec, TSpec) = 
-				IsEqualDefaultCPPCheck) {
+                        bool (*compareFunc)(TSpec, TSpec) = 
+                IsEqualDefaultCPPCheck) {
      for(int e = 0; e < GetArrayLength(universe); e++) {
           if(compareFunc(universe[e], element)) {
                return true;
-	  }
+      }
      }
      return false;
 }
@@ -73,17 +73,17 @@ static inline int StringTranslateCharacters(char *str, char existingChar, char r
      for(char *chpos = str; *chpos != '\0'; chpos++) { 
           if(*chpos == existingChar) { 
                *chpos = replChar;
-	       ++numReplacements;
-	  }
+           ++numReplacements;
+      }
      }
      return numReplacements;
 }
 
 #define RunAndReturn(Runner, Return) ({\
-	volatile decltype(Return) returnVar = Return; \
-	Runner; \
-	returnVar; \
-	})
+    volatile decltype(Return) returnVar = Return; \
+    Runner; \
+    returnVar; \
+    })
 
 #define StringMapCharacter(s, oldch, newch) RunAndReturn(StringTranslateCharacters(s, oldch, newch), s)
 
@@ -106,10 +106,10 @@ static inline const char * GetUserHome() {
      const char *userHomeDir = getenv("HOME");
      if(userHomeDir == NULL) {
           struct passwd *uhdPasswd = getpwuid(getuid());
-	  if(uhdPasswd) 
+      if(uhdPasswd) 
                userHomeDir = uhdPasswd->pw_dir;
-	  else
-	       userHomeDir = "";
+      else
+           userHomeDir = "";
      }
      return userHomeDir;
 }
@@ -214,10 +214,10 @@ static inline bool FileFormatSortCmp(boost::filesystem::path filePathV1, boost::
           return fileV1 < fileV2;
      }
      else if(f1IsNopCT && !f2IsNopCT) {
-	  return false;
+      return false;
      }
      else if(f2IsNopCT) {
-	  return true;
+      return true;
      }
      return fileV1 < fileV2;
 

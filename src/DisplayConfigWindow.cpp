@@ -44,21 +44,21 @@
      volatile char FLTK_THEME[MAX_BUFFER_SIZE]; 
 
      const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT] = { 
-     	     "local",
-	     "base", 
-	     "plastic", 
-	     "gtk+", 
-	     "gleam",
-	     "custom"
+              "local",
+         "base", 
+         "plastic", 
+         "gtk+", 
+         "gleam",
+         "custom"
      }; 
 
      const char *FLTK_THEME_HELP[FLTK_THEME_COUNT] = {
              "A sane choice for the local RNAStructViz application", 
-	     "Default old Windows (95/98/Me/NT/2000), old GTK/KDE", 
-	     "Aqua theme inspired controls like in Max OSX", 
-	     "RedHat Bluecurve like theme", 
-	     "Scheme inspired by the Clearlooks Glossy theme",
-	     "Something else (user defined)"
+         "Default old Windows (95/98/Me/NT/2000), old GTK/KDE", 
+         "Aqua theme inspired controls like in Max OSX", 
+         "RedHat Bluecurve like theme", 
+         "Scheme inspired by the Clearlooks Glossy theme",
+         "Something else (user defined)"
      };
 
      char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
@@ -96,7 +96,7 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      ConfigParser::nullTerminateString((char *) FLTK_THEME); 
      snprintf(LIBFLTK_VERSION_STRING, MAX_BUFFER_SIZE - 1, 
               "%d.%d.%d (%g) - API %g", FL_MAJOR_VERSION, FL_MINOR_VERSION, 
-	      FL_PATCH_VERSION, FL_VERSION, FL_API_VERSION);
+          FL_PATCH_VERSION, FL_VERSION, FL_API_VERSION);
      ConfigParser::nullTerminateString(LIBFLTK_VERSION_STRING); 
 
      if(!UpdateApplicationThemeByName("Structviz default")) {
@@ -109,28 +109,28 @@ bool DisplayConfigWindow::SetupInitialConfig() {
 
      int structDiagramColorCounts[3] = { 1, 3, 7 };
      Fl_Color diagramInitColors[3][7] = {
-	     {
-		     FL_BLACK
-	     },
-	     {
-		     FL_BLACK, 
-		     FL_MAGENTA,
-		     FL_GREEN,
-	     },
-	     {
-		     FL_BLACK, 
-		     FL_LOCAL_DEEP_BLUE,
-		     FL_LOCAL_BRIGHT_YELLOW,
-		     FL_MAGENTA,
-		     FL_GREEN,
-		     FL_RED,
-		     FL_CYAN
-	     },
+         {
+             FL_BLACK
+         },
+         {
+             FL_BLACK, 
+             FL_MAGENTA,
+             FL_GREEN,
+         },
+         {
+             FL_BLACK, 
+             FL_LOCAL_DEEP_BLUE,
+             FL_LOCAL_BRIGHT_YELLOW,
+             FL_MAGENTA,
+             FL_GREEN,
+             FL_RED,
+             FL_CYAN
+         },
      };
      for(int s = 0; s < 3; s++) {
           for(int c = 0; c < structDiagramColorCounts[s]; c++) {
                STRUCTURE_DIAGRAM_COLORS[s][c] = diagramInitColors[s][c];
-	  }
+      }
      }
 
      GUI_USE_DEFAULT_FOLDER_NAMES = false;
@@ -152,8 +152,8 @@ char * DisplayConfigWindow::TrimFilePathDisplay(const char *path, int maxlen = C
      }
      else {
           truncPath[0] = truncPath[1] = truncPath[2] = '.';
-	  strncpy(truncPath + 3, path + strlen(path) - maxlen, maxlen);
-	  truncPath[maxlen + 2] = '\0';
+      strncpy(truncPath + 3, path + strlen(path) - maxlen, maxlen);
+      truncPath[maxlen + 2] = '\0';
      }
      return truncPath;
 }
@@ -168,9 +168,9 @@ DisplayConfigWindow::DisplayConfigWindow() :
      imageData = new uchar[imageStride * CONFIG_WINDOW_WIDTH];
      memset(imageData, 0, imageStride * CONFIG_WINDOW_WIDTH);
      crSurface = cairo_image_surface_create_for_data( 
-			          imageData, CAIRO_FORMAT_ARGB32, 
+                      imageData, CAIRO_FORMAT_ARGB32, 
                                   CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
-				  imageStride
+                  imageStride
                  );
      crDraw = cairo_create(crSurface);   
      Fl::cairo_cc(crDraw, false);
@@ -207,81 +207,81 @@ void DisplayConfigWindow::ConstructWindow() {
      int workingYOffset = CFGWIN_WIDGET_OFFSETY;
     
      fpathsIcon = new Fl_RGB_Image(ConfigPathsIcon.pixel_data, 
-		  ConfigPathsIcon.width, ConfigPathsIcon.height, 
-		  ConfigPathsIcon.bytes_per_pixel);
+          ConfigPathsIcon.width, ConfigPathsIcon.height, 
+          ConfigPathsIcon.bytes_per_pixel);
      Fl_Box *fpathsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-		             fpathsIcon->w(), fpathsIcon->h());
+                     fpathsIcon->w(), fpathsIcon->h());
      fpathsIconBox->image(fpathsIcon);
      windowWidgets.push_back(fpathsIconBox);
      workingYOffset += fpathsIcon->h() + CFGWIN_SPACING / 2;
 
      const char *fieldDesc[] = {
-	"@->   File Search Directory:", 
-	"@->   PNG Output Directory:", 
-	"@->   PNG Output File Name:", 
-	"@->   Radial Layout PNG Name:"
+    "@->   File Search Directory:", 
+    "@->   PNG Output Directory:", 
+    "@->   PNG Output File Name:", 
+    "@->   Radial Layout PNG Name:"
      };
      volatile char (*fieldUpdateVars[])[MAX_BUFFER_SIZE] = {
          &CTFILE_SEARCH_DIRECTORY, 
-	 &PNG_OUTPUT_DIRECTORY, 
-	 &PNG_OUTPUT_PATH, 
-	 &PNG_RADIAL_LAYOUT_OUTPUT_PATH,
+     &PNG_OUTPUT_DIRECTORY, 
+     &PNG_OUTPUT_PATH, 
+     &PNG_RADIAL_LAYOUT_OUTPUT_PATH,
      };
      bool needsDirChooser[] {
           true, 
           true,
-	  false,
-	  false
+      false,
+      false
      };
      for(int f = 0; f < NUMSETTINGS; f++) {
          int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
          Fl_Box *descBox = new Fl_Box(offsetX, workingYOffset, 
-	 		   CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-	 		   fieldDesc[f]);
-	 descBox->labelcolor(GUI_TEXT_COLOR);
-	 descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	 windowWidgets.push_back(descBox);
-	 offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
+                CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                fieldDesc[f]);
+     descBox->labelcolor(GUI_TEXT_COLOR);
+     descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+     windowWidgets.push_back(descBox);
+     offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
          Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
-			      (int) (2 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
+                  (int) (2 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
                               (char *) *(fieldUpdateVars[f]));
-	 settingBox->copy_label(TrimFilePathDisplay((char *) *(fieldUpdateVars[f])));
-	 settingBox->color(GUI_BTEXT_COLOR);
-	 settingBox->labelcolor(GUI_TEXT_COLOR);
-	 settingBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+     settingBox->copy_label(TrimFilePathDisplay((char *) *(fieldUpdateVars[f])));
+     settingBox->color(GUI_BTEXT_COLOR);
+     settingBox->labelcolor(GUI_TEXT_COLOR);
+     settingBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
          fpathsSettingBoxes[f] = settingBox;
-	 fpathsUpdateRefs[f] = (char *) *(fieldUpdateVars[f]);
-	 windowWidgets.push_back(settingBox);
-	 offsetX += (int) (2 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING / 2;
-	 if(needsDirChooser[f]) { 
+     fpathsUpdateRefs[f] = (char *) *(fieldUpdateVars[f]);
+     windowWidgets.push_back(settingBox);
+     offsetX += (int) (2 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING / 2;
+     if(needsDirChooser[f]) { 
               Fl_Button *chooseDirBtn = new Fl_Button(offsetX, workingYOffset, 
-			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-			"Select @|>");
-	      chooseDirBtn->color(GUI_BGCOLOR);
-	      chooseDirBtn->labelcolor(GUI_BTEXT_COLOR);
-	      chooseDirBtn->user_data((void *) f);
-	      chooseDirBtn->callback(SelectDirectoryCallback);
-	      windowWidgets.push_back(chooseDirBtn);
-	 }
-	 else {
+            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+            "Select @|>");
+          chooseDirBtn->color(GUI_BGCOLOR);
+          chooseDirBtn->labelcolor(GUI_BTEXT_COLOR);
+          chooseDirBtn->user_data((void *) f);
+          chooseDirBtn->callback(SelectDirectoryCallback);
+          windowWidgets.push_back(chooseDirBtn);
+     }
+     else {
               Fl_Button *updatePathBtn = new Fl_Button(offsetX, workingYOffset, 
-			CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-			"Update @filesaveas");
-	      updatePathBtn->color(GUI_BGCOLOR);
-	      updatePathBtn->labelcolor(GUI_BTEXT_COLOR);
-	      updatePathBtn->user_data((void *) f);
-	      updatePathBtn->callback(UpdatePNGPathCallback);
-	      windowWidgets.push_back(updatePathBtn);
-	 }
-	 workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+            "Update @filesaveas");
+          updatePathBtn->color(GUI_BGCOLOR);
+          updatePathBtn->labelcolor(GUI_BTEXT_COLOR);
+          updatePathBtn->user_data((void *) f);
+          updatePathBtn->callback(UpdatePNGPathCallback);
+          windowWidgets.push_back(updatePathBtn);
+     }
+     workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
      workingYOffset += CFGWIN_SPACING;
      
      dwinSettingsIcon = new Fl_RGB_Image(ConfigDiagramWindow.pixel_data, 
-		                         ConfigDiagramWindow.width, ConfigDiagramWindow.height, 
-		                         ConfigDiagramWindow.bytes_per_pixel);
+                                 ConfigDiagramWindow.width, ConfigDiagramWindow.height, 
+                                 ConfigDiagramWindow.bytes_per_pixel);
      Fl_Box *dwinSettingsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-		                              dwinSettingsIcon->w(), dwinSettingsIcon->h());
+                                      dwinSettingsIcon->w(), dwinSettingsIcon->h());
      dwinSettingsIconBox->image(dwinSettingsIcon);
      windowWidgets.push_back(dwinSettingsIconBox);
      workingYOffset += dwinSettingsIcon->h() + CFGWIN_SPACING / 2;
@@ -289,88 +289,88 @@ void DisplayConfigWindow::ConstructWindow() {
      int structColorCounts[3] = { 1, 3, 7 };
      const char *arcColorRowDesc[3] = {
           "@->   Arc Colors for One Structure:", 
-	  "@->   Arc Colors for Two Structures:", 
-	  "@->   Arc Colors for Three Structures:" 
+      "@->   Arc Colors for Two Structures:", 
+      "@->   Arc Colors for Three Structures:" 
      };
      volatile Fl_Color *structColorVarRefs[3][7] = {
-	     { 
-		     &STRUCTURE_DIAGRAM_COLORS[0][0]
-	     },
-	     {
-		     &STRUCTURE_DIAGRAM_COLORS[1][0], 
-		     &STRUCTURE_DIAGRAM_COLORS[1][1], 
+         { 
+             &STRUCTURE_DIAGRAM_COLORS[0][0]
+         },
+         {
+             &STRUCTURE_DIAGRAM_COLORS[1][0], 
+             &STRUCTURE_DIAGRAM_COLORS[1][1], 
                      &STRUCTURE_DIAGRAM_COLORS[1][2]
-	     },
-	     {
-		     &STRUCTURE_DIAGRAM_COLORS[2][0], 
+         },
+         {
+             &STRUCTURE_DIAGRAM_COLORS[2][0], 
                      &STRUCTURE_DIAGRAM_COLORS[2][1], 
                      &STRUCTURE_DIAGRAM_COLORS[2][2], 
                      &STRUCTURE_DIAGRAM_COLORS[2][3], 
                      &STRUCTURE_DIAGRAM_COLORS[2][4], 
                      &STRUCTURE_DIAGRAM_COLORS[2][5], 
                      &STRUCTURE_DIAGRAM_COLORS[2][6]
-	     }
+         }
      };
      int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
      int offsetXInit = offsetX;
      for(int s = 0; s < 3; s++) {
           Fl_Box *structColorsDescBox = new Fl_Box(offsetX, workingYOffset, 
-			                           1.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                                       1.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
                                                    arcColorRowDesc[s]);
           structColorsDescBox->labelcolor(GUI_TEXT_COLOR);
           structColorsDescBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
           windowWidgets.push_back(structColorsDescBox);
           offsetX += 1.5 * CFGWIN_LABEL_WIDTH + CFGWIN_COLOR_WIDTH + 2 * CFGWIN_SPACING;
           for(int c = 0; c < structColorCounts[s]; c++) { 
-	       Fl_Button *colorButton = new Fl_Button(offsetX, workingYOffset, 
-			                              CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "[+]");
-	       Fl_Color initDefaultButtonColor = *(structColorVarRefs[s][c]);
-	       colorButton->color(initDefaultButtonColor);
-	       Fl_Color labelTextColor = initDefaultButtonColor == FL_BLACK ? 
-		                         Lighter(initDefaultButtonColor, 0.5) :
-					 Darker(initDefaultButtonColor, 0.5);
-	       colorButton->labelcolor(labelTextColor);
-	       int indexUserData = (s & 0x0000ffff) | ((c << 16) & 0xffff0000);
-	       colorButton->user_data((void *) indexUserData);
-	       colorButton->callback(ChangeDiagramWindowArcColorCallback);
-	       dwinArcColorChangeRefs[s][c] = structColorVarRefs[s][c];
-	       windowWidgets.push_back(colorButton);
-	       offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
-	  }
-	  offsetX = offsetXInit;
+           Fl_Button *colorButton = new Fl_Button(offsetX, workingYOffset, 
+                                          CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "[+]");
+           Fl_Color initDefaultButtonColor = *(structColorVarRefs[s][c]);
+           colorButton->color(initDefaultButtonColor);
+           Fl_Color labelTextColor = initDefaultButtonColor == FL_BLACK ? 
+                                 Lighter(initDefaultButtonColor, 0.5) :
+                     Darker(initDefaultButtonColor, 0.5);
+           colorButton->labelcolor(labelTextColor);
+           int indexUserData = (s & 0x0000ffff) | ((c << 16) & 0xffff0000);
+           colorButton->user_data((void *) indexUserData);
+           colorButton->callback(ChangeDiagramWindowArcColorCallback);
+           dwinArcColorChangeRefs[s][c] = structColorVarRefs[s][c];
+           windowWidgets.push_back(colorButton);
+           offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
+      }
+      offsetX = offsetXInit;
           workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
 
      // now handle user customizable selections of the FLTK schemes:
      themesIcon = new Fl_RGB_Image(ConfigThemesIcon.pixel_data, 
-		  ConfigThemesIcon.width, ConfigThemesIcon.height, 
-		  ConfigThemesIcon.bytes_per_pixel);
+          ConfigThemesIcon.width, ConfigThemesIcon.height, 
+          ConfigThemesIcon.bytes_per_pixel);
      Fl_Box *themesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-		             themesIcon->w(), themesIcon->h());
+                     themesIcon->w(), themesIcon->h());
      themesIconBox->image(themesIcon);
      windowWidgets.push_back(themesIconBox);
      workingYOffset += themesIcon->h() + CFGWIN_SPACING / 2;
 
      Fl_Box *themeDescBox = new Fl_Box(offsetX, workingYOffset, 
-	 	        	       CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-	 		               "@->   Global Preset Themes: ");
+                            CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                            "@->   Global Preset Themes: ");
      themeDescBox->labelcolor(GUI_TEXT_COLOR);
      themeDescBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
      windowWidgets.push_back(themeDescBox);
      offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_COLOR_WIDTH + 2 * CFGWIN_SPACING;
      Fl_Choice *fltkThemeChoiceMenu = new Fl_Choice(offsetX, workingYOffset, 
-		                      CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
+                              CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
      int choiceActiveIdx = 0;
      for(int t = 0; t < FLTK_THEME_COUNT; t++) {
-	  if(!strcmp(ALL_FLTK_THEMES[t], (char *) FLTK_THEME)) {
+      if(!strcmp(ALL_FLTK_THEMES[t], (char *) FLTK_THEME)) {
                choiceActiveIdx = t;
-	  }
-	  fltkThemeChoiceMenu->add(ALL_FLTK_THEMES[t], 0, 
-			           FLTKThemeChoiceMenuCallback, 
-			           (void *) ((long int) t), 0);
-	  Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
-		                        fltkThemeChoiceMenu->find_item(ALL_FLTK_THEMES[t]);
-	  nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
+      }
+      fltkThemeChoiceMenu->add(ALL_FLTK_THEMES[t], 0, 
+                       FLTKThemeChoiceMenuCallback, 
+                       (void *) ((long int) t), 0);
+      Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
+                                fltkThemeChoiceMenu->find_item(ALL_FLTK_THEMES[t]);
+      nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
      }
      fltkThemeChoiceMenu->value(choiceActiveIdx);
      fltkThemeChoiceMenu->labelcolor(GUI_BTEXT_COLOR);
@@ -378,15 +378,15 @@ void DisplayConfigWindow::ConstructWindow() {
      
      offsetX += CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING;
      Fl_Choice *presetThemesChooser = new Fl_Choice(offsetX, workingYOffset, 
-		                      CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
+                              CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
      int numThemes = sizeof(PRESET_COLOR_THEMES) / sizeof(PRESET_COLOR_THEMES[0]);
      for(int t = numThemes - 1; t >= 0; t--) {
           presetThemesChooser->add(PRESET_COLOR_THEMES[t].themeName, 0, 
-			           PresetThemeChooserMenuCallback, 
-			           (void *) ((long int) t), 0);
-	  Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
-		  presetThemesChooser->find_item(PRESET_COLOR_THEMES[t].themeName);
-	  nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
+                       PresetThemeChooserMenuCallback, 
+                       (void *) ((long int) t), 0);
+      Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
+          presetThemesChooser->find_item(PRESET_COLOR_THEMES[t].themeName);
+      nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
      }
      presetThemesChooser->labelcolor(GUI_BTEXT_COLOR);
      presetThemesChooser->value(0);
@@ -395,106 +395,106 @@ void DisplayConfigWindow::ConstructWindow() {
 
      const char *colorFieldDesc[] = {
           "@->   Window Background:", 
-	  "@->   Widget Color:", 
-	  "@->   Button Text Color:", 
-	  "@->   Primary Text Color:"
+      "@->   Widget Color:", 
+      "@->   Button Text Color:", 
+      "@->   Primary Text Color:"
      };
      volatile Fl_Color *colorVarRefs[] = {
           &GUI_WINDOW_BGCOLOR, 
-	  &GUI_BGCOLOR, 
-	  &GUI_BTEXT_COLOR, 
-	  &GUI_TEXT_COLOR
+      &GUI_BGCOLOR, 
+      &GUI_BTEXT_COLOR, 
+      &GUI_TEXT_COLOR
      };
      for(int c = 0; c < GUICOLORS; c++) { 
-	 offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+     offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
          Fl_Box *descBox = new Fl_Box(offsetX, workingYOffset, 
-			   CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-			   colorFieldDesc[c]);
-	 descBox->labelcolor(GUI_TEXT_COLOR);
-	 descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	 windowWidgets.push_back(descBox);
-	 offsetX += CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
-	 Fl_Box *colorBox = new Fl_Box(offsetX, workingYOffset, 
-			    CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "@square");
-	 colorBox->labelcolor(*(colorVarRefs[c]));
-	 colorDisplayBoxes[c] = colorBox;
-	 colorChangeRefs[c] = colorVarRefs[c];
-	 windowWidgets.push_back(colorBox);
-	 offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
-	 Fl_Button *selectColorButton = new Fl_Button(offsetX, workingYOffset, 
-			                CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-					"Choose Color @|>");
-	 selectColorButton->user_data((void *) c);
-	 selectColorButton->labelcolor(GUI_BTEXT_COLOR); 
-	 selectColorButton->color(GUI_BGCOLOR);
-	 selectColorButton->callback(ChangeColorCallback); 
-	 windowWidgets.push_back(selectColorButton);
+               CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+               colorFieldDesc[c]);
+     descBox->labelcolor(GUI_TEXT_COLOR);
+     descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+     windowWidgets.push_back(descBox);
+     offsetX += CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
+     Fl_Box *colorBox = new Fl_Box(offsetX, workingYOffset, 
+                CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "@square");
+     colorBox->labelcolor(*(colorVarRefs[c]));
+     colorDisplayBoxes[c] = colorBox;
+     colorChangeRefs[c] = colorVarRefs[c];
+     windowWidgets.push_back(colorBox);
+     offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
+     Fl_Button *selectColorButton = new Fl_Button(offsetX, workingYOffset, 
+                            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                    "Choose Color @|>");
+     selectColorButton->user_data((void *) c);
+     selectColorButton->labelcolor(GUI_BTEXT_COLOR); 
+     selectColorButton->color(GUI_BGCOLOR);
+     selectColorButton->callback(ChangeColorCallback); 
+     windowWidgets.push_back(selectColorButton);
          offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
-	 Fl_Button *selectColormapBtn = new Fl_Button(offsetX, workingYOffset, 
-			                CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-					"Select Colormap @|>");
-	 selectColormapBtn->user_data((void *) c);
-	 selectColormapBtn->labelcolor(GUI_BTEXT_COLOR);
-	 selectColormapBtn->color(GUI_BGCOLOR);
-	 selectColormapBtn->callback(SelectFromColormapCallback);
-	 windowWidgets.push_back(selectColormapBtn);
-	 
-	 workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+     Fl_Button *selectColormapBtn = new Fl_Button(offsetX, workingYOffset, 
+                            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                    "Select Colormap @|>");
+     selectColormapBtn->user_data((void *) c);
+     selectColormapBtn->labelcolor(GUI_BTEXT_COLOR);
+     selectColormapBtn->color(GUI_BGCOLOR);
+     selectColormapBtn->callback(SelectFromColormapCallback);
+     windowWidgets.push_back(selectColormapBtn);
+     
+     workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
 
      cfgCheckboxesIcon = new Fl_RGB_Image(ConfigCheckBoxParamsIcon.pixel_data, 
-		                          ConfigCheckBoxParamsIcon.width, 
-					  ConfigCheckBoxParamsIcon.height, 
-		                          ConfigCheckBoxParamsIcon.bytes_per_pixel);
+                                  ConfigCheckBoxParamsIcon.width, 
+                      ConfigCheckBoxParamsIcon.height, 
+                                  ConfigCheckBoxParamsIcon.bytes_per_pixel);
      Fl_Box *cfgCheckboxesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-		                               cfgCheckboxesIcon->w(), cfgCheckboxesIcon->h());
+                                       cfgCheckboxesIcon->w(), cfgCheckboxesIcon->h());
      cfgCheckboxesIconBox->image(cfgCheckboxesIcon);
      windowWidgets.push_back(cfgCheckboxesIconBox);
      workingYOffset += cfgCheckboxesIcon->h() + CFGWIN_SPACING / 2;
 
      const char *checkBoxLabels[] = {
           "Display first-run message when RNAStructViz starts",
-	  "Use default folder names in load files dialog (not recommended)", 
-	  "Remember structure folder names (use sticky folder names)",
+      "Use default folder names in load files dialog (not recommended)", 
+      "Remember structure folder names (use sticky folder names)",
      };
      bool includeRHSClearButton[] = { false, false, true };
      volatile bool *checkBoxParamSettings[] = {
           &DISPLAY_FIRSTRUN_MESSAGE,
-	  &GUI_USE_DEFAULT_FOLDER_NAMES,
+      &GUI_USE_DEFAULT_FOLDER_NAMES,
           &GUI_KEEP_STICKY_FOLDER_NAMES,
      };
      for(int cbi = 0; cbi < GetArrayLength(checkBoxLabels); cbi++) {
-	  const int bulletPointBoxWidth = 16;
+      const int bulletPointBoxWidth = 16;
           int workingOffsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
-	  Fl_Box *bpBox = new Fl_Box(workingOffsetX, workingYOffset, 
-			             bulletPointBoxWidth, CFGWIN_LABEL_HEIGHT, 
-			             "@->  ");
-	  bpBox->labelcolor(GUI_TEXT_COLOR);
+      Fl_Box *bpBox = new Fl_Box(workingOffsetX, workingYOffset, 
+                         bulletPointBoxWidth, CFGWIN_LABEL_HEIGHT, 
+                         "@->  ");
+      bpBox->labelcolor(GUI_TEXT_COLOR);
           bpBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	  windowWidgets.push_back(bpBox);
-	  workingOffsetX += bulletPointBoxWidth + CFGWIN_SPACING;
+      windowWidgets.push_back(bpBox);
+      workingOffsetX += bulletPointBoxWidth + CFGWIN_SPACING;
           Fl_Check_Button *cbParam = new Fl_Check_Button(workingOffsetX, workingYOffset, 
-	                                                 2.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-							 checkBoxLabels[cbi]);
-	  cbParam->type(FL_TOGGLE_BUTTON);
-	  cbParam->labelcolor(GUI_BTEXT_COLOR);
-	  cbParam->selection_color(GUI_TEXT_COLOR);
-	  cbParam->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-	  cbParam->value((int) *(checkBoxParamSettings[cbi]));
-	  cbParam->user_data((void *) checkBoxParamSettings[cbi]);
-	  cbParam->callback(ToggleCheckBoxParamCallback);
-	  windowWidgets.push_back(cbParam);
-	  if(includeRHSClearButton[cbi]) {
-	       workingOffsetX += 2.5 * CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
-	       Fl_Button *clearStickyNamesBtn = new Fl_Button(workingOffsetX, workingYOffset, 
-			                                      1.5 * CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-							      "@undo  Clear Saved Folder Names");
-	       clearStickyNamesBtn->labelcolor(GUI_BTEXT_COLOR);
+                                                     2.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                             checkBoxLabels[cbi]);
+      cbParam->type(FL_TOGGLE_BUTTON);
+      cbParam->labelcolor(GUI_BTEXT_COLOR);
+      cbParam->selection_color(GUI_TEXT_COLOR);
+      cbParam->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+      cbParam->value((int) *(checkBoxParamSettings[cbi]));
+      cbParam->user_data((void *) checkBoxParamSettings[cbi]);
+      cbParam->callback(ToggleCheckBoxParamCallback);
+      windowWidgets.push_back(cbParam);
+      if(includeRHSClearButton[cbi]) {
+           workingOffsetX += 2.5 * CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
+           Fl_Button *clearStickyNamesBtn = new Fl_Button(workingOffsetX, workingYOffset, 
+                                                  1.5 * CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                                  "@undo  Clear Saved Folder Names");
+           clearStickyNamesBtn->labelcolor(GUI_BTEXT_COLOR);
                clearStickyNamesBtn->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
                clearStickyNamesBtn->callback(ClearAllStickyFolderNamesCallback);
                windowWidgets.push_back(clearStickyNamesBtn);
-	  }
-	  workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+      }
+      workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
 
      // draw bounding box for the two action buttons on the 
@@ -504,17 +504,17 @@ void DisplayConfigWindow::ConstructWindow() {
      int bdBoxHeight = (int) (2.0 * CFGWIN_LABEL_HEIGHT);
      int bdBoxYOffset = workingYOffset + CFGWIN_SPACING;
      Fl_Box *btnBoundingBox = new Fl_Box(offsetX, bdBoxYOffset, 
-		              boundingBoxWidth, bdBoxHeight);
+                      boundingBoxWidth, bdBoxHeight);
      btnBoundingBox->box(FL_RSHADOW_BOX);
      btnBoundingBox->color(GUI_BGCOLOR);
      windowWidgets.push_back(btnBoundingBox);
 
      offsetX = CONFIG_WINDOW_WIDTH - 
-	       (CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING);
+           (CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING);
      int offsetY = bdBoxYOffset + bdBoxHeight / 4;
      Fl_Button *writeConfigBtn = new Fl_Button(offsetX, offsetY, 
-		                 CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-				 "@filenew   Save Settings");
+                         CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                 "@filenew   Save Settings");
      writeConfigBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
      writeConfigBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      writeConfigBtn->callback(WriteConfigFileCallback);
@@ -522,8 +522,8 @@ void DisplayConfigWindow::ConstructWindow() {
      offsetX -= CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING;
 
      Fl_Button *restoreDefaultsBtn = new Fl_Button(offsetX, offsetY, 
-		                     CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-				     "@redo   Restore Previous");
+                             CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                     "@redo   Restore Previous");
      restoreDefaultsBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
      restoreDefaultsBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      restoreDefaultsBtn->callback(RestoreDefaultsCallback);
@@ -531,8 +531,8 @@ void DisplayConfigWindow::ConstructWindow() {
      offsetX -= CFGWIN_BUTTON_WIDTH + 2 * CFGWIN_SPACING;
 
      Fl_Button *cancelBtn = new Fl_Button(offsetX, offsetY, 
-		            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-			    "@1+   Cancel");
+                    CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                "@1+   Cancel");
      cancelBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
      cancelBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      cancelBtn->callback(WindowCloseCallback);
@@ -556,9 +556,9 @@ void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
 
     DisplayConfigWindow *thisWin = (DisplayConfigWindow *) crWin;
     cairo_set_source_rgb(thisWin->crDraw, 
-    		         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
-    		         GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-    			 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+                     GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
+                     GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_scale(thisWin->crDraw, thisWin->w(), thisWin->h());
     cairo_fill(thisWin->crDraw);
     thisWin->drawWidgets();
@@ -569,9 +569,9 @@ bool DisplayConfigWindow::UpdateApplicationThemeByName(const char *themeName) {
      int themeIndex = -1;
      for(int t = 0; t < GetArrayLength(PRESET_COLOR_THEMES); t++) {
           if(!strcmp(themeName, PRESET_COLOR_THEMES[t].themeName)) {
-	       themeIndex = t;
-	       break;
-	  }
+           themeIndex = t;
+           break;
+      }
      }
      return UpdateApplicationThemeByIndex(themeIndex);
 }
@@ -597,7 +597,7 @@ void DisplayConfigWindow::SelectDirectoryCallback(Fl_Widget *btn, void *udata) {
      DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
      long int settingIdx = (long int) ((int *) btn->user_data());
      char *nextDirectory = fl_dir_chooser("Select New Default Directory ...", 
-		                          parentWin->fpathsUpdateRefs[settingIdx], 0);
+                                  parentWin->fpathsUpdateRefs[settingIdx], 0);
      if(nextDirectory == NULL) {
           return;
      }
@@ -617,18 +617,18 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
      Fl_Box *msgIconBox = (Fl_Box *) fl_message_icon();
      if(parentWin->pngNewPathIcon == NULL) { 
           parentWin->pngNewPathIcon = new Fl_RGB_Image(PNGNewPathIcon.pixel_data, 
-	     	                      PNGNewPathIcon.width, PNGNewPathIcon.height, 
-		                      PNGNewPathIcon.bytes_per_pixel);
+                                   PNGNewPathIcon.width, PNGNewPathIcon.height, 
+                              PNGNewPathIcon.bytes_per_pixel);
      }
      if(msgIconBox != NULL) { 
           msgIconBox->image(parentWin->pngNewPathIcon);
           msgIconBox->label("");
-	  msgIconBox->type(FL_NO_BOX);
-	  msgIconBox->color(Lighter(GUI_BGCOLOR, 0.5f));
+      msgIconBox->type(FL_NO_BOX);
+      msgIconBox->color(Lighter(GUI_BGCOLOR, 0.5f));
           msgIconBox->box(FL_NO_BOX);
-	  msgIconBox->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | 
-			    FL_ALIGN_CENTER);
-	  msgIconBox->redraw();
+      msgIconBox->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | 
+                FL_ALIGN_CENTER);
+      msgIconBox->redraw();
      }
 
      const char *inputDialogMsg = "Choose the format of the PNG image paths saved by the diagram window. \nNote that C-style strftime-like modifiers such as %%F, %%H%%M%%S, \nare supported in the format description entered below. \nSee \"man strftime\", or strftime(3), in your terminal for a complete \ndescription of supported timestamp modifiers.";
@@ -648,7 +648,7 @@ void DisplayConfigWindow::FLTKThemeChoiceMenuCallback(Fl_Widget *widget, void *u
      strncpy((char *) FLTK_THEME, ALL_FLTK_THEMES[themeIndex], MAX_BUFFER_SIZE - 1);
      ConfigParser::nullTerminateString((char *) FLTK_THEME);
      fl_alert("The FLTK theme \"%s\" corresponds to: %s.\nNote that this new widget scheme will not take effect until after RNAStructViz is restarted.", FLTK_THEME, 
-	      FLTK_THEME_HELP[themeIndex]);
+          FLTK_THEME_HELP[themeIndex]);
 }
 
 void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *ud) {
@@ -658,8 +658,8 @@ void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *u
      UpdateApplicationThemeByIndex(themeIndex);
      for(int c = 0; c < GUICOLORS; c++) {
           thisWin->colorDisplayBoxes[c]->color((Fl_Color) 
-			                 *(thisWin->colorChangeRefs[c]));
-	  thisWin->colorDisplayBoxes[c]->redraw();
+                             *(thisWin->colorChangeRefs[c]));
+      thisWin->colorDisplayBoxes[c]->redraw();
      }
      fl_alert("The selected theme will be applied the next time you restart the application.");
 }
@@ -680,18 +680,18 @@ void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
      double currentB = GetBlue(currentColor) / 255.0;
      
      int colorSelectOK = fl_color_chooser("@search   Select New Theme Color ...", 
-		         currentR, currentG, currentB, 2);
+                 currentR, currentG, currentB, 2);
      if(colorSelectOK) { 
           int nextR = (int) (currentR * 255.0);
           int nextG = (int) (currentG * 255.0);
           int nextB = (int) (currentB * 255.0); 
           Fl_Color nextBGColor = RGBColor(nextR, nextG, nextB);
-	  *(parentWin->colorChangeRefs[colorIdx]) = nextBGColor;
+      *(parentWin->colorChangeRefs[colorIdx]) = nextBGColor;
           parentWin->colorDisplayBoxes[colorIdx]->labelcolor(nextBGColor);
           parentWin->colorDisplayBoxes[colorIdx]->redraw();
-	  if(!colorIdx) {
+      if(!colorIdx) {
                GUI_CTFILEVIEW_COLOR = Darker(nextBGColor, 0.5f);
-	  }
+      }
      }
 
 }
@@ -740,7 +740,7 @@ void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {
      }
      for(int c = 0; c < GUICOLORS; c++) {
           parentWin->colorDisplayBoxes[c]->labelcolor(*(parentWin->colorChangeRefs[c]));
-	  parentWin->colorDisplayBoxes[c]->redraw();
+      parentWin->colorDisplayBoxes[c]->redraw();
      }
 }
 

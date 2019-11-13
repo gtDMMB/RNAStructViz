@@ -20,7 +20,7 @@ ConfigParser::ConfigParser() {
 }
 
 ConfigParser::ConfigParser(const char *userCfgFile, 
-		           bool silenceErrors = false) { 
+                   bool silenceErrors = false) { 
      setDefaults(); 
      parseFile(userCfgFile, silenceErrors); 
 } 
@@ -33,9 +33,9 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 
      FILE *fpCfgFile = fopen(userCfgFile, "r+");
      if(fpCfgFile == NULL && !silenceErrors) {
-	     TerminalText::PrintError("Unable to open file \"%s\": %s\n", 
-	                              userCfgFile, strerror(errno));
-	  return errno;
+         TerminalText::PrintError("Unable to open file \"%s\": %s\n", 
+                                  userCfgFile, strerror(errno));
+      return errno;
      }
      else if(fpCfgFile == NULL) {
           return errno;
@@ -46,105 +46,105 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
      while(!feof(fpCfgFile)) { 
           if(!fgets(nextLine, MAX_BUFFER_SIZE - 1, fpCfgFile)) {
                if(!silenceErrors) 
-	            perror("Unable to read in config file line");
-	       fclose(fpCfgFile);
-	       return errno;
-	  }
-	  else if(errno = parseConfigLine(nextLine, &parsedLine)) {
-	       perror("Error reading config file line");
-	       fclose(fpCfgFile);
-	       return errno;
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "CTFILE_SEARCH_DIR")) { 
-	       if(strlen(parsedLine.cfgValue) > 0 && directoryExists(parsedLine.cfgValue)) {
-	            strncpy(ctFileSearchDirectory, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
-		    nullTerminateString(ctFileSearchDirectory);
-	       }
-	       else {
-		       TerminalText::PrintError("No such directory \"%s\" ... skipping the init.\n", 
-		                                parsedLine.cfgValue);
-	       }
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "PNGOUT_DIR")) {
-	       if(strlen(parsedLine.cfgValue) > 0 && directoryExists(parsedLine.cfgValue)) {
+                perror("Unable to read in config file line");
+           fclose(fpCfgFile);
+           return errno;
+      }
+      else if(errno = parseConfigLine(nextLine, &parsedLine)) {
+           perror("Error reading config file line");
+           fclose(fpCfgFile);
+           return errno;
+      }
+      else if(!strcmp(parsedLine.cfgOption, "CTFILE_SEARCH_DIR")) { 
+           if(strlen(parsedLine.cfgValue) > 0 && directoryExists(parsedLine.cfgValue)) {
+                strncpy(ctFileSearchDirectory, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
+            nullTerminateString(ctFileSearchDirectory);
+           }
+           else {
+               TerminalText::PrintError("No such directory \"%s\" ... skipping the init.\n", 
+                                        parsedLine.cfgValue);
+           }
+      }
+      else if(!strcmp(parsedLine.cfgOption, "PNGOUT_DIR")) {
+           if(strlen(parsedLine.cfgValue) > 0 && directoryExists(parsedLine.cfgValue)) {
                     strncpy(pngOutputDirectory, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
-		    nullTerminateString(pngOutputDirectory);
-	       }
-	       else {
-		       TerminalText::PrintError("Unknown PNG output dir \"%s\" ... skipping.\n", 
-		                                parsedLine.cfgValue);
-	       }
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "PNGOUT_PATH")) {
-	       if(strlen(parsedLine.cfgValue) > 0) {
-	            strncpy(pngOutputPath, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
-		    nullTerminateString(pngOutputPath);
-	       }
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "PNGOUT_RLAYOUT_PATH")) {
+            nullTerminateString(pngOutputDirectory);
+           }
+           else {
+               TerminalText::PrintError("Unknown PNG output dir \"%s\" ... skipping.\n", 
+                                        parsedLine.cfgValue);
+           }
+      }
+      else if(!strcmp(parsedLine.cfgOption, "PNGOUT_PATH")) {
+           if(strlen(parsedLine.cfgValue) > 0) {
+                strncpy(pngOutputPath, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
+            nullTerminateString(pngOutputPath);
+           }
+      }
+      else if(!strcmp(parsedLine.cfgOption, "PNGOUT_RLAYOUT_PATH")) {
                if(strlen(parsedLine.cfgValue) > 0) {
-	            strncpy(pngRadialLayoutOutputPath, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
-		    nullTerminateString(pngRadialLayoutOutputPath);
-	       }
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "FLTK_THEME")) {
-	       strncpy(fltkTheme, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
-	       nullTerminateString(fltkTheme);
+                strncpy(pngRadialLayoutOutputPath, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
+            nullTerminateString(pngRadialLayoutOutputPath);
+           }
+      }
+      else if(!strcmp(parsedLine.cfgOption, "FLTK_THEME")) {
+           strncpy(fltkTheme, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
+           nullTerminateString(fltkTheme);
           }
-	  else if(!strcmp(parsedLine.cfgOption, "GUI_WINDOW_BGCOLOR")) { 
+      else if(!strcmp(parsedLine.cfgOption, "GUI_WINDOW_BGCOLOR")) { 
                guiWindowBGColor = strtol(parsedLine.cfgValue, NULL, 16);
-	  }
+      }
           else if(!strcmp(parsedLine.cfgOption, "GUI_BGCOLOR")) { 
                guiBGColor = strtol(parsedLine.cfgValue, NULL, 16);
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "GUI_BTEXT_COLOR")) { 
+      }
+      else if(!strcmp(parsedLine.cfgOption, "GUI_BTEXT_COLOR")) { 
                guiBTextColor = strtol(parsedLine.cfgValue, NULL, 16);
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "GUI_TEXT_COLOR")) { 
+      }
+      else if(!strcmp(parsedLine.cfgOption, "GUI_TEXT_COLOR")) { 
                guiTextColor = strtol(parsedLine.cfgValue, NULL, 16);
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "GUI_CTFILEVIEW_COLOR")) { 
+      }
+      else if(!strcmp(parsedLine.cfgOption, "GUI_CTFILEVIEW_COLOR")) { 
                guiCTFileViewColor = strtol(parsedLine.cfgValue, NULL, 16);
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "DISPLAY_FIRSTRUN_MESSAGE")) {
+      }
+      else if(!strcmp(parsedLine.cfgOption, "DISPLAY_FIRSTRUN_MESSAGE")) {
                guiDisplayFirstRunMessage = !strcasecmp(parsedLine.cfgValue, "true");
-	  }
-	  else if(!strcmp(parsedLine.cfgOption, "GUI_KEEP_STICKY_FOLDER_NAMES")) {
-	       guiKeepStickyFolderNames = !strcasecmp(parsedLine.cfgValue, "true");
-	  }
-	  else if(!strncmp(parsedLine.cfgOption, "DWIN_COLORS_STRUCT", 18) && 
-	          strlen(parsedLine.cfgOption) == 19) {
+      }
+      else if(!strcmp(parsedLine.cfgOption, "GUI_KEEP_STICKY_FOLDER_NAMES")) {
+           guiKeepStickyFolderNames = !strcasecmp(parsedLine.cfgValue, "true");
+      }
+      else if(!strncmp(parsedLine.cfgOption, "DWIN_COLORS_STRUCT", 18) && 
+              strlen(parsedLine.cfgOption) == 19) {
                int structIndex = atoi(parsedLine.cfgOption + 18) - 1;
-	       if(structIndex < 0 || structIndex >= 3) {
-		       TerminalText::PrintError("Unknown structure index \"%s\" ... skipping\n", 
-			                        parsedLine.cfgOption + 18);
+           if(structIndex < 0 || structIndex >= 3) {
+               TerminalText::PrintError("Unknown structure index \"%s\" ... skipping\n", 
+                                    parsedLine.cfgOption + 18);
                     continue;
-	       }
-	       char *commaDelimPos = strchrnul(parsedLine.cfgValue, ',');
-	       char *curStrStartPos = parsedLine.cfgValue;
-	       bool reachedLastColor = false;
-	       int colorIdx = 0;
-	       while(!reachedLastColor) {
+           }
+           char *commaDelimPos = strchrnul(parsedLine.cfgValue, ',');
+           char *curStrStartPos = parsedLine.cfgValue;
+           bool reachedLastColor = false;
+           int colorIdx = 0;
+           while(!reachedLastColor) {
                     char colorStr[MAX_BUFFER_SIZE];
-		    int colorStrLen = commaDelimPos - curStrStartPos;
-		    strncpy(colorStr, curStrStartPos, colorStrLen);
-		    colorStr[colorStrLen] = '\0';
-		    guiStructureDiagramColors[structIndex][colorIdx] = strtol(colorStr, NULL, 16);
-		    curStrStartPos = commaDelimPos + 1;
-		    if(*commaDelimPos == '\0') {
-		         reachedLastColor = true;
-		    }
-		    else {
-			 commaDelimPos = strchrnul(curStrStartPos, ',');
-		    }
-		    colorIdx++;
-	       }
-	       guiStructureDiagramColorsCount[structIndex] = colorIdx;
-	  }
-	  else {
-		  TerminalText::PrintError("Unknown config option \"%s\" ... skipping.\n", 
-	                                   parsedLine.cfgOption);
-	  }
+            int colorStrLen = commaDelimPos - curStrStartPos;
+            strncpy(colorStr, curStrStartPos, colorStrLen);
+            colorStr[colorStrLen] = '\0';
+            guiStructureDiagramColors[structIndex][colorIdx] = strtol(colorStr, NULL, 16);
+            curStrStartPos = commaDelimPos + 1;
+            if(*commaDelimPos == '\0') {
+                 reachedLastColor = true;
+            }
+            else {
+             commaDelimPos = strchrnul(curStrStartPos, ',');
+            }
+            colorIdx++;
+           }
+           guiStructureDiagramColorsCount[structIndex] = colorIdx;
+      }
+      else {
+          TerminalText::PrintError("Unknown config option \"%s\" ... skipping.\n", 
+                                       parsedLine.cfgOption);
+      }
      }
      fclose(fpCfgFile);
      return 0;
@@ -160,113 +160,113 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
      int NUM_OPTIONS = 4;
      const char *cfgOptions[] = { 
           "CTFILE_SEARCH_DIR", 
-	  "PNGOUT_DIR", 
-	  "PNGOUT_PATH", 
-	  "PNGOUT_RLAYOUT_PATH",
-	  "FLTK_THEME",
+      "PNGOUT_DIR", 
+      "PNGOUT_PATH", 
+      "PNGOUT_RLAYOUT_PATH",
+      "FLTK_THEME",
      };
      const char *cfgValues[] = { 
           ctFileSearchDirectory, 
-	  pngOutputDirectory, 
-	  pngOutputPath,
-	  pngRadialLayoutOutputPath,
-	  fltkTheme,
+      pngOutputDirectory, 
+      pngOutputPath,
+      pngRadialLayoutOutputPath,
+      fltkTheme,
      }; 
      const char *cfgColorOptions[] = {
           "GUI_WINDOW_BGCOLOR", 
-	  "GUI_BGCOLOR", 
-	  "GUI_BTEXT_COLOR", 
-	  "GUI_TEXT_COLOR", 
-	  "GUI_CTFILEVIEW_COLOR",
+      "GUI_BGCOLOR", 
+      "GUI_BTEXT_COLOR", 
+      "GUI_TEXT_COLOR", 
+      "GUI_CTFILEVIEW_COLOR",
      };
      const Fl_Color cfgColorValues[] = {
           guiWindowBGColor, 
-	  guiBGColor, 
-	  guiBTextColor, 
+      guiBGColor, 
+      guiBTextColor, 
           guiTextColor,
-	  guiCTFileViewColor,
+      guiCTFileViewColor,
      };
 
      FILE *fpCfgFile = fopen(userCfgFile, "w+"); 
      if(fpCfgFile == NULL && !silenceErrors) { 
-	  TerminalText::PrintError("Unable to open config file \"%s\" for writing: ",
-	                           userCfgFile);
-	  TerminalText::PrintError("%s\n", strerror(errno)); 
-	  return errno;
+      TerminalText::PrintError("Unable to open config file \"%s\" for writing: ",
+                               userCfgFile);
+      TerminalText::PrintError("%s\n", strerror(errno)); 
+      return errno;
      }
      else if(fpCfgFile == NULL) {
           return errno;
      }
      
      for(int line = 0; line < NUM_OPTIONS; line++) {
-	  char nextOutputLine[MAX_BUFFER_SIZE];
-	  int lineLength = snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=%s\n", 
-	                   cfgOptions[line], cfgValues[line]); 
-	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
+      char nextOutputLine[MAX_BUFFER_SIZE];
+      int lineLength = snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=%s\n", 
+                       cfgOptions[line], cfgValues[line]); 
+      nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
           if(!fwrite(nextOutputLine, sizeof(char), lineLength, fpCfgFile)) { 
-	       TerminalText::PrintError("Error writing line #%d to file: %s\n", 
-	                                line + 1, strerror(errno));
-	       fclose(fpCfgFile); 
-	       return errno;
-	  }
+           TerminalText::PrintError("Error writing line #%d to file: %s\n", 
+                                    line + 1, strerror(errno));
+           fclose(fpCfgFile); 
+           return errno;
+      }
      }
      NUM_OPTIONS = 5;
      for(int line = 0; line < NUM_OPTIONS; line++) {
-	  char nextOutputLine[MAX_BUFFER_SIZE];
-	  int lineLength = snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=0x%08x\n", 
-	                   cfgColorOptions[line], cfgColorValues[line]); 
-	  nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
+      char nextOutputLine[MAX_BUFFER_SIZE];
+      int lineLength = snprintf(nextOutputLine, MAX_BUFFER_SIZE - 1, "%s=0x%08x\n", 
+                       cfgColorOptions[line], cfgColorValues[line]); 
+      nullTerminateString(nextOutputLine, MAX_BUFFER_SIZE - 1); 
           if(!fwrite(nextOutputLine, sizeof(char), lineLength, fpCfgFile)) { 
-	       TerminalText::PrintError("Error writing line #%d to file: %s\n", 
-	                                line + sizeof(cfgValues) + 1, strerror(errno));
-	       fclose(fpCfgFile); 
-	       return errno;
-	  }
+           TerminalText::PrintError("Error writing line #%d to file: %s\n", 
+                                    line + sizeof(cfgValues) + 1, strerror(errno));
+           fclose(fpCfgFile); 
+           return errno;
+      }
      }
      int curLineNum = sizeof(cfgValues) + NUM_OPTIONS + 1;
 
      for(int s = 0; s < 3; s++) {
           char colorListLine[MAX_BUFFER_SIZE], curColorStr[MAX_BUFFER_SIZE];
-	  snprintf(colorListLine, MAX_BUFFER_SIZE, "DWIN_COLORS_STRUCT%d=\0", s + 1);
-	  for(int c = 0; c < guiStructureDiagramColorsCount[s]; c++) {
-	       snprintf(curColorStr, MAX_BUFFER_SIZE, "0x%08x\0", guiStructureDiagramColors[s][c]);
-	       strcat(colorListLine, curColorStr);
-	       if(c + 1 < guiStructureDiagramColorsCount[s]) {
-	            strcat(colorListLine, ",");
-	       }
-	  }
-	  strcat(colorListLine, "\n");
-	  curLineNum++;
-	  if(!fwrite(colorListLine, sizeof(char), strlen(colorListLine), fpCfgFile)) {
-	       TerminalText::PrintError("Error writing line #%d to file: %s\n", curLineNum, strerror(errno));
-	       fclose(fpCfgFile);
-	       return errno;
-	  }
+      snprintf(colorListLine, MAX_BUFFER_SIZE, "DWIN_COLORS_STRUCT%d=\0", s + 1);
+      for(int c = 0; c < guiStructureDiagramColorsCount[s]; c++) {
+           snprintf(curColorStr, MAX_BUFFER_SIZE, "0x%08x\0", guiStructureDiagramColors[s][c]);
+           strcat(colorListLine, curColorStr);
+           if(c + 1 < guiStructureDiagramColorsCount[s]) {
+                strcat(colorListLine, ",");
+           }
+      }
+      strcat(colorListLine, "\n");
+      curLineNum++;
+      if(!fwrite(colorListLine, sizeof(char), strlen(colorListLine), fpCfgFile)) {
+           TerminalText::PrintError("Error writing line #%d to file: %s\n", curLineNum, strerror(errno));
+           fclose(fpCfgFile);
+           return errno;
+      }
      }
 
      const char *BOOLEAN_VALUED_CFGOPTS[] = {
           "DISPLAY_FIRSTRUN_MESSAGE",
-	  "GUI_KEEP_STICKY_FOLDER_NAMES",
+      "GUI_KEEP_STICKY_FOLDER_NAMES",
      };
      bool BOOLEAN_VALUED_CFGOPTS_VALUES[] = {
-	  guiDisplayFirstRunMessage,
-	  guiKeepStickyFolderNames,
+      guiDisplayFirstRunMessage,
+      guiKeepStickyFolderNames,
      };
      int lineLen;
      char lastOutputLine[MAX_BUFFER_SIZE];
      for(int bi = 0; bi < GetArrayLength(BOOLEAN_VALUED_CFGOPTS); bi++) {
           const char *newlineStr = bi + 1 < GetArrayLength(BOOLEAN_VALUED_CFGOPTS) ? 
-		                   "\n" : "";
-	  lineLen = snprintf(lastOutputLine, MAX_BUFFER_SIZE, "%s=%s%s", 
-	                     BOOLEAN_VALUED_CFGOPTS[bi], 
-			     BOOLEAN_VALUED_CFGOPTS_VALUES[bi] ? "true" : "false", 
-			     newlineStr);
+                           "\n" : "";
+      lineLen = snprintf(lastOutputLine, MAX_BUFFER_SIZE, "%s=%s%s", 
+                         BOOLEAN_VALUED_CFGOPTS[bi], 
+                 BOOLEAN_VALUED_CFGOPTS_VALUES[bi] ? "true" : "false", 
+                 newlineStr);
           nullTerminateString(lastOutputLine, MAX_BUFFER_SIZE - 1);
           if(!fwrite(lastOutputLine, sizeof(char), lineLen, fpCfgFile)) {
-	       TerminalText::PrintError("Error writing line #%d to file: %s\n", 
-	                                curLineNum, strerror(errno));
-	       fclose(fpCfgFile);
-	       return errno;
+           TerminalText::PrintError("Error writing line #%d to file: %s\n", 
+                                    curLineNum, strerror(errno));
+           fclose(fpCfgFile);
+           return errno;
           }
      }
 
@@ -297,7 +297,7 @@ void ConfigParser::storeVariables() const {
      for(int s = 0; s < 3; s++) {
           for(int c = 0; c < guiStructureDiagramColorsCount[s]; c++) {
                STRUCTURE_DIAGRAM_COLORS[s][c] = guiStructureDiagramColors[s][c];
-	  }
+      }
      }
 
      DISPLAY_FIRSTRUN_MESSAGE = guiDisplayFirstRunMessage;
@@ -332,17 +332,17 @@ void ConfigParser::WriteUserConfigFile(const char *fpath) {
      bool writeCfgFile = true;
      if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
           int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	  if(dirCreateErr == -1) { 
-	       TerminalText::PrintError("Unable to create directory \"%s\" ... Aborting\n", 
-		                        USER_CONFIG_DIR);
-	       perror("Directory Creation Error");
-	       writeCfgFile = false;
-	  }
+      if(dirCreateErr == -1) { 
+           TerminalText::PrintError("Unable to create directory \"%s\" ... Aborting\n", 
+                                USER_CONFIG_DIR);
+           perror("Directory Creation Error");
+           writeCfgFile = false;
+      }
      }
      if(writeCfgFile) {
           ConfigParser cfgParser;
           cfgParser.setDefaults();
-	  cfgParser.writeFile(fpath, !DEBUGGING_ON);
+      cfgParser.writeFile(fpath, !DEBUGGING_ON);
      }
 }
 
@@ -371,7 +371,7 @@ void ConfigParser::setDefaults() {
      for(int s = 0; s < 3; s++) {
           for(int c = 0; c < guiStructureDiagramColorsCount[s]; c++) {
                guiStructureDiagramColors[s][c] = STRUCTURE_DIAGRAM_COLORS[s][c];
-	  }
+      }
      }
      
      guiDisplayFirstRunMessage = DISPLAY_FIRSTRUN_MESSAGE;
@@ -387,15 +387,15 @@ int ConfigParser::parseConfigLine(const char *configLine, ParsedConfigOption_t *
 
      int lineLength = strlen(configLine);
      if(configLine[lineLength - 1] == '\n') { 
-	  --lineLength;
+      --lineLength;
      }
 
      int delimiterPos = -1;     
      for(int chpos = 0; chpos < lineLength; chpos++) { 
           if(configLine[chpos] == '=') { 
                delimiterPos = chpos; 
-	       break;
-	  }
+           break;
+      }
      }
      if(delimiterPos < 0) {
           return -2;

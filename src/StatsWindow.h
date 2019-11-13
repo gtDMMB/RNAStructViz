@@ -26,6 +26,9 @@
 #include "InputWindow.h"
 #include "ConfigOptions.h"
 
+#define DEFAULT_STATSWIN_WIDTH        (1400)
+#define DEFAULT_STATSWIN_HEIGHT       (700)
+
 class StatsWindow : public Fl_Window
 {
 public:

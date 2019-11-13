@@ -21,8 +21,8 @@ StructureManager::~StructureManager()
 {
     for (int i = m_structureCount; i > 0; --i)
     {
-		RemoveStructure(i - 1);
-	}
+        RemoveStructure(i - 1);
+    }
     free(m_structures); m_structures = NULL;
     for(int i = 0; i < (int)folders.size(); i++)
     {
@@ -34,7 +34,7 @@ StructureManager::~StructureManager()
 void StructureManager::AddFile(const char* filename)
 {
     if (!filename)
-	    return;
+        return;
 
     char* localCopy = strdup(filename);
     if (!localCopy) {
@@ -44,9 +44,9 @@ void StructureManager::AddFile(const char* filename)
     // Get the base file name
     const char* basename = strrchr(localCopy, '/');
     if (!basename)
-		basename = localCopy;
+        basename = localCopy;
     else
-		basename++;
+        basename++;
     
     // Don't load if it shares a filename with another loaded structure
     for (int i = 0; i < m_structureCount; ++i)
@@ -55,10 +55,10 @@ void StructureManager::AddFile(const char* filename)
         {
             if (!strcmp(m_structures[i]->GetFilename(true), basename))
             {
-		TerminalText::PrintInfo("Already have a structure loaded with filename: %s\n", 
-			                basename);
-            	free(localCopy);
-		return;
+        TerminalText::PrintInfo("Already have a structure loaded with filename: %s\n", 
+                            basename);
+                free(localCopy);
+        return;
             }
         }
     }
@@ -70,71 +70,71 @@ void StructureManager::AddFile(const char* filename)
     int newStructCount = 0;
     if (extension && !strncasecmp(extension, ".bpseq", 6)) {
         *structures = RNAStructure::CreateFromFile(localCopy, true);
-	newStructCount = 1;
+    newStructCount = 1;
     }
     else if (extension && !strncasecmp(extension, ".ct", 3)) {
-	*structures = RNAStructure::CreateFromFile(localCopy, false);
-	newStructCount = 1;
+    *structures = RNAStructure::CreateFromFile(localCopy, false);
+    newStructCount = 1;
     }
     else if (extension && !strncasecmp(extension, ".nopct", 6)) {
-	*structures = RNAStructure::CreateFromFile(localCopy, false);
-	newStructCount = 1;
+    *structures = RNAStructure::CreateFromFile(localCopy, false);
+    newStructCount = 1;
     }
     else if(extension && (!strncasecmp(extension, ".dot", 4) || 
-			  !strncasecmp(extension, ".bracket", 8) || 
-			  !strncasecmp(extension, ".dbn", 4))) {
-	*structures = RNAStructure::CreateFromDotBracketFile(localCopy);
-	newStructCount = 1;
+              !strncasecmp(extension, ".bracket", 8) || 
+              !strncasecmp(extension, ".dbn", 4))) {
+    *structures = RNAStructure::CreateFromDotBracketFile(localCopy);
+    newStructCount = 1;
     }
     else if(extension && !strncasecmp(extension, ".boltz", 6)) {
         structures = RNAStructure::CreateFromBoltzmannFormatFile(localCopy, &newStructCount);
     }
     else if(extension && (!strncasecmp(extension, ".helix", 6) || 
-			  !strncasecmp(extension, ".hlx", 4))) {
-	structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
+              !strncasecmp(extension, ".hlx", 4))) {
+    structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
     }
     else {
-		if (strlen(filename) > 1000)
-		    fl_message("Unknown file type: <file name too long>");
-		else
-		    fl_message("Unknown file type: %s . %s [%s]", filename, extension, basename);
-		return;
+        if (strlen(filename) > 1000)
+            fl_message("Unknown file type: <file name too long>");
+        else
+            fl_message("Unknown file type: %s . %s [%s]", filename, extension, basename);
+        return;
     }
 
     if (structures)
     {
-    	for(int s = 0; s < newStructCount; s++) { 
-	    
-	     int count = (int)folders.size();
-	     RNAStructure *structure = structures[s];
-	     if(!structure) { 
-	          continue;
-	     }
-	     AddFirstEmpty(structure);
+        for(int s = 0; s < newStructCount; s++) { 
+        
+         int count = (int)folders.size();
+         RNAStructure *structure = structures[s];
+         if(!structure) { 
+              continue;
+         }
+         AddFirstEmpty(structure);
              if(count == (int) folders.size()-1)
              {
                  
-		 off_t stickyFolderExists = FolderNameForSequenceExists(
-				                 DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
-						 structure
-				            );
-		 if(stickyFolderExists != LSEEK_NOT_FOUND && GUI_KEEP_STICKY_FOLDER_NAMES) {
-		      char *stickyFolderName = LookupStickyFolderNameForSequence(
-				                    DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
-						    stickyFolderExists
-					       );
+         off_t stickyFolderExists = FolderNameForSequenceExists(
+                                 DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+                         structure
+                            );
+         if(stickyFolderExists != LSEEK_NOT_FOUND && GUI_KEEP_STICKY_FOLDER_NAMES) {
+              char *stickyFolderName = LookupStickyFolderNameForSequence(
+                                    DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+                            stickyFolderExists
+                           );
                       if(stickyFolderName != NULL && !FolderNameExists(stickyFolderName)) {
-		           strcpy(folders[count]->folderName, stickyFolderName);
-		           Free(stickyFolderName);
+                   strcpy(folders[count]->folderName, stickyFolderName);
+                   Free(stickyFolderName);
                            MainWindow::AddFolder(folders[count]->folderName, count, false);
-			   continue;
-		      }
-		      Free(stickyFolderName);
-		 }
-		     
-		 InputWindow* input_window = new InputWindow(525, 210, 
-		     	      "New Folder Added", folders[count]->folderName, 
-			      InputWindow::FOLDER_INPUT);
+               continue;
+              }
+              Free(stickyFolderName);
+         }
+             
+         InputWindow* input_window = new InputWindow(525, 210, 
+                       "New Folder Added", folders[count]->folderName, 
+                  InputWindow::FOLDER_INPUT);
                  while (input_window->visible()) {
                        Fl::wait();
                  }
@@ -142,71 +142,71 @@ void StructureManager::AddFile(const char* filename)
                  bool same = false;
                  for(unsigned int ui = 0; ui < folders.size(); ui++)
                  {
-            	     if (!strcmp(folders[ui]->folderName,input_window->getName())
+                     if (!strcmp(folders[ui]->folderName,input_window->getName())
                          && strcmp(input_window->getName(),""))
-            	     {
+                     {
                           same = true;
-            		  break;
-            	     }
+                      break;
+                     }
                  }
             
                  while(same) {
                      int choice = fl_choice("Already have a folder with the name: %s, please choose another name.", 
                                             "Skip loading file", "Close", NULL, input_window->getName());
                      input_window->Cleanup(false);
-		     Delete(input_window);
-		     if(choice == 0) {
-		          same = false;
-			  break;
-		     }
+             Delete(input_window);
+             if(choice == 0) {
+                  same = false;
+              break;
+             }
                      input_window = new InputWindow(525, 210, "New Folder Added", 
-	            	            folders[count]->folderName, InputWindow::FOLDER_INPUT);
+                                folders[count]->folderName, InputWindow::FOLDER_INPUT);
                      while (input_window->visible()) {
                           Fl::wait();
                      }
-		     same = !strcmp(input_window->getName(), "");
+             same = !strcmp(input_window->getName(), "");
                      for(unsigned int ui = 0; ui < folders.size(); ui++)
-            	     {
-            		   if (!strcmp(folders[ui]->folderName, input_window->getName()))
-	            	   {
-    	        		 same = true;
-        	    		 break;
-            		   }
-	             }
+                     {
+                       if (!strcmp(folders[ui]->folderName, input_window->getName()))
+                       {
+                         same = true;
+                         break;
+                       }
+                 }
                  }
                         
                  if(input_window != NULL && strcmp(input_window->getName(), "")) {
-            	     strcpy(folders[count]->folderName, input_window->getName());
-		     if(GUI_KEEP_STICKY_FOLDER_NAMES) {
+                     strcpy(folders[count]->folderName, input_window->getName());
+             if(GUI_KEEP_STICKY_FOLDER_NAMES) {
                           const char *baseSeq = structure->GetSequenceString();
-			  int saveStatus = SaveStickyFolderNameToConfigFile(
-			       DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
-			       std::string(baseSeq), 
-			       std::string(folders[count]->folderName), 
-			       LSEEK_NOT_FOUND
-			  );
-			  if(saveStatus) {
-			       TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
-					                  folders[count]->folderName);
-			  }
-			  else {
-			       TerminalText::PrintDebug("Saved sticky folder name \"%s\" to local config file\n", 
-					                folders[count]->folderName);
-			  }
-		     }
-		 }
-		 if(input_window != NULL) {
+              int saveStatus = SaveStickyFolderNameToConfigFile(
+                   DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+                   std::string(baseSeq), 
+                   std::string(folders[count]->folderName), 
+                   LSEEK_NOT_FOUND
+              );
+              if(saveStatus) {
+                   TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
+                                      folders[count]->folderName);
+              }
+              else {
+                   TerminalText::PrintDebug("Saved sticky folder name \"%s\" to local config file\n", 
+                                    folders[count]->folderName);
+              }
+             }
+         }
+         if(input_window != NULL) {
                       MainWindow::AddFolder(folders[count]->folderName, count, false);
-		      input_window->Cleanup(false);
-		      Delete(input_window);
-		 }
+              input_window->Cleanup(false);
+              Delete(input_window);
+         }
              }
 
-	}
+    }
     }
     else {
          fl_alert("Error adding structure \"%s\"! Could not parse the specified format for this file.\n", 
-	          localCopy);
+              localCopy);
     }
     Free(localCopy); 
     Free(structures);
@@ -296,7 +296,7 @@ void StructureManager::AddFolder(RNAStructure* structure, const int index)
     temp->folderStructs[0] = index;
     temp->structCount = 1;
     sprintf(temp->folderNameFileCount, "(+% 2d) %-.48s", 
-	    temp->structCount, temp->folderName);
+        temp->structCount, temp->folderName);
     temp->selected = false;
     temp->folderWindow = 0;
     folders.push_back(temp);
@@ -310,13 +310,13 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
     bool found = false;
     if (!m_structures && folders.empty())
     {
-		m_structures = (RNAStructure**)malloc(sizeof(RNAStructure*));
-		m_structures[0] = structure;
-		m_structureCount = 1;
-		added = true;
-	        AddFolder(structure, 0);
-	        found = true;
-		return 0;
+        m_structures = (RNAStructure**)malloc(sizeof(RNAStructure*));
+        m_structures[0] = structure;
+        m_structureCount = 1;
+        added = true;
+            AddFolder(structure, 0);
+            found = true;
+        return 0;
     }
     for (int i = 0; i < m_structureCount; ++i)
     {
@@ -330,10 +330,10 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
     }
     if(!added)
     {
-	    m_structureCount++;
-	    m_structures = (RNAStructure**)realloc(m_structures, sizeof(RNAStructure*) * m_structureCount);
-	    m_structures[m_structureCount - 1] = structure;
-	    index = m_structureCount - 1;
+        m_structureCount++;
+        m_structures = (RNAStructure**)realloc(m_structures, sizeof(RNAStructure*) * m_structureCount);
+        m_structures[m_structureCount - 1] = structure;
+        index = m_structureCount - 1;
     }
     
     for(unsigned int ui = 0; ui < folders.size(); ui++)
@@ -387,7 +387,7 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
 void StructureManager::AddNewStructure(const int folderIndex, const int index)
 {
     const std::vector<DiagramWindow*>& diagrams = 
-    	RNAStructViz::GetInstance()->GetDiagramWindows();
+        RNAStructViz::GetInstance()->GetDiagramWindows();
     for(unsigned int ui = 0; ui < diagrams.size(); ui++)
     {
         if(diagrams[ui]->GetFolderIndex() == folderIndex)
@@ -418,7 +418,7 @@ bool StructureManager::SequenceCompare(RNAStructure* struct1, RNAStructure* stru
 }
 
 void StructureManager::DisplayFileContents(const int index, 
-		                           const char *displaySuffix)
+                                   const char *displaySuffix)
 {
     m_structures[index]->DisplayFileContents(displaySuffix);
 }

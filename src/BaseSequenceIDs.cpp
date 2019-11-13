@@ -64,7 +64,7 @@ char * LookupStickyFolderNameForSequence(const char *cfgFilePath, off_t fnameFil
      std::string fullCfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
      FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r");
      if(!fpCfgFile) {
-	  TerminalText::PrintError("Unable to open \"%s\" : %s I\n", fullCfgFilePath.c_str(), strerror(errno));
+      TerminalText::PrintError("Unable to open \"%s\" : %s I\n", fullCfgFilePath.c_str(), strerror(errno));
           return NULL;
      }
      char lineBuf[MAX_BUFFER_SIZE];
@@ -94,7 +94,7 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSp
      FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r");
      if(!fpCfgFile) {
           TerminalText::PrintDebug("Unable to open \"%s\" : %s II\n", fullCfgFilePath.c_str(), strerror(errno));
-	  return LSEEK_NOT_FOUND;
+      return LSEEK_NOT_FOUND;
      }
      std::string baseSeqHash = HashBaseSequence(baseSeqSpec);
      char lineBuf[MAX_BUFFER_SIZE];
@@ -102,10 +102,10 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSp
      bool foundMatch = false;
      while(!feof(fpCfgFile) && fgets(lineBuf, MAX_BUFFER_SIZE, fpCfgFile)) {
           if(!strncmp(baseSeqHash.c_str(), lineBuf, BSHASH_BYTES)) {
-	       foundMatch = true;
-	       break;
-	  }
-	  curFileOffset = ftell(fpCfgFile);
+           foundMatch = true;
+           break;
+      }
+      curFileOffset = ftell(fpCfgFile);
      }
      fclose(fpCfgFile);
      if(foundMatch) {
@@ -123,12 +123,12 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, RNAStructure *rnaStru
 }
 
 int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string baseSeq, 
-		                          std::string folderName) {
+                                  std::string folderName) {
 
      FILE *fpCfgFile = fopen(cfgFilePath, "w+");
      if(!fpCfgFile) {
           TerminalText::PrintError("Unable to open \"%s\": %s IV\n", cfgFilePath, strerror(errno));
-	  return errno;
+      return errno;
      }
      std::string baseSeqHash = HashBaseSequence(baseSeq.c_str());
      fprintf(fpCfgFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
@@ -138,22 +138,22 @@ int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string b
 
 }
 
-				     
+                     
 int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSeq, 
-		                     std::string folderName, off_t replacePos) {
+                             std::string folderName, off_t replacePos) {
      
      if(cfgFilePath == NULL) {
           return EINVAL;
      }
      std::string fullCfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
      if(!ConfigParser::fileExists(fullCfgFilePath.c_str())) {
-	  return SaveStickyFolderNameToFirstConfigFile(fullCfgFilePath.c_str(), baseSeq, folderName);
+      return SaveStickyFolderNameToFirstConfigFile(fullCfgFilePath.c_str(), baseSeq, folderName);
      }
 
      FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r");
      if(!fpCfgFile) {
           TerminalText::PrintError("Unable to open \"%s\" : %s III\n", fullCfgFilePath.c_str(), strerror(errno));
-	  return errno;
+      return errno;
      }
      int fdCfgFile = fileno(fpCfgFile);
      char tempFilePath[MAX_BUFFER_SIZE];
@@ -162,8 +162,8 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      FILE *fpTempFile = fopen(tempFilePath, "w+");
      if(!fpTempFile) {
           TerminalText::PrintError("Unable to open \"%s\": %s IV\n", tempFilePath, strerror(errno));
-	  fclose(fpCfgFile);
-	  return errno;
+      fclose(fpCfgFile);
+      return errno;
      }
 
      std::string baseSeqHash = HashBaseSequence(baseSeq.c_str());
@@ -171,14 +171,14 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      char lineBuf[MAX_BUFFER_SIZE];
      off_t curCfgFileOffset = 0;
      while(fgets(lineBuf, MAX_BUFFER_SIZE, fpCfgFile)) {
-	  off_t nextOffset = ftell(fpCfgFile);
-	  if(curCfgFileOffset != replacePos) {
+      off_t nextOffset = ftell(fpCfgFile);
+      if(curCfgFileOffset != replacePos) {
                fprintf(fpTempFile, "%s", lineBuf);
-	  }
-	  else {
+      }
+      else {
                fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
-	  }
-	  curCfgFileOffset = nextOffset;
+      }
+      curCfgFileOffset = nextOffset;
      }
      if(replacePos == LSEEK_NOT_FOUND) {
           fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
@@ -188,8 +188,8 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      fclose(fpTempFile);
      if(rename(tempFilePath, fullCfgFilePath.c_str())) {
           TerminalText::PrintError("Unable to move \"%s\" to \"%s\" : %s\n", 
-			           tempFilePath, cfgFilePath, strerror(errno));
-     	  return errno;
+                       tempFilePath, cfgFilePath, strerror(errno));
+           return errno;
      }
 
      return EXIT_SUCCESS;
@@ -201,19 +201,19 @@ InputFileTypeSpec ClassifyInputFileTypeByExtension(const char *fileExt) {
           return FILETYPE_CT;
      }
      else if(!strcasecmp(fileExt, "nopct")) {
-	  return FILETYPE_NOPCT;
+      return FILETYPE_NOPCT;
      }
      else if(!strcasecmp(fileExt, "dot") || !strcasecmp(fileExt, "bracket") || !strcasecmp(fileExt, "dbn")) {
-	  return FILETYPE_DOTBRACKET;
+      return FILETYPE_DOTBRACKET;
      }
      else if(!strcasecmp(fileExt, "bpseq")) {
-	  return FILETYPE_BPSEQ;
+      return FILETYPE_BPSEQ;
      }
      else if(!strcasecmp(fileExt, "gtb")) {
-	  return FILETYPE_GTB;
+      return FILETYPE_GTB;
      }
      else if(!strcasecmp(fileExt, "helix") || !strcasecmp(fileExt, "hlx")) {
-	  return FILETYPE_HLXTRIPLE;
+      return FILETYPE_HLXTRIPLE;
      }
      return FILETYPE_NONE;
 }
@@ -240,22 +240,22 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
      // have appended sample numbers to the GTB files (need to remove this data to open the files):
      char actualFilePath[MAX_BUFFER_SIZE];
      if(fileType == FILETYPE_GTB) {
-	  strcpy(actualFilePath, filePath);
-	  const char *lastDashPos = strrchr(actualFilePath, '-');
-	  const char *extPos = strrchr(actualFilePath, '.');
-	  if(lastDashPos != NULL && extPos != NULL) {
+      strcpy(actualFilePath, filePath);
+      const char *lastDashPos = strrchr(actualFilePath, '-');
+      const char *extPos = strrchr(actualFilePath, '.');
+      if(lastDashPos != NULL && extPos != NULL) {
                const char *origExtPos = strrchr(filePath, '.');
-	       size_t extStrLen = strlen(extPos);
-	       char *lastDashPosWritable = (char *) lastDashPos;
-	       strncpy(lastDashPosWritable, origExtPos, extStrLen);
-	       lastDashPosWritable[extStrLen] = '\0';
-	       filePath = (const char *) actualFilePath;
-	  }
+           size_t extStrLen = strlen(extPos);
+           char *lastDashPosWritable = (char *) lastDashPos;
+           strncpy(lastDashPosWritable, origExtPos, extStrLen);
+           lastDashPosWritable[extStrLen] = '\0';
+           filePath = (const char *) actualFilePath;
+      }
      }
      FILE *fpInputSeq = fopen(filePath, "r");
      if(!fpInputSeq) {
           TerminalText::PrintError("Unable to open file \"%s\" : %s V\n", filePath, strerror(errno));
-	  return "";
+      return "";
      }
      std::string headerLines;
      char lineBuf[MAX_BUFFER_SIZE];
@@ -263,59 +263,59 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
      int lineCount = 0;
      while(!feof(fpInputSeq) && fgets(lineBuf, MAX_BUFFER_SIZE, fpInputSeq)) {
           int lineLength = strlen(lineBuf);
-	  ++lineCount;
-	  if(lineLength == 0) {
-	       stopParsing = true;
-	       break;
-	  }
+      ++lineCount;
+      if(lineLength == 0) {
+           stopParsing = true;
+           break;
+      }
           switch(fileType) {
-	       case FILETYPE_NOPCT: {
+           case FILETYPE_NOPCT: {
                     std::string searchStr = std::string(lineBuf);
-		    if(searchStr.find("Filename") != std::string::npos || 
-		       searchStr.find("Organism") != std::string::npos || 
-		       searchStr.find("Accession") != std::string::npos) {
-		         addToHeaderStr = true;
-		    }
-		    else {
-			 stopParsing = true;
-		    }
-		    break;
-	       }
-	       case FILETYPE_CT:
-	            if(lineCount == 1) {
-		         addToHeaderStr = true;
-	            }
-		    else {
-		         stopParsing = true;
-	            }
-		    break;
-	       case FILETYPE_BPSEQ:
-	            if(lineBuf[0] != ';') {
-		         addToHeaderStr = true;
-			 stopParsing = true;
-	            }
-	            break;
-	       case FILETYPE_DOTBRACKET:
-	       case FILETYPE_GTB:
-	       case FILETYPE_HLXTRIPLE:
-	            if(lineBuf[0] == '>') {
-		         addToHeaderStr = true;
-	            }
-		    else {
-		         stopParsing = true;
-	            }
-		    break;
-	       default:
-	            stopParsing = true;
-	            break;
-	  }
-	  if(addToHeaderStr) {
-	       headerLines += string(lineBuf);
-	  }
-	  if(stopParsing) {
-	       break;
-	  }
-	  addToHeaderStr = false;
+            if(searchStr.find("Filename") != std::string::npos || 
+               searchStr.find("Organism") != std::string::npos || 
+               searchStr.find("Accession") != std::string::npos) {
+                 addToHeaderStr = true;
+            }
+            else {
+             stopParsing = true;
+            }
+            break;
+           }
+           case FILETYPE_CT:
+                if(lineCount == 1) {
+                 addToHeaderStr = true;
+                }
+            else {
+                 stopParsing = true;
+                }
+            break;
+           case FILETYPE_BPSEQ:
+                if(lineBuf[0] != ';') {
+                 addToHeaderStr = true;
+             stopParsing = true;
+                }
+                break;
+           case FILETYPE_DOTBRACKET:
+           case FILETYPE_GTB:
+           case FILETYPE_HLXTRIPLE:
+                if(lineBuf[0] == '>') {
+                 addToHeaderStr = true;
+                }
+            else {
+                 stopParsing = true;
+                }
+            break;
+           default:
+                stopParsing = true;
+                break;
+      }
+      if(addToHeaderStr) {
+           headerLines += string(lineBuf);
+      }
+      if(stopParsing) {
+           break;
+      }
+      addToHeaderStr = false;
      }
      fclose(fpInputSeq);
      return headerLines;

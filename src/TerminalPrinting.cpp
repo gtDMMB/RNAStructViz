@@ -36,16 +36,16 @@ void TerminalText::PrintNoColor(const char *msgFmt, ...) {
 }
 
 void TerminalText::PrintANSITerminalMessage(const char *prefixText, UnicodeSymbolTypeClass iconType, 
-		                            ANSIColor::ANSIColorCode prefixColor, 
-					    ANSIColor::ANSIColorCode msgTextColor, 
-					    bool randomizeUnicodeIdx, const char *msgFmt, 
-					    va_list printArgs) {
+                                    ANSIColor::ANSIColorCode prefixColor, 
+                        ANSIColor::ANSIColorCode msgTextColor, 
+                        bool randomizeUnicodeIdx, const char *msgFmt, 
+                        va_list printArgs) {
      if(!PRINT_ANSI_COLOR) {
           TerminalText::PrintNoColor(msgFmt, printArgs);
-	  return;
+      return;
      }
      wchar_t unicodeLeadingIcon = PRINT_TERMINAL_UNICODE ? 
-	                          TerminalText::GetUnicodeIconString(iconType, randomizeUnicodeIdx) : 0x00;
+                              TerminalText::GetUnicodeIconString(iconType, randomizeUnicodeIdx) : 0x00;
      setlocale(LC_CTYPE, "");
      fprintf(PRINTFP, "%s%s", prefixColor, ANSIColor::BOLD); 
      fwprintf(PRINTFP, L" %lc ", unicodeLeadingIcon != 0x00 ? unicodeLeadingIcon : L' ');
@@ -62,7 +62,7 @@ void TerminalText::PrintError(const char *emsgFmt, ...) {
      va_list argLst;
      va_start(argLst, emsgFmt);
      TerminalText::PrintANSITerminalMessage("ERROR", ERROR_SYMBOLS, ANSIColor::RED, 
-		                            ANSIColor::LIGHT_RED, true, emsgFmt, argLst);
+                                    ANSIColor::LIGHT_RED, true, emsgFmt, argLst);
      va_end(argLst);
 }
 
@@ -73,7 +73,7 @@ void TerminalText::PrintDebug(const char *dmsgFmt, ...) {
      va_list argLst;
      va_start(argLst, dmsgFmt);
      TerminalText::PrintANSITerminalMessage("DEBUGGING", INFO_SYMBOLS, ANSIColor::GREEN, 
-		                            ANSIColor::LIGHT_WHITE, true, dmsgFmt, argLst);
+                                    ANSIColor::LIGHT_WHITE, true, dmsgFmt, argLst);
      va_end(argLst);
 }
 
@@ -84,7 +84,7 @@ void TerminalText::PrintWarning(const char *wmsgFmt, ...) {
      va_list argLst;
      va_start(argLst, wmsgFmt);
      TerminalText::PrintANSITerminalMessage("WARNING", WARNING_SYMBOLS, ANSIColor::PURPLE, 
-		                            ANSIColor::LIGHT_CYAN, true, wmsgFmt, argLst);
+                                    ANSIColor::LIGHT_CYAN, true, wmsgFmt, argLst);
      va_end(argLst);
 }
 
@@ -92,7 +92,7 @@ void TerminalText::PrintInfo(const char *imsgFmt, ...) {
      va_list argLst;
      va_start(argLst, imsgFmt);
      TerminalText::PrintANSITerminalMessage("STATUS", WARNING_SYMBOLS, ANSIColor::YELLOW, 
-		                            ANSIColor::LIGHT_GRAY, true, imsgFmt, argLst);
+                                    ANSIColor::LIGHT_GRAY, true, imsgFmt, argLst);
      va_end(argLst);
 }
 

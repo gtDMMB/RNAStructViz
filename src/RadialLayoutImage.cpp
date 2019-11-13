@@ -19,22 +19,22 @@
 #include "ConfigParser.h"
 
 RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height) : 
-	Fl_Cairo_Window(width, height), RadialLayoutWindowCallbackInterface(), 
-	winTitle(NULL), vrnaPlotType(PLOT_TYPE_SIMPLE), 
-	radialLayoutCanvas(NULL), radialLayoutCanvasOrig(NULL), 
-	haveInitVRNAScroller(false), defaultScrollToX(-1), defaultScrollToY(-1),
-	scrollerFillBox(NULL), windowScroller(NULL), 
-	scalePlusBtn(NULL), scaleMinusBtn(NULL), resetBtn(NULL), 
-	cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
+    Fl_Cairo_Window(width, height), RadialLayoutWindowCallbackInterface(), 
+    winTitle(NULL), vrnaPlotType(PLOT_TYPE_SIMPLE), 
+    radialLayoutCanvas(NULL), radialLayoutCanvasOrig(NULL), 
+    haveInitVRNAScroller(false), defaultScrollToX(-1), defaultScrollToY(-1),
+    scrollerFillBox(NULL), windowScroller(NULL), 
+    scalePlusBtn(NULL), scaleMinusBtn(NULL), resetBtn(NULL), 
+    cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
         winScaleX(1.0), winScaleY(1.0), 
         imageHeight(0), imageWidth(0), 
-	displayBaseLower(0), displayBaseHigher(0) {
+    displayBaseLower(0), displayBaseHigher(0) {
 
      int offsetY = 10;
      int offsetX = (w() - 5 * RADIAL_BUTTON_WIDTH) / 2 + RADIAL_WIDGET_WIDTH / 2;
     
      scaleMinusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
-		                   "@<<   Zoom Out");
+                           "@<<   Zoom Out");
      scaleMinusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      scaleMinusBtn->labelcolor(GUI_BTEXT_COLOR);
      scaleMinusBtn->labelfont(FL_HELVETICA);
@@ -42,7 +42,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
      offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
  
      scalePlusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
-		                  "Zoom In   @>>");
+                          "Zoom In   @>>");
      scalePlusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      scalePlusBtn->labelcolor(GUI_BTEXT_COLOR);
      scalePlusBtn->labelfont(FL_HELVETICA);
@@ -50,7 +50,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
      offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
 
      resetBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
-		                  "@redo   Reset");
+                          "@redo   Reset");
      resetBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      resetBtn->labelcolor(GUI_BTEXT_COLOR);
      resetBtn->labelfont(FL_HELVETICA);
@@ -58,7 +58,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
      offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
 
      exportToPNGBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
-		                    "@filesaveas  Export to PNG");
+                            "@filesaveas  Export to PNG");
      exportToPNGBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      exportToPNGBtn->labelcolor(GUI_BTEXT_COLOR);
      exportToPNGBtn->labelfont(FL_HELVETICA);
@@ -134,7 +134,7 @@ bool RadialLayoutDisplayWindow::SetRadialPlotType(VRNAPlotType_t plotType) {
 }
 
 bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t startSeqPos, 
-		                                     size_t endSeqPos, size_t seqLength) { 
+                                             size_t endSeqPos, size_t seqLength) { 
      if(rnaSeq == NULL) {
           return false;
      }
@@ -142,7 +142,7 @@ bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t 
      Delete(radialLayoutCanvasOrig);
      
      radialLayoutCanvas = GetVRNARadialLayoutData(rnaSeq, startSeqPos, endSeqPos, seqLength, 
-     		                                  (VRNAPlotType_t) vrnaPlotType);
+                                               (VRNAPlotType_t) vrnaPlotType);
      radialLayoutCanvasOrig = new CairoContext_t(*radialLayoutCanvas);
      ResizeScrollerFillBox();
      return true;
@@ -174,8 +174,8 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
      RadialLayoutDisplayWindow *thisWindow = (RadialLayoutDisplayWindow *) thisCairoWindow; 
      fl_color(GUI_WINDOW_BGCOLOR);
      fl_rectf(0, thisWindow->buttonToolbarHeight, 
-	      thisCairoWindow->w() - SCROLL_SIZE - 2, 
-	      thisCairoWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
+          thisCairoWindow->w() - SCROLL_SIZE - 2, 
+          thisCairoWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
      fl_color(FL_BLACK);
      fl_line_style(FL_SOLID | FL_CAP_ROUND | FL_JOIN_BEVEL);
      fl_xyline(0, thisWindow->buttonToolbarHeight - 2, thisCairoWindow->w());
@@ -191,15 +191,15 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
      cairo_surface_t *crSurface = cairo_get_target(thisWindow->radialLayoutCanvas->GetCairoContext());
      cairo_set_source_surface(cr, crSurface, -thisWindow->cairoWinTranslateX, -thisWindow->cairoWinTranslateY);
      cairo_rectangle(cr, 0, thisWindow->buttonToolbarHeight, 
-		     thisWindow->w() - SCROLL_SIZE - 2, 
-		     thisWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
+             thisWindow->w() - SCROLL_SIZE - 2, 
+             thisWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
      cairo_clip(cr);
      cairo_paint(cr);
      cairo_reset_clip(cr);
      if(thisWindow->windowScroller != NULL) {
           thisWindow->scalePlusBtn->redraw();
-	  thisWindow->scaleMinusBtn->redraw();
-	  thisWindow->windowScroller->redraw();
+      thisWindow->scaleMinusBtn->redraw();
+      thisWindow->windowScroller->redraw();
      }
 }
 
@@ -213,26 +213,26 @@ std::string RadialLayoutDisplayWindow::GetExportToPNGOutputPath() {
     strcat(defaultFilePath, (char *) PNG_OUTPUT_DIRECTORY);
     strcat(defaultFilePath, defaultFilePath[strlen(defaultFilePath) - 1] == '/' ? "" : "/");
     strftime(defaultFilePath + strlen(defaultFilePath), MAX_BUFFER_SIZE - 1, (char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, 
-		              tmCurrentTime);
+                      tmCurrentTime);
     Fl_Native_File_Chooser fileChooser;
     fileChooser.title(chooserMsg);
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
     fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
-		        Fl_Native_File_Chooser::SAVEAS_CONFIRM);
+                Fl_Native_File_Chooser::SAVEAS_CONFIRM);
     fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
     fileChooser.preset_file(defaultFilePath);
     switch(fileChooser.show()) {
         case -1: // ERROR
              fl_alert("Error selecting file path to save PNG image: \"%s\".\nIf you are receiving a permissions error trying to save the image into the directory you have chosen, try again by saving the PNG image into a path in your user home directory.", fileChooser.errmsg());
-	     return string("");
-	case 1: // CANCEL
-	     return string("");
-	default:
-	     std::string outfilePath = string(fileChooser.filename());
-	     strncpy((char *) PNG_OUTPUT_DIRECTORY, fileChooser.directory(), 
-			      MAX_BUFFER_SIZE - 1);
-	     ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
-	     return outfilePath;
+         return string("");
+    case 1: // CANCEL
+         return string("");
+    default:
+         std::string outfilePath = string(fileChooser.filename());
+         strncpy((char *) PNG_OUTPUT_DIRECTORY, fileChooser.directory(), 
+                  MAX_BUFFER_SIZE - 1);
+         ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
+         return outfilePath;
     }
 }
 
@@ -250,71 +250,71 @@ void RadialLayoutDisplayWindow::SaveRadialLayoutToPNGCallback(Fl_Widget *exportB
      // initialize the image data:
      cairo_surface_t *pngInitSrc = cairo_get_target(rlDisplayWin->radialLayoutCanvas->GetCairoContext());
      cairo_surface_t *pngSrc = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
-		               rlDisplayWin->imageWidth, 
-			       rlDisplayWin->imageHeight + PNG_FOOTER_HEIGHT);
+                       rlDisplayWin->imageWidth, 
+                   rlDisplayWin->imageHeight + PNG_FOOTER_HEIGHT);
      cairo_t *crImageOutput = cairo_create(pngSrc);
      CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_WHITE).ApplyRGBAColor(crImageOutput);
      cairo_rectangle(crImageOutput, 0, 0, 
-		     rlDisplayWin->imageWidth, 
-	             rlDisplayWin->imageHeight + PNG_FOOTER_HEIGHT);
+             rlDisplayWin->imageWidth, 
+                 rlDisplayWin->imageHeight + PNG_FOOTER_HEIGHT);
      cairo_fill(crImageOutput);
      
      // draw the footer data (metadata):
      CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_WHITE).ToOpaque().ApplyRGBAColor(crImageOutput);
      cairo_rectangle(crImageOutput, 0, 
-		     rlDisplayWin->imageHeight, 
-	             rlDisplayWin->imageWidth, 
-		     PNG_FOOTER_HEIGHT);
+             rlDisplayWin->imageHeight, 
+                 rlDisplayWin->imageWidth, 
+             PNG_FOOTER_HEIGHT);
      cairo_fill(crImageOutput);
      CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_BLACK).ToOpaque().ApplyRGBAColor(crImageOutput);
      cairo_set_line_width(crImageOutput, 2);
      cairo_move_to(crImageOutput, 0, rlDisplayWin->imageHeight);
      cairo_line_to(crImageOutput, rlDisplayWin->imageWidth, 
-		   rlDisplayWin->imageHeight);
+           rlDisplayWin->imageHeight);
      cairo_stroke(crImageOutput);
      cairo_select_font_face(crImageOutput, "Courier New",
                             CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
      cairo_set_font_size(crImageOutput, 12);
      int offsetY = rlDisplayWin->imageHeight + 25;
      const char *footerLabels[] = {
-	  " * Structure Folder Name: ",
+      " * Structure Folder Name: ",
           " * Structure File Name:   ", 
-	  " * Structure Bases Shown: ", 
-	  " * Image Generated At:    ",
+      " * Structure Bases Shown: ", 
+      " * Image Generated At:    ",
      };
      const char *footerData[] = {
-	  rlDisplayWin->structFolderName.c_str(), 
-	  rlDisplayWin->ctFileName.c_str(), 
-	  "[%d, %d]", 
-	  "%c %Z",
+      rlDisplayWin->structFolderName.c_str(), 
+      rlDisplayWin->ctFileName.c_str(), 
+      "[%d, %d]", 
+      "%c %Z",
      };
      for(int fd = 0; fd < GetArrayLength(footerLabels); fd++) {
           char curStructLabel[MAX_BUFFER_SIZE];
-	  snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, 
-	           "%s%s", footerLabels[fd], footerData[fd]);
-	  if(fd == 2) {
+      snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, 
+               "%s%s", footerLabels[fd], footerData[fd]);
+      if(fd == 2) {
                char curStructLabel2[MAX_BUFFER_SIZE];
-	       snprintf(curStructLabel2, MAX_BUFFER_SIZE - 1, curStructLabel, 
-			rlDisplayWin->displayBaseLower, rlDisplayWin->displayBaseHigher);
-	       strcpy(curStructLabel, curStructLabel2);
-	  }
-	  else if(fd == 3) {
+           snprintf(curStructLabel2, MAX_BUFFER_SIZE - 1, curStructLabel, 
+            rlDisplayWin->displayBaseLower, rlDisplayWin->displayBaseHigher);
+           strcpy(curStructLabel, curStructLabel2);
+      }
+      else if(fd == 3) {
                char curStructLabel2[MAX_BUFFER_SIZE];
-	       time_t curTime = time(NULL);
-	       struct tm *tmCurTime = localtime(&curTime);
-	       strftime(curStructLabel2, MAX_BUFFER_SIZE - 1, curStructLabel, tmCurTime);
-	       strcpy(curStructLabel, curStructLabel2);
-	  }
-     	  cairo_move_to(crImageOutput, 12, offsetY);
-	  cairo_show_text(crImageOutput, curStructLabel);
-	  offsetY += 22;
+           time_t curTime = time(NULL);
+           struct tm *tmCurTime = localtime(&curTime);
+           strftime(curStructLabel2, MAX_BUFFER_SIZE - 1, curStructLabel, tmCurTime);
+           strcpy(curStructLabel, curStructLabel2);
+      }
+           cairo_move_to(crImageOutput, 12, offsetY);
+      cairo_show_text(crImageOutput, curStructLabel);
+      offsetY += 22;
      }
      
      // draw the source diagram onto the PNG output image:
      cairo_set_source_surface(crImageOutput, pngInitSrc, 0, 0);
      cairo_rectangle(crImageOutput, 0, 0, 
-		     rlDisplayWin->imageWidth, 
-	             rlDisplayWin->imageHeight); 
+             rlDisplayWin->imageWidth, 
+                 rlDisplayWin->imageHeight); 
      cairo_fill(crImageOutput);
      if(cairo_surface_write_to_png(pngSrc, pngOutputPath.c_str()) != CAIRO_STATUS_SUCCESS) {
           fl_alert("ERROR WRITING PNG TO FILE (\"%s\"): %s\n", pngOutputPath.c_str(), strerror(errno));
@@ -369,8 +369,8 @@ void RadialLayoutDisplayWindow::HandleWindowScrollCallback(Fl_Widget *scrw, void
 }
 
 CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *rnaSubseq, 
-		                            size_t startPos, size_t endPos, size_t seqLength, 
-					    VRNAPlotType_t plotType) {
+                                    size_t startPos, size_t endPos, size_t seqLength, 
+                        VRNAPlotType_t plotType) {
      
      char *effectiveRNASubseq = NULL;
      int seqIndexOffset = 0;
@@ -379,9 +379,9 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      }
      else {
           int seqStartIdx = MAX(0, startPos - 25);
-	  int seqEndIdx = MIN(endPos + 25, seqLength);
-	  seqIndexOffset = seqStartIdx;
-	  effectiveRNASubseq = GetSubstringFromRange(rnaSubseq, seqStartIdx, seqEndIdx);
+      int seqEndIdx = MIN(endPos + 25, seqLength);
+      seqIndexOffset = seqStartIdx;
+      effectiveRNASubseq = GetSubstringFromRange(rnaSubseq, seqStartIdx, seqEndIdx);
      }
      if(effectiveRNASubseq == NULL) {
           return NULL;
@@ -406,11 +406,11 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      int ge = 0, ee, gb, Lg, l[3], workingIdx;
      while( (ee = parse_gquad(mfeStructure + ge, &Lg, l)) > 0) {
           ge += ee;
-	  gb = ge - 4 * Lg - l[0] - l[1] - l[2] + 1;
-	  for(int pbpIdx = 0; pbpIdx < Lg; pbpIdx++) {
+      gb = ge - 4 * Lg - l[0] - l[1] - l[2] + 1;
+      for(int pbpIdx = 0; pbpIdx < Lg; pbpIdx++) {
                pairTableG[ge - pbpIdx] = gb + pbpIdx;
-	       pairTableG[gb + pbpIdx] = ge - pbpIdx;
-	  }
+           pairTableG[gb + pbpIdx] = ge - pbpIdx;
+      }
      }
 
      float *xPosArr = (float *) vrna_alloc((rnaSubseqLen + 1) * sizeof(float));
@@ -420,13 +420,13 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      }
      else if(plotType == PLOT_TYPE_CIRCULAR) {
           int radius = 2 * rnaSubseqLen;
-	  workingIdx = simple_circplot_coordinates(pairTableG, xPosArr, yPosArr);
-	  for(int idx = 0; idx < rnaSubseqLen; idx++) {
+      workingIdx = simple_circplot_coordinates(pairTableG, xPosArr, yPosArr);
+      for(int idx = 0; idx < rnaSubseqLen; idx++) {
                xPosArr[idx] *= radius;
-	       xPosArr[idx] += radius;
-	       yPosArr[idx] *= radius;
-	       yPosArr[idx] += radius;
-	  }
+           xPosArr[idx] += radius;
+           yPosArr[idx] *= radius;
+           yPosArr[idx] += radius;
+      }
      }
      else {
           workingIdx = naview_xy_coordinates(pairTableG, xPosArr, yPosArr);
@@ -441,35 +441,35 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           xmax = xPosArr[idx] > xmax ? xPosArr[idx] : xmax;
           ymin = yPosArr[idx] < ymin ? yPosArr[idx] : ymin;
           ymax = yPosArr[idx] > ymax ? yPosArr[idx] : ymax;
-	  for(int j = idx + 1; j < rnaSubseqLen; j++) {
-	       double edist = Square(xPosArr[idx] - xPosArr[j]) + Square(yPosArr[idx] - yPosArr[j]);
-	       edist = sqrt(edist);
-	       if(edist < dmin) {
-	            dmin = edist;
-	       }
-	  }
+      for(int j = idx + 1; j < rnaSubseqLen; j++) {
+           double edist = Square(xPosArr[idx] - xPosArr[j]) + Square(yPosArr[idx] - yPosArr[j]);
+           edist = sqrt(edist);
+           if(edist < dmin) {
+                dmin = edist;
+           }
+      }
      }
      for(int xyPos = 0; xyPos < rnaSubseqLen; xyPos++) {
           if(xmin < 0) {
-	       xPosArr[xyPos] += ABS(xmin) + nodeSize;
-	  }
-	  else {
+           xPosArr[xyPos] += ABS(xmin) + nodeSize;
+      }
+      else {
                xPosArr[xyPos] -= ABS(xmin);
-	  }
-	  if(ymin < 0) {
-	       yPosArr[xyPos] += ABS(ymin) + nodeSize;
-	  }
-	  else {
-	       yPosArr[xyPos] -= ABS(ymin);
-	  }
+      }
+      if(ymin < 0) {
+           yPosArr[xyPos] += ABS(ymin) + nodeSize;
+      }
+      else {
+           yPosArr[xyPos] -= ABS(ymin);
+      }
      }
      if(xmin < 0) {
-	  xmax += ABS(xmin) + nodeSize;
+      xmax += ABS(xmin) + nodeSize;
           xmin = nodeSize;
      }
      if(ymin < 0) {
           ymax += ABS(ymin) + nodeSize;
-	  ymin = nodeSize;
+      ymin = nodeSize;
      }
      float winScale = 1.25 * nodeSize / dmin / M_SQRT2;
      float xScale = (float) (winScale * MAX(xmax / DEFAULT_RLWIN_WIDTH, 1.0));
@@ -478,9 +478,9 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      this->winScaleY = yScale;
 
      CairoContext_t *plotCanvas = new CairoContext_t(MAX(DEFAULT_RLWIN_WIDTH, (xmax - xmin) * xScale + 
-		                                     1.5 * nodeSize), 
-		                                     MAX(DEFAULT_RLWIN_HEIGHT, (ymax - ymin) * yScale + 
-						     1.5 * nodeSize));
+                                             1.5 * nodeSize), 
+                                             MAX(DEFAULT_RLWIN_HEIGHT, (ymax - ymin) * yScale + 
+                             1.5 * nodeSize));
      imageHeight = ABS(ymax - ymin) * xScale + 1.5 * nodeSize;
      imageWidth = MAX(PNGOUT_MIN_IMAGE_WIDTH, ABS(xmax - xmin) * yScale + 1.5 * nodeSize);
      plotCanvas->BlankFillCanvas(CairoColor_t::FromFLColorType(GUI_WINDOW_BGCOLOR));
@@ -488,57 +488,57 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      plotCanvas->Translate(2 * nodeSize, 2 * nodeSize);
      plotCanvas->SetStrokeSize(2);
      plotCanvas->SetFontFace(CairoContext_t::CairoFontFace_t::MONOSPACE | 
-		             CairoContext_t::CairoFontStyle_t::BOLD | 
-			     CairoContext_t::CairoFontStyle_t::ITALIC);
+                     CairoContext_t::CairoFontStyle_t::BOLD | 
+                 CairoContext_t::CairoFontStyle_t::ITALIC);
      plotCanvas->SetFontSize(3);
 
      int idx = 0, nodeX = 0, nodeY = 0, lastNodeX, lastNodeY;
      while(idx < rnaSubseqLen) {
-	  lastNodeX = nodeX; 
-	  lastNodeY = nodeY;
+      lastNodeX = nodeX; 
+      lastNodeY = nodeY;
           nodeX = (int) ((xPosArr[idx] - xmin) * xScale);
-	  nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
-	  if(idx > 0) {
-	       plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).Lighten(0.5).ToOpaque());
-	       plotCanvas->DrawLine(nodeX, nodeY, lastNodeX, lastNodeY);
-	  }
+      nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
+      if(idx > 0) {
+           plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK).Lighten(0.5).ToOpaque());
+           plotCanvas->DrawLine(nodeX, nodeY, lastNodeX, lastNodeY);
+      }
           idx++;
      }
      idx = 0;
      while(idx < rnaSubseqLen) {
-	  lastNodeX = nodeX; 
-	  lastNodeY = nodeY;
+      lastNodeX = nodeX; 
+      lastNodeY = nodeY;
           nodeX = (int) ((xPosArr[idx] - xmin) * xScale);
-	  nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
-	  CairoColor_t baseNodeColor = GetBaseNodeColor(effectiveRNASubseq[idx]);
-	  if(idx + seqIndexOffset < startPos || idx + seqIndexOffset > endPos) {
-	       baseNodeColor = baseNodeColor.ToGrayscale();
-	  }
-	  else {
+      nodeY = (int) ((yPosArr[idx] - ymin) * yScale);
+      CairoColor_t baseNodeColor = GetBaseNodeColor(effectiveRNASubseq[idx]);
+      if(idx + seqIndexOffset < startPos || idx + seqIndexOffset > endPos) {
+           baseNodeColor = baseNodeColor.ToGrayscale();
+      }
+      else {
                if(defaultScrollToX == -1 || nodeX < defaultScrollToX) {
-	            defaultScrollToX = nodeX;
-	       }
-	       if(defaultScrollToY == -1 || nodeY < defaultScrollToY) {
-		    defaultScrollToY = nodeY;
-	       }
-	  }
-	  char nodeLabel[32];
-	  if(idx % NUMBERING_MODULO == NUMBERING_MODULO - 1) {
-	       snprintf(nodeLabel, 32, "%d\0", idx + seqIndexOffset + 1);
-	       plotCanvas->SetFontSize(1);
-	  }
-	  else {
-	       snprintf(nodeLabel, 32, "%c\0", effectiveRNASubseq[idx]);
-	  }
-	  plotCanvas->DrawBaseNode(nodeX, nodeY, nodeLabel, nodeSize, 
-	  			   baseNodeColor);
-	  idx++;
+                defaultScrollToX = nodeX;
+           }
+           if(defaultScrollToY == -1 || nodeY < defaultScrollToY) {
+            defaultScrollToY = nodeY;
+           }
+      }
+      char nodeLabel[32];
+      if(idx % NUMBERING_MODULO == NUMBERING_MODULO - 1) {
+           snprintf(nodeLabel, 32, "%d\0", idx + seqIndexOffset + 1);
+           plotCanvas->SetFontSize(1);
+      }
+      else {
+           snprintf(nodeLabel, 32, "%c\0", effectiveRNASubseq[idx]);
+      }
+      plotCanvas->DrawBaseNode(nodeX, nodeY, nodeLabel, nodeSize, 
+                     baseNodeColor);
+      idx++;
      }
      if(defaultScrollToX + DEFAULT_RLWIN_WIDTH > imageWidth) {
           defaultScrollToX = MAX(0, imageWidth - DEFAULT_RLWIN_WIDTH);
      }
      if(defaultScrollToY + DEFAULT_RLWIN_HEIGHT > imageHeight) {
-	  defaultScrollToY = MAX(0, imageHeight - DEFAULT_RLWIN_HEIGHT);
+      defaultScrollToY = MAX(0, imageHeight - DEFAULT_RLWIN_HEIGHT);
      }
 
      free(effectiveRNASubseq);
@@ -558,13 +558,13 @@ CairoColor_t RadialLayoutDisplayWindow::GetBaseNodeColor(char baseCh) {
           return CairoColor_t::FromFLColorType(FL_LOCAL_MEDIUM_GREEN);
      }
      else if(toupper(baseCh) == (int) 'C') {
-	  return CairoColor_t::FromFLColorType(FL_LOCAL_DARK_RED);
+      return CairoColor_t::FromFLColorType(FL_LOCAL_DARK_RED);
      }
      else if(toupper(baseCh) == (int) 'G') {
-	  return CairoColor_t::FromFLColorType(FL_LOCAL_LIGHT_PURPLE);
+      return CairoColor_t::FromFLColorType(FL_LOCAL_LIGHT_PURPLE);
      }
      else if(toupper(baseCh) == (int) 'U') {
-	  return CairoColor_t::FromFLColorType(FL_LOCAL_BRIGHT_YELLOW);
+      return CairoColor_t::FromFLColorType(FL_LOCAL_BRIGHT_YELLOW);
      }
      else {
           return CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_BLACK);

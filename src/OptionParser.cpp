@@ -59,7 +59,7 @@ int ParseStructVizCommandOptions(int &argc, char ** &argv) {
      bool doneParsingStructViz = false;
      while(true) {
           
-	  static struct option longarg_options[] = {
+      static struct option longarg_options[] = {
                { "about",           no_argument,      NULL,                      PRINT_ABOUT },
                { "debug",           no_argument,      NULL,                      PRINT_DEBUG }, 
                { "help",            no_argument,      NULL,                      PRINT_HELP  },
@@ -70,57 +70,57 @@ int ParseStructVizCommandOptions(int &argc, char ** &argv) {
                { "verbose",         no_argument,      &CFG_VERBOSE_MODE,         SETVAR      },
                { NULL,              NULL,             NULL,                      NULL        },
           };
-	     
-	  int option_index = 0, optch;
-	  optch = getopt_long(argcInput, argvInput, "hqvV", longarg_options, &option_index);
-	  if(optch == -1) {
-	       break;
-	  }
+         
+      int option_index = 0, optch;
+      optch = getopt_long(argcInput, argvInput, "hqvV", longarg_options, &option_index);
+      if(optch == -1) {
+           break;
+      }
           switch(optch) {
                case 0:  
-		    switch(longarg_options[option_index].val) {
+            switch(longarg_options[option_index].val) {
                          case SETVAR:
                               *(longarg_options[option_index].flag) = 1;
-		              break;
-		         case NOSETVAR:
+                      break;
+                 case NOSETVAR:
                               *(longarg_options[option_index].flag) = 0;
-			      break;
-			 default:
-			      break;
-		    }
-	       case PRINT_ABOUT:
+                  break;
+             default:
+                  break;
+            }
+           case PRINT_ABOUT:
                     ProcessAboutOption();
-	            break;
-	       case PRINT_HELP:
-	       case 'h':
-		    ProcessHelpOption();
-		    break;
-	       case PRINT_DEBUG:
-	       case 'V':
-		    ProcessDebugOption();
-	            break;
-	       case NEW_CONFIG:
-	            ProcessNewConfigOption();
-		    break;
-	       case 'q':
-		    ProcessQuietOption();
-		    break;
-	       case 'v':
-		    ProcessVerboseOption();
-		    break;
-	       default:
-		    doneParsingStructViz = true;
-		    break;
-	  }
-	  if(doneParsingStructViz) {
+                break;
+           case PRINT_HELP:
+           case 'h':
+            ProcessHelpOption();
+            break;
+           case PRINT_DEBUG:
+           case 'V':
+            ProcessDebugOption();
+                break;
+           case NEW_CONFIG:
+                ProcessNewConfigOption();
+            break;
+           case 'q':
+            ProcessQuietOption();
+            break;
+           case 'v':
+            ProcessVerboseOption();
+            break;
+           default:
+            doneParsingStructViz = true;
+            break;
+      }
+      if(doneParsingStructViz) {
                break;
-	  }
+      }
      }
      int numOptionsParsed = optind - 1;
      if(REMOVE_STRUCTVIZ_OPTIONS) {
           argc -= numOptionsParsed;
-	  argv[numOptionsParsed] = argv[0];
-	  argv += numOptionsParsed;
+      argv[numOptionsParsed] = argv[0];
+      argv += numOptionsParsed;
      }
 
      return EXIT_SUCCESS;
