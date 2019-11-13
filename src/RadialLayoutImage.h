@@ -41,7 +41,8 @@ extern "C" {
 #define NUMBERING_MODULO              (10)
 #define DEFAULT_SCALING_PERCENT       (0.25)
 
-#define PNG_FOOTER_HEIGHT             (100)
+#define PNG_FOOTER_HEIGHT             (110)
+#define PNGOUT_MIN_IMAGE_WIDTH        (425)
 
 class RadialLayoutWindowCallbackInterface {
      
@@ -116,6 +117,7 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  int cairoWinTranslateX, cairoWinTranslateY;
 	  int defaultScrollToX, defaultScrollToY;
 	  double winScaleX, winScaleY;
+	  int imageHeight, imageWidth;
 
 	  int displayBaseLower, displayBaseHigher;
 	  std::string ctFileName, structFolderName, displayBaseStr;

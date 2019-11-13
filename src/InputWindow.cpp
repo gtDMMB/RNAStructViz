@@ -112,23 +112,23 @@ InputWindow::InputWindow(int w, int h, const char *label,
         else { 
 	    
 	    const char *windowDisplayMsg = "Which sample file for the organism\ndo you want to display?";
-	    Fl_Box *box = new Fl_Box(75, 5, 300, 40, windowDisplayMsg);
+	    Fl_Box *box = new Fl_Box(50, 5, 300, 40, windowDisplayMsg);
 	    box->box(FL_RSHADOW_BOX);
 	    box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 	    box->color(GUI_BGCOLOR);
 	    box->labelcolor(GUI_BTEXT_COLOR);
-	    Fl_Button *displayButton = new Fl_Button(100, 100, 200, 30, "Display Zoomed Region @|>");
+	    Fl_Button *displayButton = new Fl_Button(50, 100, 200, 30, "Display Zoomed Region @|>");
 	    displayButton->callback(DisplayCTFileCallback, (void*)0);
 	    displayButton->color(GUI_BGCOLOR);
 	    displayButton->labelcolor(GUI_BTEXT_COLOR);
 	    displayButton->set_active();
 	    displayButton->shortcut(FL_Enter);
-	    Fl_Button *cancelButton = new Fl_Button(310, 100, 75, 30, "Cancel @1+");
+	    Fl_Button *cancelButton = new Fl_Button(260, 100, 75, 30, "Cancel @1+");
             cancelButton->callback(CancelCallback); 
 	    cancelButton->color(GUI_BGCOLOR);
 	    cancelButton->labelcolor(GUI_BTEXT_COLOR);
             
-	    ctFileChooser = new Fl_Choice(175, 55, 215, 30, "Choose Sample Structure: ");
+	    ctFileChooser = new Fl_Choice(150, 55, 240, 30, "Choose Structure: ");
             ctFileChooser->color(GUI_BGCOLOR);
 	    ctFileChooser->labelcolor(GUI_BTEXT_COLOR);
 

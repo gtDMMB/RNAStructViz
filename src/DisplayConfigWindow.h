@@ -18,14 +18,14 @@
 
 #include "ConfigOptions.h"
 
-#define CONFIG_WINDOW_WIDTH         (800)
-#define CONFIG_WINDOW_HEIGHT        (640)
+#define CONFIG_WINDOW_WIDTH         (810)
+#define CONFIG_WINDOW_HEIGHT        (665)
 #define CONFIG_WINDOW_TITLE         ("RNAStructViz Configuration Options and Settings")
 
 #define CFGWIN_WIDGET_OFFSETX       (10)
 #define CFGWIN_WIDGET_OFFSETY       (10)
 #define CFGWIN_LABEL_HEIGHT         (18)
-#define CFGWIN_LABEL_WIDTH          (200)
+#define CFGWIN_LABEL_WIDTH          (205)
 #define CFGWIN_BUTTON_WIDTH         (150)
 #define CFGWIN_COLOR_WIDTH          (32)
 #define CFGWIN_SPACING              (7)
@@ -76,7 +76,7 @@ class DisplayConfigWindow : public Fl_Cairo_Window {
 		int imageStride;
 		uchar *imageData;
 
-                #define NUMSETTINGS      (3)
+                #define NUMSETTINGS      (4)
                 #define GUICOLORS        (4)
 
 		Fl_RGB_Image *fpathsIcon, *themesIcon;

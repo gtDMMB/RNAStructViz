@@ -27,7 +27,8 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 	scalePlusBtn(NULL), scaleMinusBtn(NULL), resetBtn(NULL), 
 	cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
         winScaleX(1.0), winScaleY(1.0), 
-        displayBaseLower(0), displayBaseHigher(0) {
+        imageHeight(0), imageWidth(0), 
+	displayBaseLower(0), displayBaseHigher(0) {
 
      int offsetY = 10;
      int offsetX = (w() - 5 * RADIAL_BUTTON_WIDTH) / 2 + RADIAL_WIDGET_WIDTH / 2;
@@ -208,7 +209,10 @@ std::string RadialLayoutDisplayWindow::GetExportToPNGOutputPath() {
     time_t currentTime = time(NULL);
     struct tm *tmCurrentTime = localtime(&currentTime);
     char defaultFilePath[MAX_BUFFER_SIZE];
-    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, (char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, 
+    defaultFilePath[0] = '\0';
+    strcat(defaultFilePath, (char *) PNG_OUTPUT_DIRECTORY);
+    strcat(defaultFilePath, defaultFilePath[strlen(defaultFilePath) - 1] == '/' ? "" : "/");
+    strftime(defaultFilePath + strlen(defaultFilePath), MAX_BUFFER_SIZE - 1, (char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, 
 		              tmCurrentTime);
     Fl_Native_File_Chooser fileChooser;
     fileChooser.title(chooserMsg);
@@ -246,32 +250,32 @@ void RadialLayoutDisplayWindow::SaveRadialLayoutToPNGCallback(Fl_Widget *exportB
      // initialize the image data:
      cairo_surface_t *pngInitSrc = cairo_get_target(rlDisplayWin->radialLayoutCanvas->GetCairoContext());
      cairo_surface_t *pngSrc = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
-		               rlDisplayWin->radialLayoutCanvas->GetWidth(), 
-			       rlDisplayWin->radialLayoutCanvas->GetHeight() + PNG_FOOTER_HEIGHT);
+		               rlDisplayWin->imageWidth, 
+			       rlDisplayWin->imageHeight + PNG_FOOTER_HEIGHT);
      cairo_t *crImageOutput = cairo_create(pngSrc);
-     CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_TRANSPARENT).ApplyRGBAColor(crImageOutput);
+     CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_WHITE).ApplyRGBAColor(crImageOutput);
      cairo_rectangle(crImageOutput, 0, 0, 
-		     rlDisplayWin->radialLayoutCanvas->GetWidth(), 
-	             rlDisplayWin->radialLayoutCanvas->GetHeight() + PNG_FOOTER_HEIGHT);
+		     rlDisplayWin->imageWidth, 
+	             rlDisplayWin->imageHeight + PNG_FOOTER_HEIGHT);
      cairo_fill(crImageOutput);
      
      // draw the footer data (metadata):
      CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_WHITE).ToOpaque().ApplyRGBAColor(crImageOutput);
      cairo_rectangle(crImageOutput, 0, 
-		     rlDisplayWin->radialLayoutCanvas->GetHeight(), 
-	             rlDisplayWin->radialLayoutCanvas->GetWidth(), 
+		     rlDisplayWin->imageHeight, 
+	             rlDisplayWin->imageWidth, 
 		     PNG_FOOTER_HEIGHT);
      cairo_fill(crImageOutput);
      CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_BLACK).ToOpaque().ApplyRGBAColor(crImageOutput);
      cairo_set_line_width(crImageOutput, 2);
-     cairo_move_to(crImageOutput, 0, rlDisplayWin->radialLayoutCanvas->GetHeight());
-     cairo_line_to(crImageOutput, rlDisplayWin->radialLayoutCanvas->GetWidth(), 
-		   rlDisplayWin->radialLayoutCanvas->GetHeight());
+     cairo_move_to(crImageOutput, 0, rlDisplayWin->imageHeight);
+     cairo_line_to(crImageOutput, rlDisplayWin->imageWidth, 
+		   rlDisplayWin->imageHeight);
      cairo_stroke(crImageOutput);
      cairo_select_font_face(crImageOutput, "Courier New",
                             CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
      cairo_set_font_size(crImageOutput, 12);
-     int offsetY = rlDisplayWin->radialLayoutCanvas->GetHeight() + 25;
+     int offsetY = rlDisplayWin->imageHeight + 25;
      const char *footerLabels[] = {
 	  " * Structure Folder Name: ",
           " * Structure File Name:   ", 
@@ -309,8 +313,8 @@ void RadialLayoutDisplayWindow::SaveRadialLayoutToPNGCallback(Fl_Widget *exportB
      // draw the source diagram onto the PNG output image:
      cairo_set_source_surface(crImageOutput, pngInitSrc, 0, 0);
      cairo_rectangle(crImageOutput, 0, 0, 
-		     rlDisplayWin->radialLayoutCanvas->GetWidth(), 
-	             rlDisplayWin->radialLayoutCanvas->GetHeight()); 
+		     rlDisplayWin->imageWidth, 
+	             rlDisplayWin->imageHeight); 
      cairo_fill(crImageOutput);
      if(cairo_surface_write_to_png(pngSrc, pngOutputPath.c_str()) != CAIRO_STATUS_SUCCESS) {
           fl_alert("ERROR WRITING PNG TO FILE (\"%s\"): %s\n", pngOutputPath.c_str(), strerror(errno));
@@ -449,17 +453,23 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           if(xmin < 0) {
 	       xPosArr[xyPos] += ABS(xmin) + nodeSize;
 	  }
+	  else {
+               xPosArr[xyPos] -= ABS(xmin);
+	  }
 	  if(ymin < 0) {
 	       yPosArr[xyPos] += ABS(ymin) + nodeSize;
+	  }
+	  else {
+	       yPosArr[xyPos] -= ABS(ymin);
 	  }
      }
      if(xmin < 0) {
 	  xmax += ABS(xmin) + nodeSize;
-          xmin = 0.0;
+          xmin = nodeSize;
      }
      if(ymin < 0) {
           ymax += ABS(ymin) + nodeSize;
-	  ymin = 0.0;
+	  ymin = nodeSize;
      }
      float winScale = 1.25 * nodeSize / dmin / M_SQRT2;
      float xScale = (float) (winScale * MAX(xmax / DEFAULT_RLWIN_WIDTH, 1.0));
@@ -467,10 +477,12 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      this->winScaleX = xScale;
      this->winScaleY = yScale;
 
-     CairoContext_t *plotCanvas = new CairoContext_t(MAX(DEFAULT_RLWIN_WIDTH, xmax - xmin) * xScale + 
-		                                     nodeSize, 
-		                                     MAX(DEFAULT_RLWIN_HEIGHT, ymax - ymin) * yScale + 
-						     nodeSize);
+     CairoContext_t *plotCanvas = new CairoContext_t(MAX(DEFAULT_RLWIN_WIDTH, (xmax - xmin) * xScale + 
+		                                     1.5 * nodeSize), 
+		                                     MAX(DEFAULT_RLWIN_HEIGHT, (ymax - ymin) * yScale + 
+						     1.5 * nodeSize));
+     imageHeight = ABS(ymax - ymin) * xScale + 1.5 * nodeSize;
+     imageWidth = MAX(PNGOUT_MIN_IMAGE_WIDTH, ABS(xmax - xmin) * yScale + 1.5 * nodeSize);
      plotCanvas->BlankFillCanvas(CairoColor_t::FromFLColorType(GUI_WINDOW_BGCOLOR));
      plotCanvas->SetColor(CairoColor_t::GetCairoColor(CairoColorSpec_t::CR_TRANSPARENT));
      plotCanvas->Translate(2 * nodeSize, 2 * nodeSize);
@@ -521,6 +533,12 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
 	  plotCanvas->DrawBaseNode(nodeX, nodeY, nodeLabel, nodeSize, 
 	  			   baseNodeColor);
 	  idx++;
+     }
+     if(defaultScrollToX + DEFAULT_RLWIN_WIDTH > imageWidth) {
+          defaultScrollToX = MAX(0, imageWidth - DEFAULT_RLWIN_WIDTH);
+     }
+     if(defaultScrollToY + DEFAULT_RLWIN_HEIGHT > imageHeight) {
+	  defaultScrollToY = MAX(0, imageHeight - DEFAULT_RLWIN_HEIGHT);
      }
 
      free(effectiveRNASubseq);

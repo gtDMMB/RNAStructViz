@@ -218,16 +218,19 @@ void DisplayConfigWindow::ConstructWindow() {
      const char *fieldDesc[] = {
 	"@->   File Search Directory:", 
 	"@->   PNG Output Directory:", 
-	"@->   PNG Output File Name:"
+	"@->   PNG Output File Name:", 
+	"@->   Radial Layout PNG Name:"
      };
      volatile char (*fieldUpdateVars[])[MAX_BUFFER_SIZE] = {
          &CTFILE_SEARCH_DIRECTORY, 
 	 &PNG_OUTPUT_DIRECTORY, 
-	 &PNG_OUTPUT_PATH
+	 &PNG_OUTPUT_PATH, 
+	 &PNG_RADIAL_LAYOUT_OUTPUT_PATH,
      };
      bool needsDirChooser[] {
           true, 
           true,
+	  false,
 	  false
      };
      for(int f = 0; f < NUMSETTINGS; f++) {

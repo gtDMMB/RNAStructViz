@@ -1988,8 +1988,11 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     time_t currentTime = time(NULL);
     struct tm *tmCurrentTime = localtime(&currentTime);
     char defaultFilePath[MAX_BUFFER_SIZE];
-    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, (char *) PNG_OUTPUT_PATH, 
-		              tmCurrentTime);
+    defaultFilePath[0] = '\0';
+    strcat(defaultFilePath, (char *) PNG_OUTPUT_DIRECTORY);
+    strcat(defaultFilePath, defaultFilePath[strlen(defaultFilePath) - 1] == '/' ? "" : "/");
+    strftime(defaultFilePath + strlen(defaultFilePath), MAX_BUFFER_SIZE - 1, (char *) PNG_OUTPUT_PATH, 
+             tmCurrentTime);
     Fl_Native_File_Chooser fileChooser;
     fileChooser.title(chooserMsg);
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
