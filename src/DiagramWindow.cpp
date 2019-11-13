@@ -2054,15 +2054,15 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     case 1: // CANCEL
          return string("");
     default:
-         std::string outfilePath = string(fileChooser.filename());
          const char *outFileFullPath = fileChooser.filename();
 	 const char *dirMarkerPos = strrchr(outFileFullPath, '/');
 	 if(dirMarkerPos != NULL) {
 	      strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath, 
                       dirMarkerPos - outFileFullPath);
               ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
+	      outFileFullPath = dirMarkerPos + 1;
 	 }
-	 return outfilePath;
+	 return std::string(outFileFullPath);
     }
 }
 

@@ -1,4 +1,0 @@
-Filename	Reference	Base_Pairs	True_Positive	False_Positive	False_Negative	Conflict	Contradict	Compatible	Sensitivity	Selectivity	Positive_Predictive_Value	G-C_Pairs	A-U_Pairs	G-U_Pairs	Non-Canonical_Pairs
-GTfold_E.coli_16S.ct	1	496	496	0	0	0	0	0	1.0000000000	1.0000000000	1.0000000000	275	157	64	0
-RNAfold_E.coli_16S.ct	0	498	258	240	238	30	208	2	0.5201612711	0.5201612711	0.5180723071	269	152	77	0
-RNAstructure_E.coli_16S.ct	0	497	278	219	218	35	180	4	0.5604838729	0.5638945103	0.5593561530	268	150	79	0

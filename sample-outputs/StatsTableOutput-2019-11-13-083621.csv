@@ -1,0 +1,9 @@
+Filename,Reference,Base_Pairs,True_Positive,False_Positive,False_Negative,Conflict,Contradict,Compatible,Sensitivity,Selectivity,Positive_Predictive_Value,G-C_Pairs,A-U_Pairs,G-U_Pairs,Non-Canonical_Pairs
+16S_C.elegans_RNAStructure,1,220,220,0,0,0,0,0,1.0000000000,1.0000000000,1.0000000000,41,137,42,0
+16S_C.elegans_comparative,0,182,24,158,196,12,141,5,0.1090909094,0.1355932206,0.1318681389,40,99,22,21
+16S_C.elegans_GTfold,0,215,62,153,158,18,133,2,0.2818181813,0.2910798192,0.2883720994,46,136,33,0
+16S_C.elegans_RNAfold,0,211,92,119,128,8,110,1,0.4181818068,0.4380952418,0.4360189438,42,132,37,0
+16S_C.elegans_UNAfold,0,217,62,155,158,18,133,4,0.2818181813,0.2910798192,0.2857142985,47,137,33,0
+16S_C.elegans_sfold-centroid,0,186,63,123,157,14,108,1,0.2863636315,0.3405405283,0.3387096822,42,119,25,0
+SampleFormatExample_helix_triple_format_v1,0,33,0,33,220,4,29,0,0.0000000000,0.0000000000,0.0000000000,1,7,7,18
+SampleFormatExample_helix_triple_format_v2,0,22,0,22,220,2,20,0,0.0000000000,0.0000000000,0.0000000000,3,6,1,12

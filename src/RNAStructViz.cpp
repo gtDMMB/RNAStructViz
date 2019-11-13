@@ -372,8 +372,8 @@ int RNAStructViz::BackupAndUnlinkLocalConfigFiles(bool clearStickyFolderNamesOnl
          std::string(dateStampSuffix);
      if(!clearStickyFolderNamesOnly && rename(configPath.c_str(), configBackupPath.c_str()) || 
     rename(stickyFolderPath.c_str(), stickyFolderBackupPath.c_str())) {
-          TerminalText::PrintError("Unable to rename backup config files \"%s\" and/or \"%s\" : %s\n", 
-                       configBackupPath.c_str(), stickyFolderPath.c_str(), strerror(errno));
+          TerminalText::PrintInfo("Unable to rename backup config files \"%s\" and/or \"%s\" : %s\n", 
+                                  configBackupPath.c_str(), stickyFolderPath.c_str(), strerror(errno));
       return errno;
      }
 }

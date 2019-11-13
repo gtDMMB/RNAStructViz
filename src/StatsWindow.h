@@ -252,17 +252,17 @@ private:
   	Fl_Pack* leg4_pack;
   	
   	// Equation legend labels
-    Fl_Box* tp_label;
-    Fl_Box* fp_label;
-    Fl_Box* fp_equ_label;
-    Fl_Box* sens_label;
-    Fl_Box* sel_label;
-    Fl_Box* ppv_label;
-    Fl_Box* ppv_equ_label;
+        Fl_Box* tp_label;
+        Fl_Box* fp_label;
+        Fl_Box* fp_equ_label;
+        Fl_Box* sens_label;
+        Fl_Box* sel_label;
+        Fl_Box* ppv_label;
+        Fl_Box* ppv_equ_label;
     
   	// "Export" button and name InputWindow
   	Fl_Button* exp_button;
-    InputWindow* input_window;
+        InputWindow* input_window;
     
 };
 

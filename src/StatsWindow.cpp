@@ -2023,15 +2023,15 @@ void StatsWindow::ExportTable()
     tab_window->deactivate();
     
     char filename[MAX_BUFFER_SIZE];
-        char dateStamp[MAX_BUFFER_SIZE];
-        time_t currentTime = time(NULL);
-        struct tm *tmCurrentTime = localtime(&currentTime);
-        strftime(dateStamp, MAX_BUFFER_SIZE - 1, "%F-%H%M%S", tmCurrentTime);
+    char dateStamp[MAX_BUFFER_SIZE];
+    time_t currentTime = time(NULL);
+    struct tm *tmCurrentTime = localtime(&currentTime);
+    strftime(dateStamp, MAX_BUFFER_SIZE - 1, "%F-%H%M%S", tmCurrentTime);
     const char *sepChar = PNG_OUTPUT_DIRECTORY[
-            strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
-             "" : "/";
+                strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
+                "" : "/";
     snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.csv", 
-         PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
+             PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
     Delete(input_window);
     input_window = new InputWindow(450, 150, 
 		                   "Export Table To CSV-Fomatted Plaintext File ...",
