@@ -3,13 +3,20 @@
  * Created: 2019.03.11
  */
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <limits.h>
+#include <time.h>
 
 #include <FL/fl_draw.H>
+#include <FL/Fl_Native_File_Chooser.H>
 
 #include "RadialLayoutImage.h"
 #include "RNAStructure.h"
 #include "ThemesConfig.h"
+#include "ConfigOptions.h"
+#include "ConfigParser.h"
 
 RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height) : 
 	Fl_Cairo_Window(width, height), RadialLayoutWindowCallbackInterface(), 
@@ -19,15 +26,17 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 	scrollerFillBox(NULL), windowScroller(NULL), 
 	scalePlusBtn(NULL), scaleMinusBtn(NULL), resetBtn(NULL), 
 	cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
-        winScaleX(1.0), winScaleY(1.0) {
+        winScaleX(1.0), winScaleY(1.0), 
+        displayBaseLower(0), displayBaseHigher(0) {
 
      int offsetY = 10;
-     int offsetX = (w() - 3 * RADIAL_BUTTON_WIDTH - 2 * RADIAL_WIDGET_WIDTH) / 2 + RADIAL_WIDGET_WIDTH / 2;
+     int offsetX = (w() - 5 * RADIAL_BUTTON_WIDTH) / 2 + RADIAL_WIDGET_WIDTH / 2;
     
      scaleMinusBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
 		                   "@<<   Zoom Out");
      scaleMinusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      scaleMinusBtn->labelcolor(GUI_BTEXT_COLOR);
+     scaleMinusBtn->labelfont(FL_HELVETICA);
      scaleMinusBtn->callback(ScaleRadialLayoutMinusCallback);
      offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
  
@@ -35,6 +44,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 		                  "Zoom In   @>>");
      scalePlusBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      scalePlusBtn->labelcolor(GUI_BTEXT_COLOR);
+     scalePlusBtn->labelfont(FL_HELVETICA);
      scalePlusBtn->callback(ScaleRadialLayoutPlusCallback);
      offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
 
@@ -42,8 +52,16 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 		                  "@redo   Reset");
      resetBtn->color(Darker(GUI_BGCOLOR, 0.5f));
      resetBtn->labelcolor(GUI_BTEXT_COLOR);
+     resetBtn->labelfont(FL_HELVETICA);
      resetBtn->callback(RadialLayoutResetCallback);
+     offsetX += RADIAL_BUTTON_WIDTH + RADIAL_WIDGET_WIDTH / 2;
 
+     exportToPNGBtn = new Fl_Button(offsetX, offsetY, RADIAL_BUTTON_WIDTH, RADIAL_WIDGET_HEIGHT, 
+		                    "@filesaveas  Export to PNG");
+     exportToPNGBtn->color(Darker(GUI_BGCOLOR, 0.5f));
+     exportToPNGBtn->labelcolor(GUI_BTEXT_COLOR);
+     exportToPNGBtn->labelfont(FL_HELVETICA);
+     exportToPNGBtn->callback(SaveRadialLayoutToPNGCallback);
 
      offsetY += 10 + RADIAL_WIDGET_HEIGHT;
      buttonToolbarHeight = offsetY; 
@@ -65,6 +83,7 @@ RadialLayoutDisplayWindow::~RadialLayoutDisplayWindow() {
      Delete(radialLayoutCanvas);
      Delete(scalePlusBtn);
      Delete(scaleMinusBtn);
+     Delete(exportToPNGBtn);
      Delete(windowScroller);
 }
 
@@ -92,6 +111,20 @@ bool RadialLayoutDisplayWindow::SetTitleFormat(const char *windowTitleFmt, ...) 
      va_end(argPtr);
      nextTitleStr[MAX_BUFFER_SIZE] = '\0';
      return SetTitle(nextTitleStr);
+}
+
+void RadialLayoutDisplayWindow::SetStructureCTFileName(std::string fileName) {
+     ctFileName = fileName;
+}
+
+void RadialLayoutDisplayWindow::SetStructureFolderName(std::string folderName) {
+     structFolderName = folderName;
+}
+
+void RadialLayoutDisplayWindow::SetStructureBases(int baseLower, int baseHigher, std::string baseStr) {
+     displayBaseLower = baseLower;
+     displayBaseHigher = baseHigher;
+     displayBaseStr = baseStr;
 }
 
 bool RadialLayoutDisplayWindow::SetRadialPlotType(VRNAPlotType_t plotType) {
@@ -169,6 +202,124 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
      }
 }
 
+std::string RadialLayoutDisplayWindow::GetExportToPNGOutputPath() {
+    const char *chooserMsg = "Choose a file name for your PNG output image ...";
+    const char *fileExtMask = "*.png";
+    time_t currentTime = time(NULL);
+    struct tm *tmCurrentTime = localtime(&currentTime);
+    char defaultFilePath[MAX_BUFFER_SIZE];
+    strftime(defaultFilePath, MAX_BUFFER_SIZE - 1, (char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, 
+		              tmCurrentTime);
+    Fl_Native_File_Chooser fileChooser;
+    fileChooser.title(chooserMsg);
+    fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
+    fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
+		        Fl_Native_File_Chooser::SAVEAS_CONFIRM);
+    fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
+    fileChooser.preset_file(defaultFilePath);
+    switch(fileChooser.show()) {
+        case -1: // ERROR
+             fl_alert("Error selecting file path to save PNG image: \"%s\".\nIf you are receiving a permissions error trying to save the image into the directory you have chosen, try again by saving the PNG image into a path in your user home directory.", fileChooser.errmsg());
+	     return string("");
+	case 1: // CANCEL
+	     return string("");
+	default:
+	     std::string outfilePath = string(fileChooser.filename());
+	     strncpy((char *) PNG_OUTPUT_DIRECTORY, fileChooser.directory(), 
+			      MAX_BUFFER_SIZE - 1);
+	     ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
+	     return outfilePath;
+    }
+}
+
+void RadialLayoutDisplayWindow::SaveRadialLayoutToPNGCallback(Fl_Widget *exportBtn, void *udata) {
+     
+     RadialLayoutDisplayWindow *rlDisplayWin = (RadialLayoutDisplayWindow *) exportBtn->parent();
+     if(rlDisplayWin == NULL || rlDisplayWin->radialLayoutCanvas == NULL) {
+          return;
+     }
+     std::string pngOutputPath = rlDisplayWin->GetExportToPNGOutputPath();
+     if(pngOutputPath.length() == 0) {
+          return;
+     }
+     
+     // initialize the image data:
+     cairo_surface_t *pngInitSrc = cairo_get_target(rlDisplayWin->radialLayoutCanvas->GetCairoContext());
+     cairo_surface_t *pngSrc = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
+		               rlDisplayWin->radialLayoutCanvas->GetWidth(), 
+			       rlDisplayWin->radialLayoutCanvas->GetHeight() + PNG_FOOTER_HEIGHT);
+     cairo_t *crImageOutput = cairo_create(pngSrc);
+     CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_TRANSPARENT).ApplyRGBAColor(crImageOutput);
+     cairo_rectangle(crImageOutput, 0, 0, 
+		     rlDisplayWin->radialLayoutCanvas->GetWidth(), 
+	             rlDisplayWin->radialLayoutCanvas->GetHeight() + PNG_FOOTER_HEIGHT);
+     cairo_fill(crImageOutput);
+     
+     // draw the footer data (metadata):
+     CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_WHITE).ToOpaque().ApplyRGBAColor(crImageOutput);
+     cairo_rectangle(crImageOutput, 0, 
+		     rlDisplayWin->radialLayoutCanvas->GetHeight(), 
+	             rlDisplayWin->radialLayoutCanvas->GetWidth(), 
+		     PNG_FOOTER_HEIGHT);
+     cairo_fill(crImageOutput);
+     CairoColor_t::FromNamedConstant(CairoColorSpec_t::CR_SOLID_BLACK).ToOpaque().ApplyRGBAColor(crImageOutput);
+     cairo_set_line_width(crImageOutput, 2);
+     cairo_move_to(crImageOutput, 0, rlDisplayWin->radialLayoutCanvas->GetHeight());
+     cairo_line_to(crImageOutput, rlDisplayWin->radialLayoutCanvas->GetWidth(), 
+		   rlDisplayWin->radialLayoutCanvas->GetHeight());
+     cairo_stroke(crImageOutput);
+     cairo_select_font_face(crImageOutput, "Courier New",
+                            CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+     cairo_set_font_size(crImageOutput, 12);
+     int offsetY = rlDisplayWin->radialLayoutCanvas->GetHeight() + 25;
+     const char *footerLabels[] = {
+	  " * Structure Folder Name: ",
+          " * Structure File Name:   ", 
+	  " * Structure Bases Shown: ", 
+	  " * Image Generated At:    ",
+     };
+     const char *footerData[] = {
+	  rlDisplayWin->structFolderName.c_str(), 
+	  rlDisplayWin->ctFileName.c_str(), 
+	  "[%d, %d]", 
+	  "%c %Z",
+     };
+     for(int fd = 0; fd < GetArrayLength(footerLabels); fd++) {
+          char curStructLabel[MAX_BUFFER_SIZE];
+	  snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, 
+	           "%s%s", footerLabels[fd], footerData[fd]);
+	  if(fd == 2) {
+               char curStructLabel2[MAX_BUFFER_SIZE];
+	       snprintf(curStructLabel2, MAX_BUFFER_SIZE - 1, curStructLabel, 
+			rlDisplayWin->displayBaseLower, rlDisplayWin->displayBaseHigher);
+	       strcpy(curStructLabel, curStructLabel2);
+	  }
+	  else if(fd == 3) {
+               char curStructLabel2[MAX_BUFFER_SIZE];
+	       time_t curTime = time(NULL);
+	       struct tm *tmCurTime = localtime(&curTime);
+	       strftime(curStructLabel2, MAX_BUFFER_SIZE - 1, curStructLabel, tmCurTime);
+	       strcpy(curStructLabel, curStructLabel2);
+	  }
+     	  cairo_move_to(crImageOutput, 12, offsetY);
+	  cairo_show_text(crImageOutput, curStructLabel);
+	  offsetY += 22;
+     }
+     
+     // draw the source diagram onto the PNG output image:
+     cairo_set_source_surface(crImageOutput, pngInitSrc, 0, 0);
+     cairo_rectangle(crImageOutput, 0, 0, 
+		     rlDisplayWin->radialLayoutCanvas->GetWidth(), 
+	             rlDisplayWin->radialLayoutCanvas->GetHeight()); 
+     cairo_fill(crImageOutput);
+     if(cairo_surface_write_to_png(pngSrc, pngOutputPath.c_str()) != CAIRO_STATUS_SUCCESS) {
+          fl_alert("ERROR WRITING PNG TO FILE (\"%s\"): %s\n", pngOutputPath.c_str(), strerror(errno));
+     }
+     cairo_destroy(crImageOutput);
+     cairo_surface_destroy(pngSrc);
+     rlDisplayWin->redraw();
+}
+
 void RadialLayoutDisplayWindow::ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBtn, void *udata) {
      RadialLayoutDisplayWindow *rwin = (RadialLayoutDisplayWindow *) scaleBtn->parent();
      float scalingFactor = 1.0 + DEFAULT_SCALING_PERCENT;
@@ -208,8 +359,8 @@ void RadialLayoutDisplayWindow::HandleWindowScrollCallback(Fl_Widget *scrw, void
      Fl_Scroll *windowScroller = (Fl_Scroll *) scrw;
      int scrollXPos = windowScroller->xposition();
      int scrollYPos = windowScroller->yposition();
-     mainWindow->cairoWinTranslateX = scrollXPos; //* mainWindow->winScaleX;
-     mainWindow->cairoWinTranslateY = scrollYPos; //* mainWindow->winScaleY;
+     mainWindow->cairoWinTranslateX = scrollXPos; 
+     mainWindow->cairoWinTranslateY = scrollYPos; 
      mainWindow->redraw();
 }
 
@@ -232,6 +383,7 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
           return NULL;
      }
      StringToUppercase(effectiveRNASubseq);
+     SetStructureBases(startPos, endPos, effectiveRNASubseq);
      size_t startPos2 = 0; 
      size_t endPos2 = strlen(effectiveRNASubseq);
      endPos2 = endPos2 ? endPos2 - 1 : 0;
@@ -275,12 +427,6 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
      else {
           workingIdx = naview_xy_coordinates(pairTableG, xPosArr, yPosArr);
      }
-     //if(workingIdx != rnaSubseqLen) {
-     //     fl_alert("Warning: Strange things are happening with the ViennaRNA PS plot algorithm ...\n"
-     //	           " > workingIdx = %d, RNASubseqLen = %d;", 
-     // 		   workingIdx, rnaSubseqLen);
-     //}
-
      double xmin, xmax, ymin, ymax, dmin;
      xmin = xmax = xPosArr[0];
      ymin = ymax = yPosArr[0];

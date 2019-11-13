@@ -528,7 +528,8 @@ cairo_t * CairoContext_t::GetCairoContext() const {
 }
 
 cairo_surface_t * CairoContext_t::GetCairoSurface() const {
-     return cairoSurface;
+     return cairo_get_target(cairoContext);
+     //return cairoSurface;
 }
 
 bool CairoContext_t::LoadFromImage(const char *imageFilePath) {

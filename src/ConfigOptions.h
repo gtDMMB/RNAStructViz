@@ -33,7 +33,9 @@ using std::string;
 
 #define DEFAULT_CTFILE_SEARCH_DIRECTORY (GetUserHome())
 #define DEFAULT_PNG_OUTPUT_DIRECTORY    (GetUserHome())
-#define DEFAULT_PNG_OUTPUT_PATH         ("RNAStructViz-GUIView-%F-%H%M%S.png") 
+#define DEFAULT_PNG_OUTPUT_PATH         ("RNAStructViz-ArcDiagram-%F-%H%M%S.png") 
+                                        /* As a strftime format string */
+#define DEFAULT_RLAYOUT_PNG_OUTPUT_PATH ("RNAStructViz-RadialLayout-%F-%H%M%S.png") 
                                         /* As a strftime format string */
 #define DEFAULT_FLTK_THEME              ("gtk+")
 #define FLTK_THEME_COUNT                (6)
@@ -45,6 +47,7 @@ using std::string;
 extern volatile char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
 extern volatile char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
 extern volatile char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
+extern volatile char PNG_RADIAL_LAYOUT_OUTPUT_PATH[MAX_BUFFER_SIZE];
 extern volatile char FLTK_THEME[MAX_BUFFER_SIZE];
 extern const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT];
 extern const char *FLTK_THEME_HELP[FLTK_THEME_COUNT];

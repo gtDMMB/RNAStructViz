@@ -197,6 +197,7 @@ OptionParser.$(OBJEXT): OptionParser.h ConfigOptions.h TerminalPrinting.h \
 	$(CXX) $(CXXFLAGS_FULL) -c OptionParser.cpp
 
 RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h\
+	RNAStructure.h ThemesConfig.h ConfigOptions.h ConfigParser.h\
 	RadialLayoutImage.h RadialLayoutImage.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RadialLayoutImage.cpp
 

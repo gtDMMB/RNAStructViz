@@ -230,28 +230,26 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 	}
 	cairo_surface_t *pngInitSource = cairo_get_target(thisWindow->crDraw);
         cairo_surface_t *pngSource = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
-		                     IMAGE_WIDTH, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT + 
-				     PNG_FOOTER_HEIGHT);
+		                     IMAGE_WIDTH, IMAGE_HEIGHT + PNG_FOOTER_HEIGHT);
 	cairo_t *crImageOutput = cairo_create(pngSource);
         thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_TRANSPARENT);
-	cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT + 
-			STRAND_MARKER_IMAGE_HEIGHT + PNG_FOOTER_HEIGHT);
+	cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH, IMAGE_HEIGHT + PNG_FOOTER_HEIGHT);
 	cairo_fill(crImageOutput);
 	thisWindow->RedrawStrandEdgeMarker(crImageOutput);
 	// now draw the footer data:
         thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_SOLID_WHITE);
-	cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT, 
+	cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT, 
 			IMAGE_WIDTH, PNG_FOOTER_HEIGHT);
 	cairo_fill(crImageOutput);
 	thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_SOLID_BLACK);
 	cairo_set_line_width(crImageOutput, 2);
-	cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT); 
-	cairo_line_to(crImageOutput, IMAGE_WIDTH, IMAGE_HEIGHT + STRAND_MARKER_IMAGE_HEIGHT);
+	cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT); 
+	cairo_line_to(crImageOutput, IMAGE_WIDTH, IMAGE_HEIGHT);
 	cairo_stroke(crImageOutput);
 	cairo_select_font_face(crImageOutput, "Courier New", 
 		               CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
         cairo_set_font_size(crImageOutput, 12);
-	int offsetY = IMAGE_HEIGHT  + STRAND_MARKER_IMAGE_HEIGHT + 25;
+	int offsetY = IMAGE_HEIGHT + 25;
 	for(int s = 0; s < 3; s++) {
              char curStructLabel[MAX_BUFFER_SIZE];
 	     int menuChoiceIdx = thisWindow->m_menus[s]->value();
@@ -271,15 +269,17 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 	cairo_show_text(crImageOutput, imageTimeStamp);
 	// draw the source diagram image onto the PNG output image:
 	cairo_set_source_surface(crImageOutput, pngInitSource, 0, 0);
-        cairo_rectangle(crImageOutput, 0, 0, IMAGE_HEIGHT, IMAGE_WIDTH + 
-			STRAND_MARKER_IMAGE_HEIGHT);
+        cairo_rectangle(crImageOutput, 0, 0, IMAGE_HEIGHT, IMAGE_WIDTH);
         cairo_fill(crImageOutput);
 	if(cairo_surface_write_to_png(pngSource, exportFilePath.c_str()) != 
 			              CAIRO_STATUS_SUCCESS) {
              fl_alert("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));
 	}
+	cairo_destroy(crImageOutput);
+	cairo_surface_destroy(pngSource);
         buttonPressed->clear_changed();
-        thisWindow->redraw();
+        thisWindow->drawWidgets(NULL);
+	thisWindow->redraw();
     }
 }
 
@@ -1661,7 +1661,9 @@ int DiagramWindow::handle(int flEvent) {
 			 		      "Radial Display for %s -- Highlighting Bases #%d to #%d", 
 			 		      rnaStruct->GetFilenameNoExtension(), 
 			 		      seqStartPos + 1, seqEndPos + 1);
-                         radialDisplayWindow->SetParentWindow(this);
+                         radialDisplayWindow->SetStructureCTFileName(rnaStruct->GetFilename());
+			 radialDisplayWindow->SetStructureFolderName(structManager->GetFolderAt(folderIndex)->folderName);
+			 radialDisplayWindow->SetParentWindow(this);
 			 radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos, rnaStruct->GetLength());
 			 radialDisplayWindow->show();
 
@@ -1992,8 +1994,7 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     fileChooser.title(chooserMsg);
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
     fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
-		        Fl_Native_File_Chooser::SAVEAS_CONFIRM | 
-		        Fl_Native_File_Chooser::PREVIEW);
+		        Fl_Native_File_Chooser::SAVEAS_CONFIRM);
     fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
     fileChooser.preset_file(defaultFilePath);
     switch(fileChooser.show()) {

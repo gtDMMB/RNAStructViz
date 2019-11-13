@@ -81,6 +81,12 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
 		    nullTerminateString(pngOutputPath);
 	       }
 	  }
+	  else if(!strcmp(parsedLine.cfgOption, "PNGOUT_RLAYOUT_PATH")) {
+               if(strlen(parsedLine.cfgValue) > 0) {
+	            strncpy(pngRadialLayoutOutputPath, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
+		    nullTerminateString(pngRadialLayoutOutputPath);
+	       }
+	  }
 	  else if(!strcmp(parsedLine.cfgOption, "FLTK_THEME")) {
 	       strncpy(fltkTheme, parsedLine.cfgValue, MAX_BUFFER_SIZE - 1);
 	       nullTerminateString(fltkTheme);
@@ -156,27 +162,29 @@ int ConfigParser::writeFile(const char *userCfgFile, bool silenceErrors) const {
           "CTFILE_SEARCH_DIR", 
 	  "PNGOUT_DIR", 
 	  "PNGOUT_PATH", 
-	  "FLTK_THEME"
+	  "PNGOUT_RLAYOUT_PATH",
+	  "FLTK_THEME",
      };
      const char *cfgValues[] = { 
           ctFileSearchDirectory, 
 	  pngOutputDirectory, 
 	  pngOutputPath,
-	  fltkTheme
+	  pngRadialLayoutOutputPath,
+	  fltkTheme,
      }; 
      const char *cfgColorOptions[] = {
           "GUI_WINDOW_BGCOLOR", 
 	  "GUI_BGCOLOR", 
 	  "GUI_BTEXT_COLOR", 
 	  "GUI_TEXT_COLOR", 
-	  "GUI_CTFILEVIEW_COLOR"
+	  "GUI_CTFILEVIEW_COLOR",
      };
      const Fl_Color cfgColorValues[] = {
           guiWindowBGColor, 
 	  guiBGColor, 
 	  guiBTextColor, 
           guiTextColor,
-	  guiCTFileViewColor
+	  guiCTFileViewColor,
      };
 
      FILE *fpCfgFile = fopen(userCfgFile, "w+"); 
@@ -275,6 +283,8 @@ void ConfigParser::storeVariables() const {
      nullTerminateString((char *) PNG_OUTPUT_DIRECTORY, MAX_BUFFER_SIZE - 1); 
      strncpy((char *) PNG_OUTPUT_PATH, pngOutputPath, MAX_BUFFER_SIZE - 1);
      nullTerminateString((char *) PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);  
+     strncpy((char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, pngRadialLayoutOutputPath, MAX_BUFFER_SIZE - 1);
+     nullTerminateString((char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);  
      strncpy((char *) FLTK_THEME, fltkTheme, MAX_BUFFER_SIZE - 1); 
      nullTerminateString((char *) FLTK_THEME, MAX_BUFFER_SIZE - 1); 
 
@@ -344,6 +354,8 @@ void ConfigParser::setDefaults() {
      nullTerminateString(pngOutputDirectory);
      strncpy(pngOutputPath, (char *) PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
      nullTerminateString(pngOutputPath);
+     strncpy(pngRadialLayoutOutputPath, (char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
+     nullTerminateString(pngRadialLayoutOutputPath);
      strncpy(fltkTheme, (char *) FLTK_THEME, MAX_BUFFER_SIZE - 1);
      nullTerminateString(fltkTheme);
      

@@ -6,6 +6,8 @@
 #ifndef __RADIAL_LAYOUT_IMAGE_H__
 #define __RADIAL_LAYOUT_IMAGE_H__
 
+#include <string>
+
 #include <FL/Fl_Cairo_Window.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Box.H>
@@ -27,18 +29,19 @@ extern "C" {
 #include "ConfigOptions.h"
 #include "CairoDrawingUtils.h"
 
-#define DEFAULT_RLWIN_WIDTH           (550)
+#define DEFAULT_RLWIN_WIDTH           (750)
 #define DEFAULT_RLWIN_HEIGHT          (550)
 
 #define RADIAL_WIDGET_HEIGHT          (35)
 #define RADIAL_WIDGET_WIDTH           (50)
-#define RADIAL_BUTTON_WIDTH           (115)
+#define RADIAL_BUTTON_WIDTH           (140)
 #define RADIAL_WIDGET_SPACING         (10)
 #define SCROLL_SIZE                   (20)
 
 #define NUMBERING_MODULO              (10)
 #define DEFAULT_SCALING_PERCENT       (0.25)
 
+#define PNG_FOOTER_HEIGHT             (100)
 
 class RadialLayoutWindowCallbackInterface {
      
@@ -83,7 +86,11 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 
 	  bool SetTitle(const char *windowTitleStr);
 	  bool SetTitleFormat(const char *windowTitleFmt, ...);
-	  
+
+	  void SetStructureCTFileName(std::string fileName);
+	  void SetStructureFolderName(std::string folderName);
+	  void SetStructureBases(int baseLower, int baseHigher, std::string baseStr);
+
 	  bool SetRadialPlotType(VRNAPlotType_t plotType = PLOT_TYPE_CIRCULAR);
 	  bool DisplayRadialDiagram(const char *rnaSeq, size_t startSeqPos, 
 			            size_t endSeqPos, size_t seqLength);
@@ -102,12 +109,20 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 
 	  Fl_Box *scrollerFillBox;
 	  Fl_Button *scalePlusBtn, *scaleMinusBtn, *resetBtn;
+	  Fl_Button *exportToPNGBtn;
 	  Fl_Scroll *windowScroller;
+	  
 	  int buttonToolbarHeight;
 	  int cairoWinTranslateX, cairoWinTranslateY;
 	  int defaultScrollToX, defaultScrollToY;
 	  double winScaleX, winScaleY;
 
+	  int displayBaseLower, displayBaseHigher;
+	  std::string ctFileName, structFolderName, displayBaseStr;
+
+	  std::string GetExportToPNGOutputPath();
+
+	  static void SaveRadialLayoutToPNGCallback(Fl_Widget *exportBtn, void *udata);
 	  static void ScaleRadialLayoutPlusCallback(Fl_Widget *scaleBtn, void *udata);
           static void ScaleRadialLayoutMinusCallback(Fl_Widget *scaleBtn, void *udata);
 	  static void RadialLayoutResetCallback(Fl_Widget *resetBtn, void *udata);

@@ -40,6 +40,7 @@
      volatile char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE]; 
      volatile char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
      volatile char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
+     volatile char PNG_RADIAL_LAYOUT_OUTPUT_PATH[MAX_BUFFER_SIZE];
      volatile char FLTK_THEME[MAX_BUFFER_SIZE]; 
 
      const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT] = { 
@@ -89,6 +90,8 @@ bool DisplayConfigWindow::SetupInitialConfig() {
      ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
      strncpy((char *) PNG_OUTPUT_PATH, DEFAULT_PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
      ConfigParser::nullTerminateString((char *) PNG_OUTPUT_PATH);
+     strncpy((char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH, DEFAULT_RLAYOUT_PNG_OUTPUT_PATH, MAX_BUFFER_SIZE - 1);
+     ConfigParser::nullTerminateString((char *) PNG_RADIAL_LAYOUT_OUTPUT_PATH);
      strncpy((char *) FLTK_THEME, DEFAULT_FLTK_THEME, MAX_BUFFER_SIZE - 1); 
      ConfigParser::nullTerminateString((char *) FLTK_THEME); 
      snprintf(LIBFLTK_VERSION_STRING, MAX_BUFFER_SIZE - 1, 
