@@ -106,12 +106,12 @@ install: default
 	echo "Install Prefix: $$INSTALL_PREFIX";\
 	mkdir -p $(INSTALL_PREFIX)/bin;\
 	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz;\
-	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures;\
+	mkdir -p $(INSTALL_PREFIX)/share/RNAStructViz/sample-structures;\
 	cp -ap $(BINARY_OUTPUT) $(INSTALL_PREFIX)/bin/;\
-	cp -ap ../sample_structures/* \
-		$(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
-	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/
-	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample_structures/*
+	cp -ap ../sample-structures/* \
+		$(INSTALL_PREFIX)/share/RNAStructViz/sample-structures/
+	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample-structures/
+	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample-structures/*
 
 profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	./RNAStructViz #--inuse_space --inuse_objects --alloc_space --alloc_objects

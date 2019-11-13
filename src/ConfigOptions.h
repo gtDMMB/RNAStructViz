@@ -42,7 +42,7 @@ using std::string;
 #define USER_CONFIG_DIR                 ((string(GetUserHome()) + string("/.RNAStructViz/")).c_str())
 #define USER_CONFIG_PATH                ((USER_CONFIG_DIR + string("config.cfg")).c_str())
 #define USER_SAMPLE_STRUCTS_BASE_PATH   (string(GetUserHome()) + string("/RNAStructViz"))
-#define USER_SAMPLE_STRUCTS_PATH        (USER_SAMPLE_STRUCTS_BASE_PATH + string("/sample_structures"))
+#define USER_SAMPLE_STRUCTS_PATH        (USER_SAMPLE_STRUCTS_BASE_PATH + string("/sample-structures"))
 
 extern volatile char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
 extern volatile char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];

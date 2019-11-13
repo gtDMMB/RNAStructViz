@@ -17,8 +17,8 @@ namespace fs = boost::filesystem;
 #include "TerminalPrinting.h"
 
 static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
-             {
-              "Standard help key shortcut", 
+        {
+          "Standard help key shortcut", 
           "[F1]", 
           MODKEY_NONE, 
           FL_F + 1,
@@ -279,13 +279,13 @@ std::string RNAStructViz::LocateSampleStructuresOnSystem() {
           isApplePlatform = true; // brew folders are easy to locate!
      #endif
      if(isApplePlatform) {
-      const char *brewStructDir = "/usr/local/opt/rnastructviz/sample_structures";
+      const char *brewStructDir = "/usr/local/opt/rnastructviz/sample-structures";
           if(ConfigParser::directoryExists(brewStructDir)) {
                return std::string(brewStructDir);
       }
      }
      else {
-      const char *unixSudoInstallDir = "/usr/local/share/RNAStructViz/sample_structures";
+      const char *unixSudoInstallDir = "/usr/local/share/RNAStructViz/sample-structures";
       if(ConfigParser::directoryExists(unixSudoInstallDir)) {
            return std::string(unixSudoInstallDir);
       }
@@ -299,7 +299,7 @@ std::string RNAStructViz::LocateSampleStructuresOnSystem() {
       return "";
      }
      std::string prefixPath = cwdPath.substr(0, srcDirPos - 1);
-     prefixPath += std::string("/sample_structures");
+     prefixPath += std::string("/sample-structures");
      if(ConfigParser::directoryExists(prefixPath.c_str())) {
           return prefixPath;
      }      
@@ -316,17 +316,19 @@ int RNAStructViz::CopySampleStructures() {
      }
      if(ConfigParser::directoryExists(USER_SAMPLE_STRUCTS_PATH.c_str())) {
           TerminalText::PrintInfo("User home sample structure directory already exists: \"%s\"\n", 
-                      USER_SAMPLE_STRUCTS_PATH.c_str());
+                                  USER_SAMPLE_STRUCTS_PATH.c_str());
      }
      else {
           mode_t mkdirModes = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
-      const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), mkdirModes);
-      const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      mkdirModes); 
-      if(mkdirStatus1 == -1 || mkdirStatus2 == -1) {
-           TerminalText::PrintError("Unable to create user home sample directory: \"%s\"\n", 
-                            USER_SAMPLE_STRUCTS_PATH.c_str());
-           return -1;
-      }
+          const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), mkdirModes);
+          const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      mkdirModes); 
+          if(mkdirStatus1 == -1 || mkdirStatus2 == -1) {
+               TerminalText::PrintError("Unable to create user home sample directory: \"%s\"\n", 
+                                         mkdirStatus1 == -1 ? 
+			                 USER_SAMPLE_STRUCTS_BASE_PATH.c_str() : 
+				         USER_SAMPLE_STRUCTS_PATH.c_str());
+               return -1;
+          }
      }
      
      // have system path, made local directory, now copy the files:
@@ -334,22 +336,22 @@ int RNAStructViz::CopySampleStructures() {
      boost::filesystem::path const & destDir(USER_SAMPLE_STRUCTS_PATH.c_str());
      while(ssFile != fs::directory_iterator()) {
           fs::path ssCurPath(ssFile->path());
-      if(!fs::is_directory(ssCurPath)) {
-           try {
-                    fs::copy_file(ssCurPath, destDir / ssCurPath.filename());
-           } catch(boost::filesystem::filesystem_error fse) {
-                TerminalText::PrintInfo("Cannot copy \"%s\" into home directory (file already exists)\n", 
-                            ssCurPath.filename().c_str());
+           if(!fs::is_directory(ssCurPath)) {
+                try {
+                         fs::copy_file(ssCurPath, destDir / ssCurPath.filename());
+                } catch(boost::filesystem::filesystem_error fse) {
+                     TerminalText::PrintInfo("Cannot copy \"%s\" into home directory (file already exists)\n", 
+                                             ssCurPath.filename().c_str());
+                }
            }
-      }
-          ++ssFile;
+           ++ssFile;
      }
      //stdfs::copy(sampleStructDir.c_str(), USER_SAMPLE_STRUCTS_PATH, 
      //         stdfs::copy_options::overwrite_existing);
      strcpy((char *) CTFILE_SEARCH_DIRECTORY, USER_SAMPLE_STRUCTS_PATH.c_str());
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      std::string successMsg = std::string("Successfully copied the sample structure files! ") + 
-                          std::string("They are now located in \n« ") + 
+                  std::string("They are now located in \n« ") + 
                   std::string(USER_SAMPLE_STRUCTS_PATH) + 
                   std::string(" ». \nClick on the \"Load Files\" button to start selecting ") + 
                   std::string("the sample \nstructures we just copied!");
