@@ -2030,7 +2030,8 @@ void StatsWindow::ExportTable()
     const char *sepChar = PNG_OUTPUT_DIRECTORY[
                 strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' ? 
                 "" : "/";
-    snprintf(filename, MAX_BUFFER_SIZE - 1, "%s%sStatsTableOutput-%s.csv", 
+    snprintf(filename, MAX_BUFFER_SIZE - 1, 
+             "%s%sRNAStructViz-StatsTableOutput-%s.csv", 
              PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
     Delete(input_window);
     input_window = new InputWindow(450, 150, 
