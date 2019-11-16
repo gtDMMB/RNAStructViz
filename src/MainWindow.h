@@ -21,6 +21,7 @@
 #include "ConfigOptions.h"
 #include "RNAStructViz.h"
 #include "FolderWindow.h"
+#include "LoadFileSelectAllButton.h"
 
 #define NAVBUTTONS_OFFSETX   (5)
 #define NAVBUTTONS_OFFSETY   (10) 
@@ -184,8 +185,7 @@ class MainWindow
 	    The file chooser dialog.
         */
         Fl_File_Chooser *m_fileChooser;
-        Fl_Button *m_fileChooserSelectAllBtn;
-	static void FileChooserSelectAllCallback(Fl_Widget *btn, void *udata);
+        SelectAllButton *m_fileChooserSelectAllBtn;
 
 	/* Other widgets that need to be updated when we change the theme settings */
 	Fl_Box *columnLabel, *actionsLabel;

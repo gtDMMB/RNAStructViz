@@ -71,7 +71,7 @@ RNASTRUCTVIZ_OBJECTS = \
 	BaseSequenceIDs.$(OBJEXT) BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
 	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) \
 	DisplayConfigWindow.$(OBJEXT)\
-	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) \
+	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) LoadFileSelectAllButton.$(OBJEXT) \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
 	OptionParser.$(OBJEXT) \
 	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
@@ -182,6 +182,10 @@ FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
 	ConfigOptions.h MainWindow.h pixmaps/StructureOperationIcon.c\
 	FolderWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
+
+LoadFileSelectAllButton.$(OBJEXT): LoadFileSelectAllButton.h ConfigOptions.h\
+	LoadFileSelectAllButton.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c LoadFileSelectAllButton.cpp
 
 Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	TerminalPrinting.h OptionParser.h Main.cpp

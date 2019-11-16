@@ -296,49 +296,49 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 
     const char *nextWorkingDir = ms_instance->m_fileChooser->directory();
     if(nextWorkingDir != NULL && strcmp(nextWorkingDir, (char *) CTFILE_SEARCH_DIRECTORY)) { 
-    // update the working directory:
-        strncpy((char *) CTFILE_SEARCH_DIRECTORY, nextWorkingDir, MAX_BUFFER_SIZE - 1);
-    ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY);
+         // update the working directory:
+         strncpy((char *) CTFILE_SEARCH_DIRECTORY, nextWorkingDir, MAX_BUFFER_SIZE - 1);
+         ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY);
     }
 
-    if(ms_instance->m_fileChooserSelectAllBtn->user_data() == (void *) ms_instance->m_fileChooser) {
+    if(ms_instance->m_fileChooserSelectAllBtn->SelectAllFilesActivated()) {
         for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i) {
             const char *nextFilename = strrchr(ms_instance->m_fileChooser->value(i), '/');
-        nextFilename = nextFilename ? nextFilename : ms_instance->m_fileChooser->value(i);
-        if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
-           !strcmp(nextFilename, "..") || 
-           ConfigParser::directoryExists(nextFilename)) { // invalid file to parser, so ignore it:
-            continue;
-        }
+            nextFilename = nextFilename ? nextFilename : ms_instance->m_fileChooser->value(i);
+            if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
+               !strcmp(nextFilename, "..") || 
+               ConfigParser::directoryExists(nextFilename)) { // invalid file to parser, so ignore it:
+                continue;
+            }
             if(strlen(nextFilename) + strlen(nextWorkingDir) + 1 >= MAX_BUFFER_SIZE) {
-             fl_alert("Unable to open file: %s\nTotal file path name exceeds %d bytes.", 
-                  nextFilename, MAX_BUFFER_SIZE);
-             continue;
-        }
+                 fl_alert("Unable to open file: %s\nTotal file path name exceeds %d bytes.", 
+                          nextFilename, MAX_BUFFER_SIZE);
+                 continue;
+            }
             char nextFilePath[MAX_BUFFER_SIZE];
-        snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir, 
+            snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir, 
                  nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/", 
-             nextFilename);
-        RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
+                 nextFilename);
+            RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
         }
     }
     else {
-    const char *fileChooserFilter = (const char *) ms_instance->m_fileChooserSelectAllBtn->user_data();
-    fs::directory_iterator cwdDirIter(nextWorkingDir);
-    std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
+        const char *fileChooserFilter = ms_instance->m_fileChooserSelectAllBtn->GetSelectedFileFilter();
+        fs::directory_iterator cwdDirIter(nextWorkingDir);
+        std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
         std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
-    for(int fi = 0; fi < sortedFilePaths.size(); fi++) {
+        for(int fi = 0; fi < sortedFilePaths.size(); fi++) {
              fs::path curFileEntryPath = sortedFilePaths[fi];
-         if(!fs::is_directory(curFileEntryPath) && 
-            fl_filename_match(curFileEntryPath.filename().c_str(), fileChooserFilter)) {
+             if(!fs::is_directory(curFileEntryPath) && 
+                  fl_filename_match(curFileEntryPath.filename().c_str(), fileChooserFilter)) {
                   char nextFilePath[MAX_BUFFER_SIZE];
                   snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir,
                            nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/",
                            curFileEntryPath.filename().c_str());
-          TerminalText::PrintDebug("Adding structure with path \"%s\"\n", nextFilePath);
+                  TerminalText::PrintDebug("Adding structure with path \"%s\"\n", nextFilePath);
                   RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
+              }
          }
-    }
     }
 
     ms_instance->m_packedInfo->redraw();
@@ -519,7 +519,7 @@ void MainWindow::MoveFolderDown(Fl_Widget *widget, void* userData)
 bool MainWindow::CreateFileChooser()
 {
     if(m_fileChooser) {
-    Delete(m_fileChooserSelectAllBtn);
+        Delete(m_fileChooserSelectAllBtn);
         Delete(m_fileChooser);
     }
 
@@ -552,22 +552,10 @@ bool MainWindow::CreateFileChooser()
     m_fileChooser->favorites_label = "  @search  Goto Favorites ...";
      
     // add select all button:
-    m_fileChooserSelectAllBtn = new Fl_Button(0, 0, NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
-                                      "@filenew  Select All Files");
-    m_fileChooserSelectAllBtn->color(GUI_WINDOW_BGCOLOR);
-    m_fileChooserSelectAllBtn->labelcolor(GUI_BTEXT_COLOR);
-    m_fileChooserSelectAllBtn->user_data((void *) m_fileChooser);
-    m_fileChooserSelectAllBtn->callback(FileChooserSelectAllCallback); 
+    m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
    
     return true;
-}
-
-void MainWindow::FileChooserSelectAllCallback(Fl_Widget *btn, void *udata) {
-     Fl_File_Chooser *flfc = (Fl_File_Chooser *) btn->user_data();
-     const char *curFileFilter = flfc->filter();
-     btn->user_data((void *) curFileFilter);
-     flfc->hide();
 }
 
 void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)

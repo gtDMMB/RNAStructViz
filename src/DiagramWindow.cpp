@@ -1592,37 +1592,37 @@ int DiagramWindow::handle(int flEvent) {
       case FL_HIDE:
            return 1;
       case FL_PUSH: // mouse down
-               if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
-              Fl::event_y() >= (int) 1.25 * GLWIN_TRANSLATEY) {
+           if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
+                Fl::event_y() >= (int) 1.25 * GLWIN_TRANSLATEY) {
                 zoomButtonDown = true;
-            initZoomX = Fl::event_x();
-            initZoomY = Fl::event_y();
-            this->cursor(FL_CURSOR_MOVE);
-            Fl_Cairo_Window::handle(flEvent);
-            return 1;
+                initZoomX = Fl::event_x();
+                initZoomY = Fl::event_y();
+                this->cursor(FL_CURSOR_MOVE);
+                Fl_Cairo_Window::handle(flEvent);
+                return 1;
            }
       case FL_RELEASE:
            if(zoomButtonDown) {
-            lastZoomX = Fl::event_x();
-            lastZoomY = Fl::event_y();
-            this->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
-            zoomButtonDown = false;
-            haveZoomBuffer = true;
-            HandleUserZoomAction();
+                lastZoomX = Fl::event_x();
+                lastZoomY = Fl::event_y();
+                this->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
+                zoomButtonDown = false;
+                haveZoomBuffer = true;
+                HandleUserZoomAction();
            }
       case FL_DRAG:
            if(zoomButtonDown) {
-                    lastZoomX = Fl::event_x();
-            lastZoomY = Fl::event_y();
-                    zx0 = initZoomX;
-            zy0 = initZoomY;
-            zx1 = lastZoomX;
-            zy1 = lastZoomY;
-            zw = ABS(initZoomX - lastZoomX);
-            zh = ABS(initZoomY - lastZoomY);
-                    haveZoomBuffer = true;
-            redraw();
-            break;
+               lastZoomX = Fl::event_x();
+               lastZoomY = Fl::event_y();
+               zx0 = initZoomX;
+               zy0 = initZoomY;
+               zx1 = lastZoomX;
+               zy1 = lastZoomY;
+               zw = ABS(initZoomX - lastZoomX);
+               zh = ABS(initZoomY - lastZoomY);
+               haveZoomBuffer = true;
+               redraw();
+               break;
            }
       case FL_FOCUS:
            Fl_Cairo_Window::handle(flEvent);
@@ -1632,7 +1632,7 @@ int DiagramWindow::handle(int flEvent) {
            return 1;
       case FL_KEYDOWN:
            {
-                if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
+             if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
                  if(!haveZoomBuffer || !zoomBufferContainsArc) { 
                       const char *errMsg = "Select a zoom area containing a displayed arc before trying to view the structure's CT file contents!";
                   AddNewErrorMessageToDisplay(string(errMsg));
@@ -1670,7 +1670,7 @@ int DiagramWindow::handle(int flEvent) {
              }
              StructureManager *structManager = RNAStructViz::GetInstance()->
                                            GetStructureManager();
-                 int ctFileSelectIndex = ctFileSelectWin->getFileSelectionIndex();
+             int ctFileSelectIndex = ctFileSelectWin->getFileSelectionIndex();
              Delete(ctFileSelectWin);
              int structIdx = structManager->GetFolderAt(folderIndex)->
                          folderStructs[ctFileSelectIndex];
@@ -1707,7 +1707,8 @@ int DiagramWindow::handle(int flEvent) {
                            "Radial Display for %s -- Highlighting Bases #%d to #%d", 
                            rnaStruct->GetFilenameNoExtension(), 
                            seqStartPos + 1, seqEndPos + 1);
-                         radialDisplayWindow->SetStructureCTFileName(rnaStruct->GetFilename());
+                           radialDisplayWindow->SetStructureCTFileName(rnaStruct->GetFilename()
+	     );
              radialDisplayWindow->SetStructureFolderName(structManager->GetFolderAt(folderIndex)->folderName);
              radialDisplayWindow->SetParentWindow(this);
              radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos, rnaStruct->GetLength());
