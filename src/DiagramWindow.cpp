@@ -116,7 +116,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     
     Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw);
-    //redraw();
+    Fl::cairo_make_current(this);
 
 }
 

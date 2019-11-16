@@ -187,7 +187,6 @@ DisplayConfigWindow::DisplayConfigWindow() :
 }
 
 DisplayConfigWindow::~DisplayConfigWindow() {
-     //Fl::remove_timeout(RedrawTimerCallback, (void*) this);
      for(int w = 0; w < windowWidgets.size(); w++) {
           Delete(windowWidgets[w]);
      }
@@ -265,15 +264,15 @@ void DisplayConfigWindow::ConstructWindow() {
      }
      else {
               Fl_Button *updatePathBtn = new Fl_Button(offsetX, workingYOffset, 
-            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-            "Update @filesaveas");
-          updatePathBtn->color(GUI_BGCOLOR);
-          updatePathBtn->labelcolor(GUI_BTEXT_COLOR);
-          updatePathBtn->user_data((void *) f);
-          updatePathBtn->callback(UpdatePNGPathCallback);
-          windowWidgets.push_back(updatePathBtn);
-     }
-     workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+                                         CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                                         "Update @filesaveas");
+              updatePathBtn->color(GUI_BGCOLOR);
+              updatePathBtn->labelcolor(GUI_BTEXT_COLOR);
+              updatePathBtn->user_data((void *) f);
+              updatePathBtn->callback(UpdatePNGPathCallback);
+              windowWidgets.push_back(updatePathBtn);
+         }
+         workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
      }
      workingYOffset += CFGWIN_SPACING;
      
@@ -289,8 +288,8 @@ void DisplayConfigWindow::ConstructWindow() {
      int structColorCounts[3] = { 1, 3, 7 };
      const char *arcColorRowDesc[3] = {
           "@->   Arc Colors for One Structure:", 
-      "@->   Arc Colors for Two Structures:", 
-      "@->   Arc Colors for Three Structures:" 
+          "@->   Arc Colors for Two Structures:", 
+          "@->   Arc Colors for Three Structures:" 
      };
      volatile Fl_Color *structColorVarRefs[3][7] = {
          { 
@@ -299,16 +298,16 @@ void DisplayConfigWindow::ConstructWindow() {
          {
              &STRUCTURE_DIAGRAM_COLORS[1][0], 
              &STRUCTURE_DIAGRAM_COLORS[1][1], 
-                     &STRUCTURE_DIAGRAM_COLORS[1][2]
+             &STRUCTURE_DIAGRAM_COLORS[1][2]
          },
          {
              &STRUCTURE_DIAGRAM_COLORS[2][0], 
-                     &STRUCTURE_DIAGRAM_COLORS[2][1], 
-                     &STRUCTURE_DIAGRAM_COLORS[2][2], 
-                     &STRUCTURE_DIAGRAM_COLORS[2][3], 
-                     &STRUCTURE_DIAGRAM_COLORS[2][4], 
-                     &STRUCTURE_DIAGRAM_COLORS[2][5], 
-                     &STRUCTURE_DIAGRAM_COLORS[2][6]
+             &STRUCTURE_DIAGRAM_COLORS[2][1], 
+             &STRUCTURE_DIAGRAM_COLORS[2][2], 
+             &STRUCTURE_DIAGRAM_COLORS[2][3], 
+             &STRUCTURE_DIAGRAM_COLORS[2][4], 
+             &STRUCTURE_DIAGRAM_COLORS[2][5], 
+             &STRUCTURE_DIAGRAM_COLORS[2][6]
          }
      };
      int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
@@ -395,56 +394,57 @@ void DisplayConfigWindow::ConstructWindow() {
 
      const char *colorFieldDesc[] = {
           "@->   Window Background:", 
-      "@->   Widget Color:", 
-      "@->   Button Text Color:", 
-      "@->   Primary Text Color:"
+          "@->   Widget Color:", 
+          "@->   Button Text Color:", 
+          "@->   Primary Text Color:"
      };
      volatile Fl_Color *colorVarRefs[] = {
           &GUI_WINDOW_BGCOLOR, 
-      &GUI_BGCOLOR, 
-      &GUI_BTEXT_COLOR, 
-      &GUI_TEXT_COLOR
+          &GUI_BGCOLOR, 
+          &GUI_BTEXT_COLOR, 
+          &GUI_TEXT_COLOR
      };
      for(int c = 0; c < GUICOLORS; c++) { 
-     offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
+         offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
          Fl_Box *descBox = new Fl_Box(offsetX, workingYOffset, 
                CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
                colorFieldDesc[c]);
-     descBox->labelcolor(GUI_TEXT_COLOR);
-     descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-     windowWidgets.push_back(descBox);
-     offsetX += CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
-     Fl_Box *colorBox = new Fl_Box(offsetX, workingYOffset, 
+         descBox->labelcolor(GUI_TEXT_COLOR);
+         descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+         windowWidgets.push_back(descBox);
+         offsetX += CFGWIN_LABEL_WIDTH + 2 * CFGWIN_SPACING;
+         Fl_Box *colorBox = new Fl_Box(offsetX, workingYOffset, 
                 CFGWIN_COLOR_WIDTH, CFGWIN_LABEL_HEIGHT, "@square");
-     colorBox->labelcolor(*(colorVarRefs[c]));
-     colorDisplayBoxes[c] = colorBox;
-     colorChangeRefs[c] = colorVarRefs[c];
-     windowWidgets.push_back(colorBox);
-     offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
-     Fl_Button *selectColorButton = new Fl_Button(offsetX, workingYOffset, 
+         colorBox->labelcolor(*(colorVarRefs[c]));
+         colorDisplayBoxes[c] = colorBox;
+         colorChangeRefs[c] = colorVarRefs[c];
+         windowWidgets.push_back(colorBox);
+         offsetX += CFGWIN_COLOR_WIDTH + CFGWIN_SPACING;
+         Fl_Button *selectColorButton = new Fl_Button(offsetX, workingYOffset, 
                             CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-                    "Choose Color @|>");
-     selectColorButton->user_data((void *) c);
-     selectColorButton->labelcolor(GUI_BTEXT_COLOR); 
-     selectColorButton->color(GUI_BGCOLOR);
-     selectColorButton->callback(ChangeColorCallback); 
-     windowWidgets.push_back(selectColorButton);
+                            "Choose Color @|>");
+         selectColorButton->user_data((void *) c);
+         selectColorButton->labelcolor(GUI_BTEXT_COLOR); 
+         selectColorButton->color(GUI_BGCOLOR);
+         selectColorButton->callback(ChangeColorCallback); 
+         windowWidgets.push_back(selectColorButton);
          offsetX += CFGWIN_BUTTON_WIDTH + CFGWIN_SPACING;
-     Fl_Button *selectColormapBtn = new Fl_Button(offsetX, workingYOffset, 
+         Fl_Button *selectColormapBtn = new Fl_Button(offsetX, workingYOffset, 
                             CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
                     "Select Colormap @|>");
-     selectColormapBtn->user_data((void *) c);
-     selectColormapBtn->labelcolor(GUI_BTEXT_COLOR);
-     selectColormapBtn->color(GUI_BGCOLOR);
-     selectColormapBtn->callback(SelectFromColormapCallback);
-     windowWidgets.push_back(selectColormapBtn);
+         selectColormapBtn->user_data((void *) c);
+         selectColormapBtn->labelcolor(GUI_BTEXT_COLOR);
+         selectColormapBtn->color(GUI_BGCOLOR);
+         selectColormapBtn->callback(SelectFromColormapCallback);
+         windowWidgets.push_back(selectColormapBtn);
      
-     workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+         workingYOffset += CFGWIN_LABEL_HEIGHT + CFGWIN_SPACING;
+     
      }
 
      cfgCheckboxesIcon = new Fl_RGB_Image(ConfigCheckBoxParamsIcon.pixel_data, 
                                   ConfigCheckBoxParamsIcon.width, 
-                      ConfigCheckBoxParamsIcon.height, 
+                                  ConfigCheckBoxParamsIcon.height, 
                                   ConfigCheckBoxParamsIcon.bytes_per_pixel);
      Fl_Box *cfgCheckboxesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
                                        cfgCheckboxesIcon->w(), cfgCheckboxesIcon->h());
@@ -539,7 +539,7 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(cancelBtn);
 
      this->redraw();
-     //Fl::add_timeout(1.0, RedrawTimerCallback, (void*) this);
+     Fl::cairo_make_current(this);
 } 
 
 bool DisplayConfigWindow::isDone() const {

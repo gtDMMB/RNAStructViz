@@ -26,8 +26,8 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
     scrollerFillBox(NULL), windowScroller(NULL), 
     scalePlusBtn(NULL), scaleMinusBtn(NULL), resetBtn(NULL), 
     cairoWinTranslateX(0), cairoWinTranslateY(0), buttonToolbarHeight(0), 
-        winScaleX(1.0), winScaleY(1.0), 
-        imageHeight(0), imageWidth(0), 
+    winScaleX(1.0), winScaleY(1.0), 
+    imageHeight(0), imageWidth(0), 
     displayBaseLower(0), displayBaseHigher(0) {
 
      int offsetY = 10;
@@ -76,6 +76,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 
      color(GUI_WINDOW_BGCOLOR);
      set_draw_cb(Draw);
+     Fl::cairo_make_current(this);
 
 }
 
