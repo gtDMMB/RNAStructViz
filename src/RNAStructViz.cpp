@@ -141,7 +141,7 @@ void RNAStructViz::AddDiagramWindow(int index)
     
     if(folders.empty())
     {
-        m_diagramWindows.erase(m_diagramWindows.begin(),m_diagramWindows.end());
+        m_diagramWindows.erase(m_diagramWindows.begin(), m_diagramWindows.end());
         return;
     }
         
@@ -166,6 +166,7 @@ void RNAStructViz::AddDiagramWindow(int index)
             diagram->SetFolderIndex(index);
             diagram->ResetWindow(true);
             diagram->setAsCurrentDiagramWindow();
+	    diagram->make_current();
             diagram->show();
 	    diagram->redraw();
             return;

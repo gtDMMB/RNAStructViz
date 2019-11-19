@@ -84,11 +84,13 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     fl_rectf(0, 0, w, h);
     size_range(w, h, w, h);
     box(FL_NO_BOX);
-    setAsCurrentDiagramWindow();
-    if(redrawRefreshTimerSet) { 
-        Fl::add_timeout(DWIN_REDRAW_REFRESH, DiagramWindow::RedrawWidgetsTimerCallback);
-        redrawRefreshTimerSet = true;
-    }
+    //setAsCurrentDiagramWindow();
+    //if(redrawRefreshTimerSet) { 
+    //    Fl::add_timeout(DWIN_REDRAW_REFRESH, DiagramWindow::RedrawWidgetsTimerCallback);
+    //    redrawRefreshTimerSet = true;
+    //}
+    iconize();
+    set_non_modal();
 
     title = (char *) malloc(128 * sizeof(char));
     SetStructures(structures);
@@ -108,9 +110,9 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     cairo_fill(crBasePairsOverlay);
     crZoom = cairo_create(crZoomSurface);
     cairo_set_source_rgb(crZoom, 
-                 GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-             GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-             GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+                         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                         GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                         GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
     cairo_fill(crZoom);
     
@@ -124,9 +126,8 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
                              const std::vector<int> &structures) 
         : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
           RadialLayoutWindowCallbackInterface(this), 
-      m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
+          m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
-    
     Construct(w + WINW_EXTENSION, h, structures);
 }
 
@@ -137,7 +138,6 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
     copy_label(label);
     resize(x, y, w + WINW_EXTENSION, h);
-    
     Construct(w + WINW_EXTENSION, h, structures);
 }
 
@@ -148,11 +148,11 @@ DiagramWindow::~DiagramWindow() {
     }
     if(crSurface != NULL) {
         cairo_surface_destroy(crSurface);
-    cairo_destroy(crDraw);
-    cairo_surface_destroy(crZoomSurface);
+        cairo_destroy(crDraw);
+        cairo_surface_destroy(crZoomSurface);
         cairo_destroy(crZoom);
-    cairo_surface_destroy(crBasePairsSurface);
-    cairo_destroy(crBasePairsOverlay);
+        cairo_surface_destroy(crBasePairsSurface);
+        cairo_destroy(crBasePairsOverlay);
     }
     Delete(m_drawBranchesIndicator);
     Delete(m_cbShowTicks);
@@ -201,9 +201,9 @@ void DiagramWindow::ResetWindow(bool resetMenus = true) {
     }
     if(haveZoomBuffer) {
         cairo_set_source_rgb(crZoom, 
-                       GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-                   GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-                   GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+                             GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                             GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                             GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
         cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
         cairo_fill(crZoom);
     }
@@ -243,7 +243,6 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
 		    IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
 		    PNG_IMAGE_PADDING + PNG_FOOTER_HEIGHT);
     cairo_fill(crImageOutput);
-    //thisWindow->RedrawStrandEdgeMarker(crImageOutput);
     // now draw the footer data:
     thisWindow->SetCairoToExactFLColor(crImageOutput, thisWindow->color());
     cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2, 
