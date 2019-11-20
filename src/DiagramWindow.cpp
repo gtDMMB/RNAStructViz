@@ -82,7 +82,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
-    fl_rectf(0, 0, w, h);
+    //fl_rectf(0, 0, w, h);
     size_range(w, h, w, h);
     box(FL_NO_BOX);
     //setAsCurrentDiagramWindow();

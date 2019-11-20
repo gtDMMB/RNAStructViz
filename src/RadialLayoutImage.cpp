@@ -174,9 +174,9 @@ void RadialLayoutDisplayWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *
      }
      RadialLayoutDisplayWindow *thisWindow = (RadialLayoutDisplayWindow *) thisCairoWindow; 
      fl_color(GUI_WINDOW_BGCOLOR);
-     fl_rectf(0, thisWindow->buttonToolbarHeight, 
-          thisCairoWindow->w() - SCROLL_SIZE - 2, 
-          thisCairoWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
+     //fl_rectf(0, thisWindow->buttonToolbarHeight, 
+     //     thisCairoWindow->w() - SCROLL_SIZE - 2, 
+     //     thisCairoWindow->h() - thisWindow->buttonToolbarHeight - SCROLL_SIZE - 2);
      fl_color(FL_BLACK);
      fl_line_style(FL_SOLID | FL_CAP_ROUND | FL_JOIN_BEVEL);
      fl_xyline(0, thisWindow->buttonToolbarHeight - 2, thisCairoWindow->w());

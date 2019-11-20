@@ -152,13 +152,13 @@ diagnostic:
 	@echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
 	@$(CXX) --version -v $(CXXFLAGS_FULL)
 
-run: clean prelims default 
+run: clean default 
 	@echo ""
 	@./RNAStructViz --about
 	@echo ""
 	./RNAStructViz
 
-run-debug: clean prelims default
+run-debug: clean default
 	@echo ""
 	@./RNAStructViz --about
 	@echo ""
@@ -195,7 +195,7 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	xreader RNAStructViz-HeapProfile.pdf
 
 git-add: 
-	@echo -n $(git add --ignore-errors ./*.cpp ./*.h ./pixmaps/*.c Makefile ../scripts/* ../Makefile)
+	@echo -n $(git add --ignore-errors ./*.cpp ./*.h ./*.H ./pixmaps/*.c Makefile ../scripts/* ../Makefile)
 
 git-commit: git-add
 	@git commit -m '$("arg=$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}})'
