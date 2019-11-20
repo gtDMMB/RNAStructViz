@@ -16,8 +16,8 @@ static inline void DeletePointerCheck(PT *ptr) {
      }
 }
 
-#define DeletePointerNoType(p)          { DeletePointerCheck<void>(p); p = NULL;  }
-#define Delete(p, ptype)                { DeletePointerCheck<ptype>(p); p = NULL; }
+#define DeletePointerNoType(p)          ({ DeletePointerCheck<void>(p); p = NULL;  })
+#define Delete(p, ptype)                ({ DeletePointerCheck<ptype>(p); p = NULL; })
 
 static inline void FreePointerCheck(void *ptr) {
      if(ptr != NULL) {
@@ -25,7 +25,7 @@ static inline void FreePointerCheck(void *ptr) {
      }
 }
 
-#define Free(p)                         { FreePointerCheck(p); p = NULL; }
+#define Free(p)                         ({ FreePointerCheck(p); p = NULL; })
 
 typedef bool (*PredicateFunc_t)(char);
 

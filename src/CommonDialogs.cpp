@@ -153,7 +153,8 @@ void CommonDialogs::DisplayTourDialog() {
 std::string CommonDialogs::GetInfoAboutMessageString() {
      
      string infoTableOrigData[] = {
-           ApplicationBuildInfo::GitRevisionInfo(),
+	   ApplicationBuildInfo::GitReleaseType(),
+	   ApplicationBuildInfo::GitRevisionInfo(),
            ApplicationBuildInfo::GitRevisionDate(),
            ApplicationBuildInfo::FLTKVersionString(),
            ApplicationBuildInfo::BuildFLTKConfig(),

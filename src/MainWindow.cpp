@@ -318,7 +318,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     if(nextWorkingDir != NULL && strcmp(nextWorkingDir, (char *) CTFILE_SEARCH_DIRECTORY)) { 
          // update the working directory:
          strncpy((char *) CTFILE_SEARCH_DIRECTORY, nextWorkingDir, MAX_BUFFER_SIZE - 1);
-         ConfigParser::nullTerminateString((char *) CTFILE_SEARCH_DIRECTORY);
+         CTFILE_SEARCH_DIRECTORY[strlen(nextWorkingDir)] = '\0';
+	 ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     }
 
     if(ms_instance->m_fileChooserSelectAllBtn->SelectAllFilesActivated()) {
@@ -337,8 +338,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
             }
             char nextFilePath[MAX_BUFFER_SIZE];
             snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir, 
-                 nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/", 
-                 nextFilename);
+                     nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/", 
+                     nextFilename);
             RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
         }
     }
@@ -556,13 +557,13 @@ bool MainWindow::CreateFileChooser()
     m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
-            "All Formats (*.{boltz,ct,nopct,dot,bracket,dbn,helix,hlx})\t"
-                "CT Files (*.{nopct,ct})\t"
-            "DOT Bracket (*.{dot,bracket,dbn})\t"
-            "Boltzmann Format (*.boltz)\t"
-                "Helix Triple Format (*.{helix,hlx})\t"
-            "SEQ Files (*.bpseq)\t"
-            "All Files (*)"
+                 "All Formats (*.{boltz,ct,nopct,dot,bracket,dbn,helix,hlx})\t"
+                 "CT Files (*.{nopct,ct})\t"
+                 "DOT Bracket (*.{dot,bracket,dbn})\t"
+                 "Boltzmann Format (*.boltz)\t"
+                 "Helix Triple Format (*.{helix,hlx})\t"
+                 "SEQ Files (*.bpseq)\t"
+                 "All Files (*)"
             );
     m_fileChooser->directory(currentWD);
     m_fileChooser->preview(true);

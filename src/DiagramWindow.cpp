@@ -2030,11 +2030,14 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
     fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
                 Fl_Native_File_Chooser::SAVEAS_CONFIRM);
-    //fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
     fileChooser.preset_file(defaultFilePath);
     switch(fileChooser.show()) {
         case -1: // ERROR
-             fl_alert("Error selecting file path to save PNG image: \"%s\".\nIf you are receiving a permissions error trying to save the image into the directory you have chosen, try again by saving the PNG image into a path in your user home directory.", fileChooser.errmsg());
+             fl_alert("Error selecting file path to save PNG image: \"%s\".\n"
+		      "If you are receiving a permissions error trying to save "
+		      "the image into the directory you have chosen, try again by "
+		      "saving the PNG image into a path in your user home directory.", 
+		      fileChooser.errmsg());
          return string("");
     case 1: // CANCEL
          return string("");
@@ -2042,10 +2045,10 @@ std::string DiagramWindow::GetExportPNGFilePath() {
          const char *outFileFullPath = fileChooser.filename();
 	 const char *dirMarkerPos = strrchr(outFileFullPath, '/');
 	 if(dirMarkerPos != NULL) {
-	      strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath, 
-                      dirMarkerPos - outFileFullPath);
-              ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
-	      //outFileFullPath = dirMarkerPos + 1;
+	      unsigned int charsToCopy = (unsigned int) (dirMarkerPos - outFileFullPath);
+	      strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath, charsToCopy);
+              PNG_OUTPUT_DIRECTORY[charsToCopy] = '\0';
+	      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
 	 }
 	 fprintf(stderr, "%s [%c]\n", outFileFullPath, dirMarkerPos);
 	 return std::string(outFileFullPath);

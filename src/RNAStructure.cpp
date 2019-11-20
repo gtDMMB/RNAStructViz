@@ -27,7 +27,7 @@ RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(NULL), 
       charSeq(NULL), dotFormatCharSeq(NULL), charSeqSize(0), 
       m_pathname(NULL), m_pathname_noext(NULL), m_exactPathName(NULL), 
-      m_fileType(FILETYPE_NONE), 
+      m_fileType(FILETYPE_NONE), m_ctFileSelectionWin(NULL),
       m_fileCommentLine(NULL), m_suggestedFolderName(NULL), 
       m_ctDisplayString(NULL), m_ctDisplayFormatString(NULL), 
       m_seqDisplayString(NULL), m_seqDisplayFormatString(NULL), 
@@ -82,6 +82,7 @@ RNAStructure::~RNAStructure()
     }
     #endif
     DeleteContentWindow();
+    Delete(m_ctFileSelectionWindow, InputWindow);
     Free(m_fileCommentLine); 
     Delete(m_suggestedFolderName, char); 
 }
@@ -1300,16 +1301,17 @@ void RNAStructure::ExportFASTAFileCallback(Fl_Widget *btn, void *udata) {
      int fdataLength = rnaStructBaseObj->GenerateFASTAFormatString(
                                  fastaData, fdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
-     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.fasta\0", 
-          CTFILE_SEARCH_DIRECTORY, 
-          rnaStructBaseObj->GetFilenameNoExtension());
+     char lastDirCh = CTFIlE_SEARCH_DIRECTORY[strlen(CTFILE_SEARCH_DIRECTORY) - 1];
+     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s%s%s.fasta\0", 
+              CTFILE_SEARCH_DIRECTORY, lastDirCh == '/' ? "" : "/", 
+              rnaStructBaseObj->GetFilenameNoExtension());
      const char *exportPath = fl_file_chooser("Choose FASTA File Location ...", 
-                                      "*.fasta", suggestedOutFile, 0); 
-     bool fileWriteStatus = RNAStructure::Util::ExportStringToPlaintextFile(
-          exportPath, fastaData, fdataLength);
+                                              "*.fasta", suggestedOutFile, 0); 
+     bool fileWriteStatus = RNAStructure::Util::ExportStringToPlaintextFile(exportPath, fastaData, fdataLength);
      if(!fileWriteStatus) { 
-          fl_alert("Unable to write output FASTA file \"%s\" to disk! If you have a permissions error saving the file to disk, try saving to a location in your home directory.", 
-               exportPath);
+          fl_alert("Unable to write output FASTA file \"%s\" to disk! If you have a permissions " 
+		   "error saving the file to disk, try saving to a location in your home directory.", 
+                   exportPath);
      }
 }
 
@@ -1319,19 +1321,20 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
      size_t dbdataContentStrMaxLen = 2 * rnaStructBaseObj->charSeqSize + 
                                  DEFAULT_BUFFER_SIZE;
      char dotData[dbdataContentStrMaxLen + 1];
-     int dotDataLength = rnaStructBaseObj->GenerateDotBracketFormatString(
-                                   dotData, dbdataContentStrMaxLen);
+     int dotDataLength = rnaStructBaseObj->GenerateDotBracketFormatString(dotData, dbdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
-     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s/%s.dot\0", 
-          CTFILE_SEARCH_DIRECTORY, 
-          rnaStructBaseObj->GetFilenameNoExtension());
+     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+     snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s%s%s.dot\0", 
+              CTFILE_SEARCH_DIRECTORY, lastDirCh == '/' ? "" : "/", 
+              rnaStructBaseObj->GetFilenameNoExtension());
      const char *exportPath = fl_file_chooser("Choose DOT File Location ...", 
-                                      "*.dot", suggestedOutFile, 0); 
+                                              "*.dot", suggestedOutFile, 0); 
      bool fileWriteStatus = RNAStructure::Util::ExportStringToPlaintextFile(
           exportPath, dotData, dotDataLength);
      if(!fileWriteStatus) { 
-          fl_alert("Unable to write output DOT file \"%s\" to disk! If you have a permissions error saving the file to disk, try saving to a location in your home directory.", 
-               exportPath);
+          fl_alert("Unable to write output DOT file \"%s\" to disk! If you have a permissions error "
+	           "saving the file to disk, try saving to a location in your home directory.", 
+                   exportPath);
      }
 }
 
@@ -1435,14 +1438,17 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
 
 int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex, 
                                         int minArcIdx, int maxArcIdx) {
-     InputWindow *ctFileSelectionWin = new InputWindow(400, 175, "Select Structure File to Highlight ...", 
-                                                       "", InputWindow::CTVIEWER_FILE_INPUT, 
-                                                       structureFolderIndex);
+     
+     if(m_ctFileSelectionWin != NULL) {
+          Delete(m_ctFileSelectionWin, InputWindow);
+     }	  
+     m_ctFileSelectionWin = new InputWindow(400, 175, "Select Structure File to Highlight ...", 
+                                            "", InputWindow::CTVIEWER_FILE_INPUT, 
+                                            structureFolderIndex);
      while(ctFileSelectionWin->visible()) {
           Fl::wait();
      }
      if(ctFileSelectionWin->isCanceled() || ctFileSelectionWin->getFileSelectionIndex() < 0) {
-          Delete(ctFileSelectionWin, InputWindow);
           return -1;
      }
      ctFileSelectionWin->hide();
@@ -1462,7 +1468,6 @@ int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
           rnaStructManager->DisplayFileContents(structIndex, arcIndexDisplaySuffix);
           return structIndex;
      }
-     Delete(ctFileSelectionWin, InputWindow);
      return -1;
 }
 

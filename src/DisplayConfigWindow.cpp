@@ -568,9 +568,9 @@ void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
 
     DisplayConfigWindow *thisWin = (DisplayConfigWindow *) crWin;
     cairo_set_source_rgb(thisWin->crDraw, 
-                     GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
-                     GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-                 GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+                         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
+                         GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                         GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
     cairo_scale(thisWin->crDraw, thisWin->w(), thisWin->h());
     cairo_fill(thisWin->crDraw);
     thisWin->drawWidgets();
@@ -681,7 +681,6 @@ void DisplayConfigWindow::PresetThemeChooserMenuCallback(Fl_Widget *btn, void *u
 void DisplayConfigWindow::WriteConfigFileCallback(Fl_Widget *btn, void *udata) {
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      DisplayConfigWindow::WindowCloseCallback(btn, NULL);
-     //btn->parent()->hide();
 }
 
 void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {

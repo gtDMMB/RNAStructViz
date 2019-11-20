@@ -236,6 +236,7 @@ class RNAStructure
         char *m_pathname, *m_pathname_noext, *m_exactPathName;
 	char *m_fileCommentLine, *m_suggestedFolderName;
 	InputFileTypeSpec m_fileType;
+        InputWindow *m_ctFileSelectionWin;
 
         // Info for displaying the file contents
         Fl_Double_Window *m_contentWindow;

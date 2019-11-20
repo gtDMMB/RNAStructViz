@@ -73,7 +73,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v1.9.6-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v1.9.7-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 
@@ -89,25 +89,22 @@ using std::string;
 class ApplicationBuildInfo {
 
      protected:
-          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH = "##__GIT_COMMITREV_HASHNUM__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_RELEASE_TYPE      = "##__GIT_RELEASE_TYPE__##";
+	  inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH       = "##__GIT_COMMITREV_HASHNUM__##";
           inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH_SHORT = "##__GIT_COMMITREV_HASHNUM_SHORT__##";
-          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_DATE = "##__GIT_COMMITREV_DATE__##";
-          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_BRANCH_REVSTRING = "##__GIT_DESCRIBE_REVSTRING__##";
-          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_PLATFORM_ID = "##__BUILD_PLATFORM_ID__##";
-          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_DATETIME = "##__LOCAL_BUILD_TIME__##";
-          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_FLTK_CONFIG = "##__BUILD_FLTK_CONFIG__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_DATE       = "##__GIT_COMMITREV_DATE__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_BRANCH_REVSTRING  = "##__GIT_DESCRIBE_REVSTRING__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_PLATFORM_ID     = "##__BUILD_PLATFORM_ID__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_DATETIME        = "##__LOCAL_BUILD_TIME__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_FLTK_CONFIG     = "##__BUILD_FLTK_CONFIG__##";
 
      public:
        static inline string RNAStructVizFigletTextLogo() {
             static const char *figletTextLogoLines[] = {
-                 ".########..##....##....###.....######..########.########..##.....##..######..########.##.....##.####.########",
-                 ".##.....##.###...##...##.##...##....##....##....##.....##.##.....##.##....##....##....##.....##..##.......##.",
-                 ".##.....##.####..##..##...##..##..........##....##.....##.##.....##.##..........##....##.....##..##......##..",
-                 ".########..##.##.##.##.....##..######.....##....########..##.....##.##..........##....##.....##..##.....##...",
-                 ".##...##...##..####.#########.......##....##....##...##...##.....##.##..........##.....##...##...##....##....",
-                 ".##....##..##...###.##.....##.##....##....##....##....##..##.....##.##....##....##......##.##....##...##.....",
-                 ".##.....##.##....##.##.....##..######.....##....##.....##..#######...######.....##.......###....####.########",
-            };
+                 "+-+-+-+-+-+-+-+-+-+-+-+-+",
+                 "|R|N|A|S|t|r|u|c|t|V|i|z|",
+                 "+-+-+-+-+-+-+-+-+-+-+-+-+",
+	    };
             std::string figletTextLogo = std::string("");
             int numLogoLines = sizeof(figletTextLogoLines) / sizeof(figletTextLogoLines[0]);
             for(int line = 0; line < numLogoLines; line++) {
@@ -118,6 +115,11 @@ class ApplicationBuildInfo {
           
        static inline string UserManualWikiLink() {
                return string("User Manual: https://github.com/gtDMMB/RNAStructViz/wiki");
+       }
+
+       static inline string GitReleaseType() {
+            string releaseDesc = string("Git Release Type: ") + string(GIT_RELEASE_TYPE);
+	    return releaseDesc;
        }
 
        static inline string GitRevisionInfoFull() {
@@ -176,8 +178,9 @@ class ApplicationBuildInfo {
             fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
             fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
             if(aboutStr == NULL) {
-                    fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
-                                      UserManualWikiLink().c_str(), GitRevisionInfoFull().c_str(), 
+                    fprintf(whichOut, "   >>%s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
+                                      UserManualWikiLink().c_str(), 
+				      GitReleaseType().c_str(), GitRevisionInfoFull().c_str(), 
                                       GitRevisionDate().c_str(), FLTKVersionString().c_str(),
                                       BuildFLTKConfig().c_str(),  
                                       CairoVersionString().c_str(), BuildPlatform().c_str(), 
@@ -186,7 +189,7 @@ class ApplicationBuildInfo {
             else {
                  fprintf(whichOut, "%s\n\n", aboutStr);
             }
-	    for(unsigned int chi = 0; chi < 10 + strlen(RNASTRUCTVIZ_VSTRING); chi++) {
+	    for(unsigned int chi = 0; chi < strlen(RNASTRUCTVIZ_VSTRING); chi++) {
 	         fprintf(whichOut, "=");
 	    }
 	    fprintf(whichOut, "\n\n");

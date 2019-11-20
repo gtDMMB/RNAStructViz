@@ -33,13 +33,10 @@
 
 Fl_RGB_Image * StatsWindow::overviewLegendImage = new Fl_RGB_Image(
                StatsOverviewLegend.pixel_data, 
-           StatsOverviewLegend.width, 
-           StatsOverviewLegend.height, 
-           StatsOverviewLegend.bytes_per_pixel
-          );
-
-//const int RocBoxPlot::draw_it_active = 1;
-//const Fl_Boxtype RocBoxPlot::ROC_BOX = FL_ROUNDED_FRAME;
+               StatsOverviewLegend.width, 
+               StatsOverviewLegend.height, 
+               StatsOverviewLegend.bytes_per_pixel
+);
 
 void RocBoxPlot::roc_box_draw(int x, int y, int w, int h, Fl_Color bgcolor) {
   fl_color(RocBoxPlot::draw_it_active ? FL_BLACK : fl_inactive(FL_BLACK));
@@ -95,7 +92,6 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
             comp_pack->color(GUI_WINDOW_BGCOLOR);
         }
         comp_menu->type(Fl_Scroll::VERTICAL);
-        //comp_menu->box(FL_UP_BOX);
         comp_menu->labelcolor(GUI_TEXT_COLOR);
         comp_menu->labelfont(FL_HELVETICA_BOLD_ITALIC);
         comp_menu->align(FL_ALIGN_TOP);
@@ -797,26 +793,23 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
     tab_window->end();
     
     this->resizable(tab_window);
-    //this->size_range(800, 600);
     this->end();
-    
-    input_window = NULL;
     
     title = (char*)malloc(sizeof(char) * 64);
     SetStructures(structures);
 }
 
 StatsWindow::StatsWindow(int w, int h, const char *label, 
-                         const std::vector<int>& structures)
-: Fl_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL)
-{
+                         const std::vector<int>& structures) : 
+	Fl_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
+	input_window(NULL) {
     Construct(w, h, structures);
 }
 
 StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label, 
-                         const std::vector<int>& structures)
-: Fl_Window(x, y, w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL)
-{
+                         const std::vector<int>& structures) : 
+	Fl_Window(x, y, w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
+	input_window(NULL) {
     Construct(w, h, structures);
 }
 
@@ -830,6 +823,7 @@ StatsWindow::~StatsWindow()
     if(statsFormulasBox != NULL) {
          delete statsFormulasBox;
     }
+    Delete(input_window, InputWindow);
 }
 
 void StatsWindow::ResetWindow()
@@ -1080,13 +1074,7 @@ void StatsWindow::resize(int x, int y, int w, int h)
     
 }
 
-void StatsWindow::hide()
-{
-    if (input_window != NULL)
-    {
-        delete input_window;
-        input_window = NULL;
-    }
+void StatsWindow::hide() {
     Fl_Window::hide();
 }
 
@@ -2045,14 +2033,15 @@ void StatsWindow::ExportTable()
     snprintf(filename, MAX_BUFFER_SIZE - 1, 
              "%s%sRNAStructViz-StatsTableOutput-%s.csv", 
              PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
-    Delete(input_window, InputWindow);
+    if(input_window != NULL) {
+         Delete(input_window, InputWindow);
+    }
     input_window = new InputWindow(450, 150, 
 		                   "Export Table To CSV-Fomatted Plaintext File ...",
                                     filename, InputWindow::FILE_INPUT);
     exp_button->value(1);
     exp_button->deactivate();
-    while (input_window != NULL && input_window->visible())
-    {
+    while (input_window->visible()) {
         Fl::wait();
     }
     
@@ -2063,6 +2052,13 @@ void StatsWindow::ExportTable()
         {
             strncpy(filename, input_window->getName(), MAX_BUFFER_SIZE - 1);
             expFile = fopen(filename, "a+");
+	    const char *dirMarkerPos = strrchr(filename, '/');
+	    if(dirMarkerPos != NULL) {
+		 unsigned int charsToCopy = (unsigned int) (dirMarkerPos - filename);
+	         strncpy((char *) PNG_OUTPUT_DIRECTORY, filename, charsToCopy);
+		 PNG_OUTPUT_DIRECTORY[charsToCopy] = '\0';
+		 ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+	    }
         }
         else {
             expFile = NULL;

@@ -130,6 +130,9 @@ class StructureManager
         // Vector of folders
         std::vector<Folder*> folders;
     
+	// Keep track of the InputWindow used to fetch input folder name input from the user:
+	InputWindow *m_inputWindow;
+
         /*
          Compares two RNAStructures, if the sequences of the structures are the same
          returns true, and false otherwise.

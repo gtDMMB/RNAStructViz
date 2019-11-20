@@ -257,8 +257,10 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
     
     // otherwise, use file name and file header comments to guess at a good name for the sequence:
     InputFileTypeSpec inputFileType = ClassifyInputFileType(seqFilePath);
-    std::string fullSeqFilePath = std::string((char *) CTFILE_SEARCH_DIRECTORY) + std::string("/") + 
-                              std::string(seqFilePath);
+    char lastDirCh = CTFILE_SEARCH_DIRECTORY[strlen(CTFILE_SEARCH_DIRECTORY) - 1];
+    std::string fullSeqFilePath = std::string((char *) CTFILE_SEARCH_DIRECTORY) + 
+	                          std::string(lastDirCh == '/' ? "" : "/") + 
+                                  std::string(seqFilePath);
     std::string fileHeaderLines = GetSequenceFileHeaderLines(fullSeqFilePath.c_str(), inputFileType);
     if(fileHeaderLines.size() > 0) {
          rnaStruct->SetFileCommentLines(fileHeaderLines, inputFileType);

@@ -34,8 +34,8 @@
 
 namespace RocBoxPlot {
 
-     static const Fl_Boxtype ROC_BOX = FL_ROUNDED_FRAME;
-     static const int draw_it_active = 1;
+     inline static const Fl_Boxtype ROC_BOX = FL_ROUNDED_FRAME;
+     inline static const int draw_it_active = 1;
 
      void roc_box_draw(int x, int y, int w, int h, Fl_Color bgcolor);
      void roc_box_init();

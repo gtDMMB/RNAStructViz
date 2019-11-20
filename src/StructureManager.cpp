@@ -15,7 +15,7 @@
 #include "TerminalPrinting.h"
 
 StructureManager::StructureManager()
-    : m_structureCount(0), m_structures(0) {}
+    : m_structureCount(0), m_structures(NULL), m_inputWindow(NULL) {}
 
 StructureManager::~StructureManager()
 {
@@ -29,6 +29,7 @@ StructureManager::~StructureManager()
         free(folders[i]->folderStructs); folders[i]->folderStructs = NULL;
         free(folders[i]);
     }
+    Delete(m_inputWindow, InputWindow);
 }
 
 void StructureManager::AddFile(const char* filename)
@@ -105,46 +106,48 @@ void StructureManager::AddFile(const char* filename)
     {
         for(int s = 0; s < newStructCount; s++) { 
         
-         int count = (int)folders.size();
-         RNAStructure *structure = structures[s];
-         if(!structure) { 
-              continue;
-         }
-         AddFirstEmpty(structure);
-             if(count == (int) folders.size()-1)
-             {
+           int count = (int)folders.size();
+           RNAStructure *structure = structures[s];
+           if(!structure) { 
+                continue;
+           }
+           AddFirstEmpty(structure);
+           if(count == (int) folders.size()-1)
+           {
                  
-         off_t stickyFolderExists = FolderNameForSequenceExists(
-                                 DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
-                         structure
-                            );
-         if(stickyFolderExists != LSEEK_NOT_FOUND && GUI_KEEP_STICKY_FOLDER_NAMES) {
-              char *stickyFolderName = LookupStickyFolderNameForSequence(
+              off_t stickyFolderExists = FolderNameForSequenceExists(
+                                      DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+                                      structure
+                     );
+              if(stickyFolderExists != LSEEK_NOT_FOUND && GUI_KEEP_STICKY_FOLDER_NAMES) {
+                    char *stickyFolderName = LookupStickyFolderNameForSequence(
                                     DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
-                            stickyFolderExists
+                                    stickyFolderExists
                            );
-                      if(stickyFolderName != NULL && !FolderNameExists(stickyFolderName)) {
-                   strcpy(folders[count]->folderName, stickyFolderName);
-                   Free(stickyFolderName);
-                           MainWindow::AddFolder(folders[count]->folderName, count, false);
-               continue;
-              }
-              Free(stickyFolderName);
-         }
+                     if(stickyFolderName != NULL && !FolderNameExists(stickyFolderName)) {
+                          strcpy(folders[count]->folderName, stickyFolderName);
+                          Free(stickyFolderName);
+                          MainWindow::AddFolder(folders[count]->folderName, count, false);
+                          continue;
+                     }
+                     Free(stickyFolderName);
+                 }
              
-         InputWindow* input_window = new InputWindow(525, 210, 
-                                                     "New Folder Added", folders[count]->folderName, 
-                                                     InputWindow::FOLDER_INPUT);
-                 while (input_window->visible()) {
+	         if(m_inputWindow != NULL) {
+	              Delete(m_inputWindow, InputWindow);
+		 }
+                 m_inputWindow = new InputWindow(525, 210, 
+                                                 "New Folder Added", folders[count]->folderName, 
+                                                  InputWindow::FOLDER_INPUT);
+                 while (m_inputWindow->visible()) {
                        Fl::wait();
                  }
             
                  bool same = false;
                  for(unsigned int ui = 0; ui < folders.size(); ui++)
                  {
-                     if (!strcmp(folders[ui]->folderName,input_window->getName())
-                         && strcmp(input_window->getName(),""))
-                     {
+                     if (!strcmp(folders[ui]->folderName, m_inputWindow->getName()) && 
+                         strcmp(m_inputWindow->getName(), "")) {
                           same = true;
                           break;
                      }
@@ -154,20 +157,22 @@ void StructureManager::AddFile(const char* filename)
                      int choice = fl_choice("Already have a folder with the name: %s, please choose another name.", 
                                             "Skip loading file", "Close", NULL, input_window->getName());
                      input_window->Cleanup(false);
-                     Delete(input_window, InputWindow);
                      if(choice == 0) {
                          same = false;
                          break;
                      }
-                     input_window = new InputWindow(525, 210, "New Folder Added", 
-                                                    folders[count]->folderName, InputWindow::FOLDER_INPUT);
-                     while (input_window->visible()) {
+                     if(m_inputWindow != NULL) {
+		          Delete(m_inputWindow, InputWindow);
+		     }
+		     m_inputWindow = new InputWindow(525, 210, "New Folder Added", 
+                                                     folders[count]->folderName, InputWindow::FOLDER_INPUT);
+                     while (m_inputWindow->visible()) {
                           Fl::wait();
                      }
-                     same = !strcmp(input_window->getName(), "");
+                     same = !strcmp(m_inputWindow->getName(), "");
                      for(unsigned int ui = 0; ui < folders.size(); ui++)
                      {
-                           if (!strcmp(folders[ui]->folderName, input_window->getName()))
+                           if (!strcmp(folders[ui]->folderName, m_inputWindow->getName()))
                            {
                              same = true;
                              break;
@@ -175,7 +180,7 @@ void StructureManager::AddFile(const char* filename)
                      }
                  }
                         
-                 if(input_window != NULL && strcmp(input_window->getName(), "")) {
+                 if(m_inputWindow != NULL && strcmp(m_inputWindow->getName(), "")) {
                      strcpy(folders[count]->folderName, input_window->getName());
                      if(GUI_KEEP_STICKY_FOLDER_NAMES) {
                      const char *baseSeq = structure->GetSequenceString();
@@ -195,11 +200,11 @@ void StructureManager::AddFile(const char* filename)
                      }
                }
            }
-           if(input_window != NULL) {
+           if(m_inputWindow != NULL) {
               MainWindow::AddFolder(folders[count]->folderName, count, false);
-              input_window->Cleanup(false);
+              m_inputWindow->Cleanup(false);
 	      while(input_window->visible()) { Fl::wait(); }
-              Delete(input_window, InputWindow);
+              Delete(m_inputWindow, InputWindow);
            }
        }
 
