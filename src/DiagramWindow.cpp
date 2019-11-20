@@ -74,6 +74,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     baseColorPaletteImgBtn = NULL;
     baseColorPaletteChangeBtn = NULL;
     radialDisplayWindow = NULL;
+    ctFileSelectWin = NULL;
 
     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
@@ -118,7 +119,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     
     Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw);
-    //Fl::cairo_make_current(this);
+    Fl::cairo_make_current(this);
 
 }
 
@@ -127,7 +128,6 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
         : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
           RadialLayoutWindowCallbackInterface(this), 
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
-    Fl::cairo_make_current(this);
     copy_label(label);
     Construct(w + WINW_EXTENSION, h, structures);
 }
@@ -137,7 +137,6 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
         : Fl_Cairo_Window(w + WINW_EXTENSION, h),
           RadialLayoutWindowCallbackInterface(this),     
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
-    Fl::cairo_make_current(this);
     copy_label(label);
     resize(x, y, w + WINW_EXTENSION, h);
     Construct(w + WINW_EXTENSION, h, structures);
@@ -238,17 +237,17 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
     cairo_surface_t *pngSource = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
                                                             IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
 							    IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
-							    PNG_IMAGE_PADDING + PNG_FOOTER_HEIGHT);
+							    PNG_IMAGE_PADDING + DWIN_PNG_FOOTER_HEIGHT);
     cairo_t *crImageOutput = cairo_create(pngSource);
     thisWindow->SetCairoToExactFLColor(crImageOutput, thisWindow->color());
     cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
 		    IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
-		    PNG_IMAGE_PADDING + PNG_FOOTER_HEIGHT);
+		    PNG_IMAGE_PADDING + DWIN_PNG_FOOTER_HEIGHT);
     cairo_fill(crImageOutput);
     // now draw the footer data:
     thisWindow->SetCairoToExactFLColor(crImageOutput, thisWindow->color());
     cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2, 
-                    IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, PNG_FOOTER_HEIGHT);
+                    IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, DWIN_PNG_FOOTER_HEIGHT);
     cairo_fill(crImageOutput);
     thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_SOLID_BLACK);
     cairo_set_line_width(crImageOutput, 2);
@@ -1659,23 +1658,23 @@ int DiagramWindow::handle(int flEvent) {
                             }
                            }
                            else if(Fl::event_length() == 1 && *(Fl::event_text()) == 'R') {
-                                     
-                            InputWindow *ctFileSelectWin = new InputWindow(400, 175, 
-                                                                           "Select Structure File to View ...", "", 
-                                                                           InputWindow::RADIAL_LAYOUT_FILE_INPUT, 
-                                                                           folderIndex);
+                                 if(ctFileSelectWin != NULL) {
+			              Delete(ctFileSelectWin, InputWindow);
+				 }
+                                 ctFileSelectWin = new InputWindow(400, 175, 
+                                                                   "Select Structure File to View ...", "", 
+                                                                   InputWindow::RADIAL_LAYOUT_FILE_INPUT, 
+                                                                   folderIndex);
                             while(ctFileSelectWin->visible()) {
                                  Fl::wait();
                             }
 			    ctFileSelectWin->hide();
-			    Fl::wait(1);
 		            if(ctFileSelectWin->isCanceled() || ctFileSelectWin->getFileSelectionIndex() < 0) {
-                                      Delete(ctFileSelectWin, InputWindow);
-                                      return 1; 
+                                 return 1; 
                             }
                             StructureManager *structManager = RNAStructViz::GetInstance()->GetStructureManager();
                             int ctFileSelectIndex = ctFileSelectWin->getFileSelectionIndex();
-                            int structIdx = structManager->GetFolderAt(folderIndex)->
+			    int structIdx = structManager->GetFolderAt(folderIndex)->
                                                                 folderStructs[ctFileSelectIndex];
                             RNAStructure *rnaStruct = structManager->GetStructure(structIdx);
                             const char *rnaSeqStr = rnaStruct->GetSequenceString();
@@ -1703,7 +1702,6 @@ int DiagramWindow::handle(int flEvent) {
                                                                           string(" to ") + std::to_string(seqEndPos) + 
                                                                           string(")."); 
                                       AddNewErrorMessageToDisplay(errMsg);
-                                      Delete(ctFileSelectWin, InputWindow);
                                       return 1;
                             }
                             radialDisplayWindow = new RadialLayoutDisplayWindow();
@@ -1717,8 +1715,6 @@ int DiagramWindow::handle(int flEvent) {
                             radialDisplayWindow->SetParentWindow(this);
                             radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos, rnaStruct->GetLength());
                             radialDisplayWindow->show();
-			    Fl::wait(1);
-			    Delete(ctFileSelectWin, InputWindow);
                      }
                      return 1;
            }

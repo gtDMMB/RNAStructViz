@@ -22,7 +22,7 @@ int InputWindow::distinctStructureCount = 0;
 InputWindow::InputWindow(int w, int h, const char *label, 
     const char *defaultName, InputWindowType type, int folderIndex) : 
     Fl_Window(w, h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
-    userWindowStatus(OK), fileSelectionIndex(-1), 
+    userWindowStatus(OK), fileSelectionIndex(-1), windowDone(false),
     stickyFolderNameFound(false), suggestedFolderNameFound(false), 
     stickyFolderNamesNeedsReset(false)
 {    
@@ -33,7 +33,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
     inputText = (char *) malloc(MAX_BUFFER_SIZE * sizeof(char));
 
     if(type == InputWindow::FILE_INPUT) {
-            strncpy(inputText, defaultName, MAX_BUFFER_SIZE - 1);
+        strncpy(inputText, defaultName, MAX_BUFFER_SIZE - 1);
         inputText[MAX_BUFFER_SIZE - 1] = '\0';
         char *extPtr = strrchr(inputText, '.');
         if(extPtr != NULL) {
@@ -45,14 +45,14 @@ InputWindow::InputWindow(int w, int h, const char *label,
              fnameStartPos = filenameStartPtr - inputText;
         }
         else {
-         fnameStartPos = 0;
+             fnameStartPos = 0;
         }
         char saveDirInfo[MAX_BUFFER_SIZE];
         snprintf(saveDirInfo, fnameStartPos + 1, "%s", inputText);
         sprintf(string, "Export to Directory: %s", saveDirInfo);
         input = new Fl_Input(15, 50, 245, 30);
         input->value(filenameStartPtr + 1);
-        Fl_Box *box = new Fl_Box(100, 20, 110, 30, (const char*)string);
+        Fl_Box *box = new Fl_Box(100, 20, 110, 30, (const char*) string);
         box->box(FL_NO_BOX);
         box->align(FL_ALIGN_CENTER);
         Fl_Box *fileExtBox = new Fl_Box(255,50,40,30,".csv");
@@ -108,9 +108,9 @@ InputWindow::InputWindow(int w, int h, const char *label,
         InitCleanupParams();
         callback(CloseCallback);
     }
-        else { 
+    else { 
         
-        const char *windowDisplayMsg = "@?  Which structure file\ndo you want to display?";
+        const char *windowDisplayMsg = "Which structure do you want to\n display in the radial diagram?";
         Fl_Box *box = new Fl_Box(70, 5, 260, 40, windowDisplayMsg);
         box->box(FL_RSHADOW_BOX);
         box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
@@ -146,19 +146,21 @@ InputWindow::InputWindow(int w, int h, const char *label,
         if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && 
            (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound)) {
             show();
-    }
-    else {
-        show();
-        InputCallback((Fl_Widget *) cbUseDefaultNames, (void *) NULL);
-    }
+        }
+        else {
+            //show();
+            InputCallback((Fl_Widget *) cbUseDefaultNames, (void *) NULL);
+        }
 }
 
 InputWindow::~InputWindow() {
+    while(!windowDone) { Fl::wait(); }
     Cleanup(false);
     Delete(input, Fl_Input);
     Delete(cbUseDefaultNames, Fl_Check_Button);
     Delete(cbKeepStickyFolders, Fl_Check_Button);
     Free(inputText);
+    Free(string);
 }
 
 int InputWindow::getFileSelectionIndex() const {
@@ -170,7 +172,7 @@ bool InputWindow::isCanceled() const {
 }
 
 void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
-    InputWindow *window = (InputWindow*) widget->parent();
+    InputWindow *window = (InputWindow *) widget->parent();
     if(window->windowType == InputWindow::FILE_INPUT) {
          snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s%s%s.csv", 
                   (char *) PNG_OUTPUT_DIRECTORY, 
@@ -178,6 +180,7 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 	          window->inputText[0] == '/' ? "" : "/", 
 	          window->input->value());
          SetStringToEmpty(window->name);
+	 strcpy(window->name, window->inputText);
     }
     else {
         SetStringToEmpty(window->name);
@@ -185,8 +188,8 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
         GUI_KEEP_STICKY_FOLDER_NAMES = window->cbKeepStickyFolders->value();
     }    
     window->hide();
-    Free(window->string);
-    Fl::wait(1);
+    while(window->visible()) { Fl::wait(); }
+    window->windowDone = true;
 }
 
 void InputWindow::CloseCallback(Fl_Widget* widget, void* userData) {
@@ -194,7 +197,8 @@ void InputWindow::CloseCallback(Fl_Widget* widget, void* userData) {
     if(window != NULL) {
          SetStringToEmpty(window->name);
          window->hide();
-         Free(window->string);
+	 while(window->visible()) { Fl::wait(); } 
+	 window->windowDone = true;
     }
 }
 
@@ -209,7 +213,8 @@ void InputWindow::DisplayCTFileCallback(Fl_Widget *w, void *udata) {
            iwin->fileSelectionIndex = iwin->ctFileChooser->value();
      }
      iwin->hide();
-     Fl::wait(1);
+     while(iwin->visible()) { Fl::wait(); }
+     iwin->windowDone = true;
 }
 
 void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
@@ -218,25 +223,26 @@ void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
           iwin->userWindowStatus = CANCELED;
           iwin->fileSelectionIndex = -1;
           iwin->hide();
-	  Fl::wait(1);
+	  while(iwin->visible()) { Fl::wait(); }
+	  iwin->windowDone = true;
      }
 }
 
 std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
     
     RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
-                          LookupStructureByCTPath(seqFilePath);
+                              LookupStructureByCTPath(seqFilePath);
     
     // see if there is a sticky folder name already saved to display:
     off_t stickyFolderExists = FolderNameForSequenceExists(
-                            DEFAULT_STICKY_FOLDERNAME_CFGFILE,
+                    DEFAULT_STICKY_FOLDERNAME_CFGFILE,
                     rnaStruct
-                   );
+          );
     if(stickyFolderExists != LSEEK_NOT_FOUND) {
          char *stickyFolderName = LookupStickyFolderNameForSequence(
-                           DEFAULT_STICKY_FOLDERNAME_CFGFILE,
+                       DEFAULT_STICKY_FOLDERNAME_CFGFILE,
                        stickyFolderExists
-                  );
+         );
      if(stickyFolderName != NULL) {
           //// executive decision: save space on the small button labels by not 
           //// prepending a folder number if there is a saved sticky folder label 

@@ -162,7 +162,6 @@ DisplayConfigWindow::DisplayConfigWindow() :
      Fl_Cairo_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT),
      finished(false), pngNewPathIcon(NULL), imageData(NULL) { 
 
-     Fl::cairo_make_current(this);
      Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE | FL_INDEX);
 
      imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
@@ -217,10 +216,10 @@ void DisplayConfigWindow::ConstructWindow() {
      workingYOffset += fpathsIcon->h() + CFGWIN_SPACING / 2;
 
      const char *fieldDesc[] = {
-    "@->   File Search Directory:", 
-    "@->   PNG Output Directory:", 
-    "@->   PNG Output File Name:", 
-    "@->   Radial Layout PNG Name:"
+         "@->   File Search Directory:", 
+         "@->   PNG Output Directory:", 
+         "@->   PNG Output File Name:", 
+         "@->   Radial Layout PNG Name:"
      };
      volatile char (*fieldUpdateVars[])[MAX_BUFFER_SIZE] = {
          &CTFILE_SEARCH_DIRECTORY, 
@@ -365,15 +364,15 @@ void DisplayConfigWindow::ConstructWindow() {
                               CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT);
      int choiceActiveIdx = 0;
      for(int t = 0; t < FLTK_THEME_COUNT; t++) {
-      if(!strcmp(ALL_FLTK_THEMES[t], (char *) FLTK_THEME)) {
-               choiceActiveIdx = t;
-      }
-      fltkThemeChoiceMenu->add(ALL_FLTK_THEMES[t], 0, 
-                       FLTKThemeChoiceMenuCallback, 
-                       (void *) ((long int) t), 0);
-      Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
-                                fltkThemeChoiceMenu->find_item(ALL_FLTK_THEMES[t]);
-      nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
+           if(!strcmp(ALL_FLTK_THEMES[t], (char *) FLTK_THEME)) {
+                              choiceActiveIdx = t;
+           }
+           fltkThemeChoiceMenu->add(ALL_FLTK_THEMES[t], 0, 
+                                                FLTKThemeChoiceMenuCallback, 
+                                                (void *) ((long int) t), 0);
+           Fl_Menu_Item *nextMenuEntry = (Fl_Menu_Item *) 
+                                                                        fltkThemeChoiceMenu->find_item(ALL_FLTK_THEMES[t]);
+           nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
      }
      fltkThemeChoiceMenu->value(choiceActiveIdx);
      fltkThemeChoiceMenu->labelcolor(GUI_BTEXT_COLOR);
@@ -459,8 +458,8 @@ void DisplayConfigWindow::ConstructWindow() {
 
      const char *checkBoxLabels[] = {
           "Display first-run message when RNAStructViz starts",
-      "Use default folder names in load files dialog (not recommended)", 
-      "Remember structure folder names (use sticky folder names)",
+          "Use default folder names in load files dialog (not recommended)", 
+          "Remember structure folder names (use sticky folder names)",
      };
      bool includeRHSClearButton[] = { false, false, true };
      volatile bool *checkBoxParamSettings[] = {
@@ -544,7 +543,7 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(cancelBtn);
 
      redraw();
-     //Fl::cairo_make_current(this);
+     Fl::cairo_make_current(this);
 } 
 
 bool DisplayConfigWindow::isDone() const {

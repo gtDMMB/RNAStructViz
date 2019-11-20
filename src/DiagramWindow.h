@@ -29,6 +29,7 @@ using std::max_element;
 #include "CairoDrawingUtils.h"
 #include "BranchTypeIdentification.h"
 #include "RadialLayoutImage.h"
+#include "InputWindow.h"
 
 #define IMAGE_DIM                    (485)
 #define DIAGRAM_TO_IMAGE_RATIO       (0.85f)
@@ -39,7 +40,7 @@ using std::max_element;
 #define IMAGE_DEPTH                  (3)
 
 #define STRAND_MARKER_IMAGE_HEIGHT   (25)
-#define PNG_FOOTER_HEIGHT            (100)
+#define DWIN_PNG_FOOTER_HEIGHT       (100)
 #define PNG_IMAGE_PADDING            (35)
 
 #define GLWIN_TRANSLATEX             (85)
@@ -263,6 +264,7 @@ private:
     void WarnUserDrawingConflict();
     std::string GetExportPNGFilePath();
 
+    InputWindow *ctFileSelectWin;
     volatile static DiagramWindow *currentDiagramWindowInstance;
     static bool redrawRefreshTimerSet;
     static vector<string> errorMsgQueue;

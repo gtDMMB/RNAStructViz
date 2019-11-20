@@ -25,7 +25,7 @@ using std::string;
 #include "CairoDrawingUtils.h"
 
 #ifndef PERFORM_BRANCH_TYPE_ID
-     #define PERFORM_BRANCH_TYPE_ID          (false)
+     #define PERFORM_BRANCH_TYPE_ID          (0)
 #endif
 
 #define MAX_BUFFER_SIZE                 (384)

@@ -1,6 +1,9 @@
 default:
 	cd src && make -f Makefile default
 
+help:
+	cd src && make -f Makefile help
+
 diagnostic:
 	cd src && make -f Makefile diagnostic
 

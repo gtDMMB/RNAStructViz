@@ -43,7 +43,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     int initYOffset = NAVBUTTONS_OFFSETY + RNAStructVizLogo.height + 5; 
     const char *fileOpsLabelText = "@reload   Structure Operations.\n  Each comparision operation\n  button click opens a new window.";
     fileOpsLabel = new Fl_Box(x - 2 + NAVBUTTONS_SPACING / 2, initYOffset, 
-                             fileOpsLabelWidth + 10, fileOpsLabelHeight + spacingHeight, 
+                             fileOpsLabelWidth + 10, fileOpsLabelHeight + spacingHeight / 2, 
                              fileOpsLabelText);
     fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
     fileOpsLabel->color(GUI_BGCOLOR);
@@ -54,8 +54,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     fileOpsLabel->labeltype(FL_SHADOW_LABEL);
 
     int opButtonWidth = 135;
-    int yOffset = initYOffset + fileOpsLabelHeight;
-    Fl_Button* diagramButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7, yOffset + 2 * spacingHeight,
+    int yOffset = initYOffset + fileOpsLabelHeight + spacingHeight / 2;
+    Fl_Button* diagramButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7, yOffset + spacingHeight,
                                              opButtonWidth, 30,
                                              "@circle  Diagrams @>|");
     diagramButton->callback(DiagramCallback);
@@ -66,7 +66,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     diagramButton->tooltip("Open the arc and radial layout diagram viewer windows");
 
     Fl_Button* statsButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7 + opButtonWidth + 
-                                           spacingHeight, yOffset + 2 * spacingHeight, 
+                                           spacingHeight, yOffset + spacingHeight, 
                                            opButtonWidth, 30,
                                            "@square  Statistics @>|");
     statsButton->callback(StatsCallback);
@@ -130,7 +130,7 @@ void FolderWindow::SetStructures(int folderIndex) {
         }
         int i = folder->folderStructs[(ui+shift)];
         RNAStructure *strct = structureManager->GetStructure(i);
-    AddStructure(strct->GetFilename(), i);
+        AddStructure(strct->GetFilename(), i);
     }
     label(folder->folderName);
     char structLabel[MAX_BUFFER_SIZE];

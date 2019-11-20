@@ -27,7 +27,7 @@ OPTLEVEL=$(call GetBuildConfigOption,$(OPTLEVEL_ARG))
 DEBUGLEVEL=$(call GetBuildConfigOption,$(DEBUGLEVEL_ARG))
 
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -flto -O$(OPTLEVEL) -march=native#-pedantic-errors -fsanitize=address
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native#-pedantic-errors -fsanitize=address
 LD=g++
 LDFLAGS= -g$(DEBUGLEVEL) -lm
 
@@ -158,7 +158,13 @@ diagnostic:
 
 run: clean default
 	@./RNAStructViz --about
+	@echo ""
 	./RNAStructViz
+
+run-debug: clean default
+	@./RNAStructViz --about
+	@echo ""
+	gdb ./RNAStructViz
 
 clean:
 	@rm -f *.o *.code *.log *.callgrind *.out *.ps *.pdf \

@@ -14,19 +14,19 @@ ReplaceHeaderComponent() {
      if [[ $printVerbose == "1" ]]; then
      	echo "REPLACING \"$replacePattern\" WITH \"$replacementStr\" IN \"$headerFile\"";
      fi
-     sed -i -e "s|\${replacePattern}|\${replacementStr}|" $headerFile;
+     sed -i -e 's|\${replacePattern}|\${replacementStr}|' "${headerFile}";
 }
 
 OUTPUT_HEADER_FILE=$1
-LOCAL_SCRIPTS_DIR=$(echo $1 | sed -e "s/\/[a-zA-Z]*\/[a-zA-Z]*\.h//g")
+LOCAL_SCRIPTS_DIR=$(echo $1 | sed -e 's/\/[a-zA-Z]*\/[a-zA-Z]*.h//')
 HEADER_SKELETON_FILE="${LOCAL_SCRIPTS_DIR}/scripts/BuildTargetInfo.h.in"
 
-GIT_COMMITREV_HASHNUM=$(git show | head -n 1 | sed -e "s/commit //g")
-GIT_COMMITREV_HASHNUM_SHORT=$(echo $GIT_COMMITREV_HASHNUM | cut -c-12)
-GIT_COMMITREV_DATE=$(git show | grep Date: | head -n 1 | sed -e "s/Date:[ ]*//g")
-GIT_DESCRIBE_REVSTRING=$(git describe --all --abbrev=6 HEAD^)
-BUILD_PLATFORM_IDSTRING=$(printf "%s (%s) [%s] @@ %s" $(uname -s) $(uname -r) $(uname -m) $(uname -n))
-LOCAL_BUILD_TIME=$(date +"%c")
+GIT_COMMITREV_HASHNUM=`git show | head -n 1 | sed -e 's/commit //'`
+GIT_COMMITREV_HASHNUM_SHORT=`echo "${GIT_COMMITREV_HASHNUM}" | cut -c-12`
+GIT_COMMITREV_DATE=`git show | grep Date: | head -n 1 | sed -e 's/Date:[ ]*//'`
+GIT_DESCRIBE_REVSTRING=`git describe --all --abbrev=6 HEAD^`
+BUILD_PLATFORM_IDSTRING=`printf "%s (%s) [%s] @@ %s" $(uname -s) $(uname -r) $(uname -m) $(uname -n)`
+LOCAL_BUILD_TIME=`date +"%c"`
 BUILD_FLTK_CONFIG=$2
 
 REPL_PATTERNS=("##__GIT_COMMITREV_HASHNUM_SHORT__##" "##__GIT_COMMITREV_HASHNUM__##" \

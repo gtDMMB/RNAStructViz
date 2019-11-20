@@ -977,10 +977,11 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
                             titleSuffix == NULL ? "" : titleSuffix);
          m_contentWindow = new Fl_Double_Window(subwinWidth, subwinTotalHeight);
          m_contentWindow->copy_label(contentWinTitleString);
-         m_contentWindow->set_non_modal();
+         //m_contentWindow->set_non_modal();
 	 
 	 int curYOffset = 6, windowSpacing = 10;
-         int curXOffset = (m_contentWindow->w() - 2 * btnWidth - windowSpacing) / 2;
+         int curXOffset = 5; 
+	 int exportBtnsXOffset = (m_contentWindow->w() - 2 * btnWidth - windowSpacing) / 2;
 	 
 	 Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
                                         subwinTotalHeight - subwinResizeSpacing);
@@ -999,15 +1000,15 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
          m_exportExtFilesBox->box(labelBoxType);
          curYOffset += labelHeight + windowSpacing;
 
-         m_exportFASTABtn = new Fl_Button(windowSpacing, curYOffset, 
+         m_exportFASTABtn = new Fl_Button(curXOffset + exportBtnsXOffset, curYOffset, 
                                           btnWidth, btnHeight, 
-                                          "@filesaveas  --   Export to FASTA");
+                                          "@filesaveas  -- Export to FASTA");
          m_exportFASTABtn->user_data((void *) this);
          m_exportFASTABtn->callback(ExportFASTAFileCallback);
          m_exportFASTABtn->labelcolor(GUI_BTEXT_COLOR);
-         m_exportDBBtn = new Fl_Button(2 * windowSpacing + btnWidth, curYOffset, 
+         m_exportDBBtn = new Fl_Button(curXOffset + exportBtnsXOffset + btnWidth + windowSpacing, curYOffset, 
                                        btnWidth, btnHeight, 
-                                       "@filesaveas  --    Export to DotBracket");
+                                       "@filesaveas  --  Export to DotBracket");
          m_exportDBBtn->user_data((void *) this);
          m_exportDBBtn->callback(ExportDotBracketFileCallback);
          m_exportDBBtn->labelcolor(GUI_BTEXT_COLOR);
@@ -1346,10 +1347,11 @@ void RNAStructure::DeleteContentWindow() {
         while(m_contentWindow->visible()) {
              Fl::wait();
         }
-        Delete(m_contentWindow, Fl_Double_Window);
+        //Delete(m_contentWindow, Fl_Double_Window);
         Delete(m_ctTextDisplay, Fl_Text_Display);
         Delete(m_ctTextBuffer, Fl_Text_Buffer);
-        Delete(m_seqTextDisplay, Fl_Text_Display);
+        Delete(m_ctStyleBuffer, Fl_Text_Buffer);
+	Delete(m_seqTextDisplay, Fl_Text_Display);
         Delete(m_ctTextBuffer, Fl_Text_Buffer);
         Delete(m_seqStyleBuffer, Fl_Text_Buffer);
         Delete(m_exportExtFilesBox, Fl_Box);
