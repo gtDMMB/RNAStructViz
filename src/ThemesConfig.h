@@ -67,7 +67,7 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
           0x16161600, 
 	  "Green On Black", // standard Linux / command line colors
 	  true,
-          &GUI_BTEXT_COLOR,
+          &GUI_BGCOLOR,
      }, 
      {
           0xc3b68900, 
@@ -87,7 +87,7 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  Darker(0xeeb50000, 0.7f), 
 	  "Sunshine", // very vibrant and bright
 	  true,
-	  &GUI_WINDOW_BGCOLOR,
+	  &GUI_BGCOLOR,
      },
      {
           0x98a8a800,
@@ -97,7 +97,7 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  Darker(0x98a8a800, 0.65f), 
 	  "Redmond", // old school Windows 2000 era color scheme
 	  true,
-	  &GUI_WINDOW_BGCOLOR,
+	  &GUI_BGCOLOR,
      },
      {
           0xf7efd400,
@@ -107,7 +107,7 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0xf7efd400, 
 	  "Parchment",  // black and off white to gold 
 	  true,
-	  &GUI_WINDOW_BGCOLOR,
+	  &GUI_BGCOLOR,
      },
      {
           0xf7f7f900,

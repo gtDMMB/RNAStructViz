@@ -34,7 +34,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
             StructureOperationIcon.width, StructureOperationIcon.height, 
             StructureOperationIcon.bytes_per_pixel);
-    structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.5);
+    structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.65);
     Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     
