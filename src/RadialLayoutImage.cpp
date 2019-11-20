@@ -76,7 +76,7 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 
      color(GUI_WINDOW_BGCOLOR);
      set_draw_cb(Draw);
-     Fl::cairo_make_current(this);
+     //Fl::cairo_make_current(this);
 
 }
 

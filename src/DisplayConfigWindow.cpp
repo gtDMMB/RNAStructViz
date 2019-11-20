@@ -185,7 +185,7 @@ DisplayConfigWindow::DisplayConfigWindow() :
      set_modal();
      callback(WindowCloseCallback);
      set_draw_cb(Draw); 
-     Fl::cairo_make_current(this);
+     //Fl::cairo_make_current(this);
 
      ConstructWindow();
 
@@ -551,7 +551,7 @@ void DisplayConfigWindow::ConstructWindow() {
      windowWidgets.push_back(cancelBtn);
 
      redraw();
-     Fl::cairo_make_current(this);
+     //Fl::cairo_make_current(this);
 } 
 
 bool DisplayConfigWindow::isDone() const {
