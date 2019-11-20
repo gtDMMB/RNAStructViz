@@ -210,7 +210,7 @@ void DisplayConfigWindow::ConstructWindow() {
           ConfigPathsIcon.bytes_per_pixel);
      Fl_Box *fpathsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
                                         fpathsIcon->w(), fpathsIcon->h());
-     fpathsIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
+     fpathsIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
      fpathsIconBox->image(fpathsIcon);
      windowWidgets.push_back(fpathsIconBox);
      workingYOffset += fpathsIcon->h() + CFGWIN_SPACING / 2;
@@ -282,7 +282,7 @@ void DisplayConfigWindow::ConstructWindow() {
                                  ConfigDiagramWindow.bytes_per_pixel);
      Fl_Box *dwinSettingsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
                                               dwinSettingsIcon->w(), dwinSettingsIcon->h());
-     dwinSettingsIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
+     dwinSettingsIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
      dwinSettingsIconBox->image(dwinSettingsIcon);
      windowWidgets.push_back(dwinSettingsIconBox);
      workingYOffset += dwinSettingsIcon->h() + CFGWIN_SPACING / 2;
@@ -348,7 +348,7 @@ void DisplayConfigWindow::ConstructWindow() {
           ConfigThemesIcon.bytes_per_pixel);
      Fl_Box *themesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
                                         themesIcon->w(), themesIcon->h());
-     themesIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
+     themesIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
      themesIconBox->image(themesIcon);
      windowWidgets.push_back(themesIconBox);
      workingYOffset += themesIcon->h() + CFGWIN_SPACING / 2;
@@ -451,7 +451,7 @@ void DisplayConfigWindow::ConstructWindow() {
                                   ConfigCheckBoxParamsIcon.bytes_per_pixel);
      Fl_Box *cfgCheckboxesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
                                                cfgCheckboxesIcon->w(), cfgCheckboxesIcon->h());
-     cfgCheckboxesIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
+     cfgCheckboxesIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
      cfgCheckboxesIconBox->image(cfgCheckboxesIcon);
      windowWidgets.push_back(cfgCheckboxesIconBox);
      workingYOffset += cfgCheckboxesIcon->h() + CFGWIN_SPACING / 2;
