@@ -26,6 +26,7 @@
 #include "RNAStructure.h"
 #include "InputWindow.h"
 #include "ConfigOptions.h"
+#include "ConfigParser.h"
 
 #include "pixmaps/StatsFormula.c"
 #include "pixmaps/StatsWindowIcon.xbm"

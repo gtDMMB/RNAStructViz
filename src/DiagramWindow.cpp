@@ -1570,9 +1570,9 @@ int DiagramWindow::handle(int flEvent) {
 
      switch(flEvent) { 
       case FL_SHOW:
-           make_current();
+           //make_current();
            m_redrawStructures = true;
-               redraw();
+           redraw();
            Fl::flush();
            return 1;
       case FL_HIDE:

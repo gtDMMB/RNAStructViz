@@ -379,7 +379,7 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
      while(!cfgWindow->isDone() && cfgWindow->visible()) {
           Fl::wait();
      }
-     Delete(cfgWindow, DisplayConfigWindow)
+     Delete(cfgWindow, DisplayConfigWindow);
 }
 
 void MainWindow::ConfigOptionsCallback() {

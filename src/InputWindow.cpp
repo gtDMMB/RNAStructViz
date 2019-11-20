@@ -257,7 +257,7 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
     
     // otherwise, use file name and file header comments to guess at a good name for the sequence:
     InputFileTypeSpec inputFileType = ClassifyInputFileType(seqFilePath);
-    char lastDirCh = CTFILE_SEARCH_DIRECTORY[strlen(CTFILE_SEARCH_DIRECTORY) - 1];
+    char lastDirCh = CTFILE_SEARCH_DIRECTORY[strlen((char *) CTFILE_SEARCH_DIRECTORY) - 1];
     std::string fullSeqFilePath = std::string((char *) CTFILE_SEARCH_DIRECTORY) + 
 	                          std::string(lastDirCh == '/' ? "" : "/") + 
                                   std::string(seqFilePath);

@@ -155,8 +155,8 @@ void StructureManager::AddFile(const char* filename)
             
                  while(same) {
                      int choice = fl_choice("Already have a folder with the name: %s, please choose another name.", 
-                                            "Skip loading file", "Close", NULL, input_window->getName());
-                     input_window->Cleanup(false);
+                                            "Skip loading file", "Close", NULL, m_inputWindow->getName());
+                     m_inputWindow->Cleanup(false);
                      if(choice == 0) {
                          same = false;
                          break;
@@ -181,7 +181,7 @@ void StructureManager::AddFile(const char* filename)
                  }
                         
                  if(m_inputWindow != NULL && strcmp(m_inputWindow->getName(), "")) {
-                     strcpy(folders[count]->folderName, input_window->getName());
+                     strcpy(folders[count]->folderName, m_inputWindow->getName());
                      if(GUI_KEEP_STICKY_FOLDER_NAMES) {
                      const char *baseSeq = structure->GetSequenceString();
                      int saveStatus = SaveStickyFolderNameToConfigFile(
@@ -203,7 +203,7 @@ void StructureManager::AddFile(const char* filename)
            if(m_inputWindow != NULL) {
               MainWindow::AddFolder(folders[count]->folderName, count, false);
               m_inputWindow->Cleanup(false);
-	      while(input_window->visible()) { Fl::wait(); }
+	      while(m_inputWindow->visible()) { Fl::wait(); }
               Delete(m_inputWindow, InputWindow);
            }
        }

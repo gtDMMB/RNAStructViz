@@ -19,6 +19,7 @@
 
 #include "ConfigOptions.h"
 #include "BaseSequenceIDs.h"
+#include "InputWindow.h"
 
 class RNABranchType_t;
 
@@ -236,7 +237,9 @@ class RNAStructure
         char *m_pathname, *m_pathname_noext, *m_exactPathName;
 	char *m_fileCommentLine, *m_suggestedFolderName;
 	InputFileTypeSpec m_fileType;
-        InputWindow *m_ctFileSelectionWin;
+
+	friend class RNAStructViz;
+        inline static InputWindow *m_ctFileSelectionWin = NULL;
 
         // Info for displaying the file contents
         Fl_Double_Window *m_contentWindow;

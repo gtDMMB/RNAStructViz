@@ -16,9 +16,10 @@ using std::stack;
 #include "ConfigOptions.h"
 #include "ThemesConfig.h"
 #include "TerminalPrinting.h"
+#include "ConfigParser.h"
 
 #if PERFORM_BRANCH_TYPE_ID
-#include "BranchTypeIdentification.h"
+     #include "BranchTypeIdentification.h"
 #endif
 
 const RNAStructure::BasePair RNAStructure::UNPAIRED = ~0x0;
@@ -27,7 +28,7 @@ RNAStructure::RNAStructure()
     : m_sequenceLength(0), m_sequence(NULL), 
       charSeq(NULL), dotFormatCharSeq(NULL), charSeqSize(0), 
       m_pathname(NULL), m_pathname_noext(NULL), m_exactPathName(NULL), 
-      m_fileType(FILETYPE_NONE), m_ctFileSelectionWin(NULL),
+      m_fileType(FILETYPE_NONE), 
       m_fileCommentLine(NULL), m_suggestedFolderName(NULL), 
       m_ctDisplayString(NULL), m_ctDisplayFormatString(NULL), 
       m_seqDisplayString(NULL), m_seqDisplayFormatString(NULL), 
@@ -82,7 +83,6 @@ RNAStructure::~RNAStructure()
     }
     #endif
     DeleteContentWindow();
-    Delete(m_ctFileSelectionWindow, InputWindow);
     Free(m_fileCommentLine); 
     Delete(m_suggestedFolderName, char); 
 }
@@ -1089,7 +1089,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     m_contentWindow->user_data((void *) this);
     m_contentWindow->callback(CloseCTViewerContentWindowCallback);
     m_contentWindow->show();
-    m_contentWindow->make_current();
+    //m_contentWindow->make_current();
     m_contentWindow->redraw();
 
 }
@@ -1301,7 +1301,7 @@ void RNAStructure::ExportFASTAFileCallback(Fl_Widget *btn, void *udata) {
      int fdataLength = rnaStructBaseObj->GenerateFASTAFormatString(
                                  fastaData, fdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
-     char lastDirCh = CTFIlE_SEARCH_DIRECTORY[strlen(CTFILE_SEARCH_DIRECTORY) - 1];
+     char lastDirCh = CTFILE_SEARCH_DIRECTORY[strlen((char *) CTFILE_SEARCH_DIRECTORY) - 1];
      snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s%s%s.fasta\0", 
               CTFILE_SEARCH_DIRECTORY, lastDirCh == '/' ? "" : "/", 
               rnaStructBaseObj->GetFilenameNoExtension());
@@ -1324,6 +1324,7 @@ void RNAStructure::ExportDotBracketFileCallback(Fl_Widget *btn, void *udata) {
      int dotDataLength = rnaStructBaseObj->GenerateDotBracketFormatString(dotData, dbdataContentStrMaxLen);
      char suggestedOutFile[DEFAULT_BUFFER_SIZE];
      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+     char lastDirCh = CTFILE_SEARCH_DIRECTORY[strlen((char *) CTFILE_SEARCH_DIRECTORY) - 1];
      snprintf(suggestedOutFile, DEFAULT_BUFFER_SIZE, "%s%s%s.dot\0", 
               CTFILE_SEARCH_DIRECTORY, lastDirCh == '/' ? "" : "/", 
               rnaStructBaseObj->GetFilenameNoExtension());
@@ -1437,7 +1438,7 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
 }
 
 int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex, 
-                                        int minArcIdx, int maxArcIdx) {
+                                               int minArcIdx, int maxArcIdx) {
      
      if(m_ctFileSelectionWin != NULL) {
           Delete(m_ctFileSelectionWin, InputWindow);
@@ -1445,15 +1446,15 @@ int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
      m_ctFileSelectionWin = new InputWindow(400, 175, "Select Structure File to Highlight ...", 
                                             "", InputWindow::CTVIEWER_FILE_INPUT, 
                                             structureFolderIndex);
-     while(ctFileSelectionWin->visible()) {
+     while(m_ctFileSelectionWin->visible()) {
           Fl::wait();
      }
-     if(ctFileSelectionWin->isCanceled() || ctFileSelectionWin->getFileSelectionIndex() < 0) {
+     if(m_ctFileSelectionWin->isCanceled() || m_ctFileSelectionWin->getFileSelectionIndex() < 0) {
           return -1;
      }
-     ctFileSelectionWin->hide();
+     m_ctFileSelectionWin->hide();
      StructureManager *rnaStructManager = RNAStructViz::GetInstance()->GetStructureManager();
-     int fileSelectionIndex = ctFileSelectionWin->getFileSelectionIndex();
+     int fileSelectionIndex = m_ctFileSelectionWin->getFileSelectionIndex();
      int structIndex = rnaStructManager->GetFolderAt(structureFolderIndex)->
                        folderStructs[fileSelectionIndex];
      RNAStructure *rnaStructure = rnaStructManager->GetStructure(structIndex);

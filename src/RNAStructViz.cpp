@@ -113,6 +113,7 @@ void RNAStructViz::Shutdown()
 {
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     MainWindow::Shutdown();
+    Delete(RNAStructure::m_ctFileSelectionWin, InputWindow);
 }
 
 void RNAStructViz::ExitApplication(bool promptUser) {
@@ -166,7 +167,7 @@ void RNAStructViz::AddDiagramWindow(int index)
             diagram->SetFolderIndex(index);
             diagram->ResetWindow(true);
             diagram->setAsCurrentDiagramWindow();
-	    diagram->make_current();
+	    //diagram->make_current();
             diagram->show();
 	    diagram->redraw();
             return;

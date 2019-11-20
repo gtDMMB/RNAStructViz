@@ -290,7 +290,8 @@ RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h
 
 RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
 	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c\
-	ThemesConfig.h TerminalPrinting.h BaseSequenceIDs.h RNAStructure.cpp
+	ThemesConfig.h TerminalPrinting.h BaseSequenceIDs.h InputWindow.h \
+	ConfigParser.h RNAStructure.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
 
 RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
@@ -300,7 +301,8 @@ RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
 
 StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
 	RNAStructViz.h RNAStructure.h InputWindow.h TerminalPrinting.h \
-	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm StatsWindow.cpp
+	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm \
+	ConfigParser.h StatsWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
 
 StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
