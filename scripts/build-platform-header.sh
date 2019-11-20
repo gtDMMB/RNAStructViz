@@ -10,17 +10,20 @@ ReplaceHeaderComponent() {
      headerFile=$1;
      replacePattern=$2;
      replacementStr=$3;
-     echo "REPLACING \"$replacePattern\" WITH \"$replacementStr\" IN \"$headerFile\"";
-     sed -i -e "s|${replacePattern}|${replacementStr}|" "$headerFile";
+     printVerbose=$4;
+     if [[ $printVerbose == "1" ]]; then
+     	echo "REPLACING \"$replacePattern\" WITH \"$replacementStr\" IN \"$headerFile\"";
+     fi
+     sed -i -e "s|\${replacePattern}|\${replacementStr}|" $headerFile;
 }
 
 OUTPUT_HEADER_FILE=$1
-LOCAL_SCRIPTS_DIR=`echo $1 | sed -e 's/\/[a-zA-Z]*\/[a-zA-Z]*.h//'`
+LOCAL_SCRIPTS_DIR=$(echo $1 | sed -e "s/\/[a-zA-Z]*\/[a-zA-Z]*\.h//g")
 HEADER_SKELETON_FILE="${LOCAL_SCRIPTS_DIR}/scripts/BuildTargetInfo.h.in"
 
-GIT_COMMITREV_HASHNUM=$(git show | head -n 1 | sed -e 's/commit //')
+GIT_COMMITREV_HASHNUM=$(git show | head -n 1 | sed -e "s/commit //g")
 GIT_COMMITREV_HASHNUM_SHORT=$(echo $GIT_COMMITREV_HASHNUM | cut -c-12)
-GIT_COMMITREV_DATE=$(git show | grep Date: | head -n 1 | sed -e 's/Date:[ ]*//')
+GIT_COMMITREV_DATE=$(git show | grep Date: | head -n 1 | sed -e "s/Date:[ ]*//g")
 GIT_DESCRIBE_REVSTRING=$(git describe --all --abbrev=6 HEAD^)
 BUILD_PLATFORM_IDSTRING=$(printf "%s (%s) [%s] @@ %s" $(uname -s) $(uname -r) $(uname -m) $(uname -n))
 LOCAL_BUILD_TIME=$(date +"%c")
@@ -40,14 +43,15 @@ REPLACEMENTS=("${GIT_COMMITREV_HASHNUM_SHORT}" "${GIT_COMMITREV_HASHNUM}" \
 echo -e "\n"
 cp $HEADER_SKELETON_FILE $OUTPUT_HEADER_FILE;
 
+PrintVerbose=$(cat ../scripts/BuildConfig.cfg | sed -n "s/VERBOSE=\([0-9][0-9]*\)/\1/p")
 for ridx in $(seq 0 6); do
-	ReplaceHeaderComponent $OUTPUT_HEADER_FILE "${REPL_PATTERNS[$ridx]}" "${REPLACEMENTS[$ridx]}";
+	ReplaceHeaderComponent $OUTPUT_HEADER_FILE "${REPL_PATTERNS[$ridx]}" "${REPLACEMENTS[$ridx]}" "$PrintVerbose";
 done
 echo -e "\n"
 
-PrintLocalBuildHeaderFile=`cat ./BuildConfig.cfg | sed -n 's/ECHO_CONFIG_HEADER=\(.*\)/\1/p'`
+PrintLocalBuildHeaderFile=$(cat ../scripts/BuildConfig.cfg | sed -n "s/ECHO_CONFIG_HEADER=\([0-9][0-9]*\)$/\1/p")
 if [[ "$PrintLocalBuildHeaderFile" == "1" ]]; then
-	echo -e "LOCAL BUILD HEADER \"$OUTPUT_HEADER_FILE\" CONTENTS:\n\n";
+	echo -e "LOCAL BUILD HEADER \"${OUTPUT_HEADER_FILE}\" CONTENTS:\n\n";
 	cat $OUTPUT_HEADER_FILE;
 	echo -e "\n";
 	printf "FOR A TOTAL OF %s LINES (%s CHARACTERS) WRITTEN.\n\n" \

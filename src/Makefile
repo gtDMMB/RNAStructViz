@@ -2,43 +2,41 @@
 #### Author: Maxie D. Schmidt (maxieds@gmail.com)
 #### Updated: 2019.03.05 (V2)
 
-GetBuildConfigOption =                                              \
-     echo -n `cat ../BuildConfig.cfg | sed -n 's/$(1)=\(.*\)/\1/p'`;
+TRUE=1
+FALSE=0
 
-2="STRING"
-TRUE="1"
-FALSE="0"
-IsTrue =                                                                                   \
-	ifneq "$(1)" $(or "1","true","True","TRUE")                                        \
-		if [ "$(2)" = "INT" ]; then                                                \
-			echo -n "$(FALSE)";                                                \
-		else                                                                       \
-			echo -n "\"$(FALSE)\"";                                            \
-		fi                                                                         \
-	else                                                                               \
-		if [ "$(2)" = "INT" ]; then                                                \
-			echo -n "$(TRUE)";                                                 \
-		else                                                                       \
-			echo -n "\"$(TRUE)\"";                                             \
-		fi                                                                         \
-	fi                                                                                       
+define GetBuildConfigOption =
+$(shell cat ../scripts/BuildConfig.cfg | sed -n 's/^$(1)\=\([0-9][0-9]*\)/\1/p')
+endef
 
-DEBUG=$(call GetBuildConfigOption,"DEBUGGING")
-OPTLEVEL=$(call GetBuildConfigOption,"OPTLEVEL")
-DEBUGLEVEL=$(call GetBuildConfigOption,"DEBUGGING_LEVEL")
+define IsTrue =
+if [ "$(1)" = "1" ]; then 
+$(TRUE)
+else		
+$(FALSE)
+fi
+endef
+
+DEBUGGING_ARG=DEBUGGING
+OPTLEVEL_ARG=OPTLEVEL
+DEBUGLEVEL_ARG=DEBUGGING_LEVEL
+BRANCHID_ARG=BRANCH_TYPE_ID
+
+DEBUG=$(call GetBuildConfigOption,$(DEBUGGING_ARG))
+OPTLEVEL=$(call GetBuildConfigOption,$(OPTLEVEL_ARG))
+DEBUGLEVEL=$(call GetBuildConfigOption,$(DEBUGLEVEL_ARG))
 
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native #-pedantic-errors -fsanitize=address
+CXXFLAGS= -g$(DEBUGLEVEL) -flto -O$(OPTLEVEL) -march=native#-pedantic-errors -fsanitize=address
 LD=g++
 LDFLAGS= -g$(DEBUGLEVEL) -lm
 
-ifeq "$(call IsTrue,DEBUG)" "$(TRUE)"
+ifeq "$(DEBUG)" "$(TRUE)"
 	CXXFLAGS += -Wall -Wextra -pedantic
 	LDFLAGS += -Wall -Wextra
 endif
 
 .DEFAULT: default
-.PHONY:   run 
 
 # Optional compile with clang compiler:
 BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
@@ -56,24 +54,26 @@ ifneq "$(BUILD_WITH_COMPILER)" ""
 endif
 
 # OSX-specific locations and utility names:
-TARGET_PLATFORM=$(shell uname -s)
+TARGET_PLATFORM := $(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
-	READLINK=greadlink
+	READLINK=$(shell which greadlink)
 	CXXFLAGS+= -std=gnu++17 -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
 	LDFLAGS+= -L/usr/local/opt/openssl/lib 
 else
 	FLTKCONFIG=$(shell which fltk-config)
-	READLINK=readlink
+	READLINK=$(shell which readlink)
 	CXXFLAGS+= -std=gnu++17 -I/usr/include
 	LDFLAGS+= -Wl,--no-as-needed
 endif
 
 .EXPORT_ALL_VARIABLES:
+CFLAGS_FLTK_OVERRIDES=
+OTHER_CFLAGS_OVERRIDES=
+OTHER_LDFLAGS_OVERRIDES=
 
 # option to build FLTK without sudo on Linux:
-CFLAGS_FLTK_OVERRIDES=
-BUILD_FLTK_LOCAL=$(shell env | grep FLTK_INSTALL_DIR | sed -e 's/^.*=//')
+BUILD_FLTK_LOCAL := $(shell env | grep FLTK_INSTALL_DIR | sed -e 's/^.*=//')
 ifneq "$(BUILD_FLTK_LOCAL)" ""
 	BUILD_FLTK_LOCAL_ABS=$(shell $(READLINK) -f $(BUILD_FLTK_LOCAL))
 	FLTKCONFIG=$(BUILD_FLTK_LOCAL_ABS)/fltk-config
@@ -82,14 +82,12 @@ ifneq "$(BUILD_FLTK_LOCAL)" ""
 	LIBRARY_PATH=$(BUILD_FLTK_LOCAL_ABS)/lib
 endif
 
-OTHER_CFLAGS_OVERRIDES=
-BUILD_CFLAGS_USER_EXTRAS=$(shell env | grep STRUCTVIZ_EXTRA_CFLAGS | sed -e 's/^.*=//')
+BUILD_CFLAGS_USER_EXTRAS := $(shell env | grep STRUCTVIZ_EXTRA_CFLAGS | sed -e 's/^.*=//')
 ifneq "$(BUILD_CFLAGS_USER_EXTRAS)" ""
 	OTHER_CFLAGS_OVERRIDES=-isystem $(BUILD_CFLAGS_USER_EXTRAS)
 endif
 
-OTHER_LDFLAGS_OVERRIDES=
-BUILD_LDFLAGS_USER_EXTRAS=$(shell env | grep STRUCTVIZ_EXTRA_LDFLAGS | sed -e 's/^.*=//')
+BUILD_LDFLAGS_USER_EXTRAS := $(shell env | grep STRUCTVIZ_EXTRA_LDFLAGS | sed -e 's/^.*=//')
 ifneq "$(BUILD_LDFLAGS_USER_EXTRAS)" ""
 	OTHER_LDFLAGS_OVERRIDES=$(BUILD_LDFLAGS_USER_EXTRAS)
 endif
@@ -97,17 +95,17 @@ endif
 BINARY_OUTPUT=RNAStructViz
 OBJEXT=o
 
-CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
-CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
+CXXFLAGS_PKGCONFIG=$(shell ../scripts/pkg-config-flags.sh --cflags)
+CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags)
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
-	       -D_LARGEFILE64_SOURCE -funsigned-char \
-	       -DPERFORM_BRANCH_TYPE_ID=$(call IsTrue,$(call GetBuildConfigOption,BRANCH_TYPE_ID),INT)
+	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -ffloat-store -freciprocal-math -ffinite-math-only \
+	       -DPERFORM_BRANCH_TYPE_ID=$(call GetBuildConfigOption,$(BRANCHID_ARG))
 
 CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
-LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
-LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
+LDFLAGS_PKGCONFIG=$(shell ../scripts/pkg-config-flags.sh --libs)
+LDFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags)
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto -lboost_system -lboost_filesystem
 LDFLAGS_FULL=$(BUILD_LDFLAGS_USER_EXTRAS) $(LDFLAGS_EXTRA) $(LDFLAGS) 
 
@@ -131,7 +129,7 @@ help:
 	@echo "  >> default_with_gperf              : Debugging target for developers"
 	@echo "  >> prelims                         : Copy the local build header using a script (called by some targets automatically)"
 	@echo "  >> diagnostic                      : Print diagnostic information about the compiler and library source locations"
-	@echo "  >> run                             : Build and run RNAStructViz"
+	@echo "  >> run                             : Build and uun RNAStructViz"
 	@echo "  >> clean                           : Standard target"
 	@echo "  >> install                         : (On Linux / Unix, NOT Mac OSX) Install with sudo"
 	@echo "  >> profile_mem                     : Debugging target for developers"
@@ -149,16 +147,16 @@ default_with_gperf: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL) -lprofiler -ltcmalloc
 
 prelims:
-	/bin/bash `$(READLINK) -f ../scripts/build-platform-header.sh` \
-		`$(READLINK) -f ./BuildTargetInfo.h`\
-		`$(READLINK) -f $(FLTKCONFIG)`
+	@/bin/bash $(shell $(READLINK) -f ../scripts/build-platform-header.sh) \
+		$(shell $(READLINK) -f ./BuildTargetInfo.h) \
+		$(shell $(READLINK) -f $(FLTKCONFIG))
 
 diagnostic:
 	@echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
 	@echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
 	@$(CXX) --version -v $(CXXFLAGS_FULL)
 
-run: default
+run: clean default
 	@./RNAStructViz --about
 	./RNAStructViz
 
@@ -193,10 +191,10 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	xreader RNAStructViz-HeapProfile.pdf
 
 git-add: 
-	@echo -n `git add --ignore-errors ./*.cpp ./*.h ./pixmaps/*.c Makefile ../scripts/* ../Makefile`
+	@echo -n $(git add --ignore-errors ./*.cpp ./*.h ./pixmaps/*.c Makefile ../scripts/* ../Makefile)
 
 git-commit: git-add
-	@git commit -m '`"arg=$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`'
+	@git commit -m '$("arg=$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}})'
 
 git-push: git-commit
 	@git push origin master
@@ -268,7 +266,7 @@ Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	TerminalPrinting.h \
 	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -funsigned-char -c MainWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c MainWindow.cpp
 
 OptionParser.$(OBJEXT): OptionParser.h ConfigOptions.h TerminalPrinting.h \
 	OptionParser.cpp
