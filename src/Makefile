@@ -227,14 +227,15 @@ CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h TerminalPrinting.h CairoDrawing
 	$(CXX) $(CXXFLAGS_FULL) -c CairoDrawingUtils.cpp
 
 CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
-	RNAStructViz.h CommonDialogs.cpp
+	RNAStructViz.h ConfigExterns.h CommonDialogs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
 
-ConfigOptions.h: RNACUtils.cpp ../scripts/BuildTargetInfo.h.in
+ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp ../scripts/BuildTargetInfo.h.in
 
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
 	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \
-	DisplayConfigWindow.h ConfigParser.cpp
+	DisplayConfigWindow.h ConfigExterns.h ThemesConfig.h \
+	ConfigParser.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
 
 DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
@@ -249,34 +250,32 @@ DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
 	ThemesConfig.h DisplayConfigWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
 
-StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
-	RNAStructViz.h RNAStructure.h InputWindow.h TerminalPrinting.h \
-	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm StatsWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
-
-InputWindow.$(OBJEXT): InputWindow.h MainWindow.h ConfigOptions.h \
-	ConfigParser.h RNAStructViz.h StructureManager.h \
-	FolderStructure.h BaseSequenceIDs.h InputWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
-
 Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Fl_Rotated_Text.cpp
 
-FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h\
-	ConfigOptions.h MainWindow.h pixmaps/StructureOperationIcon.c\
+FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h \
+	ConfigOptions.h MainWindow.h ThemesConfig.h \
+	pixmaps/StructureOperationIcon.c \
 	FolderWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
 
+InputWindow.$(OBJEXT): InputWindow.h MainWindow.h ConfigOptions.h \
+	ConfigParser.h RNAStructViz.h StructureManager.h \
+	FolderStructure.h BaseSequenceIDs.h ConfigExterns.h \
+	InputWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
+
 LoadFileSelectAllButton.$(OBJEXT): LoadFileSelectAllButton.h ConfigOptions.h\
-	LoadFileSelectAllButton.cpp
+	ConfigExterns.h LoadFileSelectAllButton.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c LoadFileSelectAllButton.cpp
 
 Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
-	TerminalPrinting.h OptionParser.h Main.cpp
+	TerminalPrinting.h OptionParser.h ConfigExterns.h \
+	Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
 
 MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
-	TerminalPrinting.h \
+	TerminalPrinting.h ThemesConfig.h \
 	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c MainWindow.cpp
 
@@ -299,11 +298,17 @@ RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
 	StatsWindow.h TerminalPrinting.h BaseSequenceIDs.h RNAStructViz.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c RNAStructViz.cpp
 
+StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
+	RNAStructViz.h RNAStructure.h InputWindow.h TerminalPrinting.h \
+	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm StatsWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
+
 StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
 	FolderWindow.h MainWindow.h RNAStructViz.h InputWindow.h\
 	RNAStructure.h TerminalPrinting.h StructureManager.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp
 
-TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h TerminalPrinting.cpp
+TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h ConfigExterns.h \
+	TerminalPrinting.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c TerminalPrinting.cpp
 

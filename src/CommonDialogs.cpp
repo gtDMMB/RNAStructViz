@@ -9,6 +9,7 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "RNAStructViz.h"
+#include "ConfigExterns.h"
 
 std::string CommonDialogs::GetHelpInstructionsMessageString() {
 

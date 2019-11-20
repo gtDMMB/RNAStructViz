@@ -17,6 +17,7 @@
 #include "DisplayConfigWindow.h"
 #include "TerminalPrinting.h"
 #include "OptionParser.h"
+#include "ConfigExterns.h"
 
 #ifdef __STRUCTVIZ_INSTALL_SIGNAL_HANDLERS
      #include <signal.h>

@@ -44,15 +44,6 @@ using std::string;
 #define USER_SAMPLE_STRUCTS_BASE_PATH   (string(GetUserHome()) + string("/RNAStructViz"))
 #define USER_SAMPLE_STRUCTS_PATH        (USER_SAMPLE_STRUCTS_BASE_PATH + string("/sample-structures"))
 
-extern volatile char CTFILE_SEARCH_DIRECTORY[MAX_BUFFER_SIZE];
-extern volatile char PNG_OUTPUT_DIRECTORY[MAX_BUFFER_SIZE];
-extern volatile char PNG_OUTPUT_PATH[MAX_BUFFER_SIZE];
-extern volatile char PNG_RADIAL_LAYOUT_OUTPUT_PATH[MAX_BUFFER_SIZE];
-extern volatile char FLTK_THEME[MAX_BUFFER_SIZE];
-extern const char *ALL_FLTK_THEMES[FLTK_THEME_COUNT];
-extern const char *FLTK_THEME_HELP[FLTK_THEME_COUNT];
-extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
-
 #ifndef MAX
      #define MAX(x, y)                    ((x) <= (y) ? (y) : (x))
 #endif
@@ -81,23 +72,6 @@ extern char LIBFLTK_VERSION_STRING[MAX_BUFFER_SIZE];
 #define LOCAL_TEXT_SIZE                 (12)
 #define LOCAL_RMFONT                    (FL_SCREEN_BOLD)
 #define LOCAL_BFFONT                    (FL_SCREEN_BOLD)
-
-extern volatile Fl_Color GUI_WINDOW_BGCOLOR;
-extern volatile Fl_Color GUI_BGCOLOR;
-extern volatile Fl_Color GUI_BTEXT_COLOR;
-extern volatile Fl_Color GUI_TEXT_COLOR;
-extern volatile Fl_Color GUI_CTFILEVIEW_COLOR;
-
-extern volatile Fl_Color STRUCTURE_DIAGRAM_COLORS[3][7];
-
-extern bool GUI_USE_DEFAULT_FOLDER_NAMES;
-extern bool GUI_KEEP_STICKY_FOLDER_NAMES;
-extern int  DEBUGGING_ON;
-extern bool DISPLAY_FIRSTRUN_MESSAGE;
-
-extern char rnaStructVizExecPath[MAX_BUFFER_SIZE];
-extern char runtimeCWDPath[MAX_BUFFER_SIZE];
-extern char activeSystemUserFromEnv[MAX_BUFFER_SIZE];
 
 /* Helper functions and inline utilities we do not place elsewhere: */
 #include "RNACUtils.cpp"

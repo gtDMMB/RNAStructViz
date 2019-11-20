@@ -5,6 +5,7 @@
 #include "ConfigParser.h"
 #include "CommonDialogs.h"
 #include "TerminalPrinting.h"
+#include "ThemesConfig.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -60,7 +61,7 @@ MainWindow::MainWindow(int argc, char **argv)
               RNAStructVizLogo.height, 
               RNAStructVizLogo.bytes_per_pixel
 	);
-        appLogo->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
+        appLogo->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.5), 0.5);
 	Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, 
                                          NAVBUTTONS_OFFSETY, appLogo->w(), appLogo->h());
         appLogoCont->image(appLogo);
@@ -72,7 +73,7 @@ MainWindow::MainWindow(int argc, char **argv)
         helpButton->color(GUI_WINDOW_BGCOLOR);
         helpButton->labelcolor(GUI_BTEXT_COLOR);
         helpButton->labelsize(2 * LOCAL_TEXT_SIZE);
-	helpIconImage->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
+	helpIconImage->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.5), 0.5);
         helpButton->image(helpIconImage);
         helpButton->deimage(helpIconImage);
         helpButton->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
@@ -90,7 +91,7 @@ MainWindow::MainWindow(int argc, char **argv)
         infoButton->color(GUI_WINDOW_BGCOLOR);
         infoButton->labelcolor(GUI_BTEXT_COLOR);
         infoButton->labelsize(2 * LOCAL_TEXT_SIZE);
-        infoButtonImage->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
+        infoButtonImage->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.5), 0.5);
 	infoButton->image(infoButtonImage);
         infoButton->deimage(infoButtonImage);
         infoButton->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);

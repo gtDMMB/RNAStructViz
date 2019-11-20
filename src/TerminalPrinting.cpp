@@ -9,6 +9,7 @@
 #include <locale.h>
 
 #include "ConfigOptions.h"
+#include "ConfigExterns.h"
 #include "TerminalPrinting.h"
 
 int PRINT_ANSI_COLOR = true;

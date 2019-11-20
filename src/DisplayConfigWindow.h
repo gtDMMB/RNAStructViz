@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "ConfigOptions.h"
+#include "ConfigExterns.h"
 
 #define CONFIG_WINDOW_WIDTH         (810)
 #define CONFIG_WINDOW_HEIGHT        (665)

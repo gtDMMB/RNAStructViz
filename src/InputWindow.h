@@ -13,6 +13,7 @@ using std::vector;
 #include <FL/Fl_Choice.H>
 
 #include "ConfigOptions.h"
+#include "ConfigExterns.h"
 
 /* 
 InputWindow is a pop-up window for taking in user input to specify the name of 
@@ -22,6 +23,8 @@ something. There are two types:
    structure manager
 2. FILE_INPUT - takes input for the filename of the exported table of 
    statistics in the StatsWindow
+3. CTVIEWER_FILE_INPUT 
+4. RADIAL_LAYOUT_FILE_INPUT
 
 The window's callbacks close the window if the user either presses enter in the
 input text field, pushes the 'OK' button, or closes the window. If no text has
@@ -54,7 +57,7 @@ class InputWindow : public Fl_Window
 	    	no text is inputted, the InputWindow returns ""; the parent widget must
 		    handle the conditioning to replace this with the default text)
 	    type - types listed above
-	    */
+	 */
         InputWindow(int w, int h, const char *label, const char *defaultName,
     	            InputWindowType type, int folderIndex = -1);
 	~InputWindow();

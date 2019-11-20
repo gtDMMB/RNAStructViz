@@ -9,6 +9,7 @@
 #include <FL/Enumerations.H>
 #include <FL/Fl_Text_Display.H>
 
+#include "ConfigExterns.h"
 #include "ConfigOptions.h"
 
 /*
@@ -52,7 +53,10 @@ typedef struct {
      Fl_Color ctFileDisplayColor;
      const char *themeName;
      bool isValid;
+     volatile Fl_Color *bwImageAvgColor;
 } ColorTheme_t;
+
+extern volatile ColorTheme_t *LOCAL_COLOR_THEME;
 
 static const ColorTheme_t PRESET_COLOR_THEMES[] = {
      {
@@ -62,7 +66,8 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0xd3d3b200,
           0x16161600, 
 	  "Green On Black", // standard Linux / command line colors
-	  true
+	  true,
+          &GUI_BTEXT_COLOR,
      }, 
      {
           0xc3b68900, 
@@ -71,7 +76,8 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0x0f0f0e00,
           Darker(0xc3b68900, 0.5f), 
 	  "Blue on Gold", 
-	  true
+	  true,
+	  &GUI_BTEXT_COLOR,
      }, 
      {
           0xeeb50000,
@@ -80,7 +86,8 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0x604f0900,
 	  Darker(0xeeb50000, 0.7f), 
 	  "Sunshine", // very vibrant and bright
-	  true
+	  true,
+	  &GUI_WINDOW_BGCOLOR,
      },
      {
           0x98a8a800,
@@ -89,7 +96,8 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0x24241f00,
 	  Darker(0x98a8a800, 0.65f), 
 	  "Redmond", // old school Windows 2000 era color scheme
-	  true
+	  true,
+	  &GUI_WINDOW_BGCOLOR,
      },
      {
           0xf7efd400,
@@ -98,7 +106,8 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
           0x0f0f0e00,
 	  0xf7efd400, 
 	  "Parchment",  // black and off white to gold 
-	  true
+	  true,
+	  &GUI_WINDOW_BGCOLOR,
      },
      {
           0xf7f7f900,
@@ -107,7 +116,8 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0x00000000,
 	  0xf7f7f900, 
 	  "Gray on white", 
-	  true
+	  true,
+	  &GUI_BTEXT_COLOR,
      },
      {
           0xeff2f200,
@@ -116,8 +126,9 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
           0x0e0144,
 	  0xeff2f200, 
 	  "Structviz default", 
-	  true
-     },
+	  true,
+	  &GUI_BTEXT_COLOR,
+    },
     {
           0, 
 	  0, 
@@ -125,8 +136,20 @@ static const ColorTheme_t PRESET_COLOR_THEMES[] = {
 	  0, 
 	  0, 
 	  "-- Select Theme --", 
-	  false
+	  false,
+	  NULL,
      }
 };
+
+static unsigned int NUM_LOCAL_THEMES = sizeof(PRESET_COLOR_THEMES) / sizeof(PRESET_COLOR_THEMES[0]);
+
+static inline ColorTheme_t * GetColorThemeRefByName(const char *themeName) {
+     for(int t = 0; t < NUM_LOCAL_THEMES; t++) {
+          if(!strcmp(themeName, PRESET_COLOR_THEMES[t].themeName)) {
+               return (ColorTheme_t *) &(PRESET_COLOR_THEMES[t]);
+	  }
+     }
+     return NULL;
+}
 
 #endif

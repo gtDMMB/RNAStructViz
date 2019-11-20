@@ -5,6 +5,7 @@
 
 #include "LoadFileSelectAllButton.h"
 #include "ConfigOptions.h"
+#include "ConfigExterns.h"
 
 SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, const char *buttonLabel) : 
      Fl_Button(0, 0, NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, buttonLabel), 
