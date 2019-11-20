@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (ConfigThemesIcon.c) */
 
+#ifndef __CONFIG_THEMES_ICON_C__
+#define __CONFIG_THEMES_ICON_C__
+
 static struct {
   unsigned int 	 width;
   unsigned int 	 height;
@@ -2280,4 +2283,6 @@ static struct {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
+
+#endif
 

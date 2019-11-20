@@ -23,11 +23,11 @@ std::string CommonDialogs::GetHelpInstructionsMessageString() {
           "(circled question mark) at the top-right corner of the left main window pane.\n",
           "► Sample structures are available for you to use with the application. You can\n",
           "copy them into your home directory by clicking on the middle button below, or \n", 
-      "directly from the install directory using the first-run instructions link above.\n",
+          "directly from the install directory using the first-run instructions link above.\n",
           "► Users may view a summary tour of RNAStructViz features by clicking on the\nhelp ",
           "button in the upper right left pane navigation bar and then on the left-most button.\n\n",
           "Thank you for using our application! ", 
-      "Please feel free to send us questions, comments, \n",
+          "Please feel free to send us questions, comments, \n",
           "and/or leave us general feedback on your user experience by \n",
           "by posting a new \nGitHub issue thread using the instructions at the following link:\n",
           "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »", 
@@ -52,7 +52,7 @@ void CommonDialogs::DisplayFirstRunInstructions() {
      fl_message_font(FL_COURIER_BOLD, 11);
      int userHelpSelection = fl_choice("%s",
                                        "Copy WIKI link to clipboard", 
-                       "Copy sample structures to your home directory", 
+                                       "Copy sample structures to your home directory", 
                                        "Do not show again at start-up", fullInstText.c_str());
      switch(userHelpSelection) {
           case 0: {
@@ -87,7 +87,7 @@ void CommonDialogs::DisplayHelpDialog() {
      fl_message_font(FL_COURIER_BOLD, 11);
      int userHelpSelection = fl_choice("%s",
                                        "Copy WIKI link to clipboard", 
-                       "Copy sample structures to your home directory", 
+                                       "Copy sample structures to your home directory", 
                                        "Display a tour of RNAStructViz", fullInstText.c_str());
      switch(userHelpSelection) {
           case 0: {
@@ -99,12 +99,12 @@ void CommonDialogs::DisplayHelpDialog() {
       case 1: 
            RNAStructViz::CopySampleStructures();
            break;
-          case 2: {
+      case 2: {
            CommonDialogs::DisplayTourDialog();
            break;
-          }
-          default:
-               break;
+      }
+      default:
+           break;
      }
 }
 
@@ -113,25 +113,25 @@ void CommonDialogs::DisplayTourDialog() {
      const char *tourTextBuffer[] = {
           "What does RNAStructViz do?\n\n",
           "► It loads sample structures in CT, NOPCT, DOT and several other standard formats.\n",
-      "The loaded samples are then grouped into folders in the left-hand-side pane according to\n", 
-      "their common base nucleotide sequences.\n", 
-      "► After selecting an organism by clicking on its folder, the right-hand-side window pane is\n", 
-      "populated with a set of operations that can compare the different loaded samples.\n\n", 
-      "Users can then compare the samples for the selected organism by doing the following:\n\n", 
+          "The loaded samples are then grouped into folders in the left-hand-side pane according to\n", 
+          "their common base nucleotide sequences.\n", 
+          "► After selecting an organism by clicking on its folder, the right-hand-side window pane is\n", 
+          "populated with a set of operations that can compare the different loaded samples.\n\n", 
+          "Users can then compare the samples for the selected organism by doing the following:\n\n", 
           "► Generate graphical arc diagrams to compare the overlap in pairings between up to three\n", 
-      "samples at once. The arc diagram window also lets users zoom and select consecutive\n", 
-      "sequences of bases to view in a radial layout viewer based on ViennaRNA.\n", 
-      "► Compute comparitive statistics among all samples for the given organism given a \n", 
-      "reference structure.\n", 
-      "► Directly view the secondary structure base pairings in our color-coded integrated\n", 
-      "CT-file-style file viewer (lower right-hand-side buttons).\n", 
-      "► Export loaded samples to CT and DOT Bracket file formats starting from any input\n", 
-      "sequence format RNAStructViz supports.\n", 
-      "► Export statistical data and the visual arc diagram representations for the samples,\n", 
-      "respectively, to the standard text-based CSV and PNG image formats.\n\n", 
-      "The RNAStructViz WIKI page on GitHub is an excellent reference to get new users started with the\n", 
-      "functionality built into the application. It can be found online by visiting the following link:\n", 
-      "« https://github.com/gtDMMB/RNAStructViz/wiki »",
+          "samples at once. The arc diagram window also lets users zoom and select consecutive\n", 
+          "sequences of bases to view in a radial layout viewer based on ViennaRNA.\n", 
+          "► Compute comparitive statistics among all samples for the given organism given a \n", 
+          "reference structure.\n", 
+          "► Directly view the secondary structure base pairings in our color-coded integrated\n", 
+          "CT-file-style file viewer (lower right-hand-side buttons).\n", 
+          "► Export loaded samples to CT and DOT Bracket file formats starting from any input\n", 
+          "sequence format RNAStructViz supports.\n", 
+          "► Export statistical data and the visual arc diagram representations for the samples,\n", 
+          "respectively, to the standard text-based CSV and PNG image formats.\n\n", 
+          "The RNAStructViz WIKI page on GitHub is an excellent reference to get new users started with the\n", 
+          "functionality built into the application. It can be found online by visiting the following link:\n", 
+          "« https://github.com/gtDMMB/RNAStructViz/wiki »",
      };
      char fullTourText[4 * MAX_BUFFER_SIZE];
      fullTourText[0] = '\0';
@@ -159,10 +159,10 @@ std::string CommonDialogs::GetInfoAboutMessageString() {
            ApplicationBuildInfo::CairoVersionString(),
            ApplicationBuildInfo::BuildPlatform(),
            ApplicationBuildInfo::LocalBuildDateTime(),
-       //"",
-       (string("RNAStructViz Launch Path Command: ") + string(rnaStructVizExecPath)), 
-       (string("Current Working Directory (CWD): ") + string(runtimeCWDPath)), 
-       (string("Active System User (From ENV): ") + string(activeSystemUserFromEnv)),
+           //"",
+           (string("RNAStructViz Launch Path Command: ") + string(rnaStructVizExecPath)), 
+           (string("Current Working Directory (CWD): ") + string(runtimeCWDPath)), 
+           (string("Active System User (From ENV): ") + string(activeSystemUserFromEnv)),
      };
      string spaces = string("................................................................................");
      int tableHeaderWidth = 42;

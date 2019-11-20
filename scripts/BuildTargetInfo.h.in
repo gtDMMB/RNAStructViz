@@ -22,14 +22,14 @@
      static inline char* strchrnul(const char *s, int ch) {
           if(s == NULL) {
                return NULL;
-	  }
+       }
           char *strchrResult = (char *) strchr(s, ch);
           if(strchrResult == NULL) {
-	       size_t slen = strnlen(s, 2048);
+            size_t slen = strnlen(s, 2048);
                return (char *) (s + slen);
-	  }
+       }
           return strchrResult;
-     }	   
+     }        
 #endif
 
 #ifdef TARGETOS_GENERIC_UNIX
@@ -57,7 +57,7 @@
 #define FLTK_USE_CAIRO  1
 #define FLTK_HAVE_CAIRO 1
 
-//#define ERRORS_TO_ISO8859_1   1      /* FLTK Unicode character encoding */
+#define ERRORS_TO_ISO8859_1   1      /* FLTK Unicode character encoding */
 //#define ERRORS_TO_CP1252      1
 
 #ifndef BOOST_FILESYSTEM_NO_DEPRECATED
@@ -68,7 +68,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("RNAStructViz v1.9.2-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬   RNAStructViz v1.9.2-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
@@ -92,79 +92,97 @@ using std::string;
 class ApplicationBuildInfo {
 
      public:
-          static inline string UserManualWikiLink() {
+       static inline string RNAStructVizFigletTextLogo() {
+            static const char *figletTextLogoLines[] = {
+                 "",
+            };
+            std::string figletTextLogo = std::string("");
+            int numLogoLines = sizeof(figletTextLogoLines) / sizeof(figletTextLogoLines[0]);
+            for(int line = 0; line < numLogoLines; line++) {
+                 figletTextLogo += std::string(figletTextLogoLines[line]) + std::string("\n");
+            }
+            return figletTextLogo.substr(0, figletTextLogo.length() - 1);
+       }
+          
+       static inline string UserManualWikiLink() {
                return string("User Manual: https://github.com/gtDMMB/RNAStructViz/wiki");
-	  }
+       }
 
-	  static inline string GitRevisionInfoFull() {
+       static inline string GitRevisionInfoFull() {
                char revString[HUGE_BUFFER_LINE_SIZE];
                snprintf(revString, HUGE_BUFFER_LINE_SIZE, 
-	                "Git Revision: %s (%s) [%s]", 
-	                GIT_COMMIT_HASH_SHORT, GIT_COMMIT_HASH, GIT_BRANCH_REVSTRING);
+                     "Git Revision: %s (%s) [%s]", 
+                     GIT_COMMIT_HASH_SHORT, GIT_COMMIT_HASH, GIT_BRANCH_REVSTRING);
                revString[HUGE_BUFFER_LINE_SIZE - 1] = '\0';
                return string(revString);
-          }
+       }
 
-	  static inline string GitRevisionInfo() {
+       static inline string GitRevisionInfo() {
                char revString[HUGE_BUFFER_LINE_SIZE];
                snprintf(revString, HUGE_BUFFER_LINE_SIZE, 
-	                "Git Revision: %s [%s]", 
-	                GIT_COMMIT_HASH_SHORT, GIT_BRANCH_REVSTRING);
+                     "Git Revision: %s [%s]", 
+                     GIT_COMMIT_HASH_SHORT, GIT_BRANCH_REVSTRING);
                revString[HUGE_BUFFER_LINE_SIZE - 1] = '\0';
                return string(revString);
-          }
-          static inline string GitRevisionDate() {
+       }
+
+       static inline string GitRevisionDate() {
                return string("Revision Date: ") + string(GIT_COMMIT_DATE);
-          }
+       }
 
-          static inline string BuildPlatform() {
-	       return string("Target Platform: ") + string(BUILD_PLATFORM_ID);
-	  }
+       static inline string BuildPlatform() {
+            return string("Target Platform: ") + string(BUILD_PLATFORM_ID);
+       }
 
-	  static inline string LocalBuildDateTime() {
-	       return string("Local Build Time: ") + string(BUILD_DATETIME);
-	  }
+       static inline string LocalBuildDateTime() {
+            return string("Local Build Time: ") + string(BUILD_DATETIME);
+       }
 
-	  static inline string BuildFLTKConfig() {
+       static inline string BuildFLTKConfig() {
                return string("FLTK-Config: ") + 
-		      string(BUILD_FLTK_CONFIG);
-	  }
+                string(BUILD_FLTK_CONFIG);
+       }
 
-	  static inline string CairoVersionString() {
+       static inline string CairoVersionString() {
                return string("Cairo Library: ") + string(CAIRO_VERSION_STRING);
-	  }
+       }
 
-	  static inline string FLTKVersionString() {
-               char fltkVersionStr[HUGE_BUFFER_LINE_SIZE];
-	       snprintf(fltkVersionStr, HUGE_BUFFER_LINE_SIZE - 1, 
-			"%d.%d.%d (API #%d)", 
-			FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION, FL_API_VERSION);
-	       fltkVersionStr[HUGE_BUFFER_LINE_SIZE - 1] = '\0';
-	       return string("FLTK Library: ") + string(fltkVersionStr);
-	  }
+       static inline string FLTKVersionString() {
+            char fltkVersionStr[HUGE_BUFFER_LINE_SIZE];
+            snprintf(fltkVersionStr, HUGE_BUFFER_LINE_SIZE - 1, 
+                     "%d.%d.%d (API #%d)", 
+                     FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION, FL_API_VERSION);
+            fltkVersionStr[HUGE_BUFFER_LINE_SIZE - 1] = '\0';
+            return string("FLTK Library: ") + string(fltkVersionStr);
+       }
 
-	  static inline void PrintAboutListing(const char *aboutStr = NULL, FILE *whichOut = stderr) {
-               if(whichOut == NULL) {
+       static inline void PrintAboutListing(const char *aboutStr = NULL, FILE *whichOut = stderr) {
+            if(whichOut == NULL) {
                     whichOut = stderr;
-	       }
-	       fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
-	       fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
-	       if(aboutStr == NULL) {
-                    fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n", 
-			       UserManualWikiLink().c_str(), GitRevisionInfoFull().c_str(), 
-			       GitRevisionDate().c_str(), FLTKVersionString().c_str(),
-			       BuildFLTKConfig().c_str(),  
-			       CairoVersionString().c_str(), BuildPlatform().c_str(), 
-			       LocalBuildDateTime().c_str());
-	       }
-	       else {
-	            fprintf(whichOut, "%s\n", aboutStr);
-	       }
-	       const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit. "
-		                          "New issues with the application can be submitted by following the instructions at " 
-					  "https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors.";
-	       fprintf(whichOut, "BUG REPORT INFORMATION:\n**%s**\n", bugReportMsg);
-	  }
+            }
+            fprintf(whichOut, "%s\n\n", RNAStructVizFigletTextLogo().c_str());
+            fprintf(whichOut, "==== %s ====\n\n", RNASTRUCTVIZ_VSTRING);
+            fprintf(whichOut, "ABOUT THIS APPLICATION:\n");
+            if(aboutStr == NULL) {
+                    fprintf(whichOut, "   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n   >> %s\n\n", 
+                                      UserManualWikiLink().c_str(), GitRevisionInfoFull().c_str(), 
+                                      GitRevisionDate().c_str(), FLTKVersionString().c_str(),
+                                      BuildFLTKConfig().c_str(),  
+                                      CairoVersionString().c_str(), BuildPlatform().c_str(), 
+                                      LocalBuildDateTime().c_str());
+            }
+            else {
+                 fprintf(whichOut, "%s\n\n", aboutStr);
+            }
+	    for(unsigned int chi = 0; chi < 10 + strlen(RNASTRUCTVIZ_VSTRING); chi++) {
+	         fprintf(whichOut, "=");
+	    }
+	    fprintf(whichOut, "\n\n");
+            const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit.\n"
+                                       "New issues with the application can be submitted by following the instructions at\n" 
+                                       "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »";
+            fprintf(whichOut, "BUG REPORT INFORMATION:\n** %s **\n", bugReportMsg);
+       }
 
 };
 

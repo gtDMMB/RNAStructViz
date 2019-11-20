@@ -162,6 +162,7 @@ DisplayConfigWindow::DisplayConfigWindow() :
      Fl_Cairo_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT),
      finished(false), pngNewPathIcon(NULL), imageData(NULL) { 
 
+     Fl::cairo_make_current(this);
      Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE | FL_INDEX);
 
      imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
@@ -188,16 +189,16 @@ DisplayConfigWindow::DisplayConfigWindow() :
 
 DisplayConfigWindow::~DisplayConfigWindow() {
      for(int w = 0; w < windowWidgets.size(); w++) {
-          Delete(windowWidgets[w]);
+          Delete(windowWidgets[w], Fl_Widget);
      }
-     Delete(fpathsIcon);
-     Delete(themesIcon);
-     Delete(dwinSettingsIcon);
-     Delete(cfgCheckboxesIcon);
-     Delete(pngNewPathIcon);
+     Delete(fpathsIcon, Fl_RGB_Image);
+     Delete(themesIcon, Fl_RGB_Image);
+     Delete(dwinSettingsIcon, Fl_RGB_Image);
+     Delete(cfgCheckboxesIcon, Fl_RGB_Image);
+     Delete(pngNewPathIcon, Fl_RGB_Image);
      cairo_surface_destroy(crSurface);
      cairo_destroy(crDraw);
-     Delete(imageData);
+     Delete(imageData, uchar);
 }
 
 void DisplayConfigWindow::ConstructWindow() {
@@ -209,7 +210,8 @@ void DisplayConfigWindow::ConstructWindow() {
           ConfigPathsIcon.width, ConfigPathsIcon.height, 
           ConfigPathsIcon.bytes_per_pixel);
      Fl_Box *fpathsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-                     fpathsIcon->w(), fpathsIcon->h());
+                                        fpathsIcon->w(), fpathsIcon->h());
+     fpathsIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
      fpathsIconBox->image(fpathsIcon);
      windowWidgets.push_back(fpathsIconBox);
      workingYOffset += fpathsIcon->h() + CFGWIN_SPACING / 2;
@@ -280,7 +282,8 @@ void DisplayConfigWindow::ConstructWindow() {
                                  ConfigDiagramWindow.width, ConfigDiagramWindow.height, 
                                  ConfigDiagramWindow.bytes_per_pixel);
      Fl_Box *dwinSettingsIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-                                      dwinSettingsIcon->w(), dwinSettingsIcon->h());
+                                              dwinSettingsIcon->w(), dwinSettingsIcon->h());
+     dwinSettingsIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
      dwinSettingsIconBox->image(dwinSettingsIcon);
      windowWidgets.push_back(dwinSettingsIconBox);
      workingYOffset += dwinSettingsIcon->h() + CFGWIN_SPACING / 2;
@@ -345,7 +348,8 @@ void DisplayConfigWindow::ConstructWindow() {
           ConfigThemesIcon.width, ConfigThemesIcon.height, 
           ConfigThemesIcon.bytes_per_pixel);
      Fl_Box *themesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-                     themesIcon->w(), themesIcon->h());
+                                        themesIcon->w(), themesIcon->h());
+     themesIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
      themesIconBox->image(themesIcon);
      windowWidgets.push_back(themesIconBox);
      workingYOffset += themesIcon->h() + CFGWIN_SPACING / 2;
@@ -447,7 +451,8 @@ void DisplayConfigWindow::ConstructWindow() {
                                   ConfigCheckBoxParamsIcon.height, 
                                   ConfigCheckBoxParamsIcon.bytes_per_pixel);
      Fl_Box *cfgCheckboxesIconBox = new Fl_Box(CFGWIN_WIDGET_OFFSETX, workingYOffset, 
-                                       cfgCheckboxesIcon->w(), cfgCheckboxesIcon->h());
+                                               cfgCheckboxesIcon->w(), cfgCheckboxesIcon->h());
+     cfgCheckboxesIcon->color_average(Lighter(GUI_BTEXT_COLOR, 0.65), 0.67);
      cfgCheckboxesIconBox->image(cfgCheckboxesIcon);
      windowWidgets.push_back(cfgCheckboxesIconBox);
      workingYOffset += cfgCheckboxesIcon->h() + CFGWIN_SPACING / 2;
@@ -538,8 +543,8 @@ void DisplayConfigWindow::ConstructWindow() {
      cancelBtn->callback(WindowCloseCallback);
      windowWidgets.push_back(cancelBtn);
 
-     this->redraw();
-     Fl::cairo_make_current(this);
+     redraw();
+     //Fl::cairo_make_current(this);
 } 
 
 bool DisplayConfigWindow::isDone() const {

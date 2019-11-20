@@ -55,10 +55,10 @@ void StructureManager::AddFile(const char* filename)
         {
             if (!strcmp(m_structures[i]->GetFilename(true), basename))
             {
-        TerminalText::PrintInfo("Already have a structure loaded with filename: %s\n", 
-                            basename);
+                TerminalText::PrintInfo("Already have a structure loaded with filename: %s\n", 
+                                        basename);
                 free(localCopy);
-        return;
+                return;
             }
         }
     }
@@ -133,8 +133,8 @@ void StructureManager::AddFile(const char* filename)
          }
              
          InputWindow* input_window = new InputWindow(525, 210, 
-                       "New Folder Added", folders[count]->folderName, 
-                  InputWindow::FOLDER_INPUT);
+                                                     "New Folder Added", folders[count]->folderName, 
+                                                     InputWindow::FOLDER_INPUT);
                  while (input_window->visible()) {
                        Fl::wait();
                  }
@@ -146,7 +146,7 @@ void StructureManager::AddFile(const char* filename)
                          && strcmp(input_window->getName(),""))
                      {
                           same = true;
-                      break;
+                          break;
                      }
                  }
             
@@ -154,55 +154,56 @@ void StructureManager::AddFile(const char* filename)
                      int choice = fl_choice("Already have a folder with the name: %s, please choose another name.", 
                                             "Skip loading file", "Close", NULL, input_window->getName());
                      input_window->Cleanup(false);
-             Delete(input_window);
-             if(choice == 0) {
-                  same = false;
-              break;
-             }
+                     Delete(input_window, InputWindow);
+                     if(choice == 0) {
+                         same = false;
+                         break;
+                     }
                      input_window = new InputWindow(525, 210, "New Folder Added", 
-                                folders[count]->folderName, InputWindow::FOLDER_INPUT);
+                                                    folders[count]->folderName, InputWindow::FOLDER_INPUT);
                      while (input_window->visible()) {
                           Fl::wait();
                      }
-             same = !strcmp(input_window->getName(), "");
+                     same = !strcmp(input_window->getName(), "");
                      for(unsigned int ui = 0; ui < folders.size(); ui++)
                      {
-                       if (!strcmp(folders[ui]->folderName, input_window->getName()))
-                       {
-                         same = true;
-                         break;
-                       }
-                 }
+                           if (!strcmp(folders[ui]->folderName, input_window->getName()))
+                           {
+                             same = true;
+                             break;
+                           }
+                     }
                  }
                         
                  if(input_window != NULL && strcmp(input_window->getName(), "")) {
                      strcpy(folders[count]->folderName, input_window->getName());
-             if(GUI_KEEP_STICKY_FOLDER_NAMES) {
-                          const char *baseSeq = structure->GetSequenceString();
-              int saveStatus = SaveStickyFolderNameToConfigFile(
-                   DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
-                   std::string(baseSeq), 
-                   std::string(folders[count]->folderName), 
-                   LSEEK_NOT_FOUND
-              );
-              if(saveStatus) {
-                   TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
-                                      folders[count]->folderName);
-              }
-              else {
-                   TerminalText::PrintDebug("Saved sticky folder name \"%s\" to local config file\n", 
-                                    folders[count]->folderName);
-              }
-             }
-         }
-         if(input_window != NULL) {
-                      MainWindow::AddFolder(folders[count]->folderName, count, false);
+                     if(GUI_KEEP_STICKY_FOLDER_NAMES) {
+                     const char *baseSeq = structure->GetSequenceString();
+                     int saveStatus = SaveStickyFolderNameToConfigFile(
+                        DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+                        std::string(baseSeq), 
+                        std::string(folders[count]->folderName), 
+                        LSEEK_NOT_FOUND
+                     );
+                     if(saveStatus) {
+                          TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
+                                                     folders[count]->folderName);
+                     }
+                     else {
+                          TerminalText::PrintDebug("Saved sticky folder name \"%s\" to local config file\n", 
+                                                   folders[count]->folderName);
+                     }
+               }
+           }
+           if(input_window != NULL) {
+              MainWindow::AddFolder(folders[count]->folderName, count, false);
               input_window->Cleanup(false);
-              Delete(input_window);
-         }
-             }
+	      while(input_window->visible()) { Fl::wait(); }
+              Delete(input_window, InputWindow);
+           }
+       }
 
-    }
+      }
     }
     else {
          fl_alert("Error adding structure \"%s\"! Could not parse the specified format for this file.\n", 
@@ -250,9 +251,12 @@ void StructureManager::DecreaseStructCount(const int index)
         MainWindow::RemoveFolderByIndex(index, true);
     }
     else {
-        sprintf(folders[index]->folderNameFileCount, "(+% 2d) %-.48s", 
-                folders[index]->structCount, folders[index]->folderName);
-        Fl::redraw();
+        sprintf(folders[index]->folderNameFileCount, "(+% 2d) %-.25s%s", 
+                folders[index]->structCount, folders[index]->folderName, 
+		strlen(folders[index]->folderName) > 25 ? "..." : "");
+        snprintf(folders[index]->tooltipText, MAX_BUFFER_SIZE - 1, 
+	         Folder::tooltipTextFmt, folders[index]->folderName, folders[index]->structCount);
+	Fl::redraw();
     }
 }
 
@@ -260,11 +264,11 @@ void StructureManager::RemoveFolder(const int folder, const int index)
 {
     if (folders[index]->folderName != NULL) {
         free(folders[index]->folderName); 
-        folders[index]->folderName = "";
+        SetStringToEmpty(folders[index]->folderName);
     }
     if (folders[index]->folderNameFileCount != NULL) {
         free(folders[index]->folderNameFileCount); 
-        folders[index]->folderNameFileCount = "";
+        SetStringToEmpty(folders[index]->folderNameFileCount);
     }
     if (folders[index]->folderStructs != NULL) {
         free(folders[index]->folderStructs); 
@@ -295,8 +299,11 @@ void StructureManager::AddFolder(RNAStructure* structure, const int index)
     temp->folderStructs = (int*)malloc(sizeof(int)*128);
     temp->folderStructs[0] = index;
     temp->structCount = 1;
-    sprintf(temp->folderNameFileCount, "(+% 2d) %-.48s", 
-        temp->structCount, temp->folderName);
+    sprintf(temp->folderNameFileCount, "(+% 2d) %-.25s%s", 
+            temp->structCount, temp->folderName, 
+            strlen(temp->folderName) > 25 ? "..." : "");
+    snprintf(temp->tooltipText, MAX_BUFFER_SIZE - 1, 
+	     Folder::tooltipTextFmt, temp->folderName, temp->structCount);
     temp->selected = false;
     temp->folderWindow = 0;
     folders.push_back(temp);
@@ -366,9 +373,12 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
                 AddNewStructure(ui, index);
                 
                 if (folders[ui]->folderNameFileCount != NULL) {
-                    sprintf(folders[ui]->folderNameFileCount, "(+% 2d) %-.48s", 
-                            folders[ui]->structCount, folders[ui]->folderName);
-                }
+                    sprintf(folders[ui]->folderNameFileCount, "(+% 2d) %-.25s%s", 
+                            folders[ui]->structCount, folders[ui]->folderName, 
+			    strlen(folders[ui]->folderName) > 25 ? "..." : "");
+		    snprintf(folders[ui]->tooltipText, MAX_BUFFER_SIZE - 1, 
+			     Folder::tooltipTextFmt, folders[ui]->folderName, folders[ui]->structCount);
+		}
                 found = true;
                 break;
             }

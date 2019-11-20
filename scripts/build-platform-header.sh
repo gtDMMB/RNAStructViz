@@ -45,11 +45,14 @@ for ridx in $(seq 0 6); do
 done
 echo -e "\n"
 
-echo -e "LOCAL BUILD HEADER \"$OUTPUT_HEADER_FILE\" CONTENTS:\n\n";
-cat $OUTPUT_HEADER_FILE;
-echo -e "\n";
-printf "FOR A TOTAL OF %s LINES (%s CHARACTERS) WRITTEN.\n\n" \
-	$(wc -l $OUTPUT_HEADER_FILE | grep -o -e "[0-9]*") \
-	$(wc -m $OUTPUT_HEADER_FILE | grep -o -e "[0-9]*");
+PrintLocalBuildHeaderFile=`cat ./BuildConfig.cfg | sed -n 's/ECHO_CONFIG_HEADER=\(.*\)/\1/p'`
+if [[ "$PrintLocalBuildHeaderFile" == "1" ]]; then
+	echo -e "LOCAL BUILD HEADER \"$OUTPUT_HEADER_FILE\" CONTENTS:\n\n";
+	cat $OUTPUT_HEADER_FILE;
+	echo -e "\n";
+	printf "FOR A TOTAL OF %s LINES (%s CHARACTERS) WRITTEN.\n\n" \
+		$(wc -l $OUTPUT_HEADER_FILE | grep -o -e "[0-9]*") \
+		$(wc -m $OUTPUT_HEADER_FILE | grep -o -e "[0-9]*");
+fi
 
-
+exit 0

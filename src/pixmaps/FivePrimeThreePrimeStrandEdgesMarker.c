@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (FivePrimeThreePrimeStrandEdgesMarker.c) */
 
+#ifndef __FIVE_PRIME_THREE_PRIME_EDGE_MARKER_C__
+#define __FIVE_PRIME_THREE_PRIME_EDGE_MARKER_C__
+
 static struct {
   unsigned int 	 width;
   unsigned int 	 height;
@@ -586,4 +589,6 @@ static struct {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
+
+#endif
 

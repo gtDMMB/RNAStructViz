@@ -12,6 +12,8 @@ SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, const char *but
 
      color(GUI_WINDOW_BGCOLOR);
      labelcolor(GUI_BTEXT_COLOR);
+     box(FL_SHADOW_BOX);
+     labeltype(FL_SHADOW_LABEL);
      user_data((void *) flFileChooser);
      callback(SelectAllButton::FileChooserSelectAllCallback);
      activate();

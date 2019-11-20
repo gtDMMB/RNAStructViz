@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (StructureOperationIcon.c) */
 
+#ifndef __STRUCTURE_OPERATION_ICON_C__
+#define __STRUCTURE_OPERATION_ICON_C__
+
 static const struct {
   unsigned int 	 width;
   unsigned int 	 height;
@@ -2008,4 +2011,6 @@ static const struct {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
+
+#endif
 

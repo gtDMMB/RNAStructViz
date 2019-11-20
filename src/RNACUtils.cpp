@@ -9,23 +9,23 @@
 
 #define GetArrayLength(arr)             (arr != NULL ? sizeof(arr) / sizeof(arr[0]) : 0) 
 
-static inline void DeletePointerCheck(void *ptr) {
+template<typename PT>
+static inline void DeletePointerCheck(PT *ptr) {
      if(ptr != NULL) {
           delete ptr;
-      ptr = NULL;
      }
 }
 
-#define Delete(p)                       ({ DeletePointerCheck(p); p = NULL; })
+#define DeletePointerNoType(p)          { DeletePointerCheck<void>(p); p = NULL;  }
+#define Delete(p, ptype)                { DeletePointerCheck<ptype>(p); p = NULL; }
 
 static inline void FreePointerCheck(void *ptr) {
      if(ptr != NULL) {
           free(ptr);
-      ptr = NULL;
      }
 }
 
-#define Free(p)                         ({ FreePointerCheck(p); p = NULL; })
+#define Free(p)                         { FreePointerCheck(p); p = NULL; }
 
 typedef bool (*PredicateFunc_t)(char);
 
@@ -42,6 +42,8 @@ static inline const char* RemoveCharsFromStringByPredicate(char *str, PredicateF
      *chwpos = '\0';
      return str;
 }
+
+#define SetStringToEmpty(str)                     (str[0] = '\0')
 
 #define StringRemoveWhitespace(s)                 RemoveCharsFromStringByPredicate(s, isspace)
 
@@ -107,7 +109,7 @@ static inline const char * GetUserHome() {
      if(userHomeDir == NULL) {
           struct passwd *uhdPasswd = getpwuid(getuid());
       if(uhdPasswd) 
-               userHomeDir = uhdPasswd->pw_dir;
+           userHomeDir = uhdPasswd->pw_dir;
       else
            userHomeDir = "";
      }

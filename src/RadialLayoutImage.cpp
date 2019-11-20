@@ -30,6 +30,8 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
     imageHeight(0), imageWidth(0), 
     displayBaseLower(0), displayBaseHigher(0) {
 
+     Fl::cairo_make_current(this);
+
      int offsetY = 10;
      int offsetX = (w() - 5 * RADIAL_BUTTON_WIDTH) / 2 + RADIAL_WIDGET_WIDTH / 2;
     
@@ -76,17 +78,17 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
 
      color(GUI_WINDOW_BGCOLOR);
      set_draw_cb(Draw);
-     Fl::cairo_make_current(this);
+     //Fl::cairo_make_current(this);
 
 }
 
 RadialLayoutDisplayWindow::~RadialLayoutDisplayWindow() {
      Free(winTitle);
-     Delete(radialLayoutCanvas);
-     Delete(scalePlusBtn);
-     Delete(scaleMinusBtn);
-     Delete(exportToPNGBtn);
-     Delete(windowScroller);
+     Delete(radialLayoutCanvas, CairoContext_t);
+     Delete(scalePlusBtn, Fl_Button);
+     Delete(scaleMinusBtn, Fl_Button);
+     Delete(exportToPNGBtn, Fl_Button);
+     Delete(windowScroller, Fl_Scroll);
 }
 
 bool RadialLayoutDisplayWindow::SetTitle(const char *windowTitleStr) {
@@ -139,8 +141,8 @@ bool RadialLayoutDisplayWindow::DisplayRadialDiagram(const char *rnaSeq, size_t 
      if(rnaSeq == NULL) {
           return false;
      }
-     Delete(radialLayoutCanvas);
-     Delete(radialLayoutCanvasOrig);
+     Delete(radialLayoutCanvas, CairoContext_t);
+     Delete(radialLayoutCanvasOrig, CairoContext_t);
      
      radialLayoutCanvas = GetVRNARadialLayoutData(rnaSeq, startSeqPos, endSeqPos, seqLength, 
                                                (VRNAPlotType_t) vrnaPlotType);
@@ -155,7 +157,7 @@ void RadialLayoutDisplayWindow::ResizeScrollerFillBox() {
      }
      if(scrollerFillBox != NULL) {
           windowScroller->remove(scrollerFillBox);
-          Delete(scrollerFillBox);
+          Delete(scrollerFillBox, Fl_Box);
      }
      int nextFillerWidth = MAX(DEFAULT_RLWIN_WIDTH, radialLayoutCanvas->GetWidth());
      int nextFillerHeight = MAX(DEFAULT_RLWIN_HEIGHT - buttonToolbarHeight, radialLayoutCanvas->GetHeight());
@@ -349,7 +351,7 @@ void RadialLayoutDisplayWindow::RadialLayoutResetCallback(Fl_Widget *resetBtn, v
      RadialLayoutDisplayWindow *rwin = (RadialLayoutDisplayWindow *) resetBtn->parent();
      CairoContext_t *oldRadialLayoutCanvas = rwin->radialLayoutCanvas;
      rwin->radialLayoutCanvas = new CairoContext_t(*(rwin->radialLayoutCanvasOrig));
-     Delete(oldRadialLayoutCanvas);
+     Delete(oldRadialLayoutCanvas, CairoContext_t);
      rwin->haveInitVRNAScroller = false;
      rwin->ResizeScrollerFillBox();
      rwin->redraw();

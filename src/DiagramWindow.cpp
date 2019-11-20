@@ -90,7 +90,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     //    redrawRefreshTimerSet = true;
     //}
     iconize();
-    set_non_modal();
+    //set_non_modal();
 
     title = (char *) malloc(128 * sizeof(char));
     SetStructures(structures);
@@ -118,7 +118,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     
     Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw);
-    Fl::cairo_make_current(this);
+    //Fl::cairo_make_current(this);
 
 }
 
@@ -127,6 +127,7 @@ DiagramWindow::DiagramWindow(int w, int h, const char *label,
         : Fl_Cairo_Window(w + WINW_EXTENSION, h), 
           RadialLayoutWindowCallbackInterface(this), 
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
+    Fl::cairo_make_current(this);
     copy_label(label);
     Construct(w + WINW_EXTENSION, h, structures);
 }
@@ -136,6 +137,7 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
         : Fl_Cairo_Window(w + WINW_EXTENSION, h),
           RadialLayoutWindowCallbackInterface(this),     
           m_redrawStructures(true), imageData(NULL), crSurface(NULL) {
+    Fl::cairo_make_current(this);
     copy_label(label);
     resize(x, y, w + WINW_EXTENSION, h);
     Construct(w + WINW_EXTENSION, h, structures);
@@ -154,12 +156,12 @@ DiagramWindow::~DiagramWindow() {
         cairo_surface_destroy(crBasePairsSurface);
         cairo_destroy(crBasePairsOverlay);
     }
-    Delete(m_drawBranchesIndicator);
-    Delete(m_cbShowTicks);
-    Delete(m_cbDrawBases);
-    Delete(baseColorPaletteImg);
-    Delete(baseColorPaletteImgBtn);
-    Delete(baseColorPaletteChangeBtn);
+    Delete(m_drawBranchesIndicator, Fl_Check_Button);
+    Delete(m_cbShowTicks, Fl_Check_Button);
+    Delete(m_cbDrawBases, Fl_Check_Button);
+    Delete(baseColorPaletteImg, Fl_RGB_Image);
+    Delete(baseColorPaletteImgBtn, Fl_Button);
+    Delete(baseColorPaletteChangeBtn, Fl_Button);
 }
 
 void DiagramWindow::SetFolderIndex(int folderIndex) {
@@ -596,7 +598,8 @@ void DiagramWindow::DrawKey3(cairo_t *crDraw) {
     cairo_set_line_join(crDraw, CAIRO_LINE_JOIN_MITER);
 
     int yPosn = 55;
-    char mystr[10] = "";
+    char mystr[10];
+    SetStringToEmpty(mystr);
     int dashedLineStyle = FL_DASH; // FL_DOT | FL_SOLID
 
     SetCairoToFLColor(crDraw, STRUCTURE_DIAGRAM_COLORS[2][0]);
@@ -681,7 +684,8 @@ void DiagramWindow::DrawKey2(cairo_t *crDraw, const int a, const int b) {
     cairo_set_font_size(crDraw, BASE_LINE_FONT_SIZE); 
 
     int yPosn = 55;
-    char mystr[10] = "";
+    char mystr[10];
+    SetStringToEmpty(mystr);
     int dashedLineStyle = FL_DASH; // FL_DOT | FL_SOLID
  
     SetCairoToFLColor(crDraw, STRUCTURE_DIAGRAM_COLORS[1][0]);
@@ -724,7 +728,8 @@ void DiagramWindow::DrawKey1(cairo_t *crDraw, const int a) {
 
     SetCairoToFLColor(crDraw, STRUCTURE_DIAGRAM_COLORS[0][0]);
     DrawWithCairo::fl_rectf(crDraw, m_menus[a]->x(), 55, m_menus[a]->w(), 3);
-    char mystr[10] = "";
+    char mystr[10];
+    SetStringToEmpty(mystr);
     sprintf(mystr, "%d", numPairs[0]);
     DrawWithCairo::fl_draw(crDraw, mystr, m_menus[2]->x() + m_menus[2]->w() + 10, 55 + 3);
     DrawWithCairo::fl_draw(crDraw, BASE_LINE_INCL_LABELS[0][0], STRUCTURE_INCLBL_XOFFSET, 55 + 3);
@@ -1573,7 +1578,7 @@ void DiagramWindow::ChangeBaseColorPaletteCallback(Fl_Widget *btn, void *udata) 
      while(!cfgWindow->isDone() && cfgWindow->visible()) 
           Fl::wait();
      cfgWindow->hide();
-     Delete(cfgWindow);
+     Delete(cfgWindow, DisplayConfigWindow);
      DiagramWindow *dwin = (DiagramWindow *) btn->parent();
      dwin->m_redrawStructures = true;
      dwin->redraw();
@@ -1629,95 +1634,96 @@ int DiagramWindow::handle(int flEvent) {
       case FL_UNFOCUS:
            Fl_Cairo_Window::handle(flEvent);
            return 1;
-      case FL_KEYDOWN:
-           {
-             if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
-                 if(!haveZoomBuffer || !zoomBufferContainsArc) { 
-                      const char *errMsg = "Select a zoom area containing a displayed arc before trying to view the structure's CT file contents!";
-                  AddNewErrorMessageToDisplay(string(errMsg));
-                  return 1;
-             }
-             int structIndex = RNAStructure::ActionOpenCTFileViewerWindow(folderIndex, 
-                           zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
-             if(structIndex < 0) {
-                  return 1;
-             }
-             int minArcPairIndex = MIN(zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
-             if(minArcPairIndex <= 0) {
-                  const char * errMsg = "Invalid arc index bounds selected! Try zooming again.";
-                  AddNewErrorMessageToDisplay(string(errMsg));
-                  return 1;
-             }
-             else if(!RNAStructure::ScrollOpenCTFileViewerWindow(structIndex, minArcPairIndex)) { 
-                  const char * errMsg = "CT view operation failed. Try zooming again?";
-                  AddNewErrorMessageToDisplay(string(errMsg));
-                  return 1;
-             }
-            }
-            else if(Fl::event_length() == 1 && *(Fl::event_text()) == 'R') {
-                 
-             InputWindow *ctFileSelectWin = new InputWindow(400, 175, 
-                                    "Select Structure File to View ...", "", 
-                            InputWindow::RADIAL_LAYOUT_FILE_INPUT, 
-                            folderIndex);
-             while(ctFileSelectWin->visible()) {
-                      Fl::wait();
-             }
-             if(ctFileSelectWin->isCanceled() || ctFileSelectWin->getFileSelectionIndex() < 0) {
-                  Delete(ctFileSelectWin);
-                  return 1; 
-             }
-             StructureManager *structManager = RNAStructViz::GetInstance()->
-                                           GetStructureManager();
-             int ctFileSelectIndex = ctFileSelectWin->getFileSelectionIndex();
-             Delete(ctFileSelectWin);
-             int structIdx = structManager->GetFolderAt(folderIndex)->
-                         folderStructs[ctFileSelectIndex];
-                 RNAStructure *rnaStruct = structManager->GetStructure(structIdx);
-             const char *rnaSeqStr = rnaStruct->GetSequenceString();
-             size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
-             size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
-             // we have to include all pairs of the clipped / highlighted radial view (increase as needed):
-             size_t nextStartPos = seqStartPos, nextEndPos = seqEndPos;
-                         for(int pos = seqStartPos; pos <= seqEndPos; pos++) {
-                  if(rnaStruct->GetBaseAt(pos)->m_pair != RNAStructure::UNPAIRED) {
-                       int pairIndex = rnaStruct->GetBaseAt(pos)->m_pair;
-                                   nextStartPos = MIN(nextStartPos, pairIndex);
-                   nextEndPos = MAX(nextEndPos, pairIndex);
-                  }
-             }
-                         seqStartPos = nextStartPos;
-             seqEndPos = nextEndPos;
-             if(seqEndPos - seqStartPos + 1 > RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH) {
-                  char numericBuf[MAX_BUFFER_SIZE];
-                  snprintf(numericBuf, MAX_BUFFER_SIZE, "%d\0", 
-                       RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH);
-                  string errMsg = string("DISABLED FEATURE: We only support radial layout ") + 
-                              string("for sequences <= ") + string(numericBuf) + 
-                          string(" bases (currently ") + 
-                          std::to_string(seqStartPos) + 
-                          string(" to ") + std::to_string(seqEndPos) + 
-                          string(")."); 
-                  AddNewErrorMessageToDisplay(errMsg);
-                  return 1;
-             }
-             radialDisplayWindow = new RadialLayoutDisplayWindow();
-             radialDisplayWindow->SetTitleFormat(
-                           "Radial Display for %s -- Highlighting Bases #%d to #%d", 
-                           rnaStruct->GetFilenameNoExtension(), 
-                           seqStartPos + 1, seqEndPos + 1);
-                           radialDisplayWindow->SetStructureCTFileName(rnaStruct->GetFilename()
-	     );
-             radialDisplayWindow->SetStructureFolderName(structManager->GetFolderAt(folderIndex)->folderName);
-             radialDisplayWindow->SetParentWindow(this);
-             radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos, rnaStruct->GetLength());
-             radialDisplayWindow->show();
-
-            }
-            return 1;
+      case FL_KEYDOWN: {
+                            if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
+                                     if(!haveZoomBuffer || !zoomBufferContainsArc) { 
+                                               const char *errMsg = "Select a zoom area containing a displayed arc before trying to view the structure's CT file contents!";
+                                      AddNewErrorMessageToDisplay(string(errMsg));
+                                      return 1;
+                            }
+                            int structIndex = RNAStructure::ActionOpenCTFileViewerWindow(folderIndex, 
+                                                         zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
+                            if(structIndex < 0) {
+                                      return 1;
+                            }
+                            int minArcPairIndex = MIN(zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
+                            if(minArcPairIndex <= 0) {
+                                      const char * errMsg = "Invalid arc index bounds selected! Try zooming again.";
+                                      AddNewErrorMessageToDisplay(string(errMsg));
+                                      return 1;
+                            }
+                            else if(!RNAStructure::ScrollOpenCTFileViewerWindow(structIndex, minArcPairIndex)) { 
+                                      const char * errMsg = "CT view operation failed. Try zooming again?";
+                                      AddNewErrorMessageToDisplay(string(errMsg));
+                                      return 1;
+                            }
+                           }
+                           else if(Fl::event_length() == 1 && *(Fl::event_text()) == 'R') {
+                                     
+                            InputWindow *ctFileSelectWin = new InputWindow(400, 175, 
+                                                                           "Select Structure File to View ...", "", 
+                                                                           InputWindow::RADIAL_LAYOUT_FILE_INPUT, 
+                                                                           folderIndex);
+                            while(ctFileSelectWin->visible()) {
+                                 Fl::wait();
+                            }
+			    ctFileSelectWin->hide();
+			    Fl::wait(1);
+		            if(ctFileSelectWin->isCanceled() || ctFileSelectWin->getFileSelectionIndex() < 0) {
+                                      Delete(ctFileSelectWin, InputWindow);
+                                      return 1; 
+                            }
+                            StructureManager *structManager = RNAStructViz::GetInstance()->GetStructureManager();
+                            int ctFileSelectIndex = ctFileSelectWin->getFileSelectionIndex();
+                            int structIdx = structManager->GetFolderAt(folderIndex)->
+                                                                folderStructs[ctFileSelectIndex];
+                            RNAStructure *rnaStruct = structManager->GetStructure(structIdx);
+                            const char *rnaSeqStr = rnaStruct->GetSequenceString();
+                            size_t seqStartPos = (zoomBufferMinArcIndex > 0) ? zoomBufferMinArcIndex - 1 : 0;
+                            size_t seqEndPos = (zoomBufferMaxArcIndex > 0) ? zoomBufferMaxArcIndex - 1 : MAX_SIZET;
+                            // we have to include all pairs of the clipped / highlighted radial view (increase as needed):
+                            size_t nextStartPos = seqStartPos, nextEndPos = seqEndPos;
+                            for(int pos = seqStartPos; pos <= seqEndPos; pos++) {
+                                      if(rnaStruct->GetBaseAt(pos)->m_pair != RNAStructure::UNPAIRED) {
+                                                int pairIndex = rnaStruct->GetBaseAt(pos)->m_pair;
+                                                nextStartPos = MIN(nextStartPos, pairIndex);
+                                                nextEndPos = MAX(nextEndPos, pairIndex);
+                                      }
+                            }
+                            seqStartPos = nextStartPos;
+                            seqEndPos = nextEndPos;
+                            if(seqEndPos - seqStartPos + 1 > RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH) {
+                                      char numericBuf[MAX_BUFFER_SIZE];
+                                      snprintf(numericBuf, MAX_BUFFER_SIZE, "%d\0", 
+                                      RadialLayoutDisplayWindow::MAX_SEQUENCE_DISPLAY_LENGTH);
+                                      string errMsg = string("DISABLED FEATURE: We only support radial layout ") + 
+                                                                          string("for sequences <= ") + string(numericBuf) + 
+                                                                          string(" bases (currently ") + 
+                                                                          std::to_string(seqStartPos) + 
+                                                                          string(" to ") + std::to_string(seqEndPos) + 
+                                                                          string(")."); 
+                                      AddNewErrorMessageToDisplay(errMsg);
+                                      Delete(ctFileSelectWin, InputWindow);
+                                      return 1;
+                            }
+                            radialDisplayWindow = new RadialLayoutDisplayWindow();
+                            radialDisplayWindow->SetTitleFormat(
+                                                         "Radial Display for %s -- Highlighting Bases #%d to #%d", 
+                                                         rnaStruct->GetFilenameNoExtension(), 
+                                                         seqStartPos + 1, seqEndPos + 1);
+                                                         radialDisplayWindow->SetStructureCTFileName(rnaStruct->GetFilename()
+	                    );
+                            radialDisplayWindow->SetStructureFolderName(structManager->GetFolderAt(folderIndex)->folderName);
+                            radialDisplayWindow->SetParentWindow(this);
+                            radialDisplayWindow->DisplayRadialDiagram(rnaSeqStr, seqStartPos, seqEndPos, rnaStruct->GetLength());
+                            radialDisplayWindow->show();
+			    Fl::wait(1);
+			    Delete(ctFileSelectWin, InputWindow);
+                     }
+                     return 1;
            }
-      default:
-               return Fl_Cairo_Window::handle(flEvent);
+           default:
+                return Fl_Cairo_Window::handle(flEvent);
      }
      return 0;
 }

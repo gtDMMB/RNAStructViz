@@ -1,15 +1,26 @@
 #ifndef FOLDERSTRUCTURE_H
 #define FOLDERSTRUCTURE_H
 
-#include "FolderWindow.h"
+#include <FL/Fl_Button.H>
 
-typedef struct {
-    char* folderName;
-    char* folderNameFileCount;
-    int* folderStructs;
-    int structCount;
+#include "FolderWindow.h"
+#include "ConfigOptions.h"
+
+class Folder {
+
+  public:
+    char *folderName;
+    char *folderNameFileCount;
+    int  *folderStructs;
+    int  structCount;
     bool selected;
-    FolderWindow* folderWindow;
-} Folder;
+    
+    FolderWindow *folderWindow;
+    
+    Fl_Button *mainWindowFolderBtn;
+    static const char *tooltipTextFmt;
+    char tooltipText[MAX_BUFFER_SIZE];
+
+};
 
 #endif

@@ -60,14 +60,14 @@ void RNAStructure::copyRNAStructure(const RNAStructure &rnaStruct) {
 
 RNAStructure::~RNAStructure()
 {
-    free(m_ctDisplayString);
-    free(m_ctDisplayFormatString);
-    free(m_seqDisplayString);
-    free(m_seqDisplayFormatString); 
-    free(m_sequence);
+    Free(m_ctDisplayString);
+    Free(m_ctDisplayFormatString);
+    Free(m_seqDisplayString);
+    Free(m_seqDisplayFormatString); 
+    Free(m_sequence);
     if(charSeqSize > 0) { 
         free((void *) charSeq); 
-    free((void *) dotFormatCharSeq);
+        free((void *) dotFormatCharSeq);
     }
     if(m_pathname != NULL) {
         free(m_pathname);
@@ -82,8 +82,8 @@ RNAStructure::~RNAStructure()
     }
     #endif
     DeleteContentWindow();
-    Free(m_fileCommentLine); m_fileCommentLine = NULL;
-    Delete(m_suggestedFolderName); m_suggestedFolderName = NULL;
+    Free(m_fileCommentLine); 
+    Delete(m_suggestedFolderName, char); 
 }
 
 RNAStructure::BaseData* RNAStructure::GetBaseAt(unsigned int position)
@@ -432,17 +432,17 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
            pairedBaseData->m_pair = baseIdx;
       }
       else {
-               TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
-               pairingDataBuf[bufIdx]);
-           Delete(rnaStruct);
+           TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+                                    pairingDataBuf[bufIdx]);
+           Delete(rnaStruct, RNAStructure);
            return NULL;
       }
       baseIdx++;
      }
      if(unpairedBasePairs.size() > 0) {
           TerminalText::PrintError("DOT parser syntax error; There are unpaired open braces remaining ...\n");
-      Delete(rnaStruct);
-      return NULL;
+          Delete(rnaStruct, RNAStructure);
+          return NULL;
      }
      seqLength = baseIdx; // allows for space characters in the parsing
      rnaStruct->m_sequenceLength = seqLength;    
@@ -556,15 +556,15 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
                 pairedBaseData->m_pair = baseIdx;
            }
            else {
-                    TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
-                    pairingDataBuf[baseIdx]);
-                Delete(rnaStruct);
+                TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
+                pairingDataBuf[baseIdx]);
+                Delete(rnaStruct, RNAStructure);
                 for(int s = 0; s < *arrayCount; s++) { 
-                     Delete(rnaStructsArray[s]);
+                     Delete(rnaStructsArray[s], RNAStructure);
                 }
                 Free(rnaStructsArray);
                 return NULL;
-           }
+             }
           }
           #if PERFORM_BRANCH_TYPE_ID
           rnaStruct->branchType = (RNABranchType_t*) malloc( 
@@ -647,7 +647,7 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
                lineBuf[lineLength - 1] = '\0';
       }
       if(!haveBaseData && lineLength > 0 && isalpha(lineBuf[0])) {
-               strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
+           strncpy(baseDataBuf, lineBuf, MAX_SEQUENCE_SIZE + 1);
            haveBaseData = true;
            int seqLength = strlen(baseDataBuf);
            memset(pairingDataBuf, '.', seqLength);
@@ -679,24 +679,24 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
            int i, j, k;
            int helixParseStatus = sscanf(helixDataBuf, "%d %d %d", &i, &j, &k);
            if(helixParseStatus != 3) {
-                    TerminalText::PrintError("Error parsing helix triple \"%s\" : %s\n", 
+                TerminalText::PrintError("Error parsing helix triple \"%s\" : %s\n", 
                 helixDataBuf, strerror(helixParseStatus));
-            parserError = true;
-            break;
+                parserError = true;
+                break;
            }
            for(int kidx = 0; kidx < k; kidx++) {
-                    int startIdx = i + kidx - 1;
-            int endIdx = j - kidx - 1;
-            pairingDataBuf[startIdx] = '(';
-                    pairingDataBuf[endIdx] = ')';
+               int startIdx = i + kidx - 1;
+               int endIdx = j - kidx - 1;
+               pairingDataBuf[startIdx] = '(';
+               pairingDataBuf[endIdx] = ')';
            }
-               commaSplice = strchr(commaSplice + 1, ',');
-      } while(commaSplice != NULL);
+           commaSplice = strchr(commaSplice + 1, ',');
+        } while(commaSplice != NULL);
      }
      fclose(fpHelixFile);
      if(parserError || !haveBaseData) {
-          Delete(rnaStructsArray);
-      return NULL;
+          Delete(rnaStructsArray, RNAStructure*);
+          return NULL;
      }
      // otherwise we need to create the structure from the bases and DB pairing data obtained above:
      int seqLength = strlen(baseDataBuf);
@@ -747,9 +747,9 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
       else {
                TerminalText::PrintError("Unrecognized DOTBracket pairing character delimeter '%c'\n", 
                pairingDataBuf[baseIdx]);
-           Delete(rnaStruct);
+           Delete(rnaStruct, RNAStructure);
            for(int s = 0; s < *arrayCount; s++) { 
-                Delete(rnaStructsArray[s]);
+                Delete(rnaStructsArray[s], RNAStructure);
            }
            Free(rnaStructsArray);
            return NULL;
@@ -958,131 +958,136 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     if(!m_ctDisplayString || !m_ctDisplayFormatString || 
        !m_seqDisplayString || !m_seqDisplayFormatString) { 
         Free(m_ctDisplayString);
-    Free(m_ctDisplayFormatString);
-    Free(m_seqDisplayString);
-    Free(m_seqDisplayFormatString);
+        Free(m_ctDisplayFormatString);
+        Free(m_seqDisplayString);
+        Free(m_seqDisplayFormatString);
         GenerateString();
     }
 
     if (!m_contentWindow)
     {
-        int subwinWidth = 473, subwinTotalHeight = 675, 
-        subwinResizeSpacing = 24;
-    int curXOffset = 6, curYOffset = 6, windowSpacing = 10;
-    int labelHeight = 25, btnHeight = 25, btnWidth = 175;
-    Fl_Boxtype labelBoxType = FL_ROUND_DOWN_BOX;
-    Fl_Boxtype noteBoxType = FL_DOWN_BOX;
+         int subwinWidth = 473, subwinTotalHeight = 675, subwinResizeSpacing = 24;
+         int labelHeight = 25, btnHeight = 25, btnWidth = 195;
+	 Fl_Boxtype labelBoxType = FL_ROUND_DOWN_BOX;
+         Fl_Boxtype noteBoxType = FL_DOWN_BOX;
 
-    char contentWinTitleString[MAX_BUFFER_SIZE];
-    snprintf(contentWinTitleString, MAX_BUFFER_SIZE, "%s%s%s\0", 
-             GetFilenameNoExtension(), titleSuffix == NULL ? "" : " : ", 
-         titleSuffix == NULL ? "" : titleSuffix);
-    m_contentWindow = new Fl_Double_Window(subwinWidth, subwinTotalHeight);
-    m_contentWindow->copy_label(contentWinTitleString);
-    Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
-                           subwinTotalHeight - subwinResizeSpacing);
-    m_contentWindow->resizable(resizeBox);
-    m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
-    subwinWidth -= subwinResizeSpacing;
+         char contentWinTitleString[MAX_BUFFER_SIZE];
+         snprintf(contentWinTitleString, MAX_BUFFER_SIZE, "%s%s%s\0", 
+                            GetFilenameNoExtension(), titleSuffix == NULL ? "" : " : ", 
+                            titleSuffix == NULL ? "" : titleSuffix);
+         m_contentWindow = new Fl_Double_Window(subwinWidth, subwinTotalHeight);
+         m_contentWindow->copy_label(contentWinTitleString);
+         m_contentWindow->set_non_modal();
+	 
+	 int curYOffset = 6, windowSpacing = 10;
+         int curXOffset = (m_contentWindow->w() - 2 * btnWidth - windowSpacing) / 2;
+	 
+	 Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
+                                        subwinTotalHeight - subwinResizeSpacing);
+         m_contentWindow->resizable(resizeBox);
+         m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
+         subwinWidth -= subwinResizeSpacing;
 
-    m_exportExtFilesBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-                         labelHeight, 
-                         "   >> Export to External Formats:");
-    m_exportExtFilesBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    m_exportExtFilesBox->color(GUI_BGCOLOR);
-    m_exportExtFilesBox->labelcolor(GUI_BTEXT_COLOR);
-    m_exportExtFilesBox->labelfont(LOCAL_BFFONT);
-    m_exportExtFilesBox->labelsize(LOCAL_TEXT_SIZE);
-    m_exportExtFilesBox->box(labelBoxType);
-    curYOffset += labelHeight + windowSpacing;
+         m_exportExtFilesBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+                                          labelHeight, 
+                                          "   >> Export to External Formats:");
+         m_exportExtFilesBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+         m_exportExtFilesBox->color(GUI_BGCOLOR);
+         m_exportExtFilesBox->labelcolor(GUI_BTEXT_COLOR);
+         m_exportExtFilesBox->labelfont(LOCAL_BFFONT);
+         m_exportExtFilesBox->labelsize(LOCAL_TEXT_SIZE);
+         m_exportExtFilesBox->box(labelBoxType);
+         curYOffset += labelHeight + windowSpacing;
 
-    m_exportFASTABtn = new Fl_Button(windowSpacing, curYOffset, 
-                             btnWidth, btnHeight, 
-                             "Export FASTA -- @filesaveas");
-    m_exportFASTABtn->user_data((void *) this);
-    m_exportFASTABtn->callback(ExportFASTAFileCallback);
-    m_exportFASTABtn->labelcolor(GUI_BTEXT_COLOR);
-    m_exportDBBtn = new Fl_Button(2 * windowSpacing + btnWidth, curYOffset, 
-                          btnWidth, btnHeight, 
-                                      "Export DotBracket -- @filesaveas");
-    m_exportDBBtn->user_data((void *) this);
-    m_exportDBBtn->callback(ExportDotBracketFileCallback);
-    m_exportDBBtn->labelcolor(GUI_BTEXT_COLOR);
-    curYOffset += btnHeight + windowSpacing;
+         m_exportFASTABtn = new Fl_Button(windowSpacing, curYOffset, 
+                                          btnWidth, btnHeight, 
+                                          "@filesaveas  --   Export to FASTA");
+         m_exportFASTABtn->user_data((void *) this);
+         m_exportFASTABtn->callback(ExportFASTAFileCallback);
+         m_exportFASTABtn->labelcolor(GUI_BTEXT_COLOR);
+         m_exportDBBtn = new Fl_Button(2 * windowSpacing + btnWidth, curYOffset, 
+                                       btnWidth, btnHeight, 
+                                       "@filesaveas  --    Export to DotBracket");
+         m_exportDBBtn->user_data((void *) this);
+         m_exportDBBtn->callback(ExportDotBracketFileCallback);
+         m_exportDBBtn->labelcolor(GUI_BTEXT_COLOR);
+         curYOffset += btnHeight + windowSpacing;
 
-    m_seqSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-                               labelHeight, 
-                           "   >> Raw Sequence Data:");
-        m_seqSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    m_seqSubwindowBox->color(GUI_BGCOLOR);
-    m_seqSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
-    m_seqSubwindowBox->labelfont(LOCAL_BFFONT);
-    m_seqSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
-    m_seqSubwindowBox->box(labelBoxType);
-    curYOffset += labelHeight + windowSpacing;
+         m_seqSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+                                        labelHeight, 
+                                        "   >> Raw Sequence Data:");
+         m_seqSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+         m_seqSubwindowBox->color(GUI_BGCOLOR);
+         m_seqSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
+         m_seqSubwindowBox->labelfont(LOCAL_BFFONT);
+         m_seqSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
+         m_seqSubwindowBox->box(labelBoxType);
+         curYOffset += labelHeight + windowSpacing;
 
-    m_seqTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, 
-                                       subwinWidth, 135);    
-    m_seqTextBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
-    m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayFormatString));
-    m_seqTextBuffer->text(m_seqDisplayString);
-    m_seqTextDisplay->buffer(m_seqTextBuffer);
-    m_seqTextDisplay->textfont(LOCAL_BFFONT);
-    m_seqTextDisplay->textsize(LOCAL_TEXT_SIZE);
-    m_seqTextDisplay->color(GUI_CTFILEVIEW_COLOR);
-    m_seqTextDisplay->textcolor(GUI_TEXT_COLOR);
-    m_seqTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
-    m_seqTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
-    m_seqTextDisplay->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-    m_seqStyleBuffer->text(m_seqDisplayFormatString);
-    int stableSize = sizeof(TEXT_BUFFER_STYLE_TABLE) / 
-                 sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
-    m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
-                  TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
-    curYOffset += 135 + windowSpacing;
+         m_seqTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, subwinWidth, 135);         
+         m_seqTextBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayString));
+         m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayFormatString));
+         m_seqTextBuffer->text(m_seqDisplayString);
+         m_seqTextDisplay->buffer(m_seqTextBuffer);
+         m_seqTextDisplay->textfont(LOCAL_BFFONT);
+         m_seqTextDisplay->textsize(LOCAL_TEXT_SIZE);
+         m_seqTextDisplay->color(GUI_CTFILEVIEW_COLOR);
+         m_seqTextDisplay->textcolor(GUI_TEXT_COLOR);
+         m_seqTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
+         m_seqTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
+         m_seqTextDisplay->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+         m_seqStyleBuffer->text(m_seqDisplayFormatString);
+         int stableSize = sizeof(TEXT_BUFFER_STYLE_TABLE) / 
+                                     sizeof(TEXT_BUFFER_STYLE_TABLE[0]);
+         m_seqTextDisplay->highlight_data(m_seqStyleBuffer, 
+                                          TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
+         curYOffset += 135 + windowSpacing;
 
-    m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-                          labelHeight, 
-                      "   >> CT Style Pairing Data:");
-    m_ctSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    m_ctSubwindowBox->color(GUI_BGCOLOR);
-    m_ctSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
-    m_ctSubwindowBox->labelfont(LOCAL_BFFONT);
-    m_ctSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
-    m_ctSubwindowBox->box(labelBoxType);
-    curYOffset += labelHeight + windowSpacing;
-                
-    m_ctTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, subwinWidth, 300);    
-    m_ctTextBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayString));
-    m_ctStyleBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayFormatString));
-    m_ctTextBuffer->text(m_ctDisplayString);
-    m_ctTextDisplay->buffer(m_ctTextBuffer);
-    m_ctTextDisplay->textfont(LOCAL_BFFONT);
-    m_ctTextDisplay->color(GUI_CTFILEVIEW_COLOR);
-    m_ctTextDisplay->textcolor(GUI_TEXT_COLOR);
-    m_ctTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
-    m_ctTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
-    m_ctStyleBuffer->text(m_ctDisplayFormatString);
-    m_ctTextDisplay->labelfont(LOCAL_BFFONT);
-    m_ctTextDisplay->highlight_data(m_ctStyleBuffer, 
-               TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
-        curYOffset += 300 + windowSpacing;
+         m_ctSubwindowBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+                                       labelHeight, 
+                                       "   >> CT Style Pairing Data:");
+         m_ctSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+         m_ctSubwindowBox->color(GUI_BGCOLOR);
+         m_ctSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
+         m_ctSubwindowBox->labelfont(LOCAL_BFFONT);
+         m_ctSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
+         m_ctSubwindowBox->box(labelBoxType);
+         curYOffset += labelHeight + windowSpacing;
+                                    
+         m_ctTextDisplay = new Fl_Text_Display(curXOffset, curYOffset, subwinWidth, 300);         
+         m_ctTextBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayString));
+         m_ctStyleBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayFormatString));
+         m_ctTextBuffer->text(m_ctDisplayString);
+         m_ctTextDisplay->buffer(m_ctTextBuffer);
+         m_ctTextDisplay->textfont(LOCAL_BFFONT);
+         m_ctTextDisplay->color(GUI_CTFILEVIEW_COLOR);
+         m_ctTextDisplay->textcolor(GUI_TEXT_COLOR);
+         m_ctTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
+         m_ctTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
+         m_ctStyleBuffer->text(m_ctDisplayFormatString);
+         m_ctTextDisplay->labelfont(LOCAL_BFFONT);
+         m_ctTextDisplay->highlight_data(m_ctStyleBuffer, 
+                                         TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
+         curYOffset += 300 + windowSpacing;
 
-    int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
-    const char *notationStr = "@line  Note: An asterisk (*) to the left of a sequence\n entry in the CT viewer above denotes that the\n base pair is the first in its pair.     @line";
-        m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
-                               pairNoteSubwinHeight, notationStr);
-        m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    m_ctViewerNotationBox->color(GUI_BGCOLOR);
-    m_ctViewerNotationBox->labelcolor(GUI_BTEXT_COLOR);
-    m_ctViewerNotationBox->labelfont(LOCAL_BFFONT);
-    m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE);
-    m_ctViewerNotationBox->box(noteBoxType);
+         int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
+         const char *notationStr = "@line   Note: An asterisk (*) to the left of a sequence\n  " 
+		                   "entry in the CT viewer above denotes that the\n" 
+	                           "  base pair is the first in its pair.   @line";
+         m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
+                                            pairNoteSubwinHeight, notationStr);
+         m_ctViewerNotationBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
+         m_ctViewerNotationBox->color(GUI_BGCOLOR);
+         m_ctViewerNotationBox->labelcolor(GUI_BTEXT_COLOR);
+         m_ctViewerNotationBox->labelfont(LOCAL_BFFONT);
+         m_ctViewerNotationBox->labelsize(LOCAL_TEXT_SIZE);
+         m_ctViewerNotationBox->box(noteBoxType);
 
     }
     m_contentWindow->user_data((void *) this);
     m_contentWindow->callback(CloseCTViewerContentWindowCallback);
     m_contentWindow->show();
+    m_contentWindow->make_current();
 
 }
 
@@ -1338,24 +1343,24 @@ void RNAStructure::CloseCTViewerContentWindowCallback(Fl_Widget *noWidget, void 
 void RNAStructure::DeleteContentWindow() {
     if(m_contentWindow) {
         m_contentWindow->hide();
-    while(m_contentWindow->visible()) {
+        while(m_contentWindow->visible()) {
              Fl::wait();
-    }
-    Delete(m_contentWindow);
-        Delete(m_ctTextDisplay);
-    Delete(m_ctTextBuffer);
-    Delete(m_seqTextDisplay);
-    Delete(m_ctTextBuffer);
-        Delete(m_seqStyleBuffer);
-    Delete(m_exportExtFilesBox);
-    Delete(m_seqSubwindowBox);
-    Delete(m_ctSubwindowBox);
-    Delete(m_exportFASTABtn);
-    Delete(m_exportDBBtn);
-    Free(m_ctDisplayString);
-    Free(m_ctDisplayFormatString);
-    Free(m_seqDisplayString);
-    Free(m_seqDisplayFormatString);
+        }
+        Delete(m_contentWindow, Fl_Double_Window);
+        Delete(m_ctTextDisplay, Fl_Text_Display);
+        Delete(m_ctTextBuffer, Fl_Text_Buffer);
+        Delete(m_seqTextDisplay, Fl_Text_Display);
+        Delete(m_ctTextBuffer, Fl_Text_Buffer);
+        Delete(m_seqStyleBuffer, Fl_Text_Buffer);
+        Delete(m_exportExtFilesBox, Fl_Box);
+        Delete(m_seqSubwindowBox, Fl_Box);
+        Delete(m_ctSubwindowBox, Fl_Box);
+        Delete(m_exportFASTABtn, Fl_Button);
+        Delete(m_exportDBBtn, Fl_Button);
+        Free(m_ctDisplayString);
+        Free(m_ctDisplayFormatString);
+        Free(m_seqDisplayString);
+        Free(m_seqDisplayFormatString);
     }
 }
 
@@ -1428,33 +1433,33 @@ bool RNAStructure::Util::ExportStringToPlaintextFile(
 int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex, 
                                         int minArcIdx, int maxArcIdx) {
      InputWindow *ctFileSelectionWin = new InputWindow(400, 175, "Select Structure File to Highlight ...", 
-                                               "", InputWindow::CTVIEWER_FILE_INPUT, 
-                               structureFolderIndex);
+                                                       "", InputWindow::CTVIEWER_FILE_INPUT, 
+                                                       structureFolderIndex);
      while(ctFileSelectionWin->visible()) {
           Fl::wait();
      }
      if(ctFileSelectionWin->isCanceled() || ctFileSelectionWin->getFileSelectionIndex() < 0) {
-          Delete(ctFileSelectionWin);
+          Delete(ctFileSelectionWin, InputWindow);
           return -1;
      }
      ctFileSelectionWin->hide();
      StructureManager *rnaStructManager = RNAStructViz::GetInstance()->GetStructureManager();
      int fileSelectionIndex = ctFileSelectionWin->getFileSelectionIndex();
      int structIndex = rnaStructManager->GetFolderAt(structureFolderIndex)->
-                   folderStructs[fileSelectionIndex];
+                       folderStructs[fileSelectionIndex];
      RNAStructure *rnaStructure = rnaStructManager->GetStructure(structIndex);
      if((rnaStructManager != NULL) && (rnaStructure != NULL)) { 
-      if(minArcIdx <= 0 || maxArcIdx <= 0) { 
-           minArcIdx = 1;
-           maxArcIdx = rnaStructure->m_sequenceLength;
-      }
+          if(minArcIdx <= 0 || maxArcIdx <= 0) { 
+               minArcIdx = 1;
+               maxArcIdx = rnaStructure->m_sequenceLength;
+          }
           char arcIndexDisplaySuffix[MAX_BUFFER_SIZE];
-      snprintf(arcIndexDisplaySuffix, MAX_BUFFER_SIZE, "#%d -- #%d (of %d)\0", 
-           minArcIdx, maxArcIdx, rnaStructure->m_sequenceLength); 
-      rnaStructManager->DisplayFileContents(structIndex, arcIndexDisplaySuffix);
-      return structIndex;
+          snprintf(arcIndexDisplaySuffix, MAX_BUFFER_SIZE, "#%d -- #%d (of %d)\0", 
+                   minArcIdx, maxArcIdx, rnaStructure->m_sequenceLength); 
+          rnaStructManager->DisplayFileContents(structIndex, arcIndexDisplaySuffix);
+          return structIndex;
      }
-     Delete(ctFileSelectionWin);
+     Delete(ctFileSelectionWin, InputWindow);
      return -1;
 }
 

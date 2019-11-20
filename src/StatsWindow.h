@@ -6,6 +6,8 @@
 #define STATSWINDOW_H
 
 #include <FL/Fl.H>
+#include <FL/fl_draw.H>
+#include <FL/Enumerations.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Choice.H>
@@ -28,6 +30,17 @@
 
 #define DEFAULT_STATSWIN_WIDTH        (1400)
 #define DEFAULT_STATSWIN_HEIGHT       (700)
+
+
+namespace RocBoxPlot {
+
+     static const Fl_Boxtype ROC_BOX = FL_ROUNDED_FRAME;
+     static const int draw_it_active = 1;
+
+     void roc_box_draw(int x, int y, int w, int h, Fl_Color bgcolor);
+     void roc_box_init();
+
+}
 
 class StatsWindow : public Fl_Window
 {

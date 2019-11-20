@@ -25,7 +25,9 @@
 Fl_Rotated_Text::~Fl_Rotated_Text(){
   delete[] text_;
 }
-Fl_Rotated_Text::Fl_Rotated_Text(const char *text , Fl_Font font , int size , uchar align , int rotation ):Fl_Bitmap((const uchar *)0, 0, 0), ar2(0){
+
+Fl_Rotated_Text::Fl_Rotated_Text(const char *text , Fl_Font font , int size , uchar align , int rotation ) : 
+	         Fl_Bitmap((const uchar *)0, 0, 0), ar2(0){
   text_ = 0;
   set(text, font, size, align, rotation);
 }
@@ -75,7 +77,7 @@ void Fl_Rotated_Text::set(const char *text, Fl_Font font, int size, uchar align,
     h(h_);
   }
  
-};
+}
 
 void Fl_Rotated_Text::draw(int x, int y, int W, int H, int cx, int cy){
   
@@ -175,4 +177,4 @@ void Fl_Rotated_Text::draw(int x, int y, int W, int H, int cx, int cy){
 
   Fl_Bitmap::draw(x, y, W, H, cx, cy); // finaly drawing the bitmap
 
-};
+}

@@ -51,7 +51,6 @@ InputWindow::InputWindow(int w, int h, const char *label,
         snprintf(saveDirInfo, fnameStartPos + 1, "%s", inputText);
         sprintf(string, "Export to Directory: %s", saveDirInfo);
         input = new Fl_Input(15, 50, 245, 30);
-        //input->when(FL_WHEN_ENTER_KEY);
         input->value(filenameStartPtr + 1);
         Fl_Box *box = new Fl_Box(100, 20, 110, 30, (const char*)string);
         box->box(FL_NO_BOX);
@@ -70,14 +69,14 @@ InputWindow::InputWindow(int w, int h, const char *label,
             strcpy(inputText, actualStructNameCStr);
             ConfigParser::nullTerminateString(inputText, actualStructName.size());
 
-        sprintf(string, "Creating new folder for the sample structure %s", defaultName);
+        sprintf(string, "@redo  Creating new folder for the sample structure:\n%s", defaultName);
         input = new Fl_Input(160, 50, 360, 30, "@fileopen  New Folder Name:");
-        //input->when(FL_WHEN_ENTER_KEY);
         input->maximum_size(60);
         input->value(inputText);
         input->color(GUI_BGCOLOR);
         input->textcolor(GUI_BTEXT_COLOR);
-        Fl_Box *box = new Fl_Box(100, 1, 400, 40, (const char*) string);
+	input->labeltype(FL_SHADOW_LABEL);
+        Fl_Box *box = new Fl_Box(10, 1, 500, 40, (const char*) string);
         box->box(FL_OSHADOW_BOX);
         box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
         box->color(GUI_BGCOLOR);
@@ -89,7 +88,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         input->callback(InputCallback, (void*)0);
         input->labelcolor(GUI_TEXT_COLOR);
         const char *cbText = " Use only default names for structure folders";
-        cbUseDefaultNames = new Fl_Check_Button(16, 100, 375, 30, cbText);
+        cbUseDefaultNames = new Fl_Check_Button(25, 100, 375, 30, cbText);
         cbUseDefaultNames->box(FL_ROUND_UP_BOX);
         cbUseDefaultNames->color(GUI_BGCOLOR);
         cbUseDefaultNames->labelcolor(GUI_BTEXT_COLOR);
@@ -98,7 +97,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         cbUseDefaultNames->value(GUI_USE_DEFAULT_FOLDER_NAMES);
         cbUseDefaultNames->selection_color(GUI_TEXT_COLOR);
         const char *stickyFoldersCBText = "Save folder names for known organisms";
-        cbKeepStickyFolders = new Fl_Check_Button(16, 145, 375, 30, stickyFoldersCBText);
+        cbKeepStickyFolders = new Fl_Check_Button(25, 145, 375, 30, stickyFoldersCBText);
             cbKeepStickyFolders->box(FL_ROUND_UP_BOX);
         cbKeepStickyFolders->color(GUI_BGCOLOR);
         cbKeepStickyFolders->labelcolor(GUI_BTEXT_COLOR);
@@ -111,12 +110,13 @@ InputWindow::InputWindow(int w, int h, const char *label,
     }
         else { 
         
-        const char *windowDisplayMsg = "Which structure file\ndo you want to display?";
+        const char *windowDisplayMsg = "@?  Which structure file\ndo you want to display?";
         Fl_Box *box = new Fl_Box(70, 5, 260, 40, windowDisplayMsg);
         box->box(FL_RSHADOW_BOX);
         box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
         box->color(GUI_BGCOLOR);
         box->labelcolor(GUI_BTEXT_COLOR);
+	box->labeltype(FL_SHADOW_LABEL);
         Fl_Button *displayButton = new Fl_Button(50, 100, 200, 30, "Display Zoomed Region @|>");
         displayButton->callback(DisplayCTFileCallback, (void*)0);
         displayButton->color(GUI_BGCOLOR);
@@ -124,27 +124,27 @@ InputWindow::InputWindow(int w, int h, const char *label,
         displayButton->set_active();
         displayButton->shortcut(FL_Enter);
         Fl_Button *cancelButton = new Fl_Button(260, 100, 75, 30, "Cancel @1+");
-            cancelButton->callback(CancelCallback); 
+        cancelButton->callback(CancelCallback); 
         cancelButton->color(GUI_BGCOLOR);
         cancelButton->labelcolor(GUI_BTEXT_COLOR);
             
         ctFileChooser = new Fl_Choice(150, 55, 240, 30, "Choose Structure: ");
-            ctFileChooser->color(GUI_BGCOLOR);
+        ctFileChooser->color(GUI_BGCOLOR);
         ctFileChooser->labelcolor(GUI_BTEXT_COLOR);
 
         StructureManager *structManager = RNAStructViz::GetInstance()->GetStructureManager();
         Folder *curFolder = structManager->GetFolderAt(folderIndex);
         for(int s = 0; s < curFolder->structCount; s++) { 
                  RNAStructure *rnaStruct = structManager->GetStructure(curFolder->folderStructs[s]);
-         const char *ctFileName = rnaStruct->GetFilename();
-         ctFileChooser->add(ctFileName);
+                 const char *ctFileName = rnaStruct->GetFilename();
+                 ctFileChooser->add(ctFileName);
         }
         ctFileChooser->value(0);
     
     }
         show();
         if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && 
-       (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound)) {
+           (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound)) {
             show();
     }
     else {
@@ -155,9 +155,9 @@ InputWindow::InputWindow(int w, int h, const char *label,
 
 InputWindow::~InputWindow() {
     Cleanup(false);
-    Delete(input);
-    Delete(cbUseDefaultNames);
-    Delete(cbKeepStickyFolders);
+    Delete(input, Fl_Input);
+    Delete(cbUseDefaultNames, Fl_Check_Button);
+    Delete(cbKeepStickyFolders, Fl_Check_Button);
     Free(inputText);
 }
 
@@ -172,28 +172,29 @@ bool InputWindow::isCanceled() const {
 void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
     InputWindow *window = (InputWindow*) widget->parent();
     if(window->windowType == InputWindow::FILE_INPUT) {
-     snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s%s%s.csv", 
-              (char *) PNG_OUTPUT_DIRECTORY, 
-	      PNG_OUTPUT_DIRECTORY[strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' || 
-	      window->inputText[0] == '/' ? "" : "/", 
-	      window->input->value());
-     window->name = "";
+         snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s%s%s.csv", 
+                  (char *) PNG_OUTPUT_DIRECTORY, 
+	          PNG_OUTPUT_DIRECTORY[strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' || 
+	          window->inputText[0] == '/' ? "" : "/", 
+	          window->input->value());
+         SetStringToEmpty(window->name);
     }
     else {
-    window->name = "";
+        SetStringToEmpty(window->name);
         GUI_USE_DEFAULT_FOLDER_NAMES = window->cbUseDefaultNames->value();
         GUI_KEEP_STICKY_FOLDER_NAMES = window->cbKeepStickyFolders->value();
     }    
-    Free(window->string);
     window->hide();
+    Free(window->string);
+    Fl::wait(1);
 }
 
 void InputWindow::CloseCallback(Fl_Widget* widget, void* userData) {
-    InputWindow *window = (InputWindow*)widget;
+    InputWindow *window = (InputWindow*) widget;
     if(window != NULL) {
-         window->name = "";
-         Free(window->string);
+         SetStringToEmpty(window->name);
          window->hide();
+         Free(window->string);
     }
 }
 
@@ -201,13 +202,14 @@ void InputWindow::DisplayCTFileCallback(Fl_Widget *w, void *udata) {
      InputWindow *iwin = (InputWindow *) w->parent();
      if(iwin->ctFileChooser == NULL) {
           iwin->userWindowStatus = CANCELED;
-      iwin->fileSelectionIndex = -1;
+          iwin->fileSelectionIndex = -1;
      }
      else {
-      iwin->userWindowStatus = OK;
-      iwin->fileSelectionIndex = iwin->ctFileChooser->value();
+           iwin->userWindowStatus = OK;
+           iwin->fileSelectionIndex = iwin->ctFileChooser->value();
      }
      iwin->hide();
+     Fl::wait(1);
 }
 
 void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
@@ -216,6 +218,7 @@ void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
           iwin->userWindowStatus = CANCELED;
           iwin->fileSelectionIndex = -1;
           iwin->hide();
+	  Fl::wait(1);
      }
 }
 
@@ -259,7 +262,8 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
          suggestedFolderNameFound = true;
          return std::string(suggestedFolderName);
     }
-    char fileTypeIdStr[MAX_BUFFER_SIZE] = "";
+    char fileTypeIdStr[MAX_BUFFER_SIZE];
+    SetStringToEmpty(fileTypeIdStr);
     const char *extPos = strrchr(seqFilePath, '.');
     if(extPos != NULL) {
          fileTypeIdStr[0] = '(';

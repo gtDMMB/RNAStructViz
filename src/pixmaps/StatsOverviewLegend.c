@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (StatsOverviewLegend.c) */
 
+#ifndef __STATS_OVERVIEW_LEGEND_C__
+#define __STATS_OVERVIEW_LEGEND_C__
+
 static struct {
   unsigned int 	 width;
   unsigned int 	 height;
@@ -2008,4 +2011,6 @@ static struct {
   "\000\000\000\377\000\000\000\377\000\000\000\377\000\000\000\377\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
+
+#endif
 

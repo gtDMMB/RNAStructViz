@@ -30,7 +30,7 @@ namespace fs = boost::filesystem;
 
 MainWindow* MainWindow::ms_instance = NULL;
 
-Fl_RGB_Image * MainWindow::    helpIconImage = new Fl_RGB_Image( 
+Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
            HelpIcon.pixel_data, 
            HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
 
@@ -60,7 +60,8 @@ MainWindow::MainWindow(int argc, char **argv)
               RNAStructVizLogo.height, 
               RNAStructVizLogo.bytes_per_pixel
 	);
-        Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, 
+        appLogo->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
+	Fl_Box *appLogoCont = new Fl_Box(NAVBUTTONS_OFFSETX, 
                                          NAVBUTTONS_OFFSETY, appLogo->w(), appLogo->h());
         appLogoCont->image(appLogo);
 
@@ -71,6 +72,7 @@ MainWindow::MainWindow(int argc, char **argv)
         helpButton->color(GUI_WINDOW_BGCOLOR);
         helpButton->labelcolor(GUI_BTEXT_COLOR);
         helpButton->labelsize(2 * LOCAL_TEXT_SIZE);
+	helpIconImage->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
         helpButton->image(helpIconImage);
         helpButton->deimage(helpIconImage);
         helpButton->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
@@ -79,7 +81,6 @@ MainWindow::MainWindow(int argc, char **argv)
         helpButton->box(FL_NO_BOX);
         helpButton->copy_tooltip("Click for help");
         helpButton->callback(HelpButtonCallback);
-        //helpButton->cursor(FL_CURSOR_HELP);
 	helpButton->redraw();
 
         int infoButtonDims = 26;
@@ -89,7 +90,8 @@ MainWindow::MainWindow(int argc, char **argv)
         infoButton->color(GUI_WINDOW_BGCOLOR);
         infoButton->labelcolor(GUI_BTEXT_COLOR);
         infoButton->labelsize(2 * LOCAL_TEXT_SIZE);
-        infoButton->image(infoButtonImage);
+        infoButtonImage->color_average(Lighter(GUI_BTEXT_COLOR, 0.5), 0.5);
+	infoButton->image(infoButtonImage);
         infoButton->deimage(infoButtonImage);
         infoButton->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
         infoButton->labeltype(_FL_ICON_LABEL);
@@ -97,16 +99,15 @@ MainWindow::MainWindow(int argc, char **argv)
         infoButton->box(FL_NO_BOX);
         infoButton->copy_tooltip("Click for information about RNAStructViz");
         infoButton->callback(InfoButtonCallback);
-        //infoButton->cursor(FL_CURSOR_INSERT);    
 	infoButton->redraw();
 
 
         // consistent alignment with the folder window display:
-        int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5; //49;
-        int dividerTextHeight = NAVBUTTONS_SPACING; // 4
+        int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5;
+        int dividerTextHeight = NAVBUTTONS_SPACING; 
 
         // make it more user friendly by including some help text: 
-        const char *navInstText = "@refresh Actions.\nEach expands into a new window.";
+        const char *navInstText = "@refresh   Actions.\n  Each action button click\n  expands into a new window.";
         int navButtonsLabelHeight = 2 * NAVBUTTONS_BHEIGHT;
         actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
                           2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
@@ -114,22 +115,26 @@ MainWindow::MainWindow(int argc, char **argv)
         actionsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         actionsLabel->color(GUI_BGCOLOR);
         actionsLabel->labelcolor(GUI_BTEXT_COLOR);
-        actionsLabel->labelfont(LOCAL_BFFONT);
+        actionsLabel->labelfont(FL_HELVETICA_BOLD);
         actionsLabel->labelsize(LOCAL_TEXT_SIZE);
         actionsLabel->box(FL_RSHADOW_BOX);
+	actionsLabel->labeltype(FL_SHADOW_LABEL);
 
         //Open button
-        openButton = new Fl_Button(NAVBUTTONS_OFFSETX, 
+        int btnsOffsetX = NAVBUTTONS_OFFSETX + 7;
+	openButton = new Fl_Button(btnsOffsetX, 
                            NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
                            NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
                            "@search   Load Files @>|");
         openButton->callback(OpenFileCallback);
         openButton->labelcolor(GUI_BTEXT_COLOR);
-        openButton->labelfont(FL_HELVETICA);
+        openButton->box(FL_SHADOW_BOX);
+	openButton->labelfont(FL_HELVETICA);
+	openButton->labeltype(FL_SHADOW_LABEL);
 
         // The button to open configuration settings:
         configOptionsButton = new Fl_Button( 
-              NAVBUTTONS_OFFSETX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
+              btnsOffsetX + NAVBUTTONS_BWIDTH + NAVBUTTONS_SPACING, 
               NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
               NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
               "@menu   User Config @>|"
@@ -137,8 +142,11 @@ MainWindow::MainWindow(int argc, char **argv)
         configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
         configOptionsButton->labelfont(FL_HELVETICA);
+	configOptionsButton->box(FL_SHADOW_BOX);
+	configOptionsButton->labeltype(FL_SHADOW_LABEL);
 
-        const char *foldersInstText = "@fileopen Folders.\nA list of structures for which\nCT files are currently loaded.";
+        const char *foldersInstText = "@fileopen   Folders.\n  A list of sequences for which\n  "
+		                      "structure files are loaded.";
         columnLabel = new Fl_Box(NAVBUTTONS_OFFSETX, 
                   NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight + 
                   NAVBUTTONS_BHEIGHT + dividerTextHeight, 
@@ -148,15 +156,17 @@ MainWindow::MainWindow(int argc, char **argv)
         columnLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         columnLabel->color(GUI_BGCOLOR);
         columnLabel->labelcolor(GUI_BTEXT_COLOR);
-        columnLabel->labelfont(LOCAL_BFFONT);
+        columnLabel->labelfont(FL_HELVETICA_BOLD);
         columnLabel->labelsize(LOCAL_TEXT_SIZE);
         columnLabel->box(FL_RSHADOW_BOX);
+	columnLabel->labeltype(FL_SHADOW_LABEL);
 
         m_structureInfo = new Fl_Scroll(0, 105 + upperYOffset + navButtonsLabelHeight + 
-                          dividerTextHeight + 15, 290, 360 - 
-                          upperYOffset - navButtonsLabelHeight - 
-                          dividerTextHeight - 50);
+                                        dividerTextHeight + 15, 290, 360 - 
+                                        upperYOffset - navButtonsLabelHeight - 
+                                        dividerTextHeight - 50);
         m_structureInfo->type(Fl_Scroll::VERTICAL_ALWAYS);
+	m_structureInfo->color(Darker(GUI_BGCOLOR, 0.23));
         m_packedInfo = new Fl_Pack(0, 105 + upperYOffset + navButtonsLabelHeight + 
                        dividerTextHeight + 15, 270,
                        360 - upperYOffset - navButtonsLabelHeight - dividerTextHeight - 50);
@@ -175,10 +185,12 @@ MainWindow::MainWindow(int argc, char **argv)
     
     menu_collapse = new Fl_Button(300, 0, 15, 450, "@>");
     menu_collapse->callback(CollapseMainCallback);
-    menu_collapse->labelcolor(GUI_BTEXT_COLOR);
+    menu_collapse->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5));
+    menu_collapse->tooltip("Click to collapse or expand main menu pane");
     folder_collapse = new Fl_Button(315, 0, 15, 450, "@<");
     folder_collapse->callback(CollapseFolderCallback);
-    folder_collapse->labelcolor(GUI_BTEXT_COLOR);
+    folder_collapse->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5));
+    folder_collapse->tooltip("Click to collapse or expand folder menu pane");
     
     folderWindowPane = new Fl_Group(330, 0, 320, 450, "");
     folderWindowPane->end();
@@ -193,21 +205,21 @@ MainWindow::MainWindow(int argc, char **argv)
 }
 
 MainWindow::~MainWindow() {
-    Delete(m_fileChooserSelectAllBtn);    
-    Delete(m_fileChooser);
-    Delete(m_packedInfo);
-    Delete(m_structureInfo);
-    Delete(columnLabel);
-    Delete(actionsLabel);
-    Delete(topTextDivider);
-    Delete(midTextDivider);
-    Delete(openButton);
-    Delete(configOptionsButton);
+    Delete(m_fileChooserSelectAllBtn, Fl_Button);    
+    Delete(m_fileChooser, Fl_File_Chooser);
+    Delete(m_packedInfo, Fl_Pack);
+    Delete(m_structureInfo, Fl_Scroll);
+    Delete(columnLabel, Fl_Box);
+    Delete(actionsLabel, Fl_Box);
+    Delete(topTextDivider, Fl_Box);
+    Delete(midTextDivider, Fl_Box);
+    Delete(openButton, Fl_Button);
+    Delete(configOptionsButton, Fl_Button);
     for(int w = 0; w < folderDataBtns.size(); w++) {
         delete folderDataBtns[w];
-    folderDataBtns[w] = NULL;
+        folderDataBtns[w] = NULL;
     }
-    Delete(m_mainWindow);
+    Delete(m_mainWindow, Fl_Double_Window);
 }
 
 bool MainWindow::Initialize(int argc, char **argv) {
@@ -219,7 +231,7 @@ bool MainWindow::Initialize(int argc, char **argv) {
 
 void MainWindow::Shutdown() {
     if(ms_instance) {
-        Delete(ms_instance);
+        DeletePointerNoType(ms_instance);
     }
 }
 
@@ -246,19 +258,23 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(),30);
     
     Fl_Button* label = new Fl_Button(pack->x() + 10, vertPosn, 
-                             pack->w() - 70, 30, "");
+                                     pack->w() - 70, 30, "");
     label->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     label->callback(MainWindow::ShowFolderCallback);
     label->user_data((void*)foldername);
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
     sprintf(folder->folderNameFileCount, "(+% 2d) %-.25s%s", 
             folder->structCount, folder->folderName, 
-        strlen(folder->folderName) > 25 ? "..." : "");
+            strlen(folder->folderName) > 25 ? "..." : "");
     label->label(folder->folderNameFileCount);
     label->labelcolor(GUI_BTEXT_COLOR);
-    label->tooltip(foldername);
+    snprintf(folder->tooltipText, MAX_BUFFER_SIZE - 1, Folder::tooltipTextFmt, 
+	     folder->folderName, folder->structCount);
+    label->tooltip(folder->tooltipText);
     label->labelsize(10);
     label->labelfont(FL_HELVETICA_BOLD_ITALIC);
+    label->box(FL_UP_BOX);
+    folder->mainWindowFolderBtn = label;
 
     ms_instance->folderDataBtns.push_back(label);
 
@@ -266,17 +282,20 @@ void MainWindow::AddFolder(const char* foldername, const int index,
     moveUpButton->tooltip("Move folder up in list");
     moveUpButton->callback(MainWindow::MoveFolderUp);
     moveUpButton->labelcolor(GUI_BTEXT_COLOR);
+    moveUpButton->box(FL_ROUND_UP_BOX);
 
     Fl_Button* moveDownButton = new Fl_Button(pack->x()+pack->w() - 40, vertPosn + 5, 20, 20, "@2>");
     moveDownButton->tooltip("Move folder down in list");
     moveDownButton->callback(MainWindow::MoveFolderDown);
     moveDownButton->labelcolor(GUI_BTEXT_COLOR);
+    moveDownButton->box(FL_ROUND_UP_BOX);
 
     Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
     removeButton->callback(MainWindow::RemoveFolderCallback);
     removeButton->label("@1+");
     removeButton->tooltip("Remove folder");
     removeButton->labelcolor(GUI_BTEXT_COLOR);
+    removeButton->box(FL_ROUND_UP_BOX);
 
     group->resizable(label);
     pack->end();
@@ -358,7 +377,7 @@ void MainWindow::ConfigOptionsCallback(Fl_Widget* widget, void* userData) {
      while(!cfgWindow->isDone() && cfgWindow->visible()) {
           Fl::wait();
      }
-     Delete(cfgWindow);
+     Delete(cfgWindow, DisplayConfigWindow)
 }
 
 void MainWindow::ConfigOptionsCallback() {
@@ -519,8 +538,8 @@ void MainWindow::MoveFolderDown(Fl_Widget *widget, void* userData)
 bool MainWindow::CreateFileChooser()
 {
     if(m_fileChooser) {
-        Delete(m_fileChooserSelectAllBtn);
-        Delete(m_fileChooser);
+        Delete(m_fileChooserSelectAllBtn, SelectAllButton);
+        Delete(m_fileChooser, Fl_File_Chooser);
     }
 
     // Get the current working directory.

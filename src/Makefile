@@ -2,13 +2,43 @@
 #### Author: Maxie D. Schmidt (maxieds@gmail.com)
 #### Updated: 2019.03.05 (V2)
 
-CXX=g++
-CXXFLAGS= -g3 -Wall -Wextra -pedantic -O0 -march=native #-pedantic-errors 
+GetBuildConfigOption =                                              \
+     echo -n `cat ../BuildConfig.cfg | sed -n 's/$(1)=\(.*\)/\1/p'`;
 
+2="STRING"
+TRUE="1"
+FALSE="0"
+IsTrue =                                                                                   \
+	ifneq "$(1)" $(or "1","true","True","TRUE")                                        \
+		if [ "$(2)" = "INT" ]; then                                                \
+			echo -n "$(FALSE)";                                                \
+		else                                                                       \
+			echo -n "\"$(FALSE)\"";                                            \
+		fi                                                                         \
+	else                                                                               \
+		if [ "$(2)" = "INT" ]; then                                                \
+			echo -n "$(TRUE)";                                                 \
+		else                                                                       \
+			echo -n "\"$(TRUE)\"";                                             \
+		fi                                                                         \
+	fi                                                                                       
+
+DEBUG=$(call GetBuildConfigOption,"DEBUGGING")
+OPTLEVEL=$(call GetBuildConfigOption,"OPTLEVEL")
+DEBUGLEVEL=$(call GetBuildConfigOption,"DEBUGGING_LEVEL")
+
+CXX=g++
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native #-pedantic-errors -fsanitize=address
 LD=g++
-LDFLAGS=-Wall -Wextra -g3 -lm #-fsanitize=address
+LDFLAGS= -g$(DEBUGLEVEL) -lm
+
+ifeq "$(call IsTrue,DEBUG)" "$(TRUE)"
+	CXXFLAGS += -Wall -Wextra -pedantic
+	LDFLAGS += -Wall -Wextra
+endif
 
 .DEFAULT: default
+.PHONY:   run 
 
 # Optional compile with clang compiler:
 BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
@@ -40,6 +70,7 @@ else
 endif
 
 .EXPORT_ALL_VARIABLES:
+
 # option to build FLTK without sudo on Linux:
 CFLAGS_FLTK_OVERRIDES=
 BUILD_FLTK_LOCAL=$(shell env | grep FLTK_INSTALL_DIR | sed -e 's/^.*=//')
@@ -51,6 +82,18 @@ ifneq "$(BUILD_FLTK_LOCAL)" ""
 	LIBRARY_PATH=$(BUILD_FLTK_LOCAL_ABS)/lib
 endif
 
+OTHER_CFLAGS_OVERRIDES=
+BUILD_CFLAGS_USER_EXTRAS=$(shell env | grep STRUCTVIZ_EXTRA_CFLAGS | sed -e 's/^.*=//')
+ifneq "$(BUILD_CFLAGS_USER_EXTRAS)" ""
+	OTHER_CFLAGS_OVERRIDES=-isystem $(BUILD_CFLAGS_USER_EXTRAS)
+endif
+
+OTHER_LDFLAGS_OVERRIDES=
+BUILD_LDFLAGS_USER_EXTRAS=$(shell env | grep STRUCTVIZ_EXTRA_LDFLAGS | sed -e 's/^.*=//')
+ifneq "$(BUILD_LDFLAGS_USER_EXTRAS)" ""
+	OTHER_LDFLAGS_OVERRIDES=$(BUILD_LDFLAGS_USER_EXTRAS)
+endif
+
 BINARY_OUTPUT=RNAStructViz
 OBJEXT=o
 
@@ -58,14 +101,15 @@ CXXFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --cflags`
 CXXFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags`
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
-	       -D_LARGEFILE64_SOURCE -funsigned-char 
+	       -D_LARGEFILE64_SOURCE -funsigned-char \
+	       -DPERFORM_BRANCH_TYPE_ID=$(call IsTrue,$(call GetBuildConfigOption,BRANCH_TYPE_ID),INT)
 
-CXXFLAGS_FULL=$(CXXFLAGS_EXTRA) $(CXXFLAGS) 
+CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
 LDFLAGS_PKGCONFIG=`../scripts/pkg-config-flags.sh --libs`
 LDFLAGS_FLTK=`$(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags`
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto -lboost_system -lboost_filesystem
-LDFLAGS_FULL=$(LDFLAGS_EXTRA) $(LDFLAGS) 
+LDFLAGS_FULL=$(BUILD_LDFLAGS_USER_EXTRAS) $(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = \
 	BaseSequenceIDs.$(OBJEXT) BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
@@ -76,10 +120,30 @@ RNASTRUCTVIZ_OBJECTS = \
 	OptionParser.$(OBJEXT) \
 	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
 	StructureManager.$(OBJEXT) TerminalPrinting.$(OBJEXT) \
-	Fl_Rotated_Text.$(OBJEXT) rocbox.$(OBJEXT) 
+	Fl_Rotated_Text.$(OBJEXT) 
 
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
+
+help: 
+	@echo "RNAStructViz Makefile targets and options:"
+	@echo "  >> default, e.g., run \'make\'     : Build the application, but do not clean sources or run it"
+	@echo "  >> default_with_gperf              : Debugging target for developers"
+	@echo "  >> prelims                         : Copy the local build header using a script (called by some targets automatically)"
+	@echo "  >> diagnostic                      : Print diagnostic information about the compiler and library source locations"
+	@echo "  >> run                             : Build and run RNAStructViz"
+	@echo "  >> clean                           : Standard target"
+	@echo "  >> install                         : (On Linux / Unix, NOT Mac OSX) Install with sudo"
+	@echo "  >> profile_mem                     : Debugging target for developers"
+	@echo "  >> git-add                         : Add all relevant (NOTE: NOT all files) source files"
+	@echo "  >> git-commit                      : Usage is 'make git commit \"<COMMIT-MSG>\"'"
+	@echo "  >> git-push                        : Usage is 'make git-push \"<COMMIT-MSG>\"'"
+	@echo ""
+	@echo "RNAStructViz Makefile hidden options and environment config settings:"
+	@echo "  >> STRUCTVIZ_COMPILER      [exported env variable] : Set a non-standard compiler for the build (default is g++)"
+	@echo "  >> FLTK_INSTALL_DIR        [exported env variable] : For local installs (FLTK build location)"
+	@echo "  >> STRUCTVIZ_EXTRA_CFLAGS  [exported env variable] : For local installs and local include paths"
+	@echo "  >> STRUCTVIZ_EXTRA_LDFLAGS [exported env variable] : For local installs and local library paths"
 
 default_with_gperf: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL) -lprofiler -ltcmalloc
@@ -90,12 +154,13 @@ prelims:
 		`$(READLINK) -f $(FLTKCONFIG)`
 
 diagnostic:
-	#echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
-	#echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
-	$(CXX) --version -v $(CXXFLAGS_FULL)
+	@echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
+	@echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
+	@$(CXX) --version -v $(CXXFLAGS_FULL)
 
 run: default
-	./RNAStructViz --about
+	@./RNAStructViz --about
+	./RNAStructViz
 
 clean:
 	@rm -f *.o *.code *.log *.callgrind *.out *.ps *.pdf \
@@ -127,8 +192,18 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 		-pdf RNAStructViz RNAStructViz.log > RNAStructViz-HeapProfile.pdf
 	xreader RNAStructViz-HeapProfile.pdf
 
-gitadd:
-	git add ./*.{c,cpp,h} pixmaps/*.{c,xbm} ../scripts/* ../Makefile
+git-add: 
+	@echo -n `git add --ignore-errors ./*.cpp ./*.h ./pixmaps/*.c Makefile ../scripts/* ../Makefile`
+
+git-commit: git-add
+	@git commit -m '`"arg=$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`'
+
+git-push: git-commit
+	@git push origin master
+	@git push fork master
+
+%: #accept not explicitly defined targets
+@: #ditto
 
 BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h TerminalPrinting.h \
 	ConfigParser.h BaseSequenceIDs.cpp
@@ -144,6 +219,8 @@ CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h TerminalPrinting.h CairoDrawing
 CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
 	RNAStructViz.h CommonDialogs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
+
+ConfigOptions.h: ConfigOptions.h RNACUtils.cpp ../scripts/BuildTargetInfo.h.in
 
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
 	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \
@@ -166,9 +243,6 @@ StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
 	RNAStructViz.h RNAStructure.h InputWindow.h TerminalPrinting.h \
 	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm StatsWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
-
-GLWindow.$(OBJEXT): GLWindow.h
-	$(CXX) $(CXXFLAGS_FULL) -c GLWindow.cpp
 
 InputWindow.$(OBJEXT): InputWindow.h MainWindow.h ConfigOptions.h \
 	ConfigParser.h RNAStructViz.h StructureManager.h \
@@ -222,7 +296,4 @@ StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
 
 TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h TerminalPrinting.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c TerminalPrinting.cpp
-
-rocbox.$(OBJEXT): rocbox.h rocbox.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c rocbox.cpp
 

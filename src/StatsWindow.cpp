@@ -17,7 +17,6 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Chart.H>
-#include <FL/fl_draw.H>
 #include <FL/Fl_Group.H>
 
 #include "Fl_Rotated_Text.H"
@@ -26,7 +25,6 @@
 #include "RNAStructViz.h"
 #include "RNAStructure.h"
 #include "InputWindow.h"
-#include "rocbox.h"
 #include "ConfigOptions.h"
 
 #include "pixmaps/StatsFormula.c"
@@ -40,12 +38,26 @@ Fl_RGB_Image * StatsWindow::overviewLegendImage = new Fl_RGB_Image(
            StatsOverviewLegend.bytes_per_pixel
           );
 
+//const int RocBoxPlot::draw_it_active = 1;
+//const Fl_Boxtype RocBoxPlot::ROC_BOX = FL_ROUNDED_FRAME;
+
+void RocBoxPlot::roc_box_draw(int x, int y, int w, int h, Fl_Color bgcolor) {
+  fl_color(RocBoxPlot::draw_it_active ? FL_BLACK : fl_inactive(FL_BLACK));
+  fl_rect(x, y, w, h);
+  fl_color(RocBoxPlot::draw_it_active ? bgcolor : fl_inactive(bgcolor));
+  fl_rectf(x + 1, y + 1, w - 2, h - 2);
+  fl_color(RocBoxPlot::draw_it_active ? FL_BLACK : fl_inactive(FL_BLACK));
+  fl_line(x, y, x + w - 1, y + h - 1);
+  fl_line(x, y + h - 1, x + w - 1, y);
+}
+
+void RocBoxPlot::roc_box_init() {
+    Fl::set_boxtype(RocBoxPlot::ROC_BOX, roc_box_draw, 1, 1, 2, 2);
+}
+
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
 
-    /* TODO: look into creating an offscreen version of the graph if calculation/
-                 creation makes it do odd things. May only work the openGL */
-    
     folderIndex = -1;
     referenceIndex = -1;
     numStats = 0;
@@ -417,11 +429,11 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 
                 roc_plot = new Fl_Group(rpx+40,rpy+20,rpw-50,
                                         rph-60,"ROC Plot");
-                roc_box_init();
-                roc_plot->box(ROC_BOX);
+                RocBoxPlot::roc_box_init();
+                roc_plot->box(RocBoxPlot::ROC_BOX);
                 roc_plot->align(FL_ALIGN_TOP);
                 roc_plot->labelcolor(GUI_TEXT_COLOR);
-                                roc_plot->labelfont(FL_HELVETICA);
+                roc_plot->labelfont(FL_HELVETICA);
                 roc_plot->color(GUI_WINDOW_BGCOLOR);
                 roc_plot->end();
                 
@@ -432,7 +444,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 text_rotate->image(text);
                 
                 // Put the number to the left of the axis, the dash to the right
-                Fl_Box* label = new Fl_Box(FL_NO_BOX,roc_plot->x(),
+                Fl_Box* label = new Fl_Box(FL_NO_BOX, roc_plot->x(),
                                            rpy+15,10,10,"100");
                 label->align(FL_ALIGN_LEFT);
                 label->labelcolor(GUI_TEXT_COLOR);
@@ -2033,7 +2045,7 @@ void StatsWindow::ExportTable()
     snprintf(filename, MAX_BUFFER_SIZE - 1, 
              "%s%sRNAStructViz-StatsTableOutput-%s.csv", 
              PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
-    Delete(input_window);
+    Delete(input_window, InputWindow);
     input_window = new InputWindow(450, 150, 
 		                   "Export Table To CSV-Fomatted Plaintext File ...",
                                     filename, InputWindow::FILE_INPUT);

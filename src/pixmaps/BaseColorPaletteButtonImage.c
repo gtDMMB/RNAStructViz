@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (BaseColorPaletteButtonImage.c) */
 
+#ifndef __BASE_COLOR_PALETTE_BUTTON_IMAGE_C__
+#define __BASE_COLOR_PALETTE_BUTTON_IMAGE_C__
+
 static struct {
   unsigned int 	 width;
   unsigned int 	 height;
@@ -878,4 +881,6 @@ static struct {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000\000\000\000\000\000\000",
 };
+
+#endif
 

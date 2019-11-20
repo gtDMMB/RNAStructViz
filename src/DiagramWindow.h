@@ -95,7 +95,7 @@ class DiagramWindow : public Fl_Cairo_Window, public RadialLayoutWindowCallbackI
 	      return;
 	 }
 	 radialDisplayWindow->hide();
-	 Delete(radialDisplayWindow);
+	 Delete(radialDisplayWindow, Fl_Widget);
     }   
 
 protected:
