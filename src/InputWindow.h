@@ -61,7 +61,6 @@ class InputWindow : public Fl_Window
 
 	    /* Returns the user input from the window*/
         inline const char* getName() const {
-            //return name;
 	    return inputText;
         }
         
