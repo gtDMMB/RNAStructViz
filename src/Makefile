@@ -19,10 +19,18 @@ OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
 DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
 BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
 
+TARGET_PLATFORM := $(shell uname -s)
+ifeq "$(TARGET_PLATFORM)" "Darwin"
+	DEBUG=1
+	OPTLEVEL=0
+	DEBUGLEVEL=3
+	BRANCHID=0
+endif
+
 CXX=g++
-CXXFLAGS= -g${DEBUGLEVEL} -O${OPTLEVEL} -march=native#-pedantic-errors -fsanitize=address
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native#-pedantic-errors -fsanitize=address
 LD=g++
-LDFLAGS= -g${DEBUGLEVEL} -lm
+LDFLAGS= -g$(DEBUGLEVEL) -lm
 
 ifeq "$(DEBUG)" "$(TRUE)"
 	CXXFLAGS += -Wall -Wextra -pedantic
@@ -47,13 +55,12 @@ ifneq "$(BUILD_WITH_COMPILER)" ""
 endif
 
 # OSX-specific locations and utility names:
-TARGET_PLATFORM := $(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
 	CXXFLAGS+= -std=gnu++17 -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
-	LDFLAGS+= -L/usr/local/opt/openssl/lib 
+	LDFLAGS+= -L/usr/local/opt/openssl/lib
 else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=$(shell which readlink)
@@ -95,7 +102,7 @@ CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
 	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -ffloat-store -freciprocal-math -ffinite-math-only \
-	       -DPERFORM_BRANCH_TYPE_ID=${BRANCHID}
+	       -DPERFORM_BRANCH_TYPE_ID=$(BRANCHID)
 
 CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
