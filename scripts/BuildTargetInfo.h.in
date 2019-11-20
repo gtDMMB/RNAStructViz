@@ -68,7 +68,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬   RNAStructViz v1.9.3-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬   RNAStructViz v1.9.4-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
 #define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
@@ -185,8 +185,8 @@ class ApplicationBuildInfo {
 	    }
 	    fprintf(whichOut, "\n\n");
             const char *bugReportMsg = "Please include a screenshot along with this information in any bug report you submit.\n"
-                                       "New issues with the application can be submitted by following the instructions at\n" 
-                                       "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »";
+                                       "   New issues with the application can be submitted by following the instructions at\n" 
+                                       "   « https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »";
             fprintf(whichOut, "BUG REPORT INFORMATION:\n** %s **\n", bugReportMsg);
        }
 

@@ -9,14 +9,6 @@ define GetBuildConfigOption =
 $(shell cat ../scripts/BuildConfig.cfg | sed -n 's/^$(1)\=\([0-9][0-9]*\)/\1/p')
 endef
 
-define IsTrue =
-if [ "$(1)" = "1" ]; then 
-$(TRUE)
-else		
-$(FALSE)
-fi
-endef
-
 DEBUGGING_ARG=DEBUGGING
 OPTLEVEL_ARG=OPTLEVEL
 DEBUGLEVEL_ARG=DEBUGGING_LEVEL
@@ -58,11 +50,13 @@ TARGET_PLATFORM := $(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
+	DEBUGGER=$(shell which lldb)
 	CXXFLAGS+= -std=gnu++17 -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
 	LDFLAGS+= -L/usr/local/opt/openssl/lib 
 else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=$(shell which readlink)
+	DEBUGGER=$(shell which gdb)
 	CXXFLAGS+= -std=gnu++17 -I/usr/include
 	LDFLAGS+= -Wl,--no-as-needed
 endif
@@ -129,7 +123,8 @@ help:
 	@echo "  >> default_with_gperf              : Debugging target for developers"
 	@echo "  >> prelims                         : Copy the local build header using a script (called by some targets automatically)"
 	@echo "  >> diagnostic                      : Print diagnostic information about the compiler and library source locations"
-	@echo "  >> run                             : Build and uun RNAStructViz"
+	@echo "  >> run                             : Build and run RNAStructViz"
+	@echo "  >> run-debug                       : Build and run RNAStructViz in the local debugger"
 	@echo "  >> clean                           : Standard target"
 	@echo "  >> install                         : (On Linux / Unix, NOT Mac OSX) Install with sudo"
 	@echo "  >> profile_mem                     : Debugging target for developers"
@@ -164,7 +159,7 @@ run: clean default
 run-debug: clean default
 	@./RNAStructViz --about
 	@echo ""
-	gdb ./RNAStructViz
+	$(DEBUGGER) $(shell $(READLINK) -f ./RNAStructViz)
 
 clean:
 	@rm -f *.o *.code *.log *.callgrind *.out *.ps *.pdf \
