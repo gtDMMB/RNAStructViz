@@ -184,7 +184,7 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
     }
     else {
         //SetStringToEmpty(window->name);
-        SetStringToEmpty(window->inputText);
+        //SetStringToEmpty(window->inputText);
 	GUI_USE_DEFAULT_FOLDER_NAMES = window->cbUseDefaultNames->value();
         GUI_KEEP_STICKY_FOLDER_NAMES = window->cbKeepStickyFolders->value();
     }    
