@@ -1089,6 +1089,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     m_contentWindow->callback(CloseCTViewerContentWindowCallback);
     m_contentWindow->show();
     m_contentWindow->make_current();
+    m_contentWindow->redraw();
 
 }
 
