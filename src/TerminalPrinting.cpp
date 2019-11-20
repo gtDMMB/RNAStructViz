@@ -21,7 +21,7 @@ unsigned int TerminalText::SelectUnicodeIconIndex(UnicodeTerminalChars::UnicodeS
      if(!randomize && iconType >= 0 && iconType < UnicodeTerminalChars::SYMBOLS_ARRAY_LENGTH) {
           return 0;
      }
-     return GetRandomNaturalNumberInRange(strlen(UnicodeTerminalChars::UNICODE_SYMBOL_LOOKUP[iconType]));
+     return GetRandomNaturalNumberInRange(wcslen(UnicodeTerminalChars::UNICODE_SYMBOL_LOOKUP[iconType]));
 }
 
 wchar_t TerminalText::GetUnicodeIconString(UnicodeTerminalChars::UnicodeSymbolTypeClass iconType, bool randomize) {
@@ -48,9 +48,9 @@ void TerminalText::PrintANSITerminalMessage(const char *prefixText,
      wchar_t unicodeLeadingIcon = PRINT_TERMINAL_UNICODE ? 
                                   TerminalText::GetUnicodeIconString(iconType, randomizeUnicodeIdx) : 0x00;
      setlocale(LC_CTYPE, "UTF-8");
-     fprintf(PRINTFP, "%s%s", prefixColor, ANSIColor::BOLD); 
-     //fwprintf(PRINTFP, L" %lc ", unicodeLeadingIcon != 0x00 ? unicodeLeadingIcon : L' ');
-     //fflush(PRINTFP);
+     fprintf(PRINTFP, "%s%s", prefixColor, ANSIColor::BOLD);
+     fwprintf(PRINTFP, L" %lc ", unicodeLeadingIcon != 0x00 ? unicodeLeadingIcon : L' ');
+     fflush(PRINTFP);
      //freopen(NULL, "w", PRINTFP);
      setlocale(LC_CTYPE, "");
      fprintf(PRINTFP, "%s%s:%s ", ANSIColor::UNDERLINE, prefixText, ANSIColor::END);

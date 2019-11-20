@@ -89,13 +89,13 @@ using std::string;
 class ApplicationBuildInfo {
 
      protected:
-          GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH = "##__GIT_COMMITREV_HASHNUM__##";
-          GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH_SHORT = "##__GIT_COMMITREV_HASHNUM_SHORT__##";
-          GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_DATE = "##__GIT_COMMITREV_DATE__##";
-          GNU_CONST_STATIC_DECLARATION static const char *GIT_BRANCH_REVSTRING = "##__GIT_DESCRIBE_REVSTRING__##";
-          GNU_CONST_STATIC_DECLARATION static const char *BUILD_PLATFORM_ID = "##__BUILD_PLATFORM_ID__##";
-          GNU_CONST_STATIC_DECLARATION static const char *BUILD_DATETIME = "##__LOCAL_BUILD_TIME__##";
-          GNU_CONST_STATIC_DECLARATION static const char *BUILD_FLTK_CONFIG = "##__BUILD_FLTK_CONFIG__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH = "##__GIT_COMMITREV_HASHNUM__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH_SHORT = "##__GIT_COMMITREV_HASHNUM_SHORT__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_DATE = "##__GIT_COMMITREV_DATE__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_BRANCH_REVSTRING = "##__GIT_DESCRIBE_REVSTRING__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_PLATFORM_ID = "##__BUILD_PLATFORM_ID__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_DATETIME = "##__LOCAL_BUILD_TIME__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *BUILD_FLTK_CONFIG = "##__BUILD_FLTK_CONFIG__##";
 
      public:
        static inline string RNAStructVizFigletTextLogo() {
