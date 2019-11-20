@@ -6,7 +6,7 @@ TRUE=1
 FALSE=0
 
 define GetBuildConfigOption =
-$(shell cat ../scripts/BuildConfig.cfg | sed -n 's/^$(1)\=\([0-9][0-9]*\)/\1/p')
+$(shell cat ../scripts/BuildConfig.cfg | sed -n 's/^${1}\=\([0-9][0-9]*\)/\1/p')
 endef
 
 DEBUGGING_ARG=DEBUGGING
@@ -14,15 +14,15 @@ OPTLEVEL_ARG=OPTLEVEL
 DEBUGLEVEL_ARG=DEBUGGING_LEVEL
 BRANCHID_ARG=BRANCH_TYPE_ID
 
-DEBUG=$(call GetBuildConfigOption,$(DEBUGGING_ARG))
-OPTLEVEL=$(call GetBuildConfigOption,$(OPTLEVEL_ARG))
-DEBUGLEVEL=$(call GetBuildConfigOption,$(DEBUGLEVEL_ARG))
-BRANCHID=$(call GetBuildConfigOption,$(BRANCHID_ARG))
+DEBUG=$(call GetBuildConfigOption,${DEBUGGING_ARG})
+OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
+DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
+BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
 
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native#-pedantic-errors -fsanitize=address
+CXXFLAGS= -g${DEBUGLEVEL} -O${OPTLEVEL} -march=native#-pedantic-errors -fsanitize=address
 LD=g++
-LDFLAGS= -g$(DEBUGLEVEL) -lm
+LDFLAGS= -g${DEBUGLEVEL} -lm
 
 ifeq "$(DEBUG)" "$(TRUE)"
 	CXXFLAGS += -Wall -Wextra -pedantic
@@ -95,7 +95,7 @@ CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
 	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -ffloat-store -freciprocal-math -ffinite-math-only \
-	       -DPERFORM_BRANCH_TYPE_ID=$(BRANCHID)
+	       -DPERFORM_BRANCH_TYPE_ID=${BRANCHID}
 
 CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
