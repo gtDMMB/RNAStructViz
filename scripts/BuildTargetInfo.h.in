@@ -54,11 +54,16 @@
      #define _GNU_SOURCE
 #endif
 
+#if __GNUC__ > 5
+     #define GNU_CONST_STATIC_DECLARATION constexpr
+#else
+     #define GNU_CONST_STATIC_DECLARATION const
+#endif
+
 #define FLTK_USE_CAIRO  1
 #define FLTK_HAVE_CAIRO 1
 
 #define ERRORS_TO_ISO8859_1   1      /* FLTK Unicode character encoding */
-//#define ERRORS_TO_CP1252      1
 
 #ifndef BOOST_FILESYSTEM_NO_DEPRECATED
 #define BOOST_FILESYSTEM_NO_DEPRECATED
@@ -68,15 +73,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬   RNAStructViz v1.9.4-testing -- RNA Secondary Structure Comparison Multi-Tool")
-
-#define GIT_COMMIT_HASH              ("##__GIT_COMMITREV_HASHNUM__##")
-#define GIT_COMMIT_HASH_SHORT        ("##__GIT_COMMITREV_HASHNUM_SHORT__##")
-#define GIT_COMMIT_DATE              ("##__GIT_COMMITREV_DATE__##")
-#define GIT_BRANCH_REVSTRING         ("##__GIT_DESCRIBE_REVSTRING__##")
-#define BUILD_PLATFORM_ID            ("##__BUILD_PLATFORM_ID__##")
-#define BUILD_DATETIME               ("##__LOCAL_BUILD_TIME__##")
-#define BUILD_FLTK_CONFIG            ("##__BUILD_FLTK_CONFIG__##")
+#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v1.9.4-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 
@@ -90,6 +87,15 @@
 using std::string;
 
 class ApplicationBuildInfo {
+
+     protected:
+          GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH = "##__GIT_COMMITREV_HASHNUM__##";
+          GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH_SHORT = "##__GIT_COMMITREV_HASHNUM_SHORT__##";
+          GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_DATE = "##__GIT_COMMITREV_DATE__##";
+          GNU_CONST_STATIC_DECLARATION static const char *GIT_BRANCH_REVSTRING = "##__GIT_DESCRIBE_REVSTRING__##";
+          GNU_CONST_STATIC_DECLARATION static const char *BUILD_PLATFORM_ID = "##__BUILD_PLATFORM_ID__##";
+          GNU_CONST_STATIC_DECLARATION static const char *BUILD_DATETIME = "##__LOCAL_BUILD_TIME__##";
+          GNU_CONST_STATIC_DECLARATION static const char *BUILD_FLTK_CONFIG = "##__BUILD_FLTK_CONFIG__##";
 
      public:
        static inline string RNAStructVizFigletTextLogo() {

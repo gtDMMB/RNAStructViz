@@ -43,7 +43,7 @@
 * and the number of lines) and can be accessed by standard w() and h() methods.
 */
 
-class Fl_Rotated_Text :public Fl_Bitmap{
+class Fl_Rotated_Text : public Fl_Bitmap{
   uchar rot_;
   char * text_;
   Fl_Font font_;
@@ -62,32 +62,30 @@ public:
   * User should use this function only when he wants to change the text within the image:
   * the function is relatively slow as it causes to rebuild the bitmap.with next redraw.*/
   void set(const char *text, Fl_Font font, int size, uchar align, int rotation);
+  
   // returns pointer to internal buffer describing the text
   const char * text() {return text_;}
+  
   /** Returns the text font. */
   Fl_Font font(){return font_;}
+  
   /** Returns the text size */
   int size(){return size_;}
+  
   /** Returns the formating parameter *before* the rotation.
   * Only FL_ALIGN_LEFT and FL_ALIGN_RIGHT has a meaning. */
   Fl_Align align(){return (Fl_Align) align_;}
+  
   /** Function returns rotation in degrees, it is always a multiplication of 90 deg */ 
   int rotation(){return rot_ * 90;}
+  
   /** The drawing function. */
   void draw(int x, int y, int w, int h, int cx = 0, int cy = 0);
+  
   /** The constructor calls also set() sunction.*/
   Fl_Rotated_Text(const char *text = 0, Fl_Font font = FL_HELVETICA, 
-  	int size = 14, uchar align = 0, int rotation = 0);
+  	          int size = 14, uchar align = 0, int rotation = 0);
   ~Fl_Rotated_Text();
 };
 
-
-
-
 #endif
-
-        
-    
-
-
-

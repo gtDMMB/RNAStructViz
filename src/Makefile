@@ -142,6 +142,7 @@ default_with_gperf: prelims $(RNASTRUCTVIZ_OBJECTS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL) -lprofiler -ltcmalloc
 
 prelims:
+	@rm -f BuildTargetInfo.h
 	@/bin/bash $(shell $(READLINK) -f ../scripts/build-platform-header.sh) \
 		$(shell $(READLINK) -f ./BuildTargetInfo.h) \
 		$(shell $(READLINK) -f $(FLTKCONFIG))
@@ -151,12 +152,14 @@ diagnostic:
 	@echo "FLTK-CONFIG PATH: " $(FLTKCONFIG)
 	@$(CXX) --version -v $(CXXFLAGS_FULL)
 
-run: clean default
+run: clean prelims default 
+	@echo ""
 	@./RNAStructViz --about
 	@echo ""
 	./RNAStructViz
 
-run-debug: clean default
+run-debug: clean prelims default
+	@echo ""
 	@./RNAStructViz --about
 	@echo ""
 	$(DEBUGGER) $(shell $(READLINK) -f ./RNAStructViz)

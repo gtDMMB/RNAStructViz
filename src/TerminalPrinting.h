@@ -28,31 +28,31 @@ namespace UnicodeTerminalChars {
           SYMBOLS_ARRAY_LENGTH = 8,
      } UnicodeSymbolTypeClass;
 
-     static const wchar_t *UNICODE_SYMBOL_LOOKUP[SYMBOLS_ARRAY_LENGTH] {
+     static const char *UNICODE_SYMBOL_LOOKUP[SYMBOLS_ARRAY_LENGTH] {
 
           /* ERROR SYMBOLS: */
-          L"‼️💥⛔🤬",
+          "‼️💥⛔🤬",
 
           /* WARNING SYMBOLS: */
-          L"⚠️,", 
+          "⚠️,", 
 
           /* INFO SYMBOLS: */
-          L"ℹ️,💬🌟",
+          "ℹ️,💬🌟",
 
           /* UI-LIKE SYMBOLS: */
-          L"☑️,✔️❎⌨️📁📂⚙️,🧰📋🔅🔆🆗✉️,", 
+          "☑️,✔️❎⌨️📁📂⚙️,🧰📋🔅🔆🆗✉️,", 
 
           /* HELP SYMBOLS: */
-          L"❓",  
+          "❓",  
 
           /* RUNTIME-OS SYMBOLS: */
-          L"🍎🐧🐡😈📎🗔,💻🖥️",
+          "🍎🐧🐡😈📎🗔,💻🖥️",
 
           /* NUMERAL SYMBOLS: */
-          L"0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟#️⃣,",
+          "0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟#️⃣,",
 
           /* MISC SYMBOLS: */
-          L"📈📊🧬🔬🧮,♾️🐞🐛👀👣" 
+          "📈📊🧬🔬🧮,♾️🐞🐛👀👣" 
 
      };
 

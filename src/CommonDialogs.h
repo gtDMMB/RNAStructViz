@@ -59,6 +59,6 @@ namespace CommonDialogs {
      
      void DisplayKeyboardShortcutsDialog();
 
-};
+}
 
 #endif
