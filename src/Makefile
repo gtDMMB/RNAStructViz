@@ -224,7 +224,7 @@ CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
 	RNAStructViz.h CommonDialogs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
 
-ConfigOptions.h: ConfigOptions.h RNACUtils.cpp ../scripts/BuildTargetInfo.h.in
+ConfigOptions.h: RNACUtils.cpp ../scripts/BuildTargetInfo.h.in
 
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
 	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \

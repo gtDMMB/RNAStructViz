@@ -40,14 +40,18 @@ REPLACEMENTS=("${GIT_COMMITREV_HASHNUM_SHORT}" "${GIT_COMMITREV_HASHNUM}" \
 	"${BUILD_FLTK_CONFIG}"\
 )
 
-echo -e "\n"
+PrintVerbose=$(cat ../scripts/BuildConfig.cfg | sed -n "s/VERBOSE=\([0-9][0-9]*\)/\1/p")
+if [[ "$PrintVerbose" == "1" ]]; then
+	echo -e "\n";
+fi
 cp $HEADER_SKELETON_FILE $OUTPUT_HEADER_FILE;
 
-PrintVerbose=$(cat ../scripts/BuildConfig.cfg | sed -n "s/VERBOSE=\([0-9][0-9]*\)/\1/p")
 for ridx in $(seq 0 6); do
 	ReplaceHeaderComponent $OUTPUT_HEADER_FILE "${REPL_PATTERNS[$ridx]}" "${REPLACEMENTS[$ridx]}" "$PrintVerbose";
 done
-echo -e "\n"
+if [[ "$PrintVerbose" == "1" ]]; then
+	echo -e "\n";
+fi
 
 PrintLocalBuildHeaderFile=$(cat ../scripts/BuildConfig.cfg | sed -n "s/ECHO_CONFIG_HEADER=\([0-9][0-9]*\)$/\1/p")
 if [[ "$PrintLocalBuildHeaderFile" == "1" ]]; then
