@@ -168,23 +168,24 @@ DisplayConfigWindow::DisplayConfigWindow() :
 
      Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE | FL_INDEX);
 
-     imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
-     imageData = new uchar[imageStride * CONFIG_WINDOW_WIDTH];
-     memset(imageData, 0, imageStride * CONFIG_WINDOW_WIDTH);
-     crSurface = cairo_image_surface_create_for_data( 
-                      imageData, CAIRO_FORMAT_ARGB32, 
-                                  CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
-                  imageStride
-                 );
-     crDraw = cairo_create(crSurface);   
-     Fl::cairo_cc(crDraw, false);
+     //imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
+     //imageData = new uchar[imageStride * CONFIG_WINDOW_WIDTH];
+     //memset(imageData, 0, imageStride * CONFIG_WINDOW_WIDTH);
+     //crSurface = cairo_image_surface_create_for_data( 
+     //                 imageData, CAIRO_FORMAT_ARGB32, 
+     //                             CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT, 
+     //             imageStride
+     //            );
+     //crDraw = cairo_create(crSurface);   
+     //Fl::cairo_cc(crDraw, false);
 
      label(CONFIG_WINDOW_TITLE);
      color(GUI_WINDOW_BGCOLOR); 
      size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
      set_modal();
-     set_draw_cb(Draw); 
      callback(WindowCloseCallback);
+     set_draw_cb(Draw); 
+     Fl::cairo_make_current(this);
 
      ConstructWindow();
 
@@ -199,8 +200,8 @@ DisplayConfigWindow::~DisplayConfigWindow() {
      Delete(dwinSettingsIcon, Fl_RGB_Image);
      Delete(cfgCheckboxesIcon, Fl_RGB_Image);
      Delete(pngNewPathIcon, Fl_RGB_Image);
-     cairo_surface_destroy(crSurface);
-     cairo_destroy(crDraw);
+     //cairo_surface_destroy(crSurface);
+     //cairo_destroy(crDraw);
      Delete(imageData, uchar);
 }
 

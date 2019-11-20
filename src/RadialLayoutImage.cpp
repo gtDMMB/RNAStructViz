@@ -235,7 +235,7 @@ std::string RadialLayoutDisplayWindow::GetExportToPNGOutputPath() {
               strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath,
                       dirMarkerPos - outFileFullPath);
               ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
-              outFileFullPath = dirMarkerPos + 1;
+              //outFileFullPath = dirMarkerPos + 1;
 	 }
 	 return std::string(outFileFullPath);
     }

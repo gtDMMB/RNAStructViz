@@ -82,24 +82,17 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
 
     //colors the top of the Diagram window where structures are chosen
     color(GUI_WINDOW_BGCOLOR);
-    //fl_rectf(0, 0, w, h);
     size_range(w, h, w, h);
     box(FL_NO_BOX);
-    //setAsCurrentDiagramWindow();
-    //if(redrawRefreshTimerSet) { 
-    //    Fl::add_timeout(DWIN_REDRAW_REFRESH, DiagramWindow::RedrawWidgetsTimerCallback);
-    //    redrawRefreshTimerSet = true;
-    //}
     iconize();
-    //set_non_modal();
 
     title = (char *) malloc(128 * sizeof(char));
     SetStructures(structures);
  
     crSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
-                                   IMAGE_WIDTH, IMAGE_HEIGHT);
+                                           IMAGE_WIDTH, IMAGE_HEIGHT);
     crZoomSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
-                ZOOM_WIDTH, ZOOM_HEIGHT);
+                                               ZOOM_WIDTH, ZOOM_HEIGHT);
     crBasePairsSurface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, IMAGE_WIDTH, IMAGE_HEIGHT);
     crDraw = cairo_create(crSurface);
     crBasePairsOverlay = cairo_create(crBasePairsSurface);
@@ -117,7 +110,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
     cairo_fill(crZoom);
     
-    Fl::cairo_cc(crDraw, false);
+    //Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw);
     Fl::cairo_make_current(this);
 
@@ -147,14 +140,12 @@ DiagramWindow::~DiagramWindow() {
     if(imageData != NULL) {
         delete imageData;
     }
-    if(crSurface != NULL) {
-        cairo_surface_destroy(crSurface);
-        cairo_destroy(crDraw);
-        cairo_surface_destroy(crZoomSurface);
-        cairo_destroy(crZoom);
-        cairo_surface_destroy(crBasePairsSurface);
-        cairo_destroy(crBasePairsOverlay);
-    }
+    //cairo_surface_destroy(crSurface);
+    //cairo_destroy(crDraw);
+    cairo_surface_destroy(crZoomSurface);
+    cairo_destroy(crZoom);
+    cairo_surface_destroy(crBasePairsSurface);
+    cairo_destroy(crBasePairsOverlay);
     Delete(m_drawBranchesIndicator, Fl_Check_Button);
     Delete(m_cbShowTicks, Fl_Check_Button);
     Delete(m_cbDrawBases, Fl_Check_Button);
@@ -227,77 +218,77 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
     Fl_Button *buttonPressed = (Fl_Button *) v;
     if (buttonPressed->changed()) {
         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
-    bool userImageSaved = false;
-    std::string exportFilePath = thisWindow->GetExportPNGFilePath();
-    if(exportFilePath.length() == 0) {
-         buttonPressed->clear_changed();     
-             return;
-    }
-    cairo_surface_t *pngInitSource = cairo_get_target(thisWindow->crDraw);
-    cairo_surface_t *pngSource = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
-                                                            IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
-							    IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
-							    PNG_IMAGE_PADDING + DWIN_PNG_FOOTER_HEIGHT);
-    cairo_t *crImageOutput = cairo_create(pngSource);
-    thisWindow->SetCairoToExactFLColor(crImageOutput, thisWindow->color());
-    cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
-		    IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
-		    PNG_IMAGE_PADDING + DWIN_PNG_FOOTER_HEIGHT);
-    cairo_fill(crImageOutput);
-    // now draw the footer data:
-    thisWindow->SetCairoToExactFLColor(crImageOutput, thisWindow->color());
-    cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2, 
-                    IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, DWIN_PNG_FOOTER_HEIGHT);
-    cairo_fill(crImageOutput);
-    thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_SOLID_BLACK);
-    cairo_set_line_width(crImageOutput, 2);
-    cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2); 
-    cairo_line_to(crImageOutput, IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
+         bool userImageSaved = false;
+         std::string exportFilePath = thisWindow->GetExportPNGFilePath();
+         if(exportFilePath.length() == 0) {
+              buttonPressed->clear_changed();          
+              return;
+         }
+         cairo_surface_t *pngInitSource = cairo_get_target(thisWindow->crDraw);
+         cairo_surface_t *pngSource = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
+                                                                                                                                       IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
+							         IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
+							         PNG_IMAGE_PADDING + DWIN_PNG_FOOTER_HEIGHT);
+         cairo_t *crImageOutput = cairo_create(pngSource);
+         thisWindow->SetCairoToExactFLColor(crImageOutput, thisWindow->color());
+         cairo_rectangle(crImageOutput, 0, 0, IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
+		         IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
+		         PNG_IMAGE_PADDING + DWIN_PNG_FOOTER_HEIGHT);
+         cairo_fill(crImageOutput);
+         // now draw the footer data:
+         thisWindow->SetCairoToExactFLColor(crImageOutput, thisWindow->color());
+         cairo_rectangle(crImageOutput, 0, IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2, 
+                                             IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, DWIN_PNG_FOOTER_HEIGHT);
+         cairo_fill(crImageOutput);
+         thisWindow->SetCairoColor(crImageOutput, CairoColorSpec_t::CR_SOLID_BLACK);
+         cairo_set_line_width(crImageOutput, 2);
+         cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2); 
+         cairo_line_to(crImageOutput, IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
 		  IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2);
-    cairo_stroke(crImageOutput);
-    cairo_select_font_face(crImageOutput, "Courier New", 
-                           CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size(crImageOutput, 12);
-    int offsetY = IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
+         cairo_stroke(crImageOutput);
+         cairo_select_font_face(crImageOutput, "Courier New", 
+                                                         CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+         cairo_set_font_size(crImageOutput, 12);
+         int offsetY = IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
 		  PNG_IMAGE_PADDING / 2 + 25;
-    char folderStructLabel[MAX_BUFFER_SIZE];
-    snprintf(folderStructLabel, MAX_BUFFER_SIZE - 1, " * Sequence Folder: %s", 
-             RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(thisWindow->m_structures[0])->folderName);
-    cairo_move_to(crImageOutput, 12, offsetY);
-    cairo_show_text(crImageOutput, folderStructLabel);
-    offsetY += 22;
-    for(int s = 0; s < 3; s++) {
-         char curStructLabel[MAX_BUFFER_SIZE];
-         int menuChoiceIdx = thisWindow->m_menus[s]->value();
-         const char *curStructName = thisWindow->m_menus[s]->menu()[menuChoiceIdx].label();
-         snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, 
-              " * Structure %d:     %s", 
-              s + 1, curStructName);
+         char folderStructLabel[MAX_BUFFER_SIZE];
+         snprintf(folderStructLabel, MAX_BUFFER_SIZE - 1, " * Sequence Folder: %s", 
+                  RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(thisWindow->m_structures[0])->folderName);
          cairo_move_to(crImageOutput, 12, offsetY);
-         cairo_show_text(crImageOutput, curStructLabel);
+         cairo_show_text(crImageOutput, folderStructLabel);
          offsetY += 22;
-    }
-    time_t currentTime = time(NULL);
-    struct tm *tmCurrentTime = localtime(&currentTime);
-    char imageTimeStamp[MAX_BUFFER_SIZE];
-    strftime(imageTimeStamp, MAX_BUFFER_SIZE - 1, " * Image Generated: %c %Z", tmCurrentTime);
-        cairo_move_to(crImageOutput, 12, offsetY);
-    cairo_show_text(crImageOutput, imageTimeStamp);
-    // draw the source diagram image onto the PNG output image:
-    thisWindow->m_redrawStructures = true;
-    thisWindow->Draw(thisWindow, crImageOutput, false);
-    //cairo_set_source_surface(crImageOutput, pngInitSource, 0, 0);
-    //    cairo_rectangle(crImageOutput, 0, 0, IMAGE_HEIGHT, IMAGE_WIDTH);
-    //    cairo_fill(crImageOutput);
-    if(cairo_surface_write_to_png(pngSource, exportFilePath.c_str()) != 
-                          CAIRO_STATUS_SUCCESS) {
-             fl_alert("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));
-    }
-    cairo_destroy(crImageOutput);
-    cairo_surface_destroy(pngSource);
-        buttonPressed->clear_changed();
-        thisWindow->drawWidgets(NULL);
-    thisWindow->redraw();
+         for(int s = 0; s < 3; s++) {
+                   char curStructLabel[MAX_BUFFER_SIZE];
+                   int menuChoiceIdx = thisWindow->m_menus[s]->value();
+                   const char *curStructName = thisWindow->m_menus[s]->menu()[menuChoiceIdx].label();
+                   snprintf(curStructLabel, MAX_BUFFER_SIZE - 1, 
+                             " * Structure %d:          %s", 
+                             s + 1, curStructName);
+                   cairo_move_to(crImageOutput, 12, offsetY);
+                   cairo_show_text(crImageOutput, curStructLabel);
+                   offsetY += 22;
+         }
+         time_t currentTime = time(NULL);
+         struct tm *tmCurrentTime = localtime(&currentTime);
+         char imageTimeStamp[MAX_BUFFER_SIZE];
+         strftime(imageTimeStamp, MAX_BUFFER_SIZE - 1, " * Image Generated: %c %Z", tmCurrentTime);
+         cairo_move_to(crImageOutput, 12, offsetY);
+         cairo_show_text(crImageOutput, imageTimeStamp);
+         // draw the source diagram image onto the PNG output image:
+         thisWindow->m_redrawStructures = true;
+         thisWindow->Draw(thisWindow, crImageOutput, false);
+         //cairo_set_source_surface(crImageOutput, pngInitSource, 0, 0);
+         //         cairo_rectangle(crImageOutput, 0, 0, IMAGE_HEIGHT, IMAGE_WIDTH);
+         //         cairo_fill(crImageOutput);
+         if(cairo_surface_write_to_png(pngSource, exportFilePath.c_str()) != CAIRO_STATUS_SUCCESS) {
+	         TerminalText::PrintError("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));          
+                           fl_alert("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));
+         }
+         cairo_surface_destroy(pngSource);
+         cairo_destroy(crImageOutput);
+         buttonPressed->clear_changed();
+         thisWindow->drawWidgets(NULL);
+         thisWindow->redraw();
     }
 }
 
@@ -419,16 +410,12 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
 
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr, bool redrawWidgets) {
 
-    DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
+     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
     thisWindow->cursor(FL_CURSOR_WAIT);
     if(redrawWidgets) {
          thisWindow->drawWidgets(cr);
     }
 
-    Fl_Color priorColor = fl_color();
-    int priorFont = fl_font();
-    int priorFontSize = fl_size();
-    
     RNAStructure *sequences[3];
     int numToDraw, keyA, keyB;
     thisWindow->computeDrawKeyParams(sequences, &numToDraw, &keyA, &keyB);
@@ -493,12 +480,8 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr, bool red
     else if(numToDraw == 3) {
         thisWindow->DrawKey3(cr);
     }
-    
-    fl_color(priorColor);
-    fl_font(priorFont, priorFontSize);
-    fl_line_style(0);
- 
-    thisWindow->cursor(FL_CURSOR_DEFAULT);
+	
+    thisWindow->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
 
 }
 
@@ -1881,9 +1864,9 @@ void DiagramWindow::HandleUserZoomAction() {
         zoomBufferContainsArc = ParseZoomSelectionArcIndices();
          cairo_identity_matrix(crZoom);
          cairo_set_source_rgb(crZoom, 
-                     GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
-                     GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
-                     GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+                              GetRed(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                              GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
+                              GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
          cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
          cairo_fill(crZoom);
          int copyWidth = MIN(ZOOM_WIDTH, zw);
@@ -1895,8 +1878,8 @@ void DiagramWindow::HandleUserZoomAction() {
          cairo_set_source_surface(crZoom, cairo_get_target(crDraw), 
                              -1 * (zx0 - GLWIN_TRANSLATEX), 
                              -1 * (zy0 - GLWIN_TRANSLATEY));
-        cairo_rectangle(crZoom, 0, 0, copyWidth, copyHeight);    
-        cairo_fill(crZoom);
+         cairo_rectangle(crZoom, 0, 0, copyWidth, copyHeight);    
+         cairo_fill(crZoom);
     }
     redraw();
 
@@ -2047,7 +2030,7 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
     fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
                 Fl_Native_File_Chooser::SAVEAS_CONFIRM);
-    fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
+    //fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
     fileChooser.preset_file(defaultFilePath);
     switch(fileChooser.show()) {
         case -1: // ERROR
@@ -2062,8 +2045,9 @@ std::string DiagramWindow::GetExportPNGFilePath() {
 	      strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath, 
                       dirMarkerPos - outFileFullPath);
               ConfigParser::nullTerminateString((char *) PNG_OUTPUT_DIRECTORY);
-	      outFileFullPath = dirMarkerPos + 1;
+	      //outFileFullPath = dirMarkerPos + 1;
 	 }
+	 fprintf(stderr, "%s [%c]\n", outFileFullPath, dirMarkerPos);
 	 return std::string(outFileFullPath);
     }
 }
