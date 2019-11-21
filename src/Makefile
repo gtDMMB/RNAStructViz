@@ -9,10 +9,10 @@ SEDCMD=`which sed`
 
 TARGET_PLATFORM := $(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
-	#DEBUG=1
-	#OPTLEVEL=0
-	#DEBUGLEVEL=3
-	#BRANCHID=0
+	DEBUG=1
+	OPTLEVEL=0
+	DEBUGLEVEL=3
+	BRANCHID=0
 	SEDCMD=`which gsed`
 endif
 
