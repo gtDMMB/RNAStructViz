@@ -567,12 +567,12 @@ void DisplayConfigWindow::drawWidgets() {
 void DisplayConfigWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
 
     DisplayConfigWindow *thisWin = (DisplayConfigWindow *) crWin;
-    cairo_set_source_rgb(thisWin->crDraw, 
+    cairo_set_source_rgb(cr, 
                          GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
                          GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f, 
                          GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
-    cairo_scale(thisWin->crDraw, thisWin->w(), thisWin->h());
-    cairo_fill(thisWin->crDraw);
+    cairo_scale(cr, thisWin->w(), thisWin->h());
+    cairo_fill(cr);
     thisWin->drawWidgets();
 
 }
