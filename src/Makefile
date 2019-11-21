@@ -9,10 +9,6 @@ SEDCMD=`which sed`
 
 TARGET_PLATFORM := $(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
-	DEBUG=1
-	OPTLEVEL=0
-	DEBUGLEVEL=3
-	BRANCHID=0
 	SEDCMD=`which gsed`
 endif
 
@@ -29,6 +25,14 @@ DEBUG=$(call GetBuildConfigOption,${DEBUGGING_ARG})
 OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
 DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
 BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
+
+## fallback values since Mac is broken as a platform:
+ifeq "$(TARGET_PLATFORM)" "Darwin"
+	DEBUG=1
+	OPTLEVEL=0
+	DEBUGLEVEL=3
+	BRANCHID=0
+endif
 
 CXX=g++
 CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -fsanitize=address -fno-omit-frame-pointer#-pedantic-errors -fsanitize=address
