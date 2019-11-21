@@ -1332,7 +1332,6 @@ void DiagramWindow::AddStructure(const int index) {
 void DiagramWindow::RemoveStructure(const int index) {
     std::vector<int>::iterator iter = std::find(m_structures.begin(),
                                                 m_structures.end(), index);
-
     if (iter != m_structures.end()) {
         m_structures.erase(iter);
 
@@ -1508,7 +1507,7 @@ void DiagramWindow::RebuildMenus() {
             m_menuItems[i].labelsize(m_menus[0]->textsize());
             m_menuItems[i].labelcolor(GUI_BTEXT_COLOR);
             m_menuItems[i].labelfont(m_menus[0]->textfont());
-        m_menuItems[i].flags = 0;
+            m_menuItems[i].flags = 0;
         }
 
         m_menus[0]->menu(m_menuItems);

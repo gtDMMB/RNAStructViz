@@ -965,6 +965,9 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
         GenerateString();
     }
 
+    if(m_contentWindow != NULL && !m_contentWindow->visible()) {
+         Delete(m_contentWindow, Fl_Double_Window);
+    }
     if (!m_contentWindow)
     {
          int subwinWidth = 473, subwinTotalHeight = 675, subwinResizeSpacing = 24;
@@ -1089,7 +1092,6 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     m_contentWindow->user_data((void *) this);
     m_contentWindow->callback(CloseCTViewerContentWindowCallback);
     m_contentWindow->show();
-    //m_contentWindow->make_current();
     m_contentWindow->redraw();
 
 }

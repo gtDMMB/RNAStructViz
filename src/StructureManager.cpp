@@ -269,11 +269,11 @@ void StructureManager::RemoveFolder(const int folder, const int index)
 {
     if (folders[index]->folderName != NULL) {
         free(folders[index]->folderName); 
-        SetStringToEmpty(folders[index]->folderName);
+        folders[index]->folderName = NULL;
     }
     if (folders[index]->folderNameFileCount != NULL) {
-        free(folders[index]->folderNameFileCount); 
-        SetStringToEmpty(folders[index]->folderNameFileCount);
+        free(folders[index]->folderNameFileCount);
+        folders[index]->folderNameFileCount = NULL;	
     }
     if (folders[index]->folderStructs != NULL) {
         free(folders[index]->folderStructs); 

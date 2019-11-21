@@ -92,7 +92,7 @@ class InputWindow : public Fl_Window
 	Fl_Choice *ctFileChooser;
 	InputWindowType windowType;
 	char *name; // The input; if the user types nothing, is the empty string
-	char *string; // For displaying the default name
+	char *winString; // For displaying the default name
 	char *inputText;
 	int userWindowStatus;
 	int fileSelectionIndex;

@@ -20,13 +20,13 @@
 int InputWindow::distinctStructureCount = 0;
 
 InputWindow::InputWindow(int w, int h, const char *label, 
-    const char *defaultName, InputWindowType type, int folderIndex) : 
+                         const char *defaultName, InputWindowType type, int folderIndex) : 
     Fl_Window(w, h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
     userWindowStatus(OK), fileSelectionIndex(-1), windowDone(false),
     stickyFolderNameFound(false), suggestedFolderNameFound(false), 
-    stickyFolderNamesNeedsReset(false)
-{    
-    string = (char*)malloc(sizeof(char)*90);
+    stickyFolderNamesNeedsReset(false), 
+    winString(NULL), inputText(NULL) {    
+    winString = (char*) malloc(MAX_BUFFER_SIZE * sizeof(char));
     color(GUI_WINDOW_BGCOLOR);
     set_modal();
     windowType = type;
@@ -40,7 +40,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
              *extPtr = '\0';
         }
         char *filenameStartPtr = strrchr(inputText, '/');
-        int fnameStartPos;
+        unsigned int fnameStartPos;
         if(filenameStartPtr != NULL) {
              fnameStartPos = filenameStartPtr - inputText;
         }
@@ -48,11 +48,12 @@ InputWindow::InputWindow(int w, int h, const char *label,
              fnameStartPos = 0;
         }
         char saveDirInfo[MAX_BUFFER_SIZE];
-        snprintf(saveDirInfo, fnameStartPos + 1, "%s", inputText);
-        sprintf(string, "Export to Directory: %s", saveDirInfo);
+        snprintf(saveDirInfo, fnameStartPos, "%s", inputText);
+        saveDirInfo[fnameStartPos] = '\0';
+	sprintf(winString, "Export to Directory: %s", saveDirInfo);
         input = new Fl_Input(15, 50, 245, 30);
-        input->value(filenameStartPtr + 1);
-        Fl_Box *box = new Fl_Box(100, 20, 110, 30, (const char*) string);
+        input->static_value(filenameStartPtr + 1);
+        Fl_Box *box = new Fl_Box(100, 20, 110, 30, (const char*) winString);
         box->box(FL_NO_BOX);
         box->align(FL_ALIGN_CENTER);
         Fl_Box *fileExtBox = new Fl_Box(255,50,40,30,".csv");
@@ -63,20 +64,18 @@ InputWindow::InputWindow(int w, int h, const char *label,
         callback(CloseCallback);
     }
     else if(type == InputWindow::FOLDER_INPUT) {    
-        std::string actualStructName = 
-                ExtractStructureNameFromFile(defaultName);
-            const char *actualStructNameCStr = actualStructName.c_str();
-            strcpy(inputText, actualStructNameCStr);
-            ConfigParser::nullTerminateString(inputText, actualStructName.size());
+        std::string actualStructName = ExtractStructureNameFromFile(defaultName);
+        const char *actualStructNameCStr = actualStructName.c_str();
+        strcpy(inputText, actualStructNameCStr);
 
-        sprintf(string, "@redo  Creating new folder for the sample structure:\n%s", defaultName);
+        sprintf(winString, "@redo  Creating new folder for the sample structure:\n%s", defaultName);
         input = new Fl_Input(160, 50, 360, 30, "@fileopen  New Folder Name:");
         input->maximum_size(60);
-        input->value(inputText);
+        input->static_value(inputText);
         input->color(GUI_BGCOLOR);
         input->textcolor(GUI_BTEXT_COLOR);
 	input->labeltype(FL_SHADOW_LABEL);
-        Fl_Box *box = new Fl_Box(10, 1, 500, 40, (const char*) string);
+        Fl_Box *box = new Fl_Box(10, 1, 500, 40, (const char*) winString);
         box->box(FL_OSHADOW_BOX);
         box->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
         box->color(GUI_BGCOLOR);
@@ -148,7 +147,6 @@ InputWindow::InputWindow(int w, int h, const char *label,
             show();
         }
         else {
-            //show();
             InputCallback((Fl_Widget *) cbUseDefaultNames, (void *) NULL);
         }
 }
@@ -160,7 +158,7 @@ InputWindow::~InputWindow() {
     Delete(cbUseDefaultNames, Fl_Check_Button);
     Delete(cbKeepStickyFolders, Fl_Check_Button);
     Free(inputText);
-    Free(string);
+    Free(winString);
 }
 
 int InputWindow::getFileSelectionIndex() const {
@@ -179,12 +177,8 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 	          PNG_OUTPUT_DIRECTORY[strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' || 
 	          window->inputText[0] == '/' ? "" : "/", 
 	          window->input->value());
-         //SetStringToEmpty(window->name);
-	 //strcpy(window->name, window->inputText);
     }
     else {
-        //SetStringToEmpty(window->name);
-        //SetStringToEmpty(window->inputText);
 	GUI_USE_DEFAULT_FOLDER_NAMES = window->cbUseDefaultNames->value();
         GUI_KEEP_STICKY_FOLDER_NAMES = window->cbKeepStickyFolders->value();
     }    
@@ -276,12 +270,12 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
     const char *extPos = strrchr(seqFilePath, '.');
     if(extPos != NULL) {
          fileTypeIdStr[0] = '(';
-     strcpy(fileTypeIdStr + 1, extPos + 1);
-     strcat(fileTypeIdStr, ")");
-     StringTransform(fileTypeIdStr, toupper);
+         strcpy(fileTypeIdStr + 1, extPos + 1);
+         strcat(fileTypeIdStr, ")");
+         StringTransform(fileTypeIdStr, toupper);
     }
     else {
-     fileTypeIdStr[0] = '\0';
+         fileTypeIdStr[0] = '\0';
     }
     char suggestedShortName[MAX_BUFFER_SIZE];
     snprintf(suggestedShortName, MAX_BUFFER_SIZE, "No. #% 2d %s", 

@@ -5,8 +5,19 @@
 TRUE=1
 FALSE=0
 
+SEDCMD=`which sed`
+
+TARGET_PLATFORM := $(shell uname -s)
+ifeq "$(TARGET_PLATFORM)" "Darwin"
+	#DEBUG=1
+	#OPTLEVEL=0
+	#DEBUGLEVEL=3
+	#BRANCHID=0
+	SEDCMD=`which gsed`
+endif
+
 define GetBuildConfigOption =
-$(shell cat ../scripts/BuildConfig.cfg | sed -n 's/^${1}\=\([0-9][0-9]*\)/\1/p')
+$(shell cat ../scripts/BuildConfig.cfg | $(SEDCMD) -n 's/^${1}\=\([0-9][0-9]*\)/\1/p')
 endef
 
 DEBUGGING_ARG=DEBUGGING
@@ -19,18 +30,10 @@ OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
 DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
 BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
 
-TARGET_PLATFORM := $(shell uname -s)
-ifeq "$(TARGET_PLATFORM)" "Darwin"
-	DEBUG=1
-	OPTLEVEL=0
-	DEBUGLEVEL=3
-	BRANCHID=0
-endif
-
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native#-pedantic-errors -fsanitize=address
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -fsanitize=address -fno-omit-frame-pointer#-pedantic-errors -fsanitize=address
 LD=g++
-LDFLAGS= -g$(DEBUGLEVEL) -lm
+LDFLAGS= -g$(DEBUGLEVEL) -lm -fsanitize=address -fno-omit-frame-pointer
 
 ifeq "$(DEBUG)" "$(TRUE)"
 	CXXFLAGS += -Wall -Wextra -pedantic
