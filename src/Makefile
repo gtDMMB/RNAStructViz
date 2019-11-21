@@ -17,7 +17,7 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 endif
 
 define GetBuildConfigOption =
-$(shell cat ../scripts/BuildConfig.cfg | $(SEDCMD) -n 's/^${1}\=\([0-9][0-9]*\)/\1/p')
+$(shell cat ../scripts/BuildConfig.cfg | $(SEDCMD) -n 's/^$(1)\=\([0-9][0-9]*\)/\1/p')
 endef
 
 DEBUGGING_ARG=DEBUGGING
