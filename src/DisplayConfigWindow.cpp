@@ -395,7 +395,7 @@ void DisplayConfigWindow::ConstructWindow() {
           presetThemesChooser->find_item(PRESET_COLOR_THEMES[t].themeName);
           nextMenuEntry->labelcolor(GUI_BTEXT_COLOR);
 	  if(!strcmp((char *) LOCAL_THEME_NAME, PRESET_COLOR_THEMES[t].themeName)) {
-	       selectedThemeIdx = t;
+	       selectedThemeIdx = numThemes - 1 - t;
 	  }
      }
      presetThemesChooser->labelcolor(GUI_BTEXT_COLOR);
