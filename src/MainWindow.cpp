@@ -840,7 +840,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         int nextIndex = (index + 1) % folders.size();    
         if(folders[nextIndex]->structCount > 0) { 
              ShowFolderByIndex(nextIndex);
-             unsigned int labelIndex = 0;
+             /*unsigned int labelIndex = 0;
              for(unsigned int lbl = 0; lbl < ms_instance->folderDataBtns.size(); lbl++) {
                   Fl_Button *folderLabel = ms_instance->folderDataBtns[lbl];
                   if(!strcmp(folders[nextIndex]->folderName, (char*) (folderLabel->user_data()))) {
@@ -848,7 +848,8 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                        break;
                   }
              }
-             Fl_Button *folderLabel = ms_instance->folderDataBtns[labelIndex];
+             Fl_Button *folderLabel = ms_instance->folderDataBtns[labelIndex];*/
+	     Fl_Button *folderLabel = folders[nextIndex]->mainWindowFolderBtn;
              folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
              folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
              ms_instance->selectedFolderBtn = folderLabel;
@@ -868,12 +869,12 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
     Fl_Pack* pack = ms_instance->m_packedInfo;
     Fl_Button* folderLabel = (Fl_Button*)(widget->parent()->child(0));
                 
-    /*for(int btn = 0; btn < ms_instance->folderDataBtns.size(); btn++) {
+    for(int btn = 0; btn < ms_instance->folderDataBtns.size(); btn++) {
         if(ms_instance->folderDataBtns[btn] == folderLabel) {
              ms_instance->folderDataBtns.erase(ms_instance->folderDataBtns.begin() + btn);
              break;
         }
-    }*/
+    }
 
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
     unsigned int index;

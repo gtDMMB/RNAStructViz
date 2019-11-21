@@ -967,6 +967,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 
     if(m_contentWindow != NULL && !m_contentWindow->visible()) {
          Delete(m_contentWindow, Fl_Double_Window);
+         DeleteContentWindow();
     }
     if (!m_contentWindow)
     {
