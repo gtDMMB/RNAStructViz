@@ -132,7 +132,7 @@ RNASTRUCTVIZ_OBJECTS = \
 	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
 	OptionParser.$(OBJEXT) \
 	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
-	StructureManager.$(OBJEXT) TerminalPrinting.$(OBJEXT) \
+	StructureManager.$(OBJEXT) StructureType.$(OBJEXT) TerminalPrinting.$(OBJEXT) \
 	Fl_Rotated_Text.$(OBJEXT) 
 
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
@@ -322,6 +322,10 @@ StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
 	FolderWindow.h MainWindow.h RNAStructViz.h InputWindow.h\
 	RNAStructure.h TerminalPrinting.h StructureManager.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp
+
+StructureType.$(OBJEXT): ConfigOptions.h ImageNavButton.h ConfigExterns.h \
+	RNAStructVizTypes.h StructureType.h StructureType.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c StructureType.cpp
 
 TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h ConfigExterns.h \
 	TerminalPrinting.cpp

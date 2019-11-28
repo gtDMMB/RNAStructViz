@@ -10,21 +10,13 @@
 #include <FL/Enumerations.H>
 
 /* Core application data structures and widget subclasses: */
-#ifndef RNASTRUCTVIZ_H
-    class RNAStructViz;
-#endif
-#ifndef MAINWINDOW_H
-    class MainWindow;
-#endif
-#ifndef FOLDERWINDOW_H
-    class FolderWindow;
-#endif
-#ifndef FOLDERSTRUCTURE_H
-    class Folder;
-#endif
-#ifndef RNASTRUCTURE_H
+class RNAStructViz;
+class StructureManager;
+class MainWindow;
+class Folder;
+class FolderWindow;
 class RNAStructure;
-#endif
+class StructureData;
 
 /* Other smaller-order types defined, and configuration settings includes: */
 #include "BuildTargetInfo.h"

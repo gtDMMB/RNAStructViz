@@ -14,10 +14,12 @@
 #include <FL/Fl_RGB_Image.H>
 
 #include <vector>
+using std::vector;
 
 #include "ConfigOptions.h"
+#include "StructureType.h"
+#include "RNAStructVizTypes.h"
 
-#define MAX_FOLDER_LABEL_CHARS           (22)
 #define STRUCT_PANE_LABEL_PREFIX         ("\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
 class FolderWindow : public Fl_Group
@@ -68,6 +70,9 @@ class FolderWindow : public Fl_Group
 
         static void DiagramCallback(Fl_Widget* widget, void* userData);
         static void StatsCallback(Fl_Widget* widget, void* userData);
+        
+	friend class StructureData;
+	static vector<StructureData*> m_storedStructDisplayData;
 
 	/*
          The scrolling group containing the folder info and files, and the packed group inside it.

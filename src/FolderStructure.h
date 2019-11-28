@@ -1,6 +1,8 @@
 #ifndef FOLDERSTRUCTURE_H
 #define FOLDERSTRUCTURE_H
 
+#include <string.h>
+
 #include <FL/Fl_Button.H>
 
 #include "MainWindow.h"
@@ -23,10 +25,12 @@ class Folder {
   public:
     inline Folder() : folderName(NULL), folderNameFileCount(NULL), folderStructs(NULL), 
 	              structCount(NULL), selected(false), fileType(FILETYPE_NONE), 
-		      folderWindow(NULL), 
+		      capacity(2 * DEFAULT_FOLDER_NAME_BUFSIZE), folderWindow(NULL), 
 		      mainWindowFolderBtn(NULL), navUpBtn(NULL), navDownBtn(NULL), 
 		      navCloseBtn(NULL), toggleStickyBtn(NULL), exportXMLBtn(NULL),
                       displayInfoBtn(NULL) {
+        folderStructs = (int *) malloc(capacity * sizeof(int));
+        memset(folderStructs, -1, capacity);
         tooltipText[0] = '\0';
     }
     
@@ -94,8 +98,8 @@ class Folder {
               nextFolder->folderName[DEFAULT_FOLDER_NAME_BUFSIZE - 4] = '\0';
          }
          nextFolder->folderNameFileCount = (char *) malloc(DEFAULT_FOLDER_NAME_LBLSIZE * sizeof(char));
-         nextFolder->folderStructs = (int *) malloc(2 * DEFAULT_FOLDER_NAME_BUFSIZE * sizeof(int));
-         nextFolder->folderStructs[0] = index;
+         
+	 nextFolder->folderStructs[0] = index;
          nextFolder->structCount = 1;
 	 nextFolder->CreateFolderGUIElements();
 	 nextFolder->SetFolderLabel();
@@ -104,6 +108,14 @@ class Folder {
 	 nextFolder->folderWindow = NULL;
 	 return nextFolder;
 
+    }
+
+    inline void AddStructToFolderByIndex(int index) {
+         if(structCount >= capacity) {
+	      folderStructs = (int *) realloc(folderStructs, 2 * capacity);
+	      capacity *= 2;
+	 }
+	 folderStructs[structCount++] = index;
     }
 
     inline void SetFolderLabel() {
@@ -143,7 +155,7 @@ class Folder {
 	 guiPackingContainerRef = pack;
 	 pack->begin();
 	 guiPackingGroup = new Fl_Group(pack->x() + x, pack->y() + y, pack->w(), FOLDER_WIDGET_HEIGHT);
-	 mainWindowFolderBtn = new Fl_Button(pack->x() + x + 10, pack->y() + y, pack->w() - 70, FOLDER_WIDGET_HEIGHT, "");
+	 mainWindowFolderBtn = new Fl_Button(pack->x() + x + 8, pack->y() + y, pack->w() - 70, FOLDER_WIDGET_HEIGHT, "");
 	 mainWindowFolderBtn->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 	 mainWindowFolderBtn->callback(MainWindow::ShowFolderCallback);
 	 mainWindowFolderBtn->user_data((void *) folderName);
@@ -151,23 +163,23 @@ class Folder {
 	 mainWindowFolderBtn->labelsize(10);
 	 mainWindowFolderBtn->labelfont(FL_HELVETICA_BOLD_ITALIC);
 	 mainWindowFolderBtn->box(FL_UP_BOX);
-         navUpBtn = new Fl_Button(pack->x() + x + pack->w() - 60, pack->y() + y + 5, 
+         navUpBtn = new Fl_Button(pack->x() + x + pack->w() - 58, pack->y() + y + 5, 
 			          FOLDER_ACTION_BUTTON_SIZE, FOLDER_ACTION_BUTTON_SIZE, Folder::navUpBtnLabel);
 	 navUpBtn->tooltip("Move folder up in list");
 	 navUpBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.50));
-	 navUpBtn->box(FL_ROUND_UP_BOX);
+	 navUpBtn->box(FL_PLASTIC_UP_BOX);
 	 navUpBtn->callback(MainWindow::MoveFolderUp);
-         navDownBtn = new Fl_Button(pack->x() + x + pack->w() - 40, pack->y() + y + 5, 
+         navDownBtn = new Fl_Button(pack->x() + x + pack->w() - 38, pack->y() + y + 5, 
 			            FOLDER_ACTION_BUTTON_SIZE, FOLDER_ACTION_BUTTON_SIZE, Folder::navDownBtnLabel);
 	 navDownBtn->tooltip("Move folder down in list");
 	 navDownBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.50));
-	 navDownBtn->box(FL_ROUND_UP_BOX);
+	 navDownBtn->box(FL_PLASTIC_UP_BOX);
 	 navDownBtn->callback(MainWindow::MoveFolderDown);
-         navCloseBtn = new Fl_Button(pack->x() + x + pack->w() - 20, pack->y() + y + 5, 
+         navCloseBtn = new Fl_Button(pack->x() + x + pack->w() - 18, pack->y() + y + 5, 
 			             FOLDER_ACTION_BUTTON_SIZE, FOLDER_ACTION_BUTTON_SIZE, Folder::navCloseBtnLabel);
 	 navCloseBtn->tooltip("Remove folder and all its stored structures");
 	 navCloseBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.50));
-	 navCloseBtn->box(FL_ROUND_UP_BOX);
+	 navCloseBtn->box(FL_PLASTIC_UP_BOX);
 	 navCloseBtn->callback(MainWindow::RemoveFolderCallback);
          guiPackingGroup->resizable(mainWindowFolderBtn);
 	 guiPackingGroup->redraw();
@@ -179,6 +191,7 @@ class Folder {
     char *folderName;
     char *folderNameFileCount;
     int  *folderStructs;
+    int  capacity;
     int  structCount;
     bool selected;
     InputFileTypeSpec fileType;

@@ -112,13 +112,13 @@ void StructureManager::AddFile(const char* filename)
     {
         for(int s = 0; s < newStructCount; s++) { 
         
-           int count = (int)folders.size();
+           int count = (int) folders.size();
            RNAStructure *structure = structures[s];
            if(!structure) { 
                 continue;
            }
            AddFirstEmpty(structure);
-           if(count == (int) folders.size()-1)
+           if(count == (int) folders.size()-1) // we added a new folder ... 
            {
                  
               off_t stickyFolderExists = FolderNameForSequenceExists(
@@ -254,7 +254,7 @@ void StructureManager::RemoveStructure(const int index)
         if(found)
             break;
     }
-    delete structure;
+    Delete(structure, RNAStructure);
     
 }
 
@@ -278,9 +278,8 @@ void StructureManager::RemoveFolder(const int folder, const int index) {
 }
 
 void StructureManager::AddFolder(RNAStructure* structure, const int index) {
-    Folder *nextFolder = Folder::AddNewFolderFromData(structure, index, false);
-    folders.push_back(nextFolder);
-    
+     Folder *nextFolder = Folder::AddNewFolderFromData(structure, index, false);
+     folders.push_back(nextFolder);
 }
 
 int StructureManager::AddFirstEmpty(RNAStructure* structure)
@@ -290,12 +289,12 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
     bool found = false;
     if (!m_structures && folders.empty())
     {
-        m_structures = (RNAStructure**)malloc(sizeof(RNAStructure*));
+        m_structures = (RNAStructure**) malloc(sizeof(RNAStructure*));
         m_structures[0] = structure;
         m_structureCount = 1;
         added = true;
-            AddFolder(structure, 0);
-            found = true;
+        AddFolder(structure, 0);
+        found = true;
         return 0;
     }
     for (int i = 0; i < m_structureCount; ++i)
@@ -311,7 +310,7 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
     if(!added)
     {
         m_structureCount++;
-        m_structures = (RNAStructure**)realloc(m_structures, sizeof(RNAStructure*) * m_structureCount);
+        m_structures = (RNAStructure **) realloc(m_structures, sizeof(RNAStructure*) * m_structureCount);
         m_structures[m_structureCount - 1] = structure;
         index = m_structureCount - 1;
     }
@@ -326,11 +325,11 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
             {
 
                 folders[ui]->structCount++;
-                if(folders[ui]->structCount >= 128) {
-                    folders[ui]->folderStructs = (int*) realloc(folders[ui]->folderStructs, 
-                                                  sizeof(int) * folders[ui]->structCount);
+                if(folders[ui]->structCount > folders[ui]->capacity + 1) {
+		    folders[ui]->capacity *= 2;
+                    folders[ui]->folderStructs = (int *) realloc(folders[ui]->folderStructs, 
+                                                                 sizeof(int) * folders[ui]->capacity);
                 }
-                
                 bool emptySlot = false;
                 for(int i = 0; i < folders[ui]->structCount-1; i++)
                 {

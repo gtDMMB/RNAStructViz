@@ -13,9 +13,12 @@
 #include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "ThemesConfig.h"
+#include "StructureType.h"
 
 #include "pixmaps/RNAStructVizLogo.c"
 #include "pixmaps/StructureOperationIcon.c"
+
+vector<StructureData*> FolderWindow::m_storedStructDisplayData;
 
 void FolderWindow::Construct(int w, int h, int folderIndex) {}
 
@@ -111,8 +114,17 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 }
 
 FolderWindow::~FolderWindow() {
-     delete structureIcon;
-     structureIcon = NULL;
+     Delete(structureIcon, Fl_RGB_Image);
+     for(int vi = 0; vi < m_storedStructDisplayData.size(); vi++) {
+          Delete(m_storedStructDisplayData[vi], StructureData);
+     }
+     m_storedStructDisplayData.clear();
+     HideFolderWindowGUIDisplay(true);
+     Delete(folderPack, Fl_Pack);
+     Delete(folderScroll, Fl_Scroll);
+     Free(title);
+     Delete(fileOpsLabel, Fl_Box);
+     Delete(fileLabel, Fl_Box);
 }
 
 void FolderWindow::SetStructures(int folderIndex) {
@@ -143,67 +155,28 @@ void FolderWindow::SetStructures(int folderIndex) {
 
 }
 
-void FolderWindow::AddStructure(const char* filename, const int index)
-{
-    
-    Fl_Pack* pack = folderPack;
-    pack->begin();
-    
-    int vertPosn = pack->children() * NAVBUTTONS_BHEIGHT; 
-    
-    Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(), NAVBUTTONS_BHEIGHT);
-    group->begin();
-    
-    Fl_Button* label = new Fl_Button(pack->x() + 10, vertPosn, pack->w() - 40, 30, filename);
-    label->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    label->callback(FolderWindow::ShowFileCallback);
-    label->user_data((void*)index);
-    label->labelcolor(GUI_BTEXT_COLOR);
-    label->labelsize(10);
-    label->labelfont(FL_HELVETICA_BOLD_ITALIC);
-    char labelWithIcon[MAX_BUFFER_SIZE];
-
-    std::string spaceBuffer = string("                                                    ");
-    char fileNameNoExt[MAX_BUFFER_SIZE];
-    size_t fileNameCopyChars = strlen(filename);
-    const char *fileExtPos = strrchr(filename, '.');
-    if(fileExtPos != NULL) {
-         fileNameCopyChars = (size_t) (fileExtPos - filename);
-    }
-    fileNameCopyChars = MIN(fileNameCopyChars, MAX_BUFFER_SIZE - 1);
-    strncpy(fileNameNoExt, filename, fileNameCopyChars);
-    fileNameNoExt[fileNameCopyChars] = '\0';
-    
-    int curLabelLen = 0;
-    char filePrefix[MAX_BUFFER_SIZE];
-    size_t fileNameBytes = strlen(filename);
-    snprintf(filePrefix, MAX_BUFFER_SIZE, "%-.22s%s", fileNameNoExt, 
-         fileNameBytes > MAX_FOLDER_LABEL_CHARS ? "..." : "");
-    snprintf(labelWithIcon, MAX_BUFFER_SIZE - 1, "@filenew   %s%s", 
-             filePrefix, spaceBuffer.substr(0, 
-             MAX(0, MAX_FOLDER_LABEL_CHARS - ((int ) strlen(filePrefix)))).c_str());
-    label->copy_label(labelWithIcon);
-    label->tooltip(filename);
-    label->box(FL_UP_BOX);
-    
-    Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
-    removeButton->callback(FolderWindow::RemoveCallback);
-    removeButton->user_data((void*)index);
-    removeButton->label("@1+");
-    removeButton->tooltip("Remove sample from folder");
-    removeButton->labelcolor(GUI_BTEXT_COLOR);
-    removeButton->box(FL_ROUND_UP_BOX);
-
-    group->resizable(label);
-    group->end();
-    pack->end();
-        
-    folderScroll->redraw();
+void FolderWindow::AddStructure(const char* filename, const int index) {
+     StructureData *nextStructData = StructureData::AddStructureFromData(this, filename, index);
+     if(FolderWindow::m_storedStructDisplayData.size() > index) {
+	  Delete(FolderWindow::m_storedStructDisplayData[index], StructureData);
+	  FolderWindow::m_storedStructDisplayData[index] = nextStructData;
+     }
+     else {
+          for(int sdi = FolderWindow::m_storedStructDisplayData.size(); sdi < index; sdi++) {
+	       FolderWindow::m_storedStructDisplayData.push_back(NULL);
+	  }
+	  FolderWindow::m_storedStructDisplayData.push_back(nextStructData);
+     }
 }
 
-void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData)
-{
-    FolderWindow* fwindow = (FolderWindow*)(widget->parent());
+void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData) {
+    FolderWindow* fwindow = (FolderWindow *) widget->parent();
+    for(int fi = 0; fi < FolderWindow::m_storedStructDisplayData.size(); fi++) {
+         if(FolderWindow::m_storedStructDisplayData[fi] != NULL && FolderWindow::m_storedStructDisplayData[fi]->origFolderWinLabel == fwindow->label()) {
+	      Delete(FolderWindow::m_storedStructDisplayData[fi], StructureData);
+	      break;
+	 }
+    }
     MainWindow::HideFolderByName(fwindow->label());
 }
 
@@ -215,13 +188,12 @@ void FolderWindow::ShowFileCallback(Fl_Widget* widget, void* userData)
 void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
 {
     FolderWindow* fwindow = (FolderWindow*)(widget->parent()->parent()->parent()->parent());
-    
     Fl_Pack* pack = fwindow->folderPack;
     for(int i = 0; i < pack->children(); ++i)
     {
         Fl_Group* tempGroup = (Fl_Group*)pack->child(i);
         Fl_Button* childButton = (Fl_Button*)tempGroup->child(1); // <--- here
-        
+        intptr_t userDataIdx = (intptr_t) childButton->user_data();
         if (childButton == widget)
         {
             RNAStructViz* appInstance = RNAStructViz::GetInstance();
@@ -230,7 +202,7 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             {
                 if(diagrams[ui]->GetFolderIndex() == fwindow->m_folderIndex)
                 {
-                    diagrams[ui]->RemoveStructure((intptr_t)userData);
+                    diagrams[ui]->RemoveStructure(userDataIdx);
                     break;
                 }
             }
@@ -239,31 +211,29 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             {
                 if(stats[ui]->GetFolderIndex() == fwindow->m_folderIndex)
                 {
-                    stats[ui]->RemoveStructure((intptr_t)userData);
+                    stats[ui]->RemoveStructure(userDataIdx);
                     break;
                 }
             }
-            Fl_Group* toRemove = (Fl_Group*)pack->child(i); // <--- here
-        int toRemoveHeight = toRemove->h();
-        int toRemoveYPos = toRemove->y();
-        for(int j = i + 1; j < pack->children(); j++) {
+            Fl_Group* toRemove = (Fl_Group*) pack->child(i); // <--- here
+            int toRemoveHeight = toRemove->h();
+            int toRemoveYPos = toRemove->y();
+            for(int j = i + 1; j < pack->children(); j++) {
                  Fl_Group* groupToMove = (Fl_Group*)pack->child(j);
-         groupToMove->resize(groupToMove->x(), groupToMove->y() - toRemoveHeight, 
-                     groupToMove->w(), groupToMove->h());
-        }
-        pack->remove(toRemove);
+                 groupToMove->resize(groupToMove->x(), groupToMove->y() - toRemoveHeight, 
+                                     groupToMove->w(), groupToMove->h());
+            }
             pack->resize(pack->x(), pack->y(), pack->w(), pack->h() - toRemoveHeight);
-        fwindow->folderScroll->scroll_to(0, 0);
-        fwindow->folderScroll->scroll_to(fwindow->folderScroll->xposition(), 
-                                 fwindow->folderScroll->yposition());
-        fwindow->folderScroll->scrollbar.align();
-        fwindow->folderScroll->redraw();
-            Fl::delete_widget(toRemove);
+            fwindow->folderScroll->scroll_to(0, 0);
+            fwindow->folderScroll->scroll_to(fwindow->folderScroll->xposition(), 
+                                             fwindow->folderScroll->yposition());
+            fwindow->folderScroll->scrollbar.align();
+            fwindow->folderScroll->redraw();
+            //Fl::delete_widget(toRemove);
             
-            appInstance->GetStructureManager()->DecreaseStructCount( 
-                                    fwindow->m_folderIndex);
-            appInstance->GetStructureManager()->RemoveStructure((intptr_t)userData);
-            
+	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
+            appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
+	    Delete(FolderWindow::m_storedStructDisplayData[userDataIdx], StructureData);
             break;
         }
     }

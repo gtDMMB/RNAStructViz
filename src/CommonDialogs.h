@@ -18,6 +18,8 @@
 #include "pixmaps/InfoButton.c"
 #include "pixmaps/TourIcon.c"
 
+#define TRUNCATE_LINE_LENGTH            (216)
+
 namespace CommonDialogs {
 
      static Fl_RGB_Image *welcomeIconImage = new Fl_RGB_Image( 

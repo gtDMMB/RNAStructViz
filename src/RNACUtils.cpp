@@ -16,7 +16,7 @@ static inline void DeletePointerCheck(PT *ptr) {
      }
 }
 
-#define DeletePointerNoType(p)          ({ DeletePointerCheck<void>(p); p = NULL;  })
+//#define DeletePointerNoType(p)          ({ DeletePointerCheck<void>(p); p = NULL;  })
 #define Delete(p, ptype)                ({ DeletePointerCheck<ptype>(p); p = NULL; })
 
 static inline void FreePointerCheck(void *ptr) {
@@ -99,6 +99,17 @@ static inline const char* StringTransform(char *str, StringTransformFunc_t trans
           *chpos = transformFunc(*chpos);
      }
      return str;
+}
+
+static inline std::string StringInsertSpacing(std::string initStr, unsigned int spacingInt, std::string spacingChars = " ") {
+     std::string spacedStr = "";
+     int numChunks = initStr.length() / spacingInt;
+     for(int si = 0; si < numChunks; si++) {
+          spacedStr += initStr.substr(si * spacingInt, spacingInt) + spacingChars;
+     }
+     int remLength = initStr.length() - numChunks * spacingInt;
+     spacedStr += initStr.substr(numChunks * spacingInt, remLength);
+     return spacedStr;
 }
 
 #define StringToUppercase(s)                RunAndReturn(StringTransform(s, toupper), s)

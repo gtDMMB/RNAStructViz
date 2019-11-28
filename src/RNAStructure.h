@@ -280,6 +280,13 @@ class RNAStructure
 	     return charSeq;
 	}
 
+	inline const char * GetDotBracketSequenceString() const {
+	     if(dotFormatCharSeq == NULL) {
+	          return "";
+	     }
+	     return dotFormatCharSeq;
+	}
+
     private:
 
 	/* Callbacks for the export buttons: */

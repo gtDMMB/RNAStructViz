@@ -38,7 +38,7 @@ class ImagePixelData {
           unsigned char *pixel_data;
 
      public:
-	  static const ImagePixelData & ConvertFromStructureType(auto &hdrStructInst) {
+	  static const ImagePixelData ConvertFromStructureType(auto &hdrStructInst) {
                ImagePixelData imgPixelData;
 	       imgPixelData.width = hdrStructInst.width;
 	       imgPixelData.height = hdrStructInst.height;

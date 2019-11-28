@@ -170,12 +170,13 @@ std::string CommonDialogs::GetInfoAboutMessageString() {
      int tableHeaderWidth = 42;
      string infoMsg;
      for(int data = 0; data < GetArrayLength(infoTableOrigData); data++) {
-          string curInfoStr = infoTableOrigData[data];
-      if(!strcmp(curInfoStr.c_str(), "")) {
-           infoMsg += string("\n");
-           continue;
-      }
-      size_t headerPos = curInfoStr.find_first_of(":");
+          string truncDataStr = infoTableOrigData[data].substr(0, MAX(infoTableOrigData[data].length(), TRUNCATE_LINE_LENGTH));
+	  string curInfoStr = truncDataStr;
+          if(!strcmp(curInfoStr.c_str(), "")) {
+              infoMsg += string("\n");
+               continue;
+          }
+          size_t headerPos = curInfoStr.find_first_of(":");
           string headerPrefix = curInfoStr.substr(0, headerPos);
           string tableData = curInfoStr.substr(headerPos + 2);
           string headerSpacing = spaces.substr(0, MAX(0, tableHeaderWidth - headerPrefix.length()));
