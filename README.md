@@ -39,6 +39,7 @@ Thank you for using our software.
 
 #### ⌨️ Installation
 
+* [📁 Custom Makefile Options](https://github.com/gtDMMB/RNAStructViz/wiki/MakefileCustomOptions)
 * [🏃 First Run Instructions](https://github.com/gtDMMB/RNAStructViz/wiki/FirstRunInstructions)
 * [🖪 Linux/Unix Source Install](https://github.com/gtDMMB/RNAStructViz/wiki/LinuxUnixInstallFromSource)
 * [🖬 Local From Source Install](https://github.com/gtDMMB/RNAStructViz/wiki/LocalSourceInstallNoSudo)
