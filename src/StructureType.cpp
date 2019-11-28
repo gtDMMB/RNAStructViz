@@ -8,6 +8,7 @@
 #include "RNAStructViz.h"
 #include "FolderWindow.h"
 #include "RNAStructure.h"
+#include "ConfigParser.h"
 
 void StructureData::SetTooltipText() {
      std::string tooltipText = structFileBaseName;
@@ -47,7 +48,7 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      SetLabelText();
      SetTooltipText();
 
-     navCloseBtn = new Fl_Button(pack->x() + pack->w() - 20, offsetY + 5, STRUCTURE_NAVBTN_SIZE, STRUCTURE_NAVBTN_SIZE);
+     navCloseBtn = new Fl_Button(pack->x() + pack->w() - 8, offsetY + 5, STRUCTURE_NAVBTN_SIZE, STRUCTURE_NAVBTN_SIZE);
      navCloseBtn->callback(FolderWindow::RemoveCallback);
      navCloseBtn->user_data((void *) index);
      navCloseBtn->label(StructureData::navCloseBtnLabel);
@@ -55,7 +56,12 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      navCloseBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      navCloseBtn->box(FL_PLASTIC_UP_BOX);
 
-     // TODO: Add the image buttons
+     bool isAutoloaded = ConfigParser::fileExists((std::string(USER_AUTOLOAD_PATH) + structFileBaseName).c_str());
+     autoloadToggleBtn = new AutoloadIndicatorButton(structFileBaseDir + "/" + structFileBaseName, 
+		                                     structFileBaseName, isAutoloaded);
+     autoloadToggleBtn->position(pack->x() + pack->w() - 42, offsetY + 3);
+     
+     // TODO: Add other image status buttons
 
      guiPackingGroup->resizable(mainViewerDisplayBtn);
      guiPackingGroup->end();
@@ -71,9 +77,9 @@ StructureData* StructureData::AddStructureFromData(FolderWindow *fwinRef, const 
      nextStructData->parentMainFolderWin = fwinRef;
      nextStructData->structure = RNAStructViz::GetInstance()->GetStructureManager()->GetStructure(index);
      nextStructData->origFolderWinLabel = std::string(fileName);
-     size_t dirPrefixLen = strlen(fileName) - ((strrchr(fileName, '/') ? strrchr(fileName, '/') : fileName + strlen(fileName)) - fileName);
-     nextStructData->structFileBaseDir = std::string(fileName).substr(0, dirPrefixLen);
-     nextStructData->structFileBaseName = std::string(fileName + dirPrefixLen);
+     size_t dirPrefixLen = ((strrchr(fileName, '/') ? strrchr(fileName, '/') : fileName) - fileName);
+     nextStructData->structFileBaseDir = std::string(fileName).substr(0, dirPrefixLen + 1);
+     nextStructData->structFileBaseName = std::string(fileName + dirPrefixLen + 1);
      nextStructData->index = index;
      nextStructData->CreateGUIElementsDisplay(fwinRef->folderPack);
      return nextStructData;

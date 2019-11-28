@@ -24,6 +24,7 @@
 #include "ConfigExterns.h"
 #include "ImageNavButton.h"
 #include "RNAStructVizTypes.h"
+#include "AutoloadIndicatorButton.h"
 
 #define STRUCTURE_WIDGET_WIDTH               (30)
 #define STRUCTURE_WIDGET_HEIGHT              (30)
@@ -52,7 +53,8 @@ class StructureData {
 	  Fl_Group  *guiPackingGroup;
 	  Fl_Button *mainViewerDisplayBtn;
           Fl_Button *navCloseBtn;
-	  ImageNavButton *fileFormatBtn, *pinStructureFlagBtn;
+	  ImageNavButton *fileFormatBtn;
+	  AutoloadIndicatorButton *autoloadToggleBtn;
 
           static inline const char *navCloseBtnLabel = "@1+";
 	  static inline std::string spaceBuffer      = std::string("                                                    ");
@@ -61,7 +63,7 @@ class StructureData {
           inline StructureData() : structure(NULL), parentMainFolderWin(NULL), 
 	                           index(-1), guiPackingContainerRef(NULL), guiPackingGroup(NULL), 
 	                           mainViewerDisplayBtn(NULL), navCloseBtn(NULL), 
-			           fileFormatBtn(NULL), pinStructureFlagBtn(NULL) {}
+			           fileFormatBtn(NULL), autoloadToggleBtn(NULL) {} 
 	  
 	  inline ~StructureData() {
                DeleteGUIWidgets();
@@ -86,7 +88,7 @@ class StructureData {
 	       Delete(mainViewerDisplayBtn, Fl_Button);
 	       Delete(navCloseBtn, Fl_Button);
 	       Delete(fileFormatBtn, ImageNavButton);
-	       Delete(pinStructureFlagBtn, ImageNavButton);
+	       Delete(autoloadToggleBtn, AutoloadIndicatorButton);
 	       Delete(guiPackingGroup, Fl_Group);
 	  }    
 

@@ -141,7 +141,8 @@ void FolderWindow::SetStructures(int folderIndex) {
         }
         int i = folder->folderStructs[(ui+shift)];
         RNAStructure *strct = structureManager->GetStructure(i);
-        AddStructure(strct->GetFilename(), i);
+        //AddStructure(strct->GetFilename(), i);
+	AddStructure(strct->GetPathname(), i);
     }
     label(folder->folderName);
     char structLabel[MAX_BUFFER_SIZE];

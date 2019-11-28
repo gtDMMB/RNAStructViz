@@ -63,6 +63,8 @@ class RNAStructViz
 	static std::string LocateSampleStructuresOnSystem();
 	static int CopySampleStructures();
         static int BackupAndUnlinkLocalConfigFiles(bool clearStickyFolderNamesOnly = false);
+        static bool CopyStructureFileToAutoloadDirectory(const char *structFileBaseName, const char *structFileDiskPath);
+	static bool RemoveStructureFileFromAutoloadDirectory(const char *structFileBaseName);
 
     private:
         static RNAStructViz* ms_instance;

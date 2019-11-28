@@ -341,11 +341,11 @@ bool ConfigParser::directoryExists(const char *dirPath) {
 
 void ConfigParser::WriteUserConfigFile(const char *fpath) {
      bool writeCfgFile = true;
-     if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
-          int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+     if(!ConfigParser::directoryExists(fpath)) {
+          int dirCreateErr = mkdir(fpath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
           if(dirCreateErr == -1) { 
                TerminalText::PrintError("Unable to create directory \"%s\" ... Aborting\n", 
-                                        USER_CONFIG_DIR);
+                                        fpath);
                perror("Directory Creation Error");
                writeCfgFile = false;
           }
@@ -355,6 +355,42 @@ void ConfigParser::WriteUserConfigFile(const char *fpath) {
           cfgParser.setDefaults();
           cfgParser.writeFile(fpath, !DEBUGGING_ON);
      }
+}
+
+#include <string>
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
+#include "RNAStructViz.h"
+
+bool ConfigParser::ParseAutoloadStructuresDirectory(const char *autoloadDirPath) {
+     if(!ConfigParser::directoryExists(autoloadDirPath)) {
+          int createDirStatus = mkdir(autoloadDirPath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	  if(createDirStatus == -1) {
+	       TerminalText::PrintError("Unable t create directory \"%s\" ... Skipping autoloading of structure files\n", 
+			                autoloadDirPath);
+	       perror("Local autoload directory creation error");
+	       return false;
+	  }
+     }
+     fs::path dirPath(autoloadDirPath);
+     fs::directory_iterator cwdDirIter(dirPath);
+     std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
+     std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
+     for(int sfileIdx = 0; sfileIdx < sortedFilePaths.size(); sfileIdx++) {
+          fs::path curStructFilePath = fs::canonical(sortedFilePaths[sfileIdx], autoloadDirPath);
+          if(curStructFilePath.filename().string() == "." || curStructFilePath.filename().string() == "..") {
+               continue;
+          }
+	  else if(fs::is_directory(curStructFilePath)) {
+	       continue;
+	  }
+	  std::string fullStructFilePath = std::string(autoloadDirPath) + curStructFilePath.filename().string();
+	  TerminalText::PrintDebug("(Auto)Loading structure file at path \"%s\" ... \n", fullStructFilePath.c_str());
+	  RNAStructViz::GetInstance()->GetStructureManager()->AddFile(fullStructFilePath.c_str(), true, true);
+     }
+     return true;
 }
 
 void ConfigParser::setDefaults() { 

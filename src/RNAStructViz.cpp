@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include <boost/system/error_code.hpp>
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
@@ -106,7 +107,7 @@ bool RNAStructViz::Initialize(int argc, char** argv)
         ms_instance = new RNAStructViz();
         MainWindow::Initialize(argc, argv);
     }
-    return true;
+    return ConfigParser::ParseAutoloadStructuresDirectory();
 }
 
 void RNAStructViz::Shutdown()
@@ -167,7 +168,6 @@ void RNAStructViz::AddDiagramWindow(int index)
             diagram->SetFolderIndex(index);
             diagram->ResetWindow(true);
             diagram->setAsCurrentDiagramWindow();
-	    //diagram->make_current();
             diagram->show();
 	    diagram->redraw();
             return;
@@ -337,10 +337,10 @@ int RNAStructViz::CopySampleStructures() {
      fs::directory_iterator ssFile(sampleStructDir.c_str());
      boost::filesystem::path const & destDir(USER_SAMPLE_STRUCTS_PATH.c_str());
      while(ssFile != fs::directory_iterator()) {
-          fs::path ssCurPath(ssFile->path());
+           fs::path ssCurPath(ssFile->path());
            if(!fs::is_directory(ssCurPath)) {
                 try {
-                         fs::copy_file(ssCurPath, destDir / ssCurPath.filename());
+                     fs::copy_file(ssCurPath, destDir / ssCurPath.filename());
                 } catch(boost::filesystem::filesystem_error fse) {
                      TerminalText::PrintInfo("Cannot copy \"%s\" into home directory (file already exists)\n", 
                                              ssCurPath.filename().c_str());
@@ -373,12 +373,45 @@ int RNAStructViz::BackupAndUnlinkLocalConfigFiles(bool clearStickyFolderNamesOnl
      std::string stickyFolderPath = std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE));
      std::string stickyFolderBackupPath = 
              std::string(GetStickyFolderConfigPath(DEFAULT_STICKY_FOLDERNAME_CFGFILE)) + 
-         std::string(dateStampSuffix);
+             std::string(dateStampSuffix);
      if(!clearStickyFolderNamesOnly && rename(configPath.c_str(), configBackupPath.c_str()) || 
-    rename(stickyFolderPath.c_str(), stickyFolderBackupPath.c_str())) {
+        rename(stickyFolderPath.c_str(), stickyFolderBackupPath.c_str())) {
           TerminalText::PrintInfo("Unable to rename backup config files \"%s\" and/or \"%s\" : %s\n", 
                                   configBackupPath.c_str(), stickyFolderPath.c_str(), strerror(errno));
-      return errno;
+          return errno;
+     }
+     return EXIT_SUCCESS;
+}
+
+bool RNAStructViz::CopyStructureFileToAutoloadDirectory(const char *structFileBaseName, const char *structFileDiskPath) {
+     std::string autoloadStructPath = std::string(USER_AUTOLOAD_PATH) + std::string(structFileBaseName); 
+     if(ConfigParser::fileExists(autoloadStructPath.c_str())) {
+          return true;
+     }
+     try {
+	  fs::path toPath(autoloadStructPath.c_str()), fromPath(structFileDiskPath);
+	  fs::copy_file(fromPath, toPath, fs::copy_option::none);
+	  return true;
+     } catch(fs::filesystem_error fse) {
+          TerminalText::PrintWarning("Unable to copy file \"%s\" to autoload directory: %s\n", 
+			             structFileDiskPath, fse.what());
+	  return false;
      }
 }
 
+bool RNAStructViz::RemoveStructureFileFromAutoloadDirectory(const char *structFileBaseName) {
+     std::string autoloadStructPath = std::string(USER_AUTOLOAD_PATH) + std::string(structFileBaseName);
+     if(!ConfigParser::fileExists(autoloadStructPath.c_str())) {
+          return true;
+     }
+     try {
+	  fs::path removePath(autoloadStructPath.c_str());
+	  fs::remove(removePath);
+	  return true;
+     } catch(fs::filesystem_error fse) {
+	  TerminalText::PrintWarning("Unable to remove file \"%s\": %s\n", 
+			             structFileBaseName, fse.what());
+	  return false;
+     }
+
+}

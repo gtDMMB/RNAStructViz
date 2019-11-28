@@ -40,6 +40,7 @@ using std::string;
 #define DEFAULT_FLTK_THEME              ("gtk+")
 #define FLTK_THEME_COUNT                (6)
 #define USER_CONFIG_DIR                 ((string(GetUserHome()) + string("/.RNAStructViz/")).c_str())
+#define USER_AUTOLOAD_PATH              ((string(USER_CONFIG_DIR) + string("AutoLoad/")).c_str())
 #define USER_CONFIG_PATH                ((USER_CONFIG_DIR + string("config.cfg")).c_str())
 #define USER_SAMPLE_STRUCTS_BASE_PATH   (string(GetUserHome()) + string("/RNAStructViz"))
 #define USER_SAMPLE_STRUCTS_PATH        (USER_SAMPLE_STRUCTS_BASE_PATH + string("/sample-structures"))

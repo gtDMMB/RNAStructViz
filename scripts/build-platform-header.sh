@@ -6,11 +6,11 @@
 #### Author: Maxie D. Schmidt (maxieds@gmail.com)
 #### Created: 2018.10.31
 
-grepCmd=`which grep`;
-sedCmd=`which sed`;
+grepCmd=$(which grep);
+sedCmd=$(which sed);
 if [[ "$(uname -s)" == "Darwin" ]]; then
-	grepCmd=`which ggrep`;
-	sedCmd=`which gsed`;
+	grepCmd=$(which ggrep);
+	sedCmd=$(which gsed);
 fi
 
 ReplaceHeaderComponent() {

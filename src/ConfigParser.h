@@ -49,6 +49,7 @@ class ConfigParser {
 		static bool directoryExists(const char *dirPath); 
 
 		static void WriteUserConfigFile(const char *fpath = USER_CONFIG_PATH);
+		static bool ParseAutoloadStructuresDirectory(const char *autoloadDirPath = USER_AUTOLOAD_PATH);
 
 	private:
 		void setDefaults(); 

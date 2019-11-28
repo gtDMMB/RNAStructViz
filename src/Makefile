@@ -30,7 +30,7 @@ BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
 
 ## fallback values since Mac is broken as a platform:
 ifeq "$(TARGET_PLATFORM)" "Darwin"
-	DEBUG=0
+	DEBUG=1
 	OPTLEVEL=0
 	DEBUGLEVEL=3
 	BRANCHID=0
@@ -125,6 +125,7 @@ LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto -lboost_system
 LDFLAGS_FULL=$(BUILD_LDFLAGS_USER_EXTRAS) $(LDFLAGS_EXTRA) $(LDFLAGS) 
 
 RNASTRUCTVIZ_OBJECTS = \
+	AutoloadIndicatorButton.$(OBJEXT) \
 	BaseSequenceIDs.$(OBJEXT) BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
 	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) \
 	DisplayConfigWindow.$(OBJEXT)\
@@ -227,6 +228,10 @@ git-push: git-commit
 
 %: #accept not explicitly defined targets
 @: #ditto
+
+AutoloadIndicatorButton.$(OBJEXT): AutoloadIndicatorButton.h ConfigOptions.h RNAStructViz.h \
+	AutoloadIndicatorButton.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c AutoloadIndicatorButton.cpp
 
 BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h TerminalPrinting.h \
 	ConfigParser.h BaseSequenceIDs.cpp
