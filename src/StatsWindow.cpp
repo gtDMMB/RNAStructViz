@@ -99,7 +99,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         comp_menu->color(GUI_WINDOW_BGCOLOR);
         comp_menu->end();
         
-        calc_button = new Fl_Toggle_Button(mwx+20,mwy+ mwh-60, mww-65, 
+        calc_button = new Fl_Toggle_Button(mwx+20, mwy+ mwh-60, 185, 
                                            30, "@refresh Calculate");
         calc_button->callback(CalcCallback);
         calc_button->labelcolor(GUI_BTEXT_COLOR); 
@@ -2033,7 +2033,7 @@ void StatsWindow::ExportTable()
                 "" : "/";
     snprintf(filename, MAX_BUFFER_SIZE - 1, 
              "%s%sRNAStructViz-StatsTableOutput-%s.csv", 
-             PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
+             (char *) PNG_OUTPUT_DIRECTORY, sepChar, dateStamp);
     if(input_window != NULL) {
          Delete(input_window, InputWindow);
     }
@@ -2055,7 +2055,7 @@ void StatsWindow::ExportTable()
             expFile = fopen(filename, "a+");
 	    const char *dirMarkerPos = strrchr(filename, '/');
 	    if(dirMarkerPos != NULL) {
-		 unsigned int charsToCopy = (unsigned int) (dirMarkerPos - filename);
+		 unsigned int charsToCopy = (unsigned int) (dirMarkerPos - filename + 1);
 	         strncpy((char *) PNG_OUTPUT_DIRECTORY, filename, charsToCopy);
 		 PNG_OUTPUT_DIRECTORY[charsToCopy] = '\0';
 		 ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
@@ -2168,10 +2168,8 @@ void StatsWindow::BuildCompMenu()
             }
         }
         selectAllCompsBtn = new Fl_Button(lastBtnX + 20, lastBtnY + 120, 
-                                          10, 35, 
-                                          "Compare All Structures @redo");
+                                          95, 35, "Compare All Structures @redo");
         selectAllCompsBtn->callback(SelectAllButtonCallback);
-        selectAllCompsBtn->color(GUI_BGCOLOR);
         selectAllCompsBtn->labelcolor(GUI_BTEXT_COLOR);
         selectAllCompsBtn->labelfont(FL_HELVETICA);
     }

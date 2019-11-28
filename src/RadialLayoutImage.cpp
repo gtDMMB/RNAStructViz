@@ -235,7 +235,7 @@ std::string RadialLayoutDisplayWindow::GetExportToPNGOutputPath() {
          const char *outFileFullPath = fileChooser.filename();
          const char *dirMarkerPos = strrchr(outFileFullPath, '/');
          if(dirMarkerPos != NULL) {
-	      unsigned int charsToCopy = (unsigned int) (dirMarkerPos - outFileFullPath);
+	      unsigned int charsToCopy = (unsigned int) (dirMarkerPos - outFileFullPath + 1);
               strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath, charsToCopy);
 	      PNG_OUTPUT_DIRECTORY[charsToCopy] = '\0';
 	      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);

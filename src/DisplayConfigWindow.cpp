@@ -229,40 +229,40 @@ void DisplayConfigWindow::ConstructWindow() {
      };
      volatile char (*fieldUpdateVars[])[MAX_BUFFER_SIZE] = {
          &CTFILE_SEARCH_DIRECTORY, 
-     &PNG_OUTPUT_DIRECTORY, 
-     &PNG_OUTPUT_PATH, 
-     &PNG_RADIAL_LAYOUT_OUTPUT_PATH,
+         &PNG_OUTPUT_DIRECTORY, 
+         &PNG_OUTPUT_PATH, 
+         &PNG_RADIAL_LAYOUT_OUTPUT_PATH,
      };
      bool needsDirChooser[] {
           true, 
           true,
-      false,
-      false
+          false,
+          false
      };
      for(int f = 0; f < NUMSETTINGS; f++) {
          int offsetX = CFGWIN_WIDGET_OFFSETX + 2 * CFGWIN_SPACING;
          Fl_Box *descBox = new Fl_Box(offsetX, workingYOffset, 
                 CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
                 fieldDesc[f]);
-     descBox->labelcolor(GUI_TEXT_COLOR);
-     descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
-     windowWidgets.push_back(descBox);
-     offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
+         descBox->labelcolor(GUI_TEXT_COLOR);
+         descBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+         windowWidgets.push_back(descBox);
+         offsetX += CFGWIN_LABEL_WIDTH + CFGWIN_SPACING;
          Fl_Box *settingBox = new Fl_Box(offsetX, workingYOffset, 
                   (int) (2 * CFGWIN_LABEL_WIDTH), CFGWIN_LABEL_HEIGHT, 
                               (char *) *(fieldUpdateVars[f]));
-     settingBox->copy_label(TrimFilePathDisplay((char *) *(fieldUpdateVars[f])));
-     settingBox->color(GUI_BTEXT_COLOR);
-     settingBox->labelcolor(GUI_TEXT_COLOR);
-     settingBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+         settingBox->copy_label(TrimFilePathDisplay((char *) *(fieldUpdateVars[f])));
+         settingBox->color(GUI_BTEXT_COLOR);
+         settingBox->labelcolor(GUI_TEXT_COLOR);
+         settingBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
          fpathsSettingBoxes[f] = settingBox;
-     fpathsUpdateRefs[f] = (char *) *(fieldUpdateVars[f]);
-     windowWidgets.push_back(settingBox);
-     offsetX += (int) (2 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING / 2;
-     if(needsDirChooser[f]) { 
+         fpathsUpdateRefs[f] = (char *) *(fieldUpdateVars[f]);
+         windowWidgets.push_back(settingBox);
+         offsetX += (int) (2 * CFGWIN_LABEL_WIDTH) + CFGWIN_SPACING / 2;
+         if(needsDirChooser[f]) { 
               Fl_Button *chooseDirBtn = new Fl_Button(offsetX, workingYOffset, 
-            CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
-            "Select @|>");
+                                                      CFGWIN_BUTTON_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                                                      "Select @|>");
           chooseDirBtn->color(GUI_BGCOLOR);
           chooseDirBtn->labelcolor(GUI_BTEXT_COLOR);
           chooseDirBtn->user_data((void *) f);
@@ -612,13 +612,14 @@ void DisplayConfigWindow::SelectDirectoryCallback(Fl_Widget *btn, void *udata) {
      DisplayConfigWindow *parentWin = (DisplayConfigWindow *) btn->parent();
      long int settingIdx = (long int) ((int *) btn->user_data());
      char *nextDirectory = fl_dir_chooser("Select New Default Directory ...", 
-                                  parentWin->fpathsUpdateRefs[settingIdx], 0);
+                                          parentWin->fpathsUpdateRefs[settingIdx], 0);
      if(nextDirectory == NULL) {
           return;
      }
-     strncpy(parentWin->fpathsUpdateRefs[settingIdx], nextDirectory, MAX_BUFFER_SIZE - 1);
-     ConfigParser::nullTerminateString(parentWin->fpathsUpdateRefs[settingIdx]);
+     strncpy(parentWin->fpathsUpdateRefs[settingIdx], nextDirectory, MAX_BUFFER_SIZE);
+     parentWin->fpathsUpdateRefs[settingIdx][MAX_BUFFER_SIZE - 1] = '\0';
      parentWin->fpathsSettingBoxes[settingIdx]->copy_label(nextDirectory);
+     Free(nextDirectory);
      parentWin->fpathsSettingBoxes[settingIdx]->redraw();
 
 }
@@ -632,27 +633,29 @@ void DisplayConfigWindow::UpdatePNGPathCallback(Fl_Widget *btn, void *udata) {
      Fl_Box *msgIconBox = (Fl_Box *) fl_message_icon();
      if(parentWin->pngNewPathIcon == NULL) { 
           parentWin->pngNewPathIcon = new Fl_RGB_Image(PNGNewPathIcon.pixel_data, 
-                                   PNGNewPathIcon.width, PNGNewPathIcon.height, 
-                              PNGNewPathIcon.bytes_per_pixel);
+                                      PNGNewPathIcon.width, PNGNewPathIcon.height, 
+                                      PNGNewPathIcon.bytes_per_pixel);
      }
      if(msgIconBox != NULL) { 
-          msgIconBox->image(parentWin->pngNewPathIcon);
-          msgIconBox->label("");
-      msgIconBox->type(FL_NO_BOX);
-      msgIconBox->color(Lighter(GUI_BGCOLOR, 0.5f));
-          msgIconBox->box(FL_NO_BOX);
-      msgIconBox->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | 
-                FL_ALIGN_CENTER);
-      msgIconBox->redraw();
+           msgIconBox->image(parentWin->pngNewPathIcon);
+           msgIconBox->label("");
+           msgIconBox->type(FL_NO_BOX);
+           msgIconBox->color(Lighter(GUI_BGCOLOR, 0.5f));
+           msgIconBox->box(FL_NO_BOX);
+           msgIconBox->align(FL_ALIGN_IMAGE_BACKDROP | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
+           msgIconBox->redraw();
      }
 
-     const char *inputDialogMsg = "Choose the format of the PNG image paths saved by the diagram window. \nNote that C-style strftime-like modifiers such as %%F, %%H%%M%%S, \nare supported in the format description entered below. \nSee \"man strftime\", or strftime(3), in your terminal for a complete \ndescription of supported timestamp modifiers.";
+     const char *inputDialogMsg = "Choose the format of the PNG image paths saved by the diagram window. \n" 
+	                          "Note that C-style strftime-like modifiers such as %%F, %%H%%M%%S, \nare "
+				  "supported in the format description entered below. \nSee \"man strftime\", "
+				  "or strftime(3), in your terminal for a complete \ndescription of supported timestamp modifiers.";
      const char *nextPNGPath = fl_input(inputDialogMsg, parentWin->fpathsUpdateRefs[settingIdx]);
      if(nextPNGPath == NULL) {
           return;
      }
-     strncpy(parentWin->fpathsUpdateRefs[settingIdx], nextPNGPath, MAX_BUFFER_SIZE - 1);
-     ConfigParser::nullTerminateString(parentWin->fpathsUpdateRefs[settingIdx]);
+     strncpy(parentWin->fpathsUpdateRefs[settingIdx], nextPNGPath, MAX_BUFFER_SIZE);
+     parentWin->fpathsUpdateRefs[settingIdx][MAX_BUFFER_SIZE - 1] = '\0';
      parentWin->fpathsSettingBoxes[settingIdx]->copy_label(nextPNGPath);
      parentWin->fpathsSettingBoxes[settingIdx]->redraw();
 
@@ -700,12 +703,12 @@ void DisplayConfigWindow::ChangeColorCallback(Fl_Widget *btn, void *udata) {
           int nextG = (int) (currentG * 255.0);
           int nextB = (int) (currentB * 255.0); 
           Fl_Color nextBGColor = RGBColor(nextR, nextG, nextB);
-      *(parentWin->colorChangeRefs[colorIdx]) = nextBGColor;
+          *(parentWin->colorChangeRefs[colorIdx]) = nextBGColor;
           parentWin->colorDisplayBoxes[colorIdx]->labelcolor(nextBGColor);
           parentWin->colorDisplayBoxes[colorIdx]->redraw();
-      if(!colorIdx) {
+          if(!colorIdx) {
                GUI_CTFILEVIEW_COLOR = Darker(nextBGColor, 0.5f);
-      }
+          }
      }
 
 }
@@ -754,7 +757,7 @@ void DisplayConfigWindow::RestoreDefaultsCallback(Fl_Widget *btn, void *udata) {
      }
      for(int c = 0; c < GUICOLORS; c++) {
           parentWin->colorDisplayBoxes[c]->labelcolor(*(parentWin->colorChangeRefs[c]));
-      parentWin->colorDisplayBoxes[c]->redraw();
+          parentWin->colorDisplayBoxes[c]->redraw();
      }
 }
 

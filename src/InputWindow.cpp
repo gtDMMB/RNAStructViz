@@ -21,11 +21,11 @@ int InputWindow::distinctStructureCount = 0;
 
 InputWindow::InputWindow(int w, int h, const char *label, 
                          const char *defaultName, InputWindowType type, int folderIndex) : 
-    Fl_Window(w, h, label), cbUseDefaultNames(NULL), ctFileChooser(NULL), 
+    Fl_Window(w, h, label), cbUseDefaultNames(NULL), cbKeepStickyFolders(NULL), 
+    ctFileChooser(NULL), input(NULL), winString(NULL), inputText(NULL),
     userWindowStatus(OK), fileSelectionIndex(-1), windowDone(false),
     stickyFolderNameFound(false), suggestedFolderNameFound(false), 
-    stickyFolderNamesNeedsReset(false), 
-    winString(NULL), inputText(NULL) {    
+    stickyFolderNamesNeedsReset(false) {    
     winString = (char*) malloc(MAX_BUFFER_SIZE * sizeof(char));
     color(GUI_WINDOW_BGCOLOR);
     set_modal();
@@ -42,7 +42,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         char *filenameStartPtr = strrchr(inputText, '/');
         unsigned int fnameStartPos;
         if(filenameStartPtr != NULL) {
-             fnameStartPos = filenameStartPtr - inputText;
+             fnameStartPos = filenameStartPtr - inputText + 1;
         }
         else {
              fnameStartPos = 0;
@@ -52,8 +52,9 @@ InputWindow::InputWindow(int w, int h, const char *label,
         saveDirInfo[fnameStartPos] = '\0';
 	sprintf(winString, "Export to Directory: %s", saveDirInfo);
         input = new Fl_Input(15, 50, 245, 30);
-        input->static_value(filenameStartPtr + 1);
-        Fl_Box *box = new Fl_Box(100, 20, 110, 30, (const char*) winString);
+        input->value(filenameStartPtr + 1);
+        Fl_Box *box = new Fl_Box(65, 20, 245, 30, "");
+	box->copy_label(winString);
         box->box(FL_NO_BOX);
         box->align(FL_ALIGN_CENTER);
         Fl_Box *fileExtBox = new Fl_Box(255,50,40,30,".csv");
@@ -71,7 +72,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         sprintf(winString, "@redo  Creating new folder for the sample structure:\n%s", defaultName);
         input = new Fl_Input(160, 50, 360, 30, "@fileopen  New Folder Name:");
         input->maximum_size(60);
-        input->static_value(inputText);
+        input->value(inputText);
         input->color(GUI_BGCOLOR);
         input->textcolor(GUI_BTEXT_COLOR);
 	input->labeltype(FL_SHADOW_LABEL);
@@ -172,10 +173,11 @@ bool InputWindow::isCanceled() const {
 void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
     InputWindow *window = (InputWindow *) widget->parent();
     if(window->windowType == InputWindow::FILE_INPUT) {
+	 strcpy(window->inputText, window->input->value());
          snprintf(window->inputText, MAX_BUFFER_SIZE - 1, "%s%s%s.csv", 
                   (char *) PNG_OUTPUT_DIRECTORY, 
-	          PNG_OUTPUT_DIRECTORY[strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' || 
-	          window->inputText[0] == '/' ? "" : "/", 
+	          (PNG_OUTPUT_DIRECTORY[strlen((char *) PNG_OUTPUT_DIRECTORY) - 1] == '/' || 
+	          window->inputText[strlen(window->inputText) - 1] == '/') ? "" : "/", 
 	          window->input->value());
     }
     else {
