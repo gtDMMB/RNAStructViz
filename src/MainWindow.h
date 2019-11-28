@@ -19,9 +19,9 @@
 #include <vector>
 
 #include "ConfigOptions.h"
-#include "RNAStructViz.h"
 #include "FolderWindow.h"
 #include "LoadFileSelectAllButton.h"
+#include "RNAStructVizTypes.h"
 
 #define NAVBUTTONS_OFFSETX   (5)
 #define NAVBUTTONS_OFFSETY   (10) 
@@ -153,7 +153,10 @@ class MainWindow
         */
         static void MoveFolderUp(Fl_Widget *widget, void* userData);
         static void MoveFolderDown(Fl_Widget *widget, void* userData);
-    
+   
+	/* Give the Folder class access to set callbacks on its GUI buttons: */
+	friend class Folder;
+
         /*
 	    Create the file chooser dialog and set it to the current working directory.
         */

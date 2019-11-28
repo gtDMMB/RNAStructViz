@@ -40,12 +40,12 @@ class RNAStructure
 {
     public:
         enum Base {
-		X = 0x00, 
-	        A = 0x01,
-        	C = 0x02,
-	        G = 0x04,
-	        U = 0x08
-        } __attribute__ ((__packed__));
+		X = (int) 'X', // ambiguous pairings support
+	        A = (int) 'A',
+        	C = (int) 'C',
+	        G = (int) 'G',
+	        U = (int) 'U',
+        };
         
 	typedef uint16_t BasePair;
 
@@ -62,8 +62,8 @@ class RNAStructure
         {
 	        public:
                 BasePair m_index; // The index of this structure
-                BasePair m_pair; // The index of the base it is paired with, or UNPAIRED.
-	        Base m_base;	// The base type.
+                BasePair m_pair;  // The index of the base it is paired with, or UNPAIRED.
+	        Base m_base;	  // The base (nucleotide) type.
 
                 inline char getBaseChar() const {
                      if(m_base == A)
@@ -133,7 +133,8 @@ class RNAStructure
         /*
 	    Return the base at a given location. Indexed starting at 0.
         */
-        BaseData* GetBaseAt(unsigned int position);
+        const BaseData* GetBaseAt(unsigned int position) const;
+	BaseData* GetBaseAt(unsigned int position);
         
         #if PERFORM_BRANCH_TYPE_ID
 	RNABranchType_t* GetBranchTypeAt(unsigned int position);
@@ -195,6 +196,38 @@ class RNAStructure
             return m_sequence;
         }
 
+	/* Functions to generate listings of substructural and pairing properties: */
+	inline bool IsAmbiguous() {
+	     return strchr(GetSequenceString(), 'X') != NULL;
+	}
+
+	inline bool IsCanonical(bool skipAmbiguousPairs = false) {
+	     for(int bidx = 0; bidx < GetLength(); bidx++) {
+	          const char bp1 = GetBaseAt(bidx)->getBaseChar(), bp2 = GetBaseAt(GetBaseAt(bidx)->m_pair)->getBaseChar();
+		  if(skipAmbiguousPairs && (bp1 == 'X' || bp2 == 'X')) {
+		       continue;
+		  }
+		  bool cpairs = (bp1 == 'A' && bp2 == 'G') || (bp1 == 'G' && bp2 == 'A') || 
+			        (bp1 == 'G' && bp2 == 'U') || (bp1 == 'U' && bp2 == 'G') || 
+				(bp1 == 'G' && bp2 == 'C') || (bp1 == 'C' && bp2 == 'G');
+		  if(!cpairs) {
+		       return false;
+		  }
+	     }
+	     return true;
+	}
+
+	static inline const char *DEFAULT_STRING_LIST_DELIMITER = "\n";
+
+	std::string GetHelicesList(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+        std::string GetWatsonCrickPairs(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+        std::string GetCanonicalPairs(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+        std::string GetNonCanonicalPairs(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+        std::string GetPseudoKnots(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+        std::string GetWobblePairs(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+        std::string GetIsolatedPairs(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+        std::string GetNonIsolatedPairs(std::string strDelim = RNAStructure::DEFAULT_STRING_LIST_DELIMITER);
+
     private:
         /*
 	     Constructor is private to force use of Create methods.
@@ -202,6 +235,24 @@ class RNAStructure
         RNAStructure();
         RNAStructure(const RNAStructure &rnaStruct);
         RNAStructure & operator=(const RNAStructure &rhs);
+
+	/* Checks whether the nucleotide base sequences of the two structures match: */
+	inline bool operator^(const RNAStructure &rhs) {
+	     return GetLength() == rhs.GetLength() && !strcasecmp(GetSequenceString(), rhs.GetSequenceString());
+	}
+
+	/* Additionally, checks that the pairing data for the two structures matches as well: */
+	inline bool operator==(const RNAStructure &rhs) {
+	     if(!(*this ^ rhs)) {
+	          return false;
+	     }
+	     for(int sidx = 0; sidx < GetLength(); sidx++) {
+	          if(GetBaseAt(sidx)->m_index != rhs.GetBaseAt(sidx)->m_pair) {
+		       return false;
+		  }
+	     }
+	     return true;
+	}
 
         void copyRNAStructure(const RNAStructure &rnaStruct);
 
@@ -218,6 +269,13 @@ class RNAStructure
 	inline const char * GetSequenceString() {
 	     if(charSeq == NULL) {
 	          GenerateString();
+	     }
+	     return charSeq;
+	}
+
+	inline const char * GetSequenceString() const {
+	     if(charSeq == NULL) {
+	          return "";
 	     }
 	     return charSeq;
 	}

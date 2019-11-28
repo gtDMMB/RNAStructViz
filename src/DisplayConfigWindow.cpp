@@ -26,6 +26,7 @@
 #include "MainWindow.h"
 #include "ThemesConfig.h"
 #include "CairoDrawingUtils.h"
+#include "RNAStructViz.h"
 
 #include "pixmaps/ConfigPathsIcon.c"
 #include "pixmaps/ConfigThemesIcon.c"

@@ -5,12 +5,14 @@
 #ifndef STRUCTUREMANAGER_H
 #define STRUCTUREMANAGER_H
 
-#include "RNAStructure.h"
-#include "FolderStructure.h"
+#include <vector>
+
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
-#include <vector>
+
+#include "RNAStructure.h"
+#include "FolderStructure.h"
 
 class StructureManager
 {

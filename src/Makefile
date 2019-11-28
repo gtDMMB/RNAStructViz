@@ -17,31 +17,37 @@ $(shell cat ../scripts/BuildConfig.cfg | $(SEDCMD) -n 's/^$(1)\=\([0-9][0-9]*\)/
 endef
 
 DEBUGGING_ARG=DEBUGGING
+VERBOSE_ARG=VERBOSE
 OPTLEVEL_ARG=OPTLEVEL
 DEBUGLEVEL_ARG=DEBUGGING_LEVEL
 BRANCHID_ARG=BRANCH_TYPE_ID
 
 DEBUG=$(call GetBuildConfigOption,${DEBUGGING_ARG})
+VERBOSE=$(call GetBuildConfigOption, ${VERBOSE_ARG})
 OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
 DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
 BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
 
 ## fallback values since Mac is broken as a platform:
 ifeq "$(TARGET_PLATFORM)" "Darwin"
-	DEBUG=1
+	DEBUG=0
 	OPTLEVEL=0
 	DEBUGLEVEL=3
 	BRANCHID=0
 endif
 
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -fsanitize=address -fno-omit-frame-pointer#-pedantic-errors -fsanitize=address
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native
 LD=g++
 LDFLAGS= -g$(DEBUGLEVEL) -lm -fsanitize=address -fno-omit-frame-pointer
 
+ifeq "$(VERBOSE)" "$(TRUE)"
+	CXXFLAGS += -Wall -Wextra 
+	LDFLAGS += -Wall -Wextra 
+endif
 ifeq "$(DEBUG)" "$(TRUE)"
-	CXXFLAGS += -Wall -Wextra -pedantic
-	LDFLAGS += -Wall -Wextra
+	CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+	LDFLAGS += -fsanitize=address -fno-omit-frame-pointer#-pedantic-errors
 endif
 
 .DEFAULT: default
@@ -50,9 +56,9 @@ endif
 BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
 ifneq "$(BUILD_WITH_COMPILER)" ""
 	# add necessary CXX/LDFLAGS for clang++:
-	CLANG_EXTRA_CXXFLAGS= -std=gnu++17 -stdlib=libc++ \
+	CLANG_EXTRA_CXXFLAGS= -std=c++1z -stdlib=libc++ \
 		-I$(shell ls -d /usr/include | tail -n1)
-	CLANG_EXTRA_LDFLAGS= -std=gnu++17 -stdlib=libc++ -lm \
+	CLANG_EXTRA_LDFLAGS= -std=c++1z -stdlib=libc++ -lm \
 		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/7* | tail -n1) \
 		-lgcc_s -lpthread -lrt -lsupc++
 	CXX=$(BUILD_WITH_COMPILER)
@@ -66,7 +72,7 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=gnu++17 -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
+	CXXFLAGS+= -std=c++1z -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
 	LDFLAGS+= -L/usr/local/opt/openssl/lib
 else
 	FLTKCONFIG=$(shell which fltk-config)
@@ -109,7 +115,7 @@ CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
 	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -ffloat-store -freciprocal-math -ffinite-math-only \
-	       -DPERFORM_BRANCH_TYPE_ID=$(BRANCHID)
+		$(shell ../scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../scripts/BuildConfig.cfg))
 
 CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
@@ -210,7 +216,7 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	xreader RNAStructViz-HeapProfile.pdf
 
 git-add: 
-	@echo -n $(git add --ignore-errors ./*.cpp ./*.h ./*.H ./pixmaps/*.c Makefile ../scripts/* ../Makefile)
+	@echo -n $(git add --ignore-errors ./*.cpp ./*.h ./*.H ./Interfaces/*.h ./Interfaces/*.cpp ./pixmaps/*.c Makefile ../scripts/* ../Makefile)
 
 git-commit: git-add
 	@git commit -m '$("arg=$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}})'

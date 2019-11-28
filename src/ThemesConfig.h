@@ -11,6 +11,7 @@
 
 #include "ConfigExterns.h"
 #include "ConfigOptions.h"
+#include "RNAStructVizTypes.h"
 
 /*
  * See the following link for the built-in FLTK indexed colors:
@@ -18,7 +19,7 @@
  */
 #define FL_LOCAL_DARK_GRAY                     (36)
 #define FL_LOCAL_MEDIUM_GREEN                  (60)
-#define FL_LOCAL_DARK_RED                      (64)
+#define FL_LOCAL_DARK_RED                      (80)
 #define FL_LOCAL_BRIGHT_YELLOW                 (93)
 #define FL_LOCAL_LIGHT_PURPLE                  (192)
 #define FL_LOCAL_DEEP_BLUE                     (219)
@@ -44,17 +45,6 @@ static const Fl_Text_Display::Style_Table_Entry TEXT_BUFFER_STYLE_TABLE[] = {
 #define TBUFSTYLE_BPAIR_END                   ('G')
 #define TBUFSTYLE_BPAIR_START_STRFMT          ("F")
 #define TBUFSTYLE_BPAIR_END_STRFMT            ("G")
-
-typedef struct {
-     Fl_Color windowBGColor;
-     Fl_Color widgetBGColor;
-     Fl_Color widgetTextColor;
-     Fl_Color printTextColor;
-     Fl_Color ctFileDisplayColor;
-     const char *themeName;
-     bool isValid;
-     volatile Fl_Color *bwImageAvgColor;
-} ColorTheme_t;
 
 extern volatile ColorTheme_t *LOCAL_COLOR_THEME;
 

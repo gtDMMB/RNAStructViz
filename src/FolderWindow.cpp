@@ -17,8 +17,6 @@
 #include "pixmaps/RNAStructVizLogo.c"
 #include "pixmaps/StructureOperationIcon.c"
 
-const char * Folder::tooltipTextFmt = "%s with %d structures available";
-
 void FolderWindow::Construct(int w, int h, int folderIndex) {}
 
 FolderWindow::FolderWindow(int x, int y, int wid, int hgt, 
@@ -28,13 +26,13 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
           fileOpsLabel(NULL), fileLabel(NULL)
 {
 
-    // label configuration happens inside FolderWindow::AddStructures ... 
+    // label configuration happens inside FolderWindow::AddStructure ... 
 
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
             StructureOperationIcon.width, StructureOperationIcon.height, 
             StructureOperationIcon.bytes_per_pixel);
-    structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.65);
+    structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.45);
     Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     

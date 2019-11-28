@@ -38,6 +38,21 @@ class FolderWindow : public Fl_Group
          */
         void SetStructures(int folderIndex);
 
+	inline void HideFolderWindowGUIDisplay(bool waitForNoVisible = true) {
+	     if(folderPack != NULL) {
+		 folderPack->hide();
+	     }
+	     if(folderScroll != NULL) {
+	         folderScroll->hide();
+	     }
+	     this->hide();
+	     if(waitForNoVisible) {
+	          while(folderPack->visible() || folderScroll->visible() || this->visible()) {
+		       Fl::wait();
+		  }
+	     }
+	}
+
     private:
 
         /*

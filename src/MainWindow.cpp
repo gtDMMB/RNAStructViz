@@ -249,60 +249,14 @@ void MainWindow::DisplayFirstTimeUserInstructions() {
 }
 
 void MainWindow::AddFolder(const char* foldername, const int index, 
-                           const bool isSelected)
-{
-    
-    Fl_Pack* pack = ms_instance->m_packedInfo;
-    pack->begin();
-    int vertPosn = pack->children() * 30 + pack->y();
-    
-    Fl_Group* group = new Fl_Group(pack->x(), vertPosn, pack->w(),30);
-    
-    Fl_Button* label = new Fl_Button(pack->x() + 10, vertPosn, 
-                                     pack->w() - 70, 30, "");
-    label->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
-    label->callback(MainWindow::ShowFolderCallback);
-    label->user_data((void*)foldername);
+                           const bool isSelected) {
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
-    sprintf(folder->folderNameFileCount, "(+% 2d) %-.25s%s", 
-            folder->structCount, folder->folderName, 
-            strlen(folder->folderName) > 25 ? "..." : "");
-    label->label(folder->folderNameFileCount);
-    label->labelcolor(GUI_BTEXT_COLOR);
-    snprintf(folder->tooltipText, MAX_BUFFER_SIZE - 1, Folder::tooltipTextFmt, 
-	     folder->folderName, folder->structCount);
-    label->tooltip(folder->tooltipText);
-    label->labelsize(10);
-    label->labelfont(FL_HELVETICA_BOLD_ITALIC);
-    label->box(FL_UP_BOX);
-    folder->mainWindowFolderBtn = label;
-
-    ms_instance->folderDataBtns.push_back(label);
-
-    Fl_Button* moveUpButton = new Fl_Button(pack->x()+pack->w() - 60, vertPosn + 5, 20, 20, "@8>");
-    moveUpButton->tooltip("Move folder up in list");
-    moveUpButton->callback(MainWindow::MoveFolderUp);
-    moveUpButton->labelcolor(GUI_BTEXT_COLOR);
-    moveUpButton->box(FL_ROUND_UP_BOX);
-
-    Fl_Button* moveDownButton = new Fl_Button(pack->x()+pack->w() - 40, vertPosn + 5, 20, 20, "@2>");
-    moveDownButton->tooltip("Move folder down in list");
-    moveDownButton->callback(MainWindow::MoveFolderDown);
-    moveDownButton->labelcolor(GUI_BTEXT_COLOR);
-    moveDownButton->box(FL_ROUND_UP_BOX);
-
-    Fl_Button* removeButton = new Fl_Button(pack->x() + pack->w() - 20, vertPosn + 5, 20, 20);
-    removeButton->callback(MainWindow::RemoveFolderCallback);
-    removeButton->label("@1+");
-    removeButton->tooltip("Remove folder");
-    removeButton->labelcolor(GUI_BTEXT_COLOR);
-    removeButton->box(FL_ROUND_UP_BOX);
-
-    group->resizable(label);
-    pack->end();
-    
+    Fl_Pack* pack = ms_instance->m_packedInfo;
+    folder->SetFolderLabel();
+    folder->SetTooltipTextData();
+    folder->SetSelected(isSelected);
+    ms_instance->m_packedInfo->redraw();
     ms_instance->m_structureInfo->redraw();
-    
 }
 
 void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
@@ -539,13 +493,7 @@ void MainWindow::MoveFolderDown(Fl_Widget *widget, void* userData)
     pack->redraw();
 }
 
-bool MainWindow::CreateFileChooser()
-{
-    if(m_fileChooser) {
-        //m_fileChooserSelectAllBtn->user_data((void *) NULL);
-	//Delete(m_fileChooserSelectAllBtn, SelectAllButton);
-        //Delete(m_fileChooser, Fl_File_Chooser);
-    }
+bool MainWindow::CreateFileChooser() {
 
     // Get the current working directory.
     char currentWD[MAX_BUFFER_SIZE];
@@ -562,13 +510,14 @@ bool MainWindow::CreateFileChooser()
     }
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
-                 "All Formats (*.{boltz,ct,nopct,dot,bracket,dbn,helix,hlx})\t"
+                 "All Formats (*.{boltz,ct,nopct,dot,bracket,dbn,helix,hlx,fasta,txt,bpseq})\t"
                  "CT Files (*.{nopct,ct})\t"
                  "DOT Bracket (*.{dot,bracket,dbn})\t"
                  "Boltzmann Format (*.boltz)\t"
                  "Helix Triple Format (*.{helix,hlx})\t"
                  "SEQ Files (*.bpseq)\t"
-                 "All Files (*)"
+                 "FASTA Files (*.{fasta,txt})\t"
+		 "All Files (*)"
             );
     m_fileChooser->directory(currentWD);
     m_fileChooser->preview(true);
@@ -724,9 +673,8 @@ void MainWindow::HideFolderByIndex(const int index)
     else {
 	 pane->redraw();
     }
-    
-    //pane->hide();
-    //pane->show();
+    pane->hide();
+    pane->show();
 
 }
 
@@ -749,7 +697,6 @@ void MainWindow::HideFolderByName(const char* foldername)
             pane->remove(pane->children() - 1);
         }
     }
-    
     pane->hide();
     pane->show();
 }
@@ -765,12 +712,12 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         Fl_Button* childButton = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childButton->user_data()),folders[index]->folderName)) {
             
-            for(int btn = 0; btn < ms_instance->folderDataBtns.size(); btn++) {
+            /*for(int btn = 0; btn < ms_instance->folderDataBtns.size(); btn++) {
                  if(ms_instance->folderDataBtns[btn] == childButton) {
                       ms_instance->folderDataBtns.erase(ms_instance->folderDataBtns.begin() + btn);
                       break;
                  }
-            }
+            }*/
 
             Fl_Group* toRemove = (Fl_Group*) pack->child(i);
             
@@ -822,9 +769,15 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
             folders[index]->structCount = 0;
             
             appInstance->GetStructureManager()->RemoveFolder(index , i);
-            pack->remove(pack->child(pack->children()-1));
+            //Fl_Widget *widgetToRemove = pack->child(pack->children() - 1);
+	    //pack->remove(widgetToRemove);
+	    //Delete(widgetToRemove, Fl_Widget);
+	    ms_instance->m_packedInfo->hide();
+	    ms_instance->m_packedInfo->show();
+	    ms_instance->m_packedInfo->redraw();
+            ms_instance->m_structureInfo->scrollbar.align();
             ms_instance->m_structureInfo->redraw();
-            break;
+	    break;
         }
         
     }
@@ -955,8 +908,13 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
                 }
             }
             
-            pack->remove(pack->child(pack->children()-1));
-            ms_instance->m_structureInfo->scrollbar.align();
+            //Fl_Widget *widgetToRemove = pack->child(pack->children() - 1);
+	    //pack->remove(widgetToRemove);
+	    //Delete(widgetToRemove, Fl_Widget);
+            ms_instance->m_packedInfo->hide();
+	    ms_instance->m_packedInfo->show();
+            ms_instance->m_packedInfo->redraw();
+	    ms_instance->m_structureInfo->scrollbar.align();
             ms_instance->m_structureInfo->redraw();
             break;
         }

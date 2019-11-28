@@ -87,7 +87,16 @@ RNAStructure::~RNAStructure()
     Delete(m_suggestedFolderName, char); 
 }
 
-RNAStructure::BaseData* RNAStructure::GetBaseAt(unsigned int position)
+const RNAStructure::BaseData* RNAStructure::GetBaseAt(unsigned int position) const
+{
+    if (position < m_sequenceLength)
+    {
+        return &m_sequence[position];
+    }
+    return NULL;
+}
+
+RNAStructure::BaseData* RNAStructure::GetBaseAt(unsigned int position) 
 {
     if (position < m_sequenceLength)
     {
@@ -986,7 +995,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
 	 
 	 int curYOffset = 6, windowSpacing = 10;
          int curXOffset = 5; 
-	 int exportBtnsXOffset = (m_contentWindow->w() - 2 * btnWidth - windowSpacing) / 2;
+	 int exportBtnsXOffset = (m_contentWindow->w() - 2 * btnWidth - 2 * windowSpacing) / 2;
 	 
 	 Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
                                         subwinTotalHeight - subwinResizeSpacing);
@@ -1025,7 +1034,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
          m_seqSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
          m_seqSubwindowBox->color(GUI_BGCOLOR);
          m_seqSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
-         m_seqSubwindowBox->labelfont(LOCAL_BFFONT);
+         m_seqSubwindowBox->labelfont(FL_SCREEN_BOLD);
          m_seqSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
          m_seqSubwindowBox->box(labelBoxType);
          curYOffset += labelHeight + windowSpacing;
@@ -1035,7 +1044,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
          m_seqStyleBuffer = new Fl_Text_Buffer(strlen(m_seqDisplayFormatString));
          m_seqTextBuffer->text(m_seqDisplayString);
          m_seqTextDisplay->buffer(m_seqTextBuffer);
-         m_seqTextDisplay->textfont(LOCAL_BFFONT);
+         m_seqTextDisplay->textfont(FL_SCREEN_BOLD);
          m_seqTextDisplay->textsize(LOCAL_TEXT_SIZE);
          m_seqTextDisplay->color(GUI_CTFILEVIEW_COLOR);
          m_seqTextDisplay->textcolor(GUI_TEXT_COLOR);
@@ -1055,7 +1064,7 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
          m_ctSubwindowBox->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
          m_ctSubwindowBox->color(GUI_BGCOLOR);
          m_ctSubwindowBox->labelcolor(GUI_BTEXT_COLOR);
-         m_ctSubwindowBox->labelfont(LOCAL_BFFONT);
+         m_ctSubwindowBox->labelfont(FL_SCREEN_BOLD);
          m_ctSubwindowBox->labelsize(LOCAL_TEXT_SIZE);
          m_ctSubwindowBox->box(labelBoxType);
          curYOffset += labelHeight + windowSpacing;
@@ -1065,20 +1074,20 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
          m_ctStyleBuffer = new Fl_Text_Buffer(strlen(m_ctDisplayFormatString));
          m_ctTextBuffer->text(m_ctDisplayString);
          m_ctTextDisplay->buffer(m_ctTextBuffer);
-         m_ctTextDisplay->textfont(LOCAL_BFFONT);
+         m_ctTextDisplay->textfont(FL_SCREEN_BOLD);
          m_ctTextDisplay->color(GUI_CTFILEVIEW_COLOR);
          m_ctTextDisplay->textcolor(GUI_TEXT_COLOR);
          m_ctTextDisplay->cursor_style(Fl_Text_Display::CARET_CURSOR);
          m_ctTextDisplay->cursor_color(fl_darker(GUI_WINDOW_BGCOLOR));
          m_ctStyleBuffer->text(m_ctDisplayFormatString);
-         m_ctTextDisplay->labelfont(LOCAL_BFFONT);
+         //m_ctTextDisplay->labelfont(LOCAL_BFFONT);
          m_ctTextDisplay->highlight_data(m_ctStyleBuffer, 
                                          TEXT_BUFFER_STYLE_TABLE, stableSize - 1, 'A', 0, 0);
          curYOffset += 300 + windowSpacing;
 
          int pairNoteSubwinHeight = subwinTotalHeight - subwinResizeSpacing / 2 - curYOffset;
-         const char *notationStr = "@line   Note: An asterisk (*) to the left of a sequence\n  " 
-		                   "entry in the CT viewer above denotes that the\n" 
+         const char *notationStr = "@line   Note: An asterisk (*) to the left of a sequence  \n  " 
+		                   "entry in the CT viewer above denotes that the  \n" 
 	                           "  base pair is the first in its pair.   @line";
          m_ctViewerNotationBox = new Fl_Box(curXOffset, curYOffset, subwinWidth, 
                                             pairNoteSubwinHeight, notationStr);
@@ -1095,6 +1104,38 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     m_contentWindow->show();
     m_contentWindow->redraw();
 
+}
+
+std::string RNAStructure::GetHelicesList(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
+}
+
+std::string RNAStructure::GetWatsonCrickPairs(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
+}
+
+std::string RNAStructure::GetCanonicalPairs(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
+}
+
+std::string RNAStructure::GetNonCanonicalPairs(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
+}
+
+std::string RNAStructure::GetPseudoKnots(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
+}
+
+std::string RNAStructure::GetWobblePairs(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
+}
+
+std::string RNAStructure::GetIsolatedPairs(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
+}
+
+std::string RNAStructure::GetNonIsolatedPairs(std::string strDelim) {
+     throw "NOT IMPLEMENTED ERROR!!";
 }
 
 void RNAStructure::GenerateString()

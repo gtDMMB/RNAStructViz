@@ -19,6 +19,7 @@
 #include <string>
 
 #include "ConfigOptions.h"
+#include "RNAStructVizTypes.h"
 
 class RNAStructure;
 
@@ -44,16 +45,6 @@ int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath,
 int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, 
 		                     std::string baseSeq, std::string folderName, 
 		                     off_t replacePos = LSEEK_NOT_FOUND);
-
-typedef enum {
-     FILETYPE_CT, 
-     FILETYPE_NOPCT,
-     FILETYPE_DOTBRACKET, 
-     FILETYPE_BPSEQ,
-     FILETYPE_GTB,
-     FILETYPE_HLXTRIPLE,
-     FILETYPE_NONE,
-} InputFileTypeSpec;
 
 InputFileTypeSpec ClassifyInputFileTypeByExtension(const char *fileExt);
 InputFileTypeSpec ClassifyInputFileType(const char *inputFilePath);

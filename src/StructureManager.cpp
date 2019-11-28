@@ -69,30 +69,36 @@ void StructureManager::AddFile(const char* filename)
     extension = extension ? extension : "";
     RNAStructure **structures = (RNAStructure **) malloc(sizeof(RNAStructure *));
     int newStructCount = 0;
+    bool isFASTAFile = false;
     if (extension && !strncasecmp(extension, ".bpseq", 6)) {
         *structures = RNAStructure::CreateFromFile(localCopy, true);
-    newStructCount = 1;
+        newStructCount = 1;
     }
     else if (extension && !strncasecmp(extension, ".ct", 3)) {
-    *structures = RNAStructure::CreateFromFile(localCopy, false);
-    newStructCount = 1;
+        *structures = RNAStructure::CreateFromFile(localCopy, false);
+        newStructCount = 1;
     }
     else if (extension && !strncasecmp(extension, ".nopct", 6)) {
-    *structures = RNAStructure::CreateFromFile(localCopy, false);
-    newStructCount = 1;
+        *structures = RNAStructure::CreateFromFile(localCopy, false);
+        newStructCount = 1;
     }
     else if(extension && (!strncasecmp(extension, ".dot", 4) || 
               !strncasecmp(extension, ".bracket", 8) || 
               !strncasecmp(extension, ".dbn", 4))) {
-    *structures = RNAStructure::CreateFromDotBracketFile(localCopy);
-    newStructCount = 1;
+        *structures = RNAStructure::CreateFromDotBracketFile(localCopy);
+        newStructCount = 1;
     }
     else if(extension && !strncasecmp(extension, ".boltz", 6)) {
         structures = RNAStructure::CreateFromBoltzmannFormatFile(localCopy, &newStructCount);
     }
     else if(extension && (!strncasecmp(extension, ".helix", 6) || 
               !strncasecmp(extension, ".hlx", 4))) {
-    structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
+        structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
+    }
+    else if(extension && (!strncasecmp(extension, ".fasta", 6) || !strncasecmp(extension, ".txt", 4))) {
+        structures = NULL;
+	newStructCount = 0;
+	isFASTAFile = true;
     }
     else {
         if (strlen(filename) > 1000)
@@ -102,7 +108,7 @@ void StructureManager::AddFile(const char* filename)
         return;
     }
 
-    if (structures)
+    if(structures != NULL && newStructCount > 0)
     {
         for(int s = 0; s < newStructCount; s++) { 
         
@@ -210,9 +216,13 @@ void StructureManager::AddFile(const char* filename)
 
       }
     }
+    else if(isFASTAFile) {
+	 TerminalText::PrintWarning("Skipping loading of FASTA / TXT file data from \"%s\" ...", localCopy);
+    
+    }
     else {
          fl_alert("Error adding structure \"%s\"! Could not parse the specified format for this file.\n", 
-              localCopy);
+                  localCopy);
     }
     Free(localCopy); 
     Free(structures);
@@ -256,62 +266,20 @@ void StructureManager::DecreaseStructCount(const int index)
         MainWindow::RemoveFolderByIndex(index, true);
     }
     else {
-        sprintf(folders[index]->folderNameFileCount, "(+% 2d) %-.25s%s", 
-                folders[index]->structCount, folders[index]->folderName, 
-		strlen(folders[index]->folderName) > 25 ? "..." : "");
-        snprintf(folders[index]->tooltipText, MAX_BUFFER_SIZE - 1, 
-	         Folder::tooltipTextFmt, folders[index]->folderName, folders[index]->structCount);
+        folders[index]->SetTooltipTextData();
+	folders[index]->SetFolderLabel();
 	Fl::redraw();
     }
 }
 
-void StructureManager::RemoveFolder(const int folder, const int index)
-{
-    if (folders[index]->folderName != NULL) {
-        free(folders[index]->folderName); 
-        folders[index]->folderName = NULL;
-    }
-    if (folders[index]->folderNameFileCount != NULL) {
-        free(folders[index]->folderNameFileCount);
-        folders[index]->folderNameFileCount = NULL;	
-    }
-    if (folders[index]->folderStructs != NULL) {
-        free(folders[index]->folderStructs); 
-        folders[index]->folderStructs = NULL;
-    }
-    
-    if(folders[index]->folderWindow)
-    {
-        delete folders[index]->folderWindow;
-        folders[index]->folderWindow = NULL;
-    }
-    folders[index]->structCount = 0;
+void StructureManager::RemoveFolder(const int folder, const int index) {
+    Delete(folders[index], Folder);
     folders.erase(folders.begin() + index);
 }
 
-void StructureManager::AddFolder(RNAStructure* structure, const int index)
-{
-    Folder *temp = (Folder*)malloc(sizeof(Folder));
-    temp->folderName = (char*)malloc(sizeof(char)*64);
-    if(strlen(structure->GetFilename()) < 60) {
-        strcpy(temp->folderName,structure->GetFilename());
-    }
-    else {
-        strncpy(temp->folderName,structure->GetFilename(),60);
-        temp->folderName[50]='\0';
-    }
-    temp->folderNameFileCount = (char*)malloc(sizeof(char)*72);
-    temp->folderStructs = (int*)malloc(sizeof(int)*128);
-    temp->folderStructs[0] = index;
-    temp->structCount = 1;
-    sprintf(temp->folderNameFileCount, "(+% 2d) %-.25s%s", 
-            temp->structCount, temp->folderName, 
-            strlen(temp->folderName) > 25 ? "..." : "");
-    snprintf(temp->tooltipText, MAX_BUFFER_SIZE - 1, 
-	     Folder::tooltipTextFmt, temp->folderName, temp->structCount);
-    temp->selected = false;
-    temp->folderWindow = 0;
-    folders.push_back(temp);
+void StructureManager::AddFolder(RNAStructure* structure, const int index) {
+    Folder *nextFolder = Folder::AddNewFolderFromData(structure, index, false);
+    folders.push_back(nextFolder);
     
 }
 
@@ -378,11 +346,8 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
                 AddNewStructure(ui, index);
                 
                 if (folders[ui]->folderNameFileCount != NULL) {
-                    sprintf(folders[ui]->folderNameFileCount, "(+% 2d) %-.25s%s", 
-                            folders[ui]->structCount, folders[ui]->folderName, 
-			    strlen(folders[ui]->folderName) > 25 ? "..." : "");
-		    snprintf(folders[ui]->tooltipText, MAX_BUFFER_SIZE - 1, 
-			     Folder::tooltipTextFmt, folders[ui]->folderName, folders[ui]->structCount);
+                    folders[ui]->SetTooltipTextData();
+	            folders[ui]->SetFolderLabel();
 		}
                 found = true;
                 break;

@@ -15,6 +15,7 @@ using std::sort;
 #include "BranchTypeIdentification.h"
 
 #if PERFORM_BRANCH_TYPE_ID
+#pragma message "Compiling in support for branch-type ID in " __FILE__ "..."
 
 vector<RNAStructure::BaseData *> RNABranchType_t::getEnclosingArcs( 
        RNAStructure * &rnaStructBase, bool removeTopFour = false) { 
