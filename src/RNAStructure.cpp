@@ -123,11 +123,11 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     {
         if (strlen(filename) > 1000)
         {
-            TerminalText::PrintError("Unable to open file: <file name too long>");
+            TerminalText::PrintError("Unable to open file: <file name too long>\n");
         }
         else
         {
-            TerminalText::PrintError("Unable to open file: %s", filename);
+            TerminalText::PrintError("Unable to open file: %s\n", filename);
         }
         inStream.close();
         return 0;

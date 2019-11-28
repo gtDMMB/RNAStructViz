@@ -9,30 +9,84 @@
 #ifndef __LOAD_FILE_SELECT_ALL_BUTTON_H__
 #define __LOAD_FILE_SELECT_ALL_BUTTON_H__
 
-#include <FL/Fl_Button.H>
+#include <string>
+#include <vector>
+using std::string;
+using std::vector;
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 #include <FL/Fl_File_Chooser.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Pack.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Scroll.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Check_Button.H>
 
 #ifndef NAVBUTTONS_BWIDTH
      #define NAVBUTTONS_BWIDTH    (135)
      #define NAVBUTTONS_BHEIGHT   (30)
 #endif
 
-class SelectAllButton : public Fl_Button {
+#define DEFAULT_SAWIDGET_WIDTH    (460)
+#define DEFAULT_SAWIDGET_HEIGHT   (250)
+#define SAWIDGET_PADDING          (12)
+
+class SelectAllButton : public Fl_Pack {
 
      public:
           SelectAllButton(Fl_File_Chooser *flFileChooserRef, 
-			  const char *btnLabel = "@filenew  Select All Files");
+			  int w = DEFAULT_SAWIDGET_WIDTH, 
+			  int h = DEFAULT_SAWIDGET_HEIGHT);
+          ~SelectAllButton();
 
 	  bool SelectAllFilesActivated() const;
+	  bool SelectAllFilesInHomeActivated() const;
 	  const char * GetSelectedFileFilter() const;
+	  bool RecursiveDirectorySearch() const;
+	  bool HiddenDirectorySearch() const;
+	  bool FollowSymlinks() const;
+	  bool AvoidDuplicateStructures() const;
 
      protected:
+          void SetWidgetState();
+
           Fl_File_Chooser *flFileChooserRef;
-	  const char *selectedFileFilter;
+	  char *selectedFileFilter;
+          bool recursiveDirs, searchInHiddenDirs;
+	  bool followSymlinks, avoidDuplicateStructs;
+	  bool selectAll, selectAllInHome;
+
+	  Fl_Group        *saSubWidgetGroupContainer;
+	  Fl_Box          *saWidgetInstBox;
+	  Fl_Button       *selectAllBtn, *selectAllHomeBtn;
+	  Fl_Check_Button *cbRecDirSearch, *cbHiddenDirSearch;
+	  Fl_Check_Button *cbFollowSymlinks, *cbAvoidStructDuplicates;
 
 	  static void FileChooserSelectAllCallback(Fl_Widget *saBtn, void *udata);
+	  static void FileChooserSelectAllInHomeCallback(Fl_Widget *saBtn, void *udata);
 
-	  int handle(int flEvent);
+	  static inline Fl_Boxtype containerWidgetBorderStyle = FL_ROUNDED_FRAME;
+	  static inline Fl_Boxtype instLabelStyle             = FL_RSHADOW_BOX;
+	  static inline Fl_Boxtype buttonBoxStyle             = FL_PLASTIC_UP_BOX;
+	  static inline Fl_Labeltype buttonLabelStyle         = FL_SHADOW_LABEL;
+
+	  static inline const char *selectAllBtnLabel         = "@filenew  Select All Files";
+	  static inline const char *selectAllHomeBtnLabel     = "@search   Search All In User Home";
+	  static inline const char *selectAllWidgetInstsLabel = "Click on the buttons below to select all files whose\n"
+		                                                "extensions match the file filter settings in the\n"
+								"drop down menu selection at the top of this dialog.";
+     
+     /* Separate a slightly more generally useful procedure for loading files 
+      * recursively from a starting point directory on disk: 
+      */
+     public:
+	  static bool LoadAllFilesFromDirectory(std::string dirPath, const char *fileFilter, 
+			                        bool recursive, bool hidden, 
+			                        bool followSymlinks, bool avoidDuplicates);
+	  static bool LoadAllFilesFromDirectory(std::string dirPath, const SelectAllButton &settingsWidgetRef);
 
 };
 

@@ -236,6 +236,7 @@ class RNAStructure
         RNAStructure(const RNAStructure &rnaStruct);
         RNAStructure & operator=(const RNAStructure &rhs);
 
+    public:
 	/* Checks whether the nucleotide base sequences of the two structures match: */
 	inline bool operator^(const RNAStructure &rhs) {
 	     return GetLength() == rhs.GetLength() && !strcasecmp(GetSequenceString(), rhs.GetSequenceString());
@@ -254,6 +255,7 @@ class RNAStructure
 	     return true;
 	}
 
+    private:
         void copyRNAStructure(const RNAStructure &rnaStruct);
 
         /*

@@ -32,7 +32,7 @@ StructureManager::~StructureManager()
     Delete(m_inputWindow, InputWindow);
 }
 
-void StructureManager::AddFile(const char* filename)
+void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs, bool guiQuiet)
 {
     if (!filename)
         return;
@@ -56,7 +56,7 @@ void StructureManager::AddFile(const char* filename)
         {
             if (!strcmp(m_structures[i]->GetFilename(true), basename))
             {
-                TerminalText::PrintInfo("Already have a structure loaded with filename: %s\n", 
+                TerminalText::PrintInfo("Skipping ... Already have a structure loaded with filename: %s\n", 
                                         basename);
                 free(localCopy);
                 return;
@@ -95,16 +95,28 @@ void StructureManager::AddFile(const char* filename)
               !strncasecmp(extension, ".hlx", 4))) {
         structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
     }
-    else if(extension && (!strncasecmp(extension, ".fasta", 6) || !strncasecmp(extension, ".txt", 4))) {
+    else if(extension && !strncasecmp(extension, ".fasta", 6)) {
         structures = NULL;
 	newStructCount = 0;
 	isFASTAFile = true;
     }
     else {
-        if (strlen(filename) > 1000)
-            fl_message("Unknown file type: <file name too long>");
-        else
-            fl_message("Unknown file type: %s . %s [%s]", filename, extension, basename);
+        if (strlen(filename) > 1000) {
+	    if(!guiQuiet) {
+                 fl_message("Unknown file type: <file name too long>");
+	    }
+	    else {
+		 TerminalText::PrintWarning("Unknown file type: <file name too long>");
+	    }
+	}
+        else {
+	    if(!guiQuiet) {
+                 fl_message("Unknown file type: %s . %s [%s]", filename, extension, basename);
+	    }
+	    else {
+		 TerminalText::PrintWarning("Unknown file type: %s . %s [%s]", filename, extension, basename);
+	    }
+	}
         return;
     }
 
@@ -117,7 +129,7 @@ void StructureManager::AddFile(const char* filename)
            if(!structure) { 
                 continue;
            }
-           AddFirstEmpty(structure);
+           int firstEmptyIdx = AddFirstEmpty(structure);
            if(count == (int) folders.size()-1) // we added a new folder ... 
            {
                  
@@ -159,14 +171,22 @@ void StructureManager::AddFile(const char* filename)
                      }
                  }
             
+		 bool skipLoadingFile = false;
                  while(same) {
-                     int choice = fl_choice("Already have a folder with the name: %s, please choose another name.", 
-                                            "Skip loading file", "Close", NULL, m_inputWindow->getName());
-                     m_inputWindow->Cleanup(false);
-                     if(choice == 0) {
-                         same = false;
-                         break;
-                     }
+		     if(!guiQuiet) {
+                         int choice = fl_choice("Already have a folder with the name: %s, please choose another name.", 
+                                                "Skip loading file", "Close", NULL, m_inputWindow->getName());
+                         m_inputWindow->Cleanup(false);
+                         if(choice == 0) {
+                             same = false;
+			     skipLoadingFile = true;
+                             break;
+                         }
+		     }
+		     else {
+		         skipLoadingFile = true;
+			 break;
+		     }
                      if(m_inputWindow != NULL) {
 		          Delete(m_inputWindow, InputWindow);
 		     }
@@ -186,7 +206,7 @@ void StructureManager::AddFile(const char* filename)
                      }
                  }
                         
-                 if(m_inputWindow != NULL && strcmp(m_inputWindow->getName(), "")) {
+                 if(!skipLoadingFile && m_inputWindow != NULL && strcmp(m_inputWindow->getName(), "")) {
                      strcpy(folders[count]->folderName, m_inputWindow->getName());
                      if(GUI_KEEP_STICKY_FOLDER_NAMES) {
                      const char *baseSeq = structure->GetSequenceString();
@@ -206,12 +226,34 @@ void StructureManager::AddFile(const char* filename)
                      }
                }
            }
-           if(m_inputWindow != NULL) {
-              MainWindow::AddFolder(folders[count]->folderName, count, false);
+           bool haveDuplicateStruct = false;
+	   Folder *nextFolder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(count);
+	   if(nextFolder != NULL) {
+                for(int si = 0; si < nextFolder->structCount; si++) {
+                     int structIdx = nextFolder->folderStructs[si];
+		     RNAStructure *compStruct = structIdx != -1 ? 
+			                        RNAStructViz::GetInstance()->GetStructureManager()->GetStructure(structIdx) : 
+						NULL;
+		     if(compStruct == NULL) {
+		          continue;
+		     }
+		     else if(*compStruct == *structure) {
+		          haveDuplicateStruct = true;
+		          break;
+		     }
+		}
+	   }
+	   bool okToLoad = !haveDuplicateStruct || !removeDuplicateStructs;
+           if(!skipLoadingFile && okToLoad && m_inputWindow != NULL) {
+	      MainWindow::AddFolder(folders[count]->folderName, count, false);
               m_inputWindow->Cleanup(false);
 	      while(m_inputWindow->visible()) { Fl::wait(); }
               Delete(m_inputWindow, InputWindow);
            }
+	   else if(firstEmptyIdx != -1) {
+                m_structures[firstEmptyIdx] = NULL;
+		m_structureCount -= 1;
+	   }
        }
 
       }

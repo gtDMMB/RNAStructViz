@@ -206,7 +206,7 @@ MainWindow::MainWindow(int argc, char **argv)
 }
 
 MainWindow::~MainWindow() {
-    Delete(m_fileChooserSelectAllBtn, Fl_Button);    
+    Delete(m_fileChooserSelectAllBtn, SelectAllButton);    
     Delete(m_fileChooser, Fl_File_Chooser);
     Delete(m_packedInfo, Fl_Pack);
     Delete(m_structureInfo, Fl_Scroll);
@@ -278,8 +278,15 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
          CTFILE_SEARCH_DIRECTORY[strlen(nextWorkingDir)] = '\0';
 	 ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     }
+    fprintf(stderr, "Next Working Dir: %s\n", nextWorkingDir);
 
     if(ms_instance->m_fileChooserSelectAllBtn->SelectAllFilesActivated()) {
+        SelectAllButton::LoadAllFilesFromDirectory(nextWorkingDir, *(ms_instance->m_fileChooserSelectAllBtn));
+    }
+    else if(ms_instance->m_fileChooserSelectAllBtn->SelectAllFilesInHomeActivated()) {
+	SelectAllButton::LoadAllFilesFromDirectory(GetUserHome(), *(ms_instance->m_fileChooserSelectAllBtn));
+    }
+    else {
         for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i) {
             const char *nextFilename = strrchr(ms_instance->m_fileChooser->value(i), '/');
             nextFilename = nextFilename ? nextFilename : ms_instance->m_fileChooser->value(i);
@@ -300,25 +307,7 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
             RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
         }
     }
-    else {
-        const char *fileChooserFilter = ms_instance->m_fileChooserSelectAllBtn->GetSelectedFileFilter();
-        fs::directory_iterator cwdDirIter(nextWorkingDir);
-        std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
-        std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
-        for(int fi = 0; fi < sortedFilePaths.size(); fi++) {
-             fs::path curFileEntryPath = sortedFilePaths[fi];
-             if(!fs::is_directory(curFileEntryPath) && 
-                  fl_filename_match(curFileEntryPath.filename().c_str(), fileChooserFilter)) {
-                  char nextFilePath[MAX_BUFFER_SIZE];
-                  snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir,
-                           nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/",
-                           curFileEntryPath.filename().c_str());
-                  TerminalText::PrintDebug("Adding structure with path \"%s\"\n", nextFilePath);
-                  RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
-              }
-         }
-    }
-
+    
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
 
@@ -511,13 +500,13 @@ bool MainWindow::CreateFileChooser() {
     }
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
-                 "All Formats (*.{boltz,ct,nopct,dot,bracket,dbn,helix,hlx,fasta,txt,bpseq})\t"
+                 "All Formats (*.{boltz,ct,nopct,dot,bracket,dbn,helix,hlx,fasta,bpseq})\t"
                  "CT Files (*.{nopct,ct})\t"
                  "DOT Bracket (*.{dot,bracket,dbn})\t"
                  "Boltzmann Format (*.boltz)\t"
                  "Helix Triple Format (*.{helix,hlx})\t"
                  "SEQ Files (*.bpseq)\t"
-                 "FASTA Files (*.{fasta,txt})\t"
+                 "FASTA Files (*.fasta)\t"
 		 "All Files (*)"
             );
     m_fileChooser->directory(currentWD);
@@ -528,13 +517,10 @@ bool MainWindow::CreateFileChooser() {
     m_fileChooser->favorites_label = "  @search  Goto Favorites ...";
      
     // add select all button:
-    if(m_fileChooserSelectAllBtn == NULL) {
-         m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
-         m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
-    }
-    else {
-	 m_fileChooserSelectAllBtn->user_data((void *) m_fileChooser);
-    }
+    Delete(m_fileChooserSelectAllBtn, SelectAllButton);
+    m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
+    m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
+    m_fileChooserSelectAllBtn->set_active();
    
     return true;
 }
