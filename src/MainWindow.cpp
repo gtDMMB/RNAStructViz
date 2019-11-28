@@ -278,7 +278,6 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
          CTFILE_SEARCH_DIRECTORY[strlen(nextWorkingDir)] = '\0';
 	 ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     }
-    fprintf(stderr, "Next Working Dir: %s\n", nextWorkingDir);
 
     if(ms_instance->m_fileChooserSelectAllBtn->SelectAllFilesActivated()) {
         SelectAllButton::LoadAllFilesFromDirectory(nextWorkingDir, *(ms_instance->m_fileChooserSelectAllBtn));

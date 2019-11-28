@@ -172,47 +172,50 @@ bool SelectAllButton::LoadAllFilesFromDirectory(std::string dirPathStr, const ch
 		                                bool recursive, bool hidden, 
 		                                bool followSymlinks, bool avoidDuplicates) {
      
-     fprintf(stderr, "Dir Path Str: %s\n\n", dirPathStr.c_str());
      bool returnStatus = true;
      const char *fileChooserFilter = fileFilter;
-     fs::path dirPath(dirPathStr.c_str());
-     fs::directory_iterator cwdDirIter(dirPath);
-     std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
-     std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
-     for(int fi = 0; fi < sortedFilePaths.size(); fi++) {
-          fs::path curFileEntryPath = fs::canonical(sortedFilePaths[fi], dirPath);
-	  fprintf(stderr, "Cur File Entry Path: %s\n", curFileEntryPath.filename().string().c_str());
-	  if(curFileEntryPath.filename().string() == "." || 
-	     curFileEntryPath.filename().string() == "..") {
-               continue;
-	  }
-	  else if(curFileEntryPath.filename().string().length() > 0 && 
-		  curFileEntryPath.filename().string().at(0) == '.' && !hidden) {
-	       continue;
-	  }
-	  else if(fs::symlink_status(curFileEntryPath).type() == fs::symlink_file && !followSymlinks) {
-	       continue;
-	  }
-	  else if(fs::is_directory(curFileEntryPath) && !recursive) {
-	       continue;
-	  }
-	  else if(fs::is_directory(curFileEntryPath)) {
-	       returnStatus = returnStatus && SelectAllButton::LoadAllFilesFromDirectory(curFileEntryPath.filename().string(), 
-			                                                                 fileChooserFilter, 
-			                                                                 recursive, hidden, followSymlinks, 
-                                                                                         avoidDuplicates);
-	       continue;
-	  }
-	  else if(fl_filename_match(curFileEntryPath.filename().c_str(), fileChooserFilter)) {
-                  char nextFilePath[MAX_BUFFER_SIZE];
-		  char *nextWorkingDir = strdup(dirPathStr.c_str());
-                  snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir,
-                           nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/",
-                           curFileEntryPath.filename().c_str());
-                  TerminalText::PrintDebug("Adding structure with path \"%s\" [%s]\n", nextFilePath, nextWorkingDir);
-                  RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath, avoidDuplicates, true);
-		  Free(nextWorkingDir);
-          }
+     try {
+        fs::path dirPath(dirPathStr.c_str());
+        fs::directory_iterator cwdDirIter(dirPath);
+        std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
+        std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
+        for(int fi = 0; fi < sortedFilePaths.size(); fi++) {
+             fs::path curFileEntryPath = fs::canonical(sortedFilePaths[fi], dirPath);
+	     if(curFileEntryPath.filename().string() == "." || 
+	        curFileEntryPath.filename().string() == "..") {
+                  continue;
+	     }
+	     else if(curFileEntryPath.filename().string().length() > 0 && 
+	      	     curFileEntryPath.filename().string().at(0) == '.' && !hidden) {
+	          continue;
+	     }
+	     else if(fs::symlink_status(curFileEntryPath).type() == fs::symlink_file && !followSymlinks) {
+	          continue;
+	     }
+	     else if(fs::is_directory(curFileEntryPath) && !recursive) {
+	          continue;
+	     }
+	     else if(fs::is_directory(curFileEntryPath)) {
+	          returnStatus = returnStatus && SelectAllButton::LoadAllFilesFromDirectory(dirPathStr + "/" + curFileEntryPath.filename().string(), 
+			                                                                    fileChooserFilter, 
+			                                                                    recursive, hidden, followSymlinks, 
+                                                                                            avoidDuplicates);
+	          continue;
+	     }
+	     else if(fl_filename_match(curFileEntryPath.filename().c_str(), fileChooserFilter)) {
+                     char nextFilePath[MAX_BUFFER_SIZE];
+		     char *nextWorkingDir = strdup(dirPathStr.c_str());
+                     snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir,
+                              nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/",
+                              curFileEntryPath.filename().c_str());
+                     TerminalText::PrintDebug("Adding structure with path \"%s\" [%s]\n", nextFilePath, nextWorkingDir);
+                     RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath, avoidDuplicates, true);
+		     Free(nextWorkingDir);
+             }
+        }
+     } catch(fs::filesystem_error fse) {
+          TerminalText::PrintError("Received filesystem_error (aborting from here): %s\n", fse.what());
+	  return false;
      }
      return returnStatus;
 
