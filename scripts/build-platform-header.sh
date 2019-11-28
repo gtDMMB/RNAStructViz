@@ -23,7 +23,7 @@ ReplaceHeaderComponent() {
      fi
      #sedReplPattern=$(printf "\'s|%s|%s|\'" $replacementPattern $replacementStr);
      #echo "${sedReplPattern}"
-     $sedCmd -e "s|${replacePattern}|${replacementStr}|" "${headerFile}";
+     $sedCmd -i "s|${replacePattern}|${replacementStr}|" "${headerFile}";
 }
 
 OUTPUT_HEADER_FILE=$1
