@@ -25,6 +25,7 @@
 #include "ConfigExterns.h"
 #include "ThemesConfig.h"
 
+#include "pixmaps/PixelDataStruct.h"
 #include "pixmaps/SmallInfoButtonIcon.c"
 
 class ImageNavButton;
@@ -38,7 +39,7 @@ class ImagePixelData {
           unsigned char *pixel_data;
 
      public:
-	  static const ImagePixelData ConvertFromStructureType(auto &hdrStructInst) {
+	  static const ImagePixelData ConvertFromStructureType(PixelDataStruct_t &hdrStructInst) {
                ImagePixelData imgPixelData;
 	       imgPixelData.width = hdrStructInst.width;
 	       imgPixelData.height = hdrStructInst.height;

@@ -1,12 +1,16 @@
 /* GIMP RGBA C-Source image dump (SmallInfoButtonIcon.c) */
 
-static struct {
+#include "PixelDataStruct.h"
+
+/*static struct {
   unsigned int 	 width;
   unsigned int 	 height;
-  unsigned int 	 bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */ 
-  unsigned char	 pixel_data[24 * 28 * 4 + 1];
-} SmallInfoButtonIcon = {
-  24, 28, 4,
+  unsigned int 	 bytes_per_pixel; // 2:RGB16, 3:RGB, 4:RGBA // 
+  const char	 *pixel_data; //[24 * 28 * 4 + 1];
+}*/
+
+static PixelDataStruct_t SmallInfoButtonIcon = {
+  24, 28, 4, (const unsigned char *)
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000t\002\002\002\377\004\004\004\377"
   "\004\004\004\377\004\004\004\377\004\004\004\377\004\004\004\377\004\004\004\377\004\004\004\377\004\004\004\377\002"
   "\002\002\377\000\000\000t\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
