@@ -56,9 +56,9 @@ endif
 BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
 ifneq "$(BUILD_WITH_COMPILER)" ""
 	# add necessary CXX/LDFLAGS for clang++:
-	CLANG_EXTRA_CXXFLAGS= -std=c++1z -stdlib=libc++ \
+	CLANG_EXTRA_CXXFLAGS= -std=c++17 -stdlib=libc++ \
 		-I$(shell ls -d /usr/include | tail -n1)
-	CLANG_EXTRA_LDFLAGS= -std=c++1z -stdlib=libc++ -lm \
+	CLANG_EXTRA_LDFLAGS= -std=c++17 -stdlib=libc++ -lm \
 		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/7* | tail -n1) \
 		-lgcc_s -lpthread -lrt -lsupc++
 	CXX=$(BUILD_WITH_COMPILER)
@@ -72,7 +72,7 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=c++1z -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
+	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
 	LDFLAGS+= -L/usr/local/opt/openssl/lib
 else
 	FLTKCONFIG=$(shell which fltk-config)
