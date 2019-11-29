@@ -341,11 +341,11 @@ bool ConfigParser::directoryExists(const char *dirPath) {
 
 void ConfigParser::WriteUserConfigFile(const char *fpath) {
      bool writeCfgFile = true;
-     if(!ConfigParser::directoryExists(fpath)) {
-          int dirCreateErr = mkdir(fpath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+     if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
+          int dirCreateErr = mkdir(USER_CONFIG_DIR, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
           if(dirCreateErr == -1) { 
                TerminalText::PrintError("Unable to create directory \"%s\" ... Aborting\n", 
-                                        fpath);
+                                        USER_CONFIG_DIR);
                perror("Directory Creation Error");
                writeCfgFile = false;
           }
