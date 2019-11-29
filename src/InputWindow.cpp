@@ -192,7 +192,6 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 void InputWindow::CloseCallback(Fl_Widget* widget, void* userData) {
     InputWindow *window = (InputWindow*) widget;
     if(window != NULL) {
-         SetStringToEmpty(window->name);
          window->hide();
 	 while(window->visible()) { Fl::wait(); } 
 	 window->windowDone = true;
