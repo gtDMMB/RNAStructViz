@@ -4,8 +4,12 @@
 
 TRUE=1
 FALSE=0
-
 SEDCMD=`which sed`
+
+CXX=g++
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native
+LD=g++
+LDFLAGS= -g$(DEBUGLEVEL) -lm
 
 # OSX-specific locations and utility names:
 TARGET_PLATFORM := $(shell uname -s)
@@ -46,11 +50,6 @@ ifneq "$(TARGET_PLATFORM)" "Darwin"
 	DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
 	BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
 endif
-
-CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native
-LD=g++
-LDFLAGS= -g$(DEBUGLEVEL) -lm
 
 ifeq "$(VERBOSE)" "$(TRUE)"
 	CXXFLAGS += -Wall -Wextra 
@@ -108,10 +107,11 @@ OBJEXT=o
 
 CXXFLAGS_PKGCONFIG=$(shell ../build-scripts/pkg-config-flags.sh --cflags)
 CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags)
+CXXFLAGS_DEFINES=$(shell ../build-scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg))
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
-	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -freciprocal-math -ffinite-math-only \
-	       $(shell ../build-scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg))
+	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -freciprocal-math \
+	       -ffinite-math-only $(CXXFLAGS_DEFINES)
 
 CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 

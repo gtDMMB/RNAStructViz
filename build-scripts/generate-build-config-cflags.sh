@@ -18,10 +18,10 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 fi
 
 GetBuildConfigSetting() {
-	buildConfigFile=$0;
-	buildConfigSetting=$1;
+	buildConfigFile=$1;
+	buildConfigSetting=$2;
 	#echo "GROKING BUILD CONFIG FILE: ${buildConfigFile} // ${buildConfigSetting} ... " >&2;
-	settingValue=$(cat $buildConfigFile | $GSED -n 's|${buildConfigSetting}=\([0-9][0-9]*\)|\1|p');
+	settingValue=$(cat $buildConfigFile | $GSED -n -e "s|${buildConfigSetting}=\([0-9][0-9]*\)|\1|p");
 	echo -n "${settingValue}"
 }
 
@@ -49,11 +49,10 @@ for sidx in $(seq 1 $numSettings); do
 	arrIndex=$(($sidx - 1));
 	cfgSetting=$(GetBuildConfigSetting $BUILD_CONFIG_SRCFILE ${CFGFILE_OPTIONS_LIST[$arrIndex]});
 	defineName=${DASHD_DEFINES_CFLAG_SPECS[$arrIndex]};
-	if [[ "$cfgSetting" != "" ]]; then
+	if [[ "${cfgSetting}" != "" ]]; then
 		EXTRA_CFLAGS_LIST="${EXTRA_CFLAGS_LIST} -D${defineName}=${cfgSetting}";
 	fi
 done
 
 echo -n "${EXTRA_CFLAGS_LIST}"
-
 exit 0
