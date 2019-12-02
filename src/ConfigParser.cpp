@@ -379,7 +379,7 @@ bool ConfigParser::ParseAutoloadStructuresDirectory(const char *autoloadDirPath)
      std::vector<boost::filesystem::path> sortedFilePaths(cwdDirIter, boost::filesystem::directory_iterator());
      std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
      for(int sfileIdx = 0; sfileIdx < sortedFilePaths.size(); sfileIdx++) {
-          fs::path curStructFilePath = fs::canonical(sortedFilePaths[sfileIdx], autoloadDirPath);
+          fs::path curStructFilePath = fs::canonical(sortedFilePaths[sfileIdx]);
           if(curStructFilePath.filename().string() == "." || curStructFilePath.filename().string() == "..") {
                continue;
           }
