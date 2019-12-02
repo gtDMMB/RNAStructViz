@@ -39,11 +39,13 @@ OPTLEVEL_ARG=OPTLEVEL
 DEBUGLEVEL_ARG=DEBUGGING_LEVEL
 BRANCHID_ARG=BRANCH_TYPE_ID
 
-DEBUG=$(call GetBuildConfigOption,${DEBUGGING_ARG})
-VERBOSE=$(call GetBuildConfigOption, ${VERBOSE_ARG})
-OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
-DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
-BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
+ifneq "$(TARGET_PLATFORM)" "Darwin"
+	DEBUG=$(call GetBuildConfigOption,${DEBUGGING_ARG})
+	VERBOSE=$(call GetBuildConfigOption, ${VERBOSE_ARG})
+	OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
+	DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
+	BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
+endif
 
 CXX=g++
 CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native
