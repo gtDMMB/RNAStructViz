@@ -50,8 +50,13 @@ void AutoloadIndicatorButton::ResetButton(int stateValue) {
 void AutoloadIndicatorButton::ToggleAutoloadStatusCallback(Fl_Widget *wbtn, void *udata) {
      AutoloadIndicatorButton *aliBtn = (AutoloadIndicatorButton *) wbtn;
      bool opState;
-     if(!aliBtn->isAutoloadedState) {
-          fprintf(stderr, "CopyStructure: %s, %s\n", aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
+     fprintf(stderr, "Copy/RemoveStructure: %s, %s\n", aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
+     std::string autoLoadDir = std::string(USER_AUTOLOAD_PATH);
+     if(filePathOnDisk.length() >= autoLoadDir.length() && filePathOnDisk.substr(0, autoLoadDir.length()) == autoLoadDir) {
+	  TerminalText::PrintWarning("Unable to unlink non-symlinked file from initial autoload directory!");
+	  return;
+     }
+     else if(!aliBtn->isAutoloadedState) {
 	  opState = RNAStructViz::CopyStructureFileToAutoloadDirectory(aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
      }
      else {
