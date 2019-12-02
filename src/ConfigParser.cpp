@@ -323,12 +323,12 @@ void ConfigParser::nullTerminateString(char *str, int nullCharPos) {
      str[nullCharPos] = '\0';
 }
 
-bool ConfigParser::fileExists(const char *filePath) { 
+bool ConfigParser::fileExists(const char *filePath, bool regularFile) { 
      if(filePath == NULL) { 
           return false;
      }
      struct stat fileInfo;
-     return stat(filePath, &fileInfo) == 0 && IS_FILE(fileInfo.st_mode);
+     return stat(filePath, &fileInfo) == 0 && (!regularFile || IS_FILE(fileInfo.st_mode));
 }
 
 bool ConfigParser::directoryExists(const char *dirPath) { 
@@ -386,7 +386,8 @@ bool ConfigParser::ParseAutoloadStructuresDirectory(const char *autoloadDirPath)
 	  else if(fs::is_directory(curStructFilePath)) {
 	       continue;
 	  }
-	  std::string fullStructFilePath = std::string(autoloadDirPath) + curStructFilePath.filename().string();
+	  std::string parentDir = curStructFilePath.parent_path().filename().string();
+	  std::string fullStructFilePath = parentDir + "/" + curStructFilePath.filename().string();
 	  TerminalText::PrintDebug("(Auto)Loading structure file at path \"%s\" ... \n", fullStructFilePath.c_str());
 	  RNAStructViz::GetInstance()->GetStructureManager()->AddFile(fullStructFilePath.c_str(), true, true);
      }

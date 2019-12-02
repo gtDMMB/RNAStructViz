@@ -51,7 +51,7 @@ void AutoloadIndicatorButton::ToggleAutoloadStatusCallback(Fl_Widget *wbtn, void
      AutoloadIndicatorButton *aliBtn = (AutoloadIndicatorButton *) wbtn;
      bool opState;
      if(!aliBtn->isAutoloadedState) {
-          fprintf(stderr, "CopyStructure: %s, %s\n", aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
+          //fprintf(stderr, "CopyStructure: %s, %s\n", aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
 	  opState = RNAStructViz::CopyStructureFileToAutoloadDirectory(aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
      }
      else {
