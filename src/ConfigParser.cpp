@@ -382,7 +382,7 @@ bool ConfigParser::ParseAutoloadStructuresDirectory(const char *autoloadDirPath)
         std::sort(sortedFilePaths.begin(), sortedFilePaths.end(), FileFormatSortCmp);
         for(int sfileIdx = 0; sfileIdx < sortedFilePaths.size(); sfileIdx++) {
              curFilePath = sortedFilePaths[sfileIdx].filename().string();
-	     bool isSymlink = fs::symlink_status(curFileEntryPath).type() == fs::symlink_file;
+	     bool isSymlink = fs::symlink_status(sortedFilePaths[sfileIdx]).type() == fs::symlink_file;
 	     fs::path curStructFilePath = fs::canonical( isSymlink ? fs::read_symlink(sortedFilePaths[sfileIdx]) : sortedFilePaths[sfileIdx] );
              if(curStructFilePath.filename().string() == "." || curStructFilePath.filename().string() == "..") {
                   continue;

@@ -392,7 +392,7 @@ bool RNAStructViz::CopyStructureFileToAutoloadDirectory(const char *structFileBa
      try {
 	  fs::path toPath(autoloadStructPath.c_str()), fromPath(structFileDiskPath);
 	  //fs::copy_file(fromPath, toPath, fs::copy_option::none);
-	  fs::create_symlink(fromPath, toPath);
+	  fs::create_symlink(toPath, fromPath);
 	  return true;
      } catch(fs::filesystem_error fse) {
           TerminalText::PrintWarning("Unable to copy file \"%s\" to autoload directory: %s\n", 
@@ -403,13 +403,13 @@ bool RNAStructViz::CopyStructureFileToAutoloadDirectory(const char *structFileBa
 
 bool RNAStructViz::RemoveStructureFileFromAutoloadDirectory(const char *structFileBaseName) {
      std::string autoloadStructPath = std::string(USER_AUTOLOAD_PATH) + std::string(structFileBaseName);
-     if(!ConfigParser::fileExists(autoloadStructPath.c_str())) {
+     if(!ConfigParser::fileExists(autoloadStructPath.c_str(), false)) {
           return true;
      }
      try {
 	  fs::path removePath(autoloadStructPath.c_str());
 	  fs::remove(removePath);
-	  return true;
+	  return !ConfigParser::fileExists(autoloadStructPath.c_str(), false);
      } catch(fs::filesystem_error fse) {
 	  TerminalText::PrintWarning("Unable to remove file \"%s\": %s\n", 
 			             structFileBaseName, fse.what());
