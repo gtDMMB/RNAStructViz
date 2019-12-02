@@ -29,7 +29,7 @@ void AutoloadIndicatorButton::ResetButton(int stateValue) {
      if(stateValue) {
           image(LINK_SET_ICON);
 	  deimage(LINK_SET_ICON);
-          //value(1);
+          value(1);
           set();
 	  isAutoloadedState = true;
 	  tooltip(AutoloadIndicatorButton::linkSetTooltipText);
@@ -37,7 +37,7 @@ void AutoloadIndicatorButton::ResetButton(int stateValue) {
      else {
           image(LINK_UNSET_ICON);
 	  deimage(LINK_UNSET_ICON);
-          //value(0);
+          value(0);
 	  clear();
 	  isAutoloadedState = false;
           tooltip(AutoloadIndicatorButton::linkUnsetTooltipText);
@@ -50,8 +50,9 @@ void AutoloadIndicatorButton::ResetButton(int stateValue) {
 void AutoloadIndicatorButton::ToggleAutoloadStatusCallback(Fl_Widget *wbtn, void *udata) {
      AutoloadIndicatorButton *aliBtn = (AutoloadIndicatorButton *) wbtn;
      bool opState;
-     if(aliBtn->value() == 0) {
-          opState = RNAStructViz::CopyStructureFileToAutoloadDirectory(aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
+     if(!aliBtn->isAutoloadedState) {
+          fprintf(stderr, "CopyStructure: %s, %s\n", aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
+	  opState = RNAStructViz::CopyStructureFileToAutoloadDirectory(aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
      }
      else {
 	  RNAStructViz::RemoveStructureFileFromAutoloadDirectory(aliBtn->filePathBaseName.c_str());
