@@ -52,7 +52,7 @@ void AutoloadIndicatorButton::ToggleAutoloadStatusCallback(Fl_Widget *wbtn, void
      bool opState;
      fprintf(stderr, "Copy/RemoveStructure: %s, %s\n", aliBtn->filePathBaseName.c_str(), aliBtn->filePathOnDisk.c_str());
      std::string autoLoadDir = std::string(USER_AUTOLOAD_PATH);
-     if(filePathOnDisk.length() >= autoLoadDir.length() && filePathOnDisk.substr(0, autoLoadDir.length()) == autoLoadDir) {
+     if(aliBtn->filePathOnDisk.length() >= autoLoadDir.length() && aliBtn->filePathOnDisk.substr(0, autoLoadDir.length()) == autoLoadDir) {
 	  TerminalText::PrintWarning("Unable to unlink non-symlinked file from initial autoload directory!");
 	  return;
      }
