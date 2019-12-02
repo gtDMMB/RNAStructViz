@@ -8,8 +8,8 @@ if [[ $# -lt 2 ]]; then
 	exit -1;
 fi
 
-$buildConfigFilePath=$2
-$configSettingSpec=$3
+$buildConfigFilePath=$1
+$configSettingSpec=$2
 
 GGREP=`which grep`;
 GSED=`which sed`;
