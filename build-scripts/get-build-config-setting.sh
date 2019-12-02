@@ -19,8 +19,8 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
 fi
 
 GetBuildConfigSetting() {
-        buildConfigFile=$0;
-        buildConfigSetting=$1;
+        buildConfigFile=$1;
+        buildConfigSetting=$2;
         settingValue=$(cat $buildConfigFile | $GSED -n "s/${buildConfigSetting}=\([0-9][0-9]*\)/\1/p");
         echo -n "${settingValue}";
 }
