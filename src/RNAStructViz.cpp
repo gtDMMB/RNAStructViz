@@ -391,8 +391,13 @@ bool RNAStructViz::CopyStructureFileToAutoloadDirectory(const char *structFileBa
      }
      try {
 	  fs::path toPath(autoloadStructPath.c_str()), fromPath(structFileDiskPath);
+	  //bool isSymlink = fs::symlink_status(fromPath).type() == fs::symlink_file;
+          //if(isSymlink) {
+          //     fs::path nextFromPath(fs::read_symlink(fromPath));
+	  //     fromPath = nextFromPath;
+	  //}
 	  //fs::copy_file(fromPath, toPath, fs::copy_option::none);
-	  fs::create_symlink(toPath, fromPath);
+	  fs::create_symlink(fromPath, toPath);
 	  return true;
      } catch(fs::filesystem_error fse) {
           TerminalText::PrintWarning("Unable to copy file \"%s\" to autoload directory: %s\n", 

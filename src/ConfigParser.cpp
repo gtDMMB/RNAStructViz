@@ -383,20 +383,22 @@ bool ConfigParser::ParseAutoloadStructuresDirectory(const char *autoloadDirPath)
         for(int sfileIdx = 0; sfileIdx < sortedFilePaths.size(); sfileIdx++) {
              curFilePath = sortedFilePaths[sfileIdx].filename().string();
 	     bool isSymlink = fs::symlink_status(sortedFilePaths[sfileIdx]).type() == fs::symlink_file;
-	     fs::path curStructFilePath = fs::canonical( isSymlink ? fs::read_symlink(sortedFilePaths[sfileIdx]) : sortedFilePaths[sfileIdx] );
-             if(curStructFilePath.filename().string() == "." || curStructFilePath.filename().string() == "..") {
+	     fs::path curStructFilePathCanon = fs::canonical( isSymlink ? fs::read_symlink(sortedFilePaths[sfileIdx]) : sortedFilePaths[sfileIdx] );
+	     fs::path curStructFilePath = fs::absolute(curStructFilePathCanon, curStructFilePathCanon.parent_path());
+	     if(curFilePath == "." || curFilePath == "..") {
                   continue;
              }
 	     else if(fs::is_directory(curStructFilePath)) {
 	          continue;
 	     }
-	     std::string parentDir = curStructFilePath.parent_path().filename().string();
+	     std::string parentDir = curStructFilePath.parent_path().string();
 	     std::string fullStructFilePath = parentDir + "/" + curStructFilePath.filename().string();
+	     //std::string fullStructFilePath = curStructFilePath.filename().string();
 	     TerminalText::PrintDebug("(Auto)Loading structure file at path \"%s\" ... \n", fullStructFilePath.c_str());
 	     RNAStructViz::GetInstance()->GetStructureManager()->AddFile(fullStructFilePath.c_str(), true, true);
         }
      } catch(fs::filesystem_error fse) {
-          TerminalText::PrintWarning("Unable to copy autoloaded file \"%s\": %s\n (ABORTING OPERATION)", curFilePath.c_str(), fse.what());
+          TerminalText::PrintWarning("Unable to copy autoloaded file \"%s\": %s\n (ABORTING ENTIRE OPERATION)", curFilePath.c_str(), fse.what());
      }
      return true;
 }
