@@ -7,13 +7,30 @@ FALSE=0
 
 SEDCMD=`which sed`
 
+# OSX-specific locations and utility names:
 TARGET_PLATFORM := $(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	SEDCMD=`which gsed`
+	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
+	READLINK=$(shell which greadlink)
+	DEBUGGER=$(shell which lldb)
+	CXXFLAGS+= -std=c++2a -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
+	LDFLAGS+= -L/usr/local/opt/openssl/lib
+	## fallback values since Mac is broken as a platform w.r.t. its make version:
+	DEBUG=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING)
+	OPTLEVEL=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) OPTLEVEL)
+	DEBUGLEVEL=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING_LEVEL)
+	BRANCHID=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) BRANCH_TYPE_ID)
+else
+	FLTKCONFIG=$(shell which fltk-config)
+	READLINK=$(shell which readlink)
+	DEBUGGER=$(shell which gdb)
+	CXXFLAGS+= -std=gnu++17 -I/usr/include
+	LDFLAGS+= -Wl,--no-as-needed
 endif
 
 define GetBuildConfigOption =
-$(shell cat ../scripts/BuildConfig.cfg | $(SEDCMD) -n 's/^$(1)\=\([0-9][0-9]*\)/\1/p')
+$(shell cat $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) | $(SEDCMD) -n 's/^$(1)\=\([0-9][0-9]*\)/\1/p')
 endef
 
 DEBUGGING_ARG=DEBUGGING
@@ -28,18 +45,10 @@ OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
 DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
 BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
 
-## fallback values since Mac is broken as a platform:
-ifeq "$(TARGET_PLATFORM)" "Darwin"
-	DEBUG=1
-	OPTLEVEL=0
-	DEBUGLEVEL=3
-	BRANCHID=0
-endif
-
 CXX=g++
 CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native
 LD=g++
-LDFLAGS= -g$(DEBUGLEVEL) -lm -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS= -g$(DEBUGLEVEL) -lm
 
 ifeq "$(VERBOSE)" "$(TRUE)"
 	CXXFLAGS += -Wall -Wextra 
@@ -65,21 +74,6 @@ ifneq "$(BUILD_WITH_COMPILER)" ""
 	CXXFLAGS+=$(CLANG_EXTRA_CXXFLAGS)
 	LD=$(BUILD_WITH_COMPILER)
 	LDFLAGS+=$(CLANG_EXTRA_LDFLAGS)
-endif
-
-# OSX-specific locations and utility names:
-ifeq "$(TARGET_PLATFORM)" "Darwin"
-	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
-	READLINK=$(shell which greadlink)
-	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=c++2a -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
-	LDFLAGS+= -L/usr/local/opt/openssl/lib
-else
-	FLTKCONFIG=$(shell which fltk-config)
-	READLINK=$(shell which readlink)
-	DEBUGGER=$(shell which gdb)
-	CXXFLAGS+= -std=gnu++17 -I/usr/include
-	LDFLAGS+= -Wl,--no-as-needed
 endif
 
 .EXPORT_ALL_VARIABLES:
@@ -110,16 +104,16 @@ endif
 BINARY_OUTPUT=RNAStructViz
 OBJEXT=o
 
-CXXFLAGS_PKGCONFIG=$(shell ../scripts/pkg-config-flags.sh --cflags)
+CXXFLAGS_PKGCONFIG=$(shell ../build-scripts/pkg-config-flags.sh --cflags)
 CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags)
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
 	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -ffloat-store -freciprocal-math -ffinite-math-only \
-		$(shell ../scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../scripts/BuildConfig.cfg))
+		$(shell ../build-scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../scripts/BuildConfig.cfg))
 
 CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 
-LDFLAGS_PKGCONFIG=$(shell ../scripts/pkg-config-flags.sh --libs)
+LDFLAGS_PKGCONFIG=$(shell ../build-scripts/pkg-config-flags.sh --libs)
 LDFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --ldstaticflags)
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto -lboost_system -lboost_filesystem
 LDFLAGS_FULL=$(BUILD_LDFLAGS_USER_EXTRAS) $(LDFLAGS_EXTRA) $(LDFLAGS) 
@@ -165,7 +159,7 @@ default_with_gperf: prelims $(RNASTRUCTVIZ_OBJECTS)
 
 prelims:
 	@rm -f BuildTargetInfo.h
-	@/bin/bash $(shell $(READLINK) -f ../scripts/build-platform-header.sh) \
+	@/bin/bash $(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
 		$(shell $(READLINK) -f ./BuildTargetInfo.h) \
 		$(shell $(READLINK) -f $(FLTKCONFIG))
 
@@ -217,7 +211,7 @@ profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
 	xreader RNAStructViz-HeapProfile.pdf
 
 git-add: 
-	@echo -n $(git add --ignore-errors ./*.cpp ./*.h ./*.H ./Interfaces/*.h ./Interfaces/*.cpp ./pixmaps/*.c Makefile ../scripts/* ../Makefile)
+	@echo -n $(git add --ignore-errors ./*.cpp ./*.h ./*.H ./Interfaces/*.h ./Interfaces/*.cpp ./pixmaps/*.c Makefile ../build-scripts/* ../Makefile)
 
 git-commit: git-add
 	@git commit -m '$("arg=$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}})'
@@ -248,7 +242,7 @@ CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
 	RNAStructViz.h ConfigExterns.h CommonDialogs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
 
-ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp ../scripts/BuildTargetInfo.h.in
+ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp ../build-scripts/BuildTargetInfo.h.in
 
 ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
 	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \

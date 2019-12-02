@@ -27,7 +27,7 @@ ReplaceHeaderComponent() {
 }
 
 OUTPUT_HEADER_FILE=$1
-HEADER_SKELETON_FILE="../scripts/BuildTargetInfo.h.in"
+HEADER_SKELETON_FILE="../build-scripts/BuildTargetInfo.h.in"
 
 GIT_COMMITREV_HASHNUM=$(git show | head -n 1 | $sedCmd -e 's/commit //')
 GIT_COMMITREV_HASHNUM_SHORT=$(echo "${GIT_COMMITREV_HASHNUM}" | cut -c-12)
@@ -48,7 +48,7 @@ REPLACEMENTS=($GIT_COMMITREV_HASHNUM_SHORT $GIT_COMMITREV_HASHNUM \
 	"${BUILD_FLTK_CONFIG}" \
 )
 
-PrintVerbose=$(cat ../scripts/BuildConfig.cfg | $sedCmd -n "s/VERBOSE=\([0-9][0-9]*\)/\1/p")
+PrintVerbose=$(cat ../build-scripts/BuildConfig.cfg | $sedCmd -n "s/VERBOSE=\([0-9][0-9]*\)/\1/p")
 if [[ "$PrintVerbose" == "1" ]]; then
 	echo -e "\n";
 fi
@@ -62,7 +62,7 @@ if [[ "$PrintVerbose" == "1" ]]; then
 	echo -e "\n";
 fi
 
-PrintLocalBuildHeaderFile=$(cat ../scripts/BuildConfig.cfg | $sedCmd -n "s/ECHO_CONFIG_HEADER=\([0-9][0-9]*\)$/\1/p")
+PrintLocalBuildHeaderFile=$(cat ../build-scripts/BuildConfig.cfg | $sedCmd -n "s/ECHO_CONFIG_HEADER=\([0-9][0-9]*\)$/\1/p")
 if [[ "$PrintLocalBuildHeaderFile" == "1" ]]; then
 	echo -e "LOCAL BUILD HEADER \"${OUTPUT_HEADER_FILE}\" CONTENTS:\n\n";
 	cat $OUTPUT_HEADER_FILE;

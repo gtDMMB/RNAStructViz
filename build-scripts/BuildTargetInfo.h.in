@@ -73,7 +73,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.0.0-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.0.1-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 
@@ -89,7 +89,7 @@ using std::string;
 class ApplicationBuildInfo {
 
      protected:
-          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_RELEASE_TYPE      = "##__GIT_RELEASE_TYPE__##";
+          inline GNU_CONST_STATIC_DECLARATION static const char *GIT_RELEASE_TYPE      = "BETA-TESTING"; //"##__GIT_RELEASE_TYPE__##";
 	  inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH       = "##__GIT_COMMITREV_HASHNUM__##";
           inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_HASH_SHORT = "##__GIT_COMMITREV_HASHNUM_SHORT__##";
           inline GNU_CONST_STATIC_DECLARATION static const char *GIT_COMMIT_DATE       = "##__GIT_COMMITREV_DATE__##";
