@@ -27,7 +27,7 @@ GetBuildConfigSetting() {
 
 $configSettingValue=$(GetBuildConfigSetting $buildConfigFilePath $configSettingPath)
 if [[ "$configSettingValue" == "" ]]; then
-	echo "Unable to find build config setting \"${buildConfigSetting}\} ... Exiting! (-2)";
+	echo "Unable to find build config setting \"${buildConfigSetting}\" ... Exiting! (-2)";
 	exit -2;
 fi
 
