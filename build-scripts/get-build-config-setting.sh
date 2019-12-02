@@ -5,11 +5,11 @@
 
 if [[ $# -lt 2 ]]; then
 	echo "Invalid parameters passed to script $0 ... Exiting! (-1)"
-	exit -1;
+	exit -1
 fi
 
-$buildConfigFilePath=$1
-$configSettingSpec=$2
+buildConfigFilePath=$1
+configSettingSpec=$2
 
 GGREP=`which grep`;
 GSED=`which sed`;
@@ -21,15 +21,15 @@ fi
 GetBuildConfigSetting() {
         buildConfigFile=$1;
         buildConfigSetting=$2;
-        settingValue=$(cat $buildConfigFile | $GSED -n "s/${buildConfigSetting}=\([0-9][0-9]*\)/\1/p");
-        echo -n "${settingValue}";
+        settingValue=$(cat $buildConfigFile | $GSED -n "s|${buildConfigSetting}=\([0-9][0-9]*\)|\1|p");
+        echo -n "${settingValue}"
 }
 
-$configSettingValue=$(GetBuildConfigSetting $buildConfigFilePath $configSettingPath)
+configSettingValue=$(GetBuildConfigSetting $buildConfigFilePath $configSettingSpec);
 if [[ "$configSettingValue" == "" ]]; then
-	echo "Unable to find build config setting \"${buildConfigSetting}\" ... Exiting! (-2)";
-	exit -2;
+	echo "Unable to find build config setting \"${configSettingSpec}\" ... Exiting! (-2)"
+	exit -2
 fi
 
-echo -n $configSettingValue;
-exit 0;
+echo -n $configSettingValue
+exit 0
