@@ -6,6 +6,7 @@
 #include "ConfigOptions.h"
 #include "AutoloadIndicatorButton.h"
 #include "RNAStructViz.h"
+#include "TerminalText.h"
 
 AutoloadIndicatorButton::AutoloadIndicatorButton(std::string diskPath, std::string baseNamePath, bool initState) : 
      Fl_Button(0, 0, AUTOLOAD_BUTTON_SIZE, AUTOLOAD_BUTTON_SIZE, ""), 
