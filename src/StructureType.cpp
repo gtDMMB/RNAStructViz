@@ -57,7 +57,7 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      navCloseBtn->box(FL_PLASTIC_UP_BOX);
 
      bool isAutoloaded = ConfigParser::fileExists((std::string(USER_AUTOLOAD_PATH) + structFileBaseName).c_str());
-     autoloadToggleBtn = new AutoloadIndicatorButton(structFileBaseDir + "/" + structFileBaseName, 
+     autoloadToggleBtn = new AutoloadIndicatorButton(structFileBaseDir + structFileBaseName, 
 		                                     structFileBaseName, isAutoloaded);
      autoloadToggleBtn->position(pack->x() + pack->w() - 32, offsetY + 3);
      
