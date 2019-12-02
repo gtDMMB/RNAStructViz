@@ -14,7 +14,7 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=c++2a -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
+	CXXFLAGS+= -std=c++1z -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
 	LDFLAGS+= -L/usr/local/opt/openssl/lib
 	## fallback values since Mac is broken as a platform w.r.t. its make version:
 	DEBUG=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING)
@@ -25,7 +25,7 @@ else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=$(shell which readlink)
 	DEBUGGER=$(shell which gdb)
-	CXXFLAGS+= -std=gnu++17 -I/usr/include
+	CXXFLAGS+= -std=gnu++1z -I/usr/include
 	LDFLAGS+= -Wl,--no-as-needed
 endif
 
@@ -67,9 +67,9 @@ endif
 BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
 ifneq "$(BUILD_WITH_COMPILER)" ""
 	# add necessary CXX/LDFLAGS for clang++:
-	CLANG_EXTRA_CXXFLAGS= -std=c++2a -stdlib=libc++ \
+	CLANG_EXTRA_CXXFLAGS= -std=c++1z -stdlib=libc++ \
 		-I$(shell ls -d /usr/include | tail -n1)
-	CLANG_EXTRA_LDFLAGS= -std=c++2a -stdlib=libc++ -lm \
+	CLANG_EXTRA_LDFLAGS= -std=c++1z -stdlib=libc++ -lm \
 		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/7* | tail -n1) \
 		-lgcc_s -lpthread -lrt -lsupc++
 	CXX=$(BUILD_WITH_COMPILER)
@@ -110,8 +110,8 @@ CXXFLAGS_PKGCONFIG=$(shell ../build-scripts/pkg-config-flags.sh --cflags)
 CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags)
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
 	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
-	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -ffloat-store -freciprocal-math -ffinite-math-only \
-		$(shell ../build-scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../scripts/BuildConfig.cfg))
+	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -freciprocal-math -ffinite-math-only \
+	       $(shell ../build-scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg))
 
 CXXFLAGS_FULL=$(BUILD_CFLAGS_USER_EXTRAS) $(CXXFLAGS_EXTRA) $(CXXFLAGS) 
 

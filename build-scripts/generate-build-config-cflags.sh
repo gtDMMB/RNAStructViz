@@ -21,8 +21,8 @@ GetBuildConfigSetting() {
 	buildConfigFile=$0;
 	buildConfigSetting=$1;
 	#echo "GROKING BUILD CONFIG FILE: ${buildConfigFile} // ${buildConfigSetting} ... " >&2;
-	settingValue=$(cat $buildConfigFile | $GSED -n "s/${buildConfigSetting}=\([0-9][0-9]*\)/\1/p");
-	echo -n "${settingValue}";
+	settingValue=$(cat $buildConfigFile | $GSED -n 's|${buildConfigSetting}=\([0-9][0-9]*\)|\1|p');
+	echo -n "${settingValue}"
 }
 
 CFGFILE_OPTIONS_LIST=(\
