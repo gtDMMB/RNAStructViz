@@ -16,6 +16,7 @@ namespace fs = boost::filesystem;
 #include "ConfigParser.h"
 #include "BaseSequenceIDs.h"
 #include "TerminalPrinting.h"
+#include "ConfigParser.h"
 
 static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
         {
