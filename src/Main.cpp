@@ -85,8 +85,9 @@ void RNAStructViz_SignalHandler(int signum) {
      
      if(signum == SIGINT) {
           fprintf(stderr, "\n");
-      TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
-      ConfigParser::WriteUserConfigFile();
+          TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
+          //ConfigParser::WriteUserConfigFile();
+	  RNAStructViz::Shutdown();
      }
      else if(signum == SIGSEGV) {
           TerminalText::PrintError("Handling unexpected SEGFAULT (SIGSEGV) signal.\n\n");

@@ -232,7 +232,9 @@ bool MainWindow::Initialize(int argc, char **argv) {
 
 void MainWindow::Shutdown() {
     if(ms_instance) {
-        delete ms_instance;
+        ms_instance->m_mainWindow->hide();
+	while(ms_instance->m_mainWindow->visible()) { Fl::wait(1.0); }
+	delete ms_instance;
 	ms_instance = NULL;
     }
 }

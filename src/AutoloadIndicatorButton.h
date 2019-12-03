@@ -20,6 +20,10 @@
 #include "pixmaps/LinkSetIcon.c"
 #include "pixmaps/LinkUnsetIcon.c"
 
+#include "RNAStructVizTypes.h"
+#include "ThemesConfig.h"
+#include "ConfigExterns.h"
+
 #define AUTOLOAD_BUTTON_SIZE           (24)
 
 class AutoloadIndicatorButton : public Fl_Button {
@@ -49,7 +53,19 @@ class AutoloadIndicatorButton : public Fl_Button {
 	       LinkUnsetIcon.height,
 	       LinkUnsetIcon.bytes_per_pixel
 	  );
+	  
+     public:
+	  static inline void InitStaticData() {
+               if(isStaticDataInit) {
+	            return;
+	       }
+	       LINK_SET_ICON->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 0.65);
+	       LINK_UNSET_ICON->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 0.65);
+               isStaticDataInit = true;
+	  }
 
+     protected:
+	  static inline bool isStaticDataInit = false;
 	  static inline const char *linkSetTooltipText = "@> : AUTOLOADING STRUCTURE";
 	  static inline const char *linkUnsetTooltipText = "@1+ : NOT AUTOLOADING STRUCTURE";
 

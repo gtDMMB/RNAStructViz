@@ -13,6 +13,7 @@ AutoloadIndicatorButton::AutoloadIndicatorButton(std::string diskPath, std::stri
      filePathOnDisk(diskPath), filePathBaseName(baseNamePath), 
      isAutoloadedState(initState) {
      
+     AutoloadIndicatorButton::InitStaticData();
      if(initState) {
 	  ResetButton(1);
      }

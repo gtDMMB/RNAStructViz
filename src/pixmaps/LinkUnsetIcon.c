@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (LinkUnsetIcon.c) */
 
+#ifndef __LINK_UNSET_ICON_C__
+#define __LINK_UNSET_ICON_C__
+
 #include "PixelDataStruct.h"
 
 static PixelDataStruct_t LinkUnsetIcon = {
@@ -48,3 +51,4 @@ static PixelDataStruct_t LinkUnsetIcon = {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
 
+#endif

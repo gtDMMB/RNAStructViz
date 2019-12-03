@@ -116,6 +116,7 @@ void RNAStructViz::Shutdown()
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     MainWindow::Shutdown();
     Delete(RNAStructure::m_ctFileSelectionWin, InputWindow);
+    Delete(RNAStructViz::ms_instance, RNAStructViz);
 }
 
 void RNAStructViz::ExitApplication(bool promptUser) {

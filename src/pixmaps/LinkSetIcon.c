@@ -1,5 +1,8 @@
 /* GIMP RGBA C-Source image dump (LinkSetIcon.c) */
 
+#ifndef __LINK_SET_ICON_C__
+#define __LINK_SET_ICON_C__
+
 #include "PixelDataStruct.h"
 
 static PixelDataStruct_t LinkSetIcon = {
@@ -42,4 +45,6 @@ static PixelDataStruct_t LinkSetIcon = {
   "\210\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000",
 };
+
+#endif
 

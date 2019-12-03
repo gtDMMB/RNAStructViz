@@ -17,8 +17,8 @@ void StructureData::SetTooltipText() {
 	  std::string dotPairSeqStart = std::string(structure->GetDotBracketSequenceString()).substr(0, TOOLTIP_PREVIEW_CHARS_LENGTH);
 	  baseSeqStart = StringInsertSpacing(baseSeqStart, TOOLTIP_DATA_SPACING_INTERVAL, " ");
 	  dotPairSeqStart = StringInsertSpacing(dotPairSeqStart, TOOLTIP_DATA_SPACING_INTERVAL, " ");
-          baseSeqStart += " ///";
-          dotPairSeqStart += " ///";
+          baseSeqStart += " /// ->";
+          dotPairSeqStart += " /// ->";
           tooltipText += std::string("\n") + baseSeqStart + std::string("\n") + dotPairSeqStart;
      }
      mainViewerDisplayBtn->copy_tooltip(tooltipText.c_str());
@@ -35,10 +35,10 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
 
      pack->begin();
      int offsetY = STRUCTURE_WIDGET_HEIGHT * pack->children();
-     guiPackingGroup = new Fl_Group(pack->x() + 10, offsetY, pack->w(), STRUCTURE_WIDGET_HEIGHT, "");
+     guiPackingGroup = new Fl_Group(pack->x() + 2, offsetY, pack->w() + 8, STRUCTURE_WIDGET_HEIGHT, "");
      guiPackingGroup->begin();
                
-     mainViewerDisplayBtn = new Fl_Button(pack->x() + 10, offsetY, pack->w() - 50, STRUCTURE_WIDGET_HEIGHT, "");
+     mainViewerDisplayBtn = new Fl_Button(pack->x() + 2, offsetY, pack->w() - 60, STRUCTURE_WIDGET_HEIGHT, "");
      mainViewerDisplayBtn->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
      mainViewerDisplayBtn->callback(FolderWindow::ShowFileCallback);
      mainViewerDisplayBtn->user_data((void *) index);
