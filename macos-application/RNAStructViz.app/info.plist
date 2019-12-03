@@ -1,0 +1,28 @@
+<key>CFBundleDisplayName</key>
+<string>RNAStructViz</string>
+
+<key>CFBundleSpokenName</key>
+<string>RNA Struct Viz</string>
+
+<key>CFBundleIdentifier</key>
+<string>org.gtDMMB.RNAStructViz</string>
+
+<key>CFBundlePackageType</key>
+<string>APPL</string>
+
+<key>CFBundleShortVersionString</key>
+<string>2.0.2</string>
+<key>CFBundleLongVersionString</key>
+<string>v2.0.2-testing</string>
+
+<key>CFBundleExecutable</key>
+<string>RNAStructViz</string>
+
+<key>NSHumanReadableCopyright</key>
+<string>Copyleft 2017-2019 via the GNU GPL v3.0 license.</string>
+
+<key>RNAStructVizWebsite</key>
+<string>https://github.com/gtDMMB/RNAStructViz/wiki</string>
+
+<key>CFBundleIconFile</key>
+<string>RNAStructViz-AppIcon-512x512</string>
