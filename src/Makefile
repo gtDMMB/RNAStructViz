@@ -63,7 +63,7 @@ ifeq "$(DEBUG)" "$(TRUE)"
 	CXXFLAGS += -Werror=array-bounds -fsanitize=address -fno-omit-frame-pointer -fsanitize-address-use-after-scope \
 		    -fstack-protector #-FORTIFY_SOURCE #-ltcmalloc
 	LDFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -lasan \
-		   -fstack-protector -FORTIFY_SOURCE#-pedantic-errors
+		   -fstack-protector #-FORTIFY_SOURCE#-pedantic-errors
 endif
 
 .DEFAULT: default
