@@ -51,7 +51,7 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->color(GUI_WINDOW_BGCOLOR);
     m_mainWindow->begin();    
 
-    mainMenuPane = new Fl_Group(0, 0, 300, 450,"");
+    mainMenuPane = new Fl_Group(0, 0, 300, 450, "");
     {
         
         // setup the program logo (for now dynamically loaded):
@@ -102,7 +102,6 @@ MainWindow::MainWindow(int argc, char **argv)
         infoButton->callback(InfoButtonCallback);
 	infoButton->redraw();
 
-
         // consistent alignment with the folder window display:
         int upperYOffset = NAVBUTTONS_OFFSETY + appLogo->h() + 5;
         int dividerTextHeight = NAVBUTTONS_SPACING; 
@@ -111,8 +110,8 @@ MainWindow::MainWindow(int argc, char **argv)
         const char *navInstText = "@refresh   Actions.\n  Each action button click\n  expands into a new window.";
         int navButtonsLabelHeight = 2 * NAVBUTTONS_BHEIGHT;
         actionsLabel = new Fl_Box(NAVBUTTONS_OFFSETX, upperYOffset, 
-                          2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
-                              navButtonsLabelHeight, navInstText);     
+                                  2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING, 
+                                  navButtonsLabelHeight, navInstText);     
         actionsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
         actionsLabel->color(GUI_BGCOLOR);
         actionsLabel->labelcolor(GUI_BTEXT_COLOR);
@@ -139,7 +138,7 @@ MainWindow::MainWindow(int argc, char **argv)
               NAVBUTTONS_OFFSETY + upperYOffset + navButtonsLabelHeight, 
               NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
               "@menu   User Config @>|"
-	 );
+	);
         configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
         configOptionsButton->labelfont(FL_HELVETICA);
@@ -188,11 +187,14 @@ MainWindow::MainWindow(int argc, char **argv)
     menu_collapse->callback(CollapseMainCallback);
     menu_collapse->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5));
     menu_collapse->tooltip("Click to collapse or expand main menu pane");
+    menu_collapse->deactivate();
+
     folder_collapse = new Fl_Button(315, 0, 15, 450, "@<");
     folder_collapse->callback(CollapseFolderCallback);
     folder_collapse->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5));
     folder_collapse->tooltip("Click to collapse or expand folder menu pane");
-    
+    folder_collapse->deactivate();
+
     folderWindowPane = new Fl_Group(330, 0, 320, 450, "");
     folderWindowPane->end();
     folderWindowPane->color(GUI_WINDOW_BGCOLOR);
@@ -212,13 +214,19 @@ MainWindow::~MainWindow() {
     Delete(m_structureInfo, Fl_Scroll);
     Delete(columnLabel, Fl_Box);
     Delete(actionsLabel, Fl_Box);
-    Delete(topTextDivider, Fl_Box);
-    Delete(midTextDivider, Fl_Box);
     Delete(openButton, Fl_Button);
     Delete(configOptionsButton, Fl_Button);
     for(int w = 0; w < folderDataBtns.size(); w++) {
         delete folderDataBtns[w];
         folderDataBtns[w] = NULL;
+    }
+    for(int cw = m_mainWindow->children() - 1; cw >= 0; cw--) {
+         Fl_Group *winGroupContainer = (Fl_Group *) m_mainWindow->child(cw)->as_group();
+	 if(winGroupContainer != NULL) {
+              m_mainWindow->remove(cw);
+	      ++cw;
+	      //break;
+	 }
     }
     Delete(m_mainWindow, Fl_Double_Window);
 }

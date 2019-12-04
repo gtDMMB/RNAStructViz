@@ -2020,11 +2020,12 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     struct tm *tmCurrentTime = localtime(&currentTime);
     char defaultFilePath[MAX_BUFFER_SIZE];
     defaultFilePath[0] = '\0';
-    strcat(defaultFilePath, (char *) PNG_OUTPUT_DIRECTORY);
-    strcat(defaultFilePath, defaultFilePath[strlen(defaultFilePath) - 1] == '/' ? "" : "/");
+    //strcat(defaultFilePath, (char *) PNG_OUTPUT_DIRECTORY);
+    //strcat(defaultFilePath, defaultFilePath[strlen(defaultFilePath) - 1] == '/' ? "" : "/");
     strftime(defaultFilePath + strlen(defaultFilePath), MAX_BUFFER_SIZE - 1, (char *) PNG_OUTPUT_PATH, 
              tmCurrentTime);
     Fl_Native_File_Chooser fileChooser;
+    fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
     fileChooser.title(chooserMsg);
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
     fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
@@ -2038,18 +2039,17 @@ std::string DiagramWindow::GetExportPNGFilePath() {
 		      "saving the PNG image into a path in your user home directory.", 
 		      fileChooser.errmsg());
          return string("");
-    case 1: // CANCEL
+      case 1: // CANCEL
          return string("");
-    default:
+      default:
          const char *outFileFullPath = fileChooser.filename();
 	 const char *dirMarkerPos = strrchr(outFileFullPath, '/');
-	 if(dirMarkerPos != NULL) {
+	 if(dirMarkerPos != NULL || (dirMarkerPos = strrchr(fileChooser.directory(), '/')) != NULL) {
 	      unsigned int charsToCopy = (unsigned int) (dirMarkerPos - outFileFullPath + 1);
 	      strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath, charsToCopy);
               PNG_OUTPUT_DIRECTORY[charsToCopy] = '\0';
 	      ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
 	 }
-	 fprintf(stderr, "%s [%c]\n", outFileFullPath, dirMarkerPos);
 	 return std::string(outFileFullPath);
     }
 }

@@ -44,4 +44,8 @@ typedef enum {
      FILETYPE_NONE,
 } InputFileTypeSpec;
 
+/* Custom widget classes: */
+class AutoloadIndicatorButton;
+class XMLExportButton;
+
 #endif

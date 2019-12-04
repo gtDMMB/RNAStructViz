@@ -41,8 +41,8 @@ namespace XMLExport {
 
 	  public:
 	       static inline unsigned int LEVEL_INDENT = 5;
-	       static inline const char *TAG_SPACING = "\n";
-	       static const inline const char *GLOBAL_META_TAG = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
+	       static inline const char *TAG_LINE_SPACING = "\n";
+	       static inline const char *GLOBAL_META_TAG = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 
 	  protected:
                typedef enum {
@@ -100,11 +100,12 @@ namespace XMLExport {
 #include "ConfigOptions.h"
 #include "RNAStructVizTypes.h"
 #include "ThemesConfig.h"
-#include "StructureType.h"
 
 #include "pixmaps/XMLExportButtonIcon.c"
 
-public class XMLExportButton : public Fl_Button {
+#define XMLEXPORT_BUTTON_SIZE              (20)
+
+class XMLExportButton : public Fl_Button {
 
      public:
           XMLExportButton(unsigned int sindex);
@@ -130,7 +131,10 @@ public class XMLExportButton : public Fl_Button {
                if(staticDataInit) {
 	            return;
 	       }
-	       XMLEXPORT_BUTTON_IMAGE->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 0.65);
+	       XMLEXPORT_BUTTON_IMAGE->color_average(
+			 Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 
+			 0.65
+	       );
                staticDataInit = true;
 	  }
 };

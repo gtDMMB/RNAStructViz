@@ -60,6 +60,14 @@
      #define GNU_CONST_STATIC_DECLARATION const
 #endif
 
+// Debugging settings with the -fsanitize=address flag:
+#ifndef __RNASTRUCTVIZ_LOCAL_FSANITIZE_CONFIG
+     #define __RNASTRUCTVIZ_LOCAL_FSANITIZE_CONFIG
+     static inline const char* __asan_default_options() { 
+          return "verbosity=1:malloc_context_size=20:detect_leaks=0:detect_stack_use_after_return=1:print_stats=1"; 
+     }
+#endif
+
 #define FLTK_USE_CAIRO  1
 #define FLTK_HAVE_CAIRO 1
 
@@ -73,7 +81,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.0.2-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.0.3-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 

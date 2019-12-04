@@ -21,10 +21,14 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	CXXFLAGS+= -std=c++1z -Wno-c++11-narrowing -Wno-c++17-narrowing -I/usr/local/opt/openssl/include 
 	LDFLAGS+= -L/usr/local/opt/openssl/lib
 	## fallback values since Mac is broken as a platform w.r.t. its make version:
-	DEBUG=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING)
-	OPTLEVEL=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) OPTLEVEL)
-	DEBUGLEVEL=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING_LEVEL)
-	BRANCHID=$(shell ../build-scripts/get-build-config-setting.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) BRANCH_TYPE_ID)
+	DEBUG=$(shell ../build-scripts/get-build-config-setting.sh \
+	      $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING)
+	OPTLEVEL=$(shell ../build-scripts/get-build-config-setting.sh \
+		 $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) OPTLEVEL)
+	DEBUGLEVEL=$(shell ../build-scripts/get-build-config-setting.sh \
+		   $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING_LEVEL)
+	BRANCHID=$(shell ../build-scripts/get-build-config-setting.sh \
+		 $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) BRANCH_TYPE_ID)
 else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=$(shell which readlink)
@@ -57,7 +61,7 @@ ifeq "$(VERBOSE)" "$(TRUE)"
 endif
 ifeq "$(DEBUG)" "$(TRUE)"
 	CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
-	LDFLAGS += -fsanitize=address -fno-omit-frame-pointer#-pedantic-errors
+	LDFLAGS += -fsanitize=address#-pedantic-errors
 endif
 
 .DEFAULT: default
@@ -126,11 +130,11 @@ RNASTRUCTVIZ_OBJECTS = \
 	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) \
 	DisplayConfigWindow.$(OBJEXT)\
 	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) LoadFileSelectAllButton.$(OBJEXT) \
-	FolderWindow.$(OBJEXT) Main.$(OBJEXT) MainWindow.$(OBJEXT) \
-	OptionParser.$(OBJEXT) \
+	FolderWindow.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT) \
+	Main.$(OBJEXT) MainWindow.$(OBJEXT) OptionParser.$(OBJEXT) \
 	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
-	StructureManager.$(OBJEXT) StructureType.$(OBJEXT) TerminalPrinting.$(OBJEXT) \
-	Fl_Rotated_Text.$(OBJEXT) 
+	StructureManager.$(OBJEXT) StructureType.$(OBJEXT) \
+	TerminalPrinting.$(OBJEXT) XMLExportButton.$(OBJEXT)
 
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
@@ -226,6 +230,7 @@ git-push: git-commit
 @: #ditto
 
 AutoloadIndicatorButton.$(OBJEXT): AutoloadIndicatorButton.h ConfigOptions.h RNAStructViz.h \
+	pixmaps/LinkSetIcon.c pixmaps/LinkUnsetIcon.c \
 	AutoloadIndicatorButton.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c AutoloadIndicatorButton.cpp
 
@@ -331,4 +336,9 @@ StructureType.$(OBJEXT): ConfigOptions.h ImageNavButton.h ConfigExterns.h \
 TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h ConfigExterns.h \
 	TerminalPrinting.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c TerminalPrinting.cpp
+
+XMLExportButton.$(OBJEXT): ConfigOptions.h RNAStructVizTypes.h ThemesConfig.h \
+	pixmaps/XMLExportButtonIcon.c \
+	XMLExportButton.h XMLExportButton.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c XMLExportButton.cpp
 

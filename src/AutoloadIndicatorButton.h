@@ -60,7 +60,7 @@ class AutoloadIndicatorButton : public Fl_Button {
 	            return;
 	       }
 	       LINK_SET_ICON->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 0.65);
-	       LINK_UNSET_ICON->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 0.65);
+	       LINK_UNSET_ICON->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 0.25);
                isStaticDataInit = true;
 	  }
 

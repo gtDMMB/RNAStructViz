@@ -23,11 +23,10 @@ StructureManager::~StructureManager()
     {
         RemoveStructure(i - 1);
     }
-    free(m_structures); m_structures = NULL;
+    Free(m_structures); 
     for(int i = 0; i < (int)folders.size(); i++)
     {
-        free(folders[i]->folderStructs); folders[i]->folderStructs = NULL;
-        free(folders[i]);
+        Delete(folders[i], Folder);
     }
     Delete(m_inputWindow, InputWindow);
 }

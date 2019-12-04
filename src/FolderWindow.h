@@ -88,9 +88,6 @@ class FolderWindow : public Fl_Group
          */
         int m_folderIndex;
 
-        // Holds the title of the window
-        char* title;
-
 	Fl_Box *fileOpsLabel, *fileLabel;
 
     public:

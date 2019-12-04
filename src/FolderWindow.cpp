@@ -118,11 +118,12 @@ FolderWindow::~FolderWindow() {
      for(int vi = 0; vi < m_storedStructDisplayData.size(); vi++) {
           Delete(m_storedStructDisplayData[vi], StructureData);
      }
-     m_storedStructDisplayData.clear();
      HideFolderWindowGUIDisplay(true);
+     for(int cidx = 0; cidx < children(); cidx++) {
+          remove(0);
+     }
      Delete(folderPack, Fl_Pack);
      Delete(folderScroll, Fl_Scroll);
-     Free(title);
      Delete(fileOpsLabel, Fl_Box);
      Delete(fileLabel, Fl_Box);
 }
@@ -141,7 +142,6 @@ void FolderWindow::SetStructures(int folderIndex) {
         }
         int i = folder->folderStructs[(ui+shift)];
         RNAStructure *strct = structureManager->GetStructure(i);
-        //AddStructure(strct->GetFilename(), i);
 	AddStructure(strct->GetPathname(), i);
     }
     label(folder->folderName);
@@ -149,7 +149,7 @@ void FolderWindow::SetStructures(int folderIndex) {
     snprintf(structLabel, MAX_BUFFER_SIZE - 1, "%s%s", STRUCT_PANE_LABEL_PREFIX, folder->folderName);
     ConfigParser::nullTerminateString(structLabel);
     copy_label(structLabel);
-    labelfont(LOCAL_BFFONT);
+    labelfont(FL_HELVETICA_BOLD);
     labeltype(_FL_SHADOW_LABEL);
     labelsize(1.25 * LOCAL_TEXT_SIZE);
     align(FL_ALIGN_TOP);
@@ -173,7 +173,8 @@ void FolderWindow::AddStructure(const char* filename, const int index) {
 void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData) {
     FolderWindow* fwindow = (FolderWindow *) widget->parent();
     for(int fi = 0; fi < FolderWindow::m_storedStructDisplayData.size(); fi++) {
-         if(FolderWindow::m_storedStructDisplayData[fi] != NULL && FolderWindow::m_storedStructDisplayData[fi]->origFolderWinLabel == fwindow->label()) {
+         if(FolderWindow::m_storedStructDisplayData[fi] != NULL && 
+	    FolderWindow::m_storedStructDisplayData[fi]->origFolderWinLabel == fwindow->label()) {
 	      Delete(FolderWindow::m_storedStructDisplayData[fi], StructureData);
 	      break;
 	 }

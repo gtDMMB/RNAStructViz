@@ -59,9 +59,10 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      bool isAutoloaded = ConfigParser::fileExists((std::string(USER_AUTOLOAD_PATH) + structFileBaseName).c_str());
      autoloadToggleBtn = new AutoloadIndicatorButton(structFileBaseDir + structFileBaseName, 
 		                                     structFileBaseName, isAutoloaded);
-     autoloadToggleBtn->position(pack->x() + pack->w() - 32, offsetY + 3);
+     autoloadToggleBtn->position(pack->x() + pack->w() - 32, offsetY + 2);
      
-     // TODO: Add other image status buttons
+     xmlExportBtn = new XMLExportButton(index);
+     xmlExportBtn->position(pack->x() + pack->w() - 52, offsetY + 5);
 
      guiPackingGroup->resizable(mainViewerDisplayBtn);
      guiPackingGroup->end();

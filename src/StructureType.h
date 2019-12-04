@@ -25,6 +25,7 @@
 #include "ImageNavButton.h"
 #include "RNAStructVizTypes.h"
 #include "AutoloadIndicatorButton.h"
+#include "XMLExportButton.h"
 
 #define STRUCTURE_WIDGET_WIDTH               (30)
 #define STRUCTURE_WIDGET_HEIGHT              (30)
@@ -38,6 +39,7 @@ class StructureData {
 
      protected:
 	  friend class FolderWindow;
+	  friend class XMLExportButton;
 
 	  std::string origFolderWinLabel;
 	  std::string structFileBaseDir;
@@ -55,6 +57,7 @@ class StructureData {
           Fl_Button *navCloseBtn;
 	  ImageNavButton *fileFormatBtn;
 	  AutoloadIndicatorButton *autoloadToggleBtn;
+	  XMLExportButton *xmlExportBtn;
 
           static inline const char *navCloseBtnLabel = "@1+";
 	  static inline std::string spaceBuffer      = std::string("                                                    ");
@@ -63,7 +66,7 @@ class StructureData {
           inline StructureData() : structure(NULL), parentMainFolderWin(NULL), 
 	                           index(-1), guiPackingContainerRef(NULL), guiPackingGroup(NULL), 
 	                           mainViewerDisplayBtn(NULL), navCloseBtn(NULL), 
-			           fileFormatBtn(NULL), autoloadToggleBtn(NULL) {} 
+			           fileFormatBtn(NULL), autoloadToggleBtn(NULL), xmlExportBtn(NULL) {} 
 	  
 	  inline ~StructureData() {
                DeleteGUIWidgets();
@@ -89,13 +92,15 @@ class StructureData {
 	       Delete(navCloseBtn, Fl_Button);
 	       Delete(fileFormatBtn, ImageNavButton);
 	       Delete(autoloadToggleBtn, AutoloadIndicatorButton);
+	       Delete(xmlExportBtn, XMLExportButton);
 	       Delete(guiPackingGroup, Fl_Group);
 	  }    
 
 	  inline void SetLabelText() {
                std::string buttonLabel = "";
 	       const char *fullFileName = structFileBaseName.c_str();
-	       size_t fileNameCopyChars = (strrchr(fullFileName, '.') ? strrchr(fullFileName, '.') : fullFileName + strlen(fullFileName)) - fullFileName;
+	       size_t fileNameCopyChars = (strrchr(fullFileName, '.') ? strrchr(fullFileName, '.') : 
+			                  fullFileName + strlen(fullFileName)) - fullFileName;
                std::string fileNameNoExt = structFileBaseName.substr(0, fileNameCopyChars);
                bool truncFileNameStr = fileNameNoExt.length() > MAX_FOLDER_LABEL_CHARS;
 	       fileNameNoExt = fileNameNoExt.substr(0, MIN(fileNameNoExt.length(), MAX_FOLDER_LABEL_CHARS));

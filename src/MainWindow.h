@@ -192,7 +192,6 @@ class MainWindow
 
 	/* Other widgets that need to be updated when we change the theme settings */
 	Fl_Box *columnLabel, *actionsLabel;
-	Fl_Box *topTextDivider, *midTextDivider;
 	Fl_Button *openButton, *configOptionsButton;
 	std::vector<Fl_Button *> folderDataBtns;
 
