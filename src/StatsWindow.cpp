@@ -972,7 +972,7 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
         button->selection_color(GUI_WINDOW_BGCOLOR);    
         if (!strcmp(button->label(), window->ref_menu->mvalue()->label()))
         {
-            //button->value(0);
+            button->value(1);
             button->deactivate();
         }
         else
@@ -1723,14 +1723,14 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
             box->color();
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount* col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                              cbh + cby - (int)(hscale * statistics[ui].gc_count),
                              col_w,
                              (int)(hscale*statistics[ui].gc_count),statistics[ui].gc_char);
@@ -1761,14 +1761,14 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
             box->color(FL_BACKGROUND_COLOR);
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                              cbh + cby - (int)(hscale * statistics[ui].au_count),
                              col_w,
                              (int)(hscale*statistics[ui].au_count),statistics[ui].au_char);
@@ -1799,14 +1799,14 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < numStats; ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
             box->color(FL_BACKGROUND_COLOR);
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                              cbh + cby - (int)(hscale * statistics[ui].gu_count),
                              col_w,
                              (int)(hscale*statistics[ui].gu_count),statistics[ui].gu_char);
@@ -1837,14 +1837,14 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
             box->color(FL_BACKGROUND_COLOR);
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                              cbh + cby - (int)(hscale * statistics[ui].non_canon_count),
                              col_w,
                              (int)(hscale*statistics[ui].non_canon_count),statistics[ui].nc_char);
