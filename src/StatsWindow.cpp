@@ -977,7 +977,7 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
         }
         else
         {
-             button->value(1);
+             //button->value(1);
              button->activate();
         }
 	if(button->value()) {
@@ -993,19 +993,28 @@ void StatsWindow::MenuCallback(Fl_Widget* widget, void* userData)
     if(strncmp(window->ref_menu->mvalue()->label(),
               "Please select a reference", 25))
     {
-        window->calc_button->value(0);
-        window->calc_button->activate();
-    }
-    else
-    {
         window->calc_button->value(1);
         window->calc_button->deactivate();
     }
+    else
+    {
+	window->calc_button->value(0);
+        window->calc_button->activate();
+    }
+    Fl_Check_Button *cb = (Fl_Check_Button *) widget;
+    if(cb->value()) {
+         cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
+    }
+    else {
+	 cb->labelfont(FL_HELVETICA);
+    }
+
 }
 
 void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
 {    
-    if(((Fl_Toggle_Button*)widget)->value() == 1)
+    Fl_Toggle_Button *cb = (Fl_Toggle_Button*) widget;
+    if(cb->value() == 1)
     {
         StatsWindow* window = (StatsWindow*)widget->parent()->parent();
         if(strncmp(window->ref_menu->mvalue()->label(),
@@ -1013,10 +1022,10 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
         {
             for (int i=0; i < window->comp_pack->children() - 1; i++)
             {
-                Fl_Check_Button* button = 
-                        (Fl_Check_Button*) window->comp_pack->child(i);
-		button->value(0);
-		button->labelfont(FL_HELVETICA);
+                //Fl_Check_Button* button = 
+                //        (Fl_Check_Button*) window->comp_pack->child(i);
+		//button->value(0);
+		//button->labelfont(FL_HELVETICA);
             }
             
             
@@ -1025,7 +1034,7 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
     }
     else
     {
-        ((Fl_Toggle_Button*)widget)->value(1);
+        //((Fl_Toggle_Button*)widget)->value(1);
     }
     ((Fl_Check_Button*) widget)->deactivate();
     Fl_Window *parentWin = widget->parent()->as_window();
@@ -1140,8 +1149,8 @@ void StatsWindow::ComputeStats()
     
     // Compute statistics for selected structures
     int statsIndex;
-        int counter = 1; 
-        // Use a different counter so statsIndex will be 0 if it's the reference and counter otherwise
+    int counter = 1; 
+    // Use a different counter so statsIndex will be 0 if it's the reference and counter otherwise
     for (int i = 0; i < comp_pack->children(); i++)
     {
         Fl_Check_Button* button = 
@@ -1155,7 +1164,7 @@ void StatsWindow::ComputeStats()
             // Initialize values
             if (strcmp(predicted->GetFilename(), reference->GetFilename()))
             {
-                statsIndex = counter;
+                statsIndex = counter - 1;
                 statistics[statsIndex].ref = false;
             }
             else
