@@ -62,10 +62,12 @@
 
 // Debugging settings with the -fsanitize=address flag:
 #ifndef __RNASTRUCTVIZ_LOCAL_FSANITIZE_CONFIG
-     #define __RNASTRUCTVIZ_LOCAL_FSANITIZE_CONFIG
+     #define __RNASTRUCTVIZ_LOCAL_FSANITIZE_CONFIG          (1)
      static inline const char* __asan_default_options() { 
           return "verbosity=1:malloc_context_size=20:detect_leaks=0:detect_stack_use_after_return=1:print_stats=1"; 
      }
+     //#define DEBUG_NEW new(__FILE__, __LINE__)
+     //#define new DEBUG_NEW
 #endif
 
 #define FLTK_USE_CAIRO  1

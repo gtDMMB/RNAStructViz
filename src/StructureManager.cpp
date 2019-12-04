@@ -26,7 +26,8 @@ StructureManager::~StructureManager()
     Free(m_structures); 
     for(int i = 0; i < (int)folders.size(); i++)
     {
-        Delete(folders[i], Folder);
+         folders[i]->SetPerformWidgetDeletion(false);
+         Delete(folders[i], Folder);
     }
     Delete(m_inputWindow, InputWindow);
 }

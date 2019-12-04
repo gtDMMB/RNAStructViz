@@ -28,7 +28,7 @@ class Folder {
 		      capacity(2 * DEFAULT_FOLDER_NAME_BUFSIZE), folderWindow(NULL), 
 		      mainWindowFolderBtn(NULL), navUpBtn(NULL), navDownBtn(NULL), 
 		      navCloseBtn(NULL), toggleStickyBtn(NULL), exportXMLBtn(NULL),
-                      displayInfoBtn(NULL) {
+                      displayInfoBtn(NULL), doWidgetDeletion(true) {
         folderStructs = (int *) malloc(capacity * sizeof(int));
         memset(folderStructs, -1, capacity);
         tooltipText[0] = '\0';
@@ -45,7 +45,9 @@ class Folder {
 	     folderWindow->HideFolderWindowGUIDisplay(true);
 	}
 	Delete(folderWindow, FolderWindow);
-        DeleteGUIWidgetData();
+        if(doWidgetDeletion) {
+	     DeleteGUIWidgetData();
+	}
 	structCount = 0;
         selected = false;
     }
@@ -60,8 +62,8 @@ class Folder {
     }
 
     inline void HideGUIWidgets(bool waitForNoVisible = true) {
-	 //Folder::WaitForHiddenWidget(guiPackingContainerRef);
-	 //Folder::WaitForHiddenWidget(guiPackingGroup);
+	 Folder::WaitForHiddenWidget(guiPackingContainerRef);
+	 Folder::WaitForHiddenWidget(guiPackingGroup);
          Folder::WaitForHiddenWidget(mainWindowFolderBtn);
 	 Folder::WaitForHiddenWidget(navUpBtn);
 	 Folder::WaitForHiddenWidget(navDownBtn);
@@ -205,6 +207,14 @@ class Folder {
     Fl_Button *mainWindowFolderBtn;
     Fl_Button *navUpBtn, *navDownBtn, *navCloseBtn;
     ImageNavButton *toggleStickyBtn, *exportXMLBtn, *displayInfoBtn;
+
+  protected:
+    bool doWidgetDeletion;
+
+  public:
+    void SetPerformWidgetDeletion(bool enable) {
+         doWidgetDeletion = enable;
+    }
 
     /* Tooltip formatting of the main button: */
     char tooltipText[MAX_BUFFER_SIZE];

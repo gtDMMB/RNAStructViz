@@ -76,7 +76,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     radialDisplayWindow = NULL;
     ctFileSelectWin = NULL;
 
-    Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
+    //Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
+    Fl::visual(FL_RGB);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
     cursor(DIAGRAMWIN_DEFAULT_CURSOR);
 

@@ -3,11 +3,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <locale.h>
+
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
 
-#ifdef WITHGPERFTOOLS
-#include <gperftools/heap-profiler.h>
+#if WITHGPERFTOOLS > 0
+     #include <gperftools/heap-profiler.h>
 #endif
 
 #include "MainWindow.h"
@@ -31,8 +32,8 @@ char activeSystemUserFromEnv[MAX_BUFFER_SIZE];
 
 int main(int argc, char **argv) {
 
-    #ifdef WITHGPERFTOOLS
-         HeapProfilerStart("RNAStructViz.log");
+    #if WITHGPERFTOOLS > 0
+	  HeapProfilerStart("RNAStructViz.log");
     #endif
    
     #ifdef __STRUCTVIZ_INSTALL_SIGNAL_HANDLERS
@@ -73,7 +74,7 @@ int main(int argc, char **argv) {
     //Fl::remove_handler(RNAStructViz::HandleGlobalKeypressEvent);
     RNAStructViz::Shutdown();
     
-    #ifdef WITHGPERFTOOLS
+    #if WITHGPERFTOOLS > 0
          HeapProfilerStop();
     #endif
     
@@ -86,7 +87,6 @@ void RNAStructViz_SignalHandler(int signum) {
      if(signum == SIGINT) {
           fprintf(stderr, "\n");
           TerminalText::PrintInfo("Handling <CTRL+C> (SIGINT) signal ... Saving config and exiting.\n");
-          //ConfigParser::WriteUserConfigFile();
 	  RNAStructViz::Shutdown();
      }
      else if(signum == SIGSEGV) {

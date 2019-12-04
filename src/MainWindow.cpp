@@ -220,14 +220,14 @@ MainWindow::~MainWindow() {
         delete folderDataBtns[w];
         folderDataBtns[w] = NULL;
     }
-    for(int cw = 0; cw < m_mainWindow->children(); cw++) {
+    /*for(int cw = 0; cw < m_mainWindow->children(); cw++) {
          Fl_Group *winGroupContainer = (Fl_Group *) m_mainWindow->child(cw)->as_group();
 	 if(winGroupContainer != NULL) {
               m_mainWindow->remove(cw);
 	      --cw;
 	      //break;
 	 }
-    }
+    }*/
     Delete(m_mainWindow, Fl_Double_Window);
 }
 
@@ -972,8 +972,8 @@ void MainWindow::RethemeMainWindow() {
           ms_instance->folderDataBtns[b]->labelcolor(GUI_BTEXT_COLOR);
          }
          if(ms_instance->selectedFolderBtn != NULL) {
-                  ms_instance->selectedFolderBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
-          ms_instance->selectedFolderBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
+              ms_instance->selectedFolderBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
+              ms_instance->selectedFolderBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
          }
          ms_instance->actionsLabel->color(GUI_BGCOLOR);
          ms_instance->actionsLabel->labelcolor(GUI_BTEXT_COLOR);

@@ -167,7 +167,8 @@ DisplayConfigWindow::DisplayConfigWindow() :
      Fl_Cairo_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT),
      finished(false), pngNewPathIcon(NULL), imageData(NULL) { 
 
-     Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE | FL_INDEX);
+     //Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE | FL_INDEX);
+     Fl::visual(FL_RGB);
 
      //imageStride = cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, CONFIG_WINDOW_WIDTH);
      //imageData = new uchar[imageStride * CONFIG_WINDOW_WIDTH];

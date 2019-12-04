@@ -89,16 +89,17 @@ RNAStructViz* RNAStructViz::ms_instance = NULL;
 RNAStructViz::RNAStructViz()
 {
     m_structureManager = new StructureManager();
-    Fl::visual(FL_RGB8 | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
-    Fl::gl_visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_ALPHA | FL_MULTISAMPLE);
+    //Fl::visual(FL_RGB8 | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
+    Fl::visual(FL_RGB);
+    //Fl::gl_visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_ALPHA | FL_MULTISAMPLE);
 }
 
 RNAStructViz::~RNAStructViz()
 {
     for (unsigned int i = 0; i < m_diagramWindows.size(); ++i)
-    delete m_diagramWindows[i];
+         delete m_diagramWindows[i];
     for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
-    delete m_statsWindows[i];
+         delete m_statsWindows[i];
     delete m_structureManager;
 }
 
@@ -179,8 +180,8 @@ void RNAStructViz::AddDiagramWindow(int index)
     char* title = (char*) malloc(DEFAULT_TITLE_STRING_SIZE * sizeof(char));
     snprintf(title, DEFAULT_TITLE_STRING_SIZE, "Structure Diagram %lu", m_diagramWindows.size() + 1);
     diagram = new DiagramWindow(3 * DiagramWindow::ms_menu_width, 
-                        IMAGE_HEIGHT + GLWIN_TRANSLATEY + 35, 
-                        title, structures);
+                                IMAGE_HEIGHT + GLWIN_TRANSLATEY + 35, 
+                                title, structures);
     diagram->SetFolderIndex(index);
     diagram->setAsCurrentDiagramWindow();
     m_diagramWindows.push_back(diagram);
@@ -205,14 +206,13 @@ void RNAStructViz::AddStatsWindow(int index)
     {
         if(folders[index]->folderStructs[(i + shift)] == -1)
             shift++;
-        if(m_structureManager->
-            GetStructure(folders[index]->folderStructs[(i + shift)]))
+        if(m_structureManager->GetStructure(folders[index]->folderStructs[(i + shift)]))
         {
             structures.push_back(folders[index]->folderStructs[(i + shift)]);
         }
     }
     
-    StatsWindow* stats = 0;
+    StatsWindow* stats = NULL;
     for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
     {
         stats = m_statsWindows[i];

@@ -60,8 +60,10 @@ ifeq "$(VERBOSE)" "$(TRUE)"
 	LDFLAGS += -Wall -Wextra 
 endif
 ifeq "$(DEBUG)" "$(TRUE)"
-	CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
-	LDFLAGS += -fsanitize=address#-pedantic-errors
+	CXXFLAGS += -Werror=array-bounds -fsanitize=address -fno-omit-frame-pointer -fsanitize-address-use-after-scope \
+		    -fstack-protector -FORTIFY_SOURCE #-ltcmalloc
+	LDFLAGS += -fsanitize=address -fsanitize-address-use-after-scope -lasan \
+		   -fstack-protector -FORTIFY_SOURCE#-pedantic-errors
 endif
 
 .DEFAULT: default
@@ -187,7 +189,7 @@ run-debug: clean default
 	$(DEBUGGER) $(shell $(READLINK) -f ./RNAStructViz)
 
 clean:
-	@rm -f *.o *.code *.log *.callgrind *.out *.ps *.pdf \
+	@rm -f *.o *.code *.log *.callgrind *.out *.ps *.pdf *.heap \
 		BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
 
 install: default
@@ -202,18 +204,19 @@ install: default
 	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample-structures/
 	chmod 666 $(INSTALL_PREFIX)/share/RNAStructViz/sample-structures/*
 
-profile_mem: clean CXXFLAGS+=" -DWITHGPERFTOOLS" default_with_gperf
+profile_mem: default_with_gperf
 	./RNAStructViz #--inuse_space --inuse_objects --alloc_space --alloc_objects
 	google-pprof -lines\
 		-add_lib=/usr/local/lib/libfltk.a\
 		-add_lib=/usr/local/lib/libfltk_cairo.a\
 		-add_lib=/usr/local/lib/libfltk_images.a\
-		-text RNAStructViz RNAStructViz.log | less
+		-text ./RNAStructViz ./RNAStructViz.log*.heap | less
 	google-pprof -functions\
 		-add_lib=/usr/local/lib/libfltk.a\
 		-add_lib=/usr/local/lib/libfltk_cairo.a\
 		-add_lib=/usr/local/lib/libfltk_images.a\
-		-pdf RNAStructViz RNAStructViz.log > RNAStructViz-HeapProfile.pdf
+		-pdf ./RNAStructViz ./RNAStructViz.log*.heap > RNAStructViz-HeapProfile.pdf
+	rm -f ./RNAStructViz.log*.heap
 	xreader RNAStructViz-HeapProfile.pdf
 
 git-add: 
