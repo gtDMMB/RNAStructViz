@@ -276,7 +276,7 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
         fl_alert("Unable to re-create the file chooser! Returning without loading files ...");
 	return;
     }
-    ms_instance->m_fileChooser->show();
+    //ms_instance->m_fileChooser->show();
     while(ms_instance->m_fileChooser->visible()) {
         Fl::wait();
     }
@@ -529,7 +529,10 @@ bool MainWindow::CreateFileChooser() {
     Delete(m_fileChooserSelectAllBtn, SelectAllButton);
     m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
-    //m_fileChooserSelectAllBtn->set_active();
+    m_fileChooser->show();
+    m_fileChooserSelectAllBtn->show();
+    while(!m_fileChooserSelectAllBtn->visible()) { Fl::wait(0.1); }
+    m_fileChooserSelectAllBtn->set_active();
     m_fileChooserSelectAllBtn->redraw();
 
     return true;
