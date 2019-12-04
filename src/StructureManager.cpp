@@ -54,7 +54,7 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
     {
         if (m_structures[i])
         {
-            if (!strcmp(m_structures[i]->GetFilename(true), basename))
+            if (!strcmp(m_structures[i]->GetFilename(false), basename))
             {
                 TerminalText::PrintInfo("Skipping ... Already have a structure loaded with filename: %s\n", 
                                         basename);

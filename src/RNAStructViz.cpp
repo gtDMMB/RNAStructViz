@@ -387,7 +387,8 @@ int RNAStructViz::BackupAndUnlinkLocalConfigFiles(bool clearStickyFolderNamesOnl
 
 bool RNAStructViz::CopyStructureFileToAutoloadDirectory(const char *structFileBaseName, const char *structFileDiskPath) {
      std::string autoloadStructPath = std::string(USER_AUTOLOAD_PATH) + std::string(structFileBaseName); 
-     if(ConfigParser::fileExists(autoloadStructPath.c_str())) {
+     if(ConfigParser::fileExists(autoloadStructPath.c_str()) && 
+	ConfigParser::fileExists(structFileDiskPath)) {
           return true;
      }
      try {

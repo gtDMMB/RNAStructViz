@@ -823,7 +823,7 @@ StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label,
 StatsWindow::~StatsWindow()
 {
     Free(title); 
-    delete[] statistics;
+    Free(statistics);
     if(statsFormulasImage != NULL) {
              delete statsFormulasImage;
     }
@@ -1059,9 +1059,11 @@ void StatsWindow::SelectAllButtonCallback(Fl_Widget *saBtn, void *udata) {
         curParentWin = curParentWin->parent();
     }
     StatsWindow *window = (StatsWindow *) curParentWin; 
-    for(int cbidx = 0; cbidx < window->comp_pack->children() - 1; cbidx++) { 
+    bool noRefMsgDisplayed = true;
+    for(int cbidx = 0; cbidx < window->comp_pack->children(); cbidx++) { 
         Fl_Check_Button *cb = (Fl_Check_Button *) window->comp_pack->child(cbidx); 
-        if(cbidx != window->referenceIndex) { 
+        if(cbidx != window->referenceIndex && strncmp(window->ref_menu->mvalue()->label(),
+                                                      "Please select a reference", 25)) { 
             cb->value(1);
 	    cb->activate();
 	    cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
@@ -1070,6 +1072,10 @@ void StatsWindow::SelectAllButtonCallback(Fl_Widget *saBtn, void *udata) {
 	    cb->value(0);
             cb->deactivate();
 	    cb->labelfont(FL_HELVETICA);
+	    if(cbidx != window->referenceIndex && noRefMsgDisplayed) {
+	         fl_alert("Please select a reference structure first.");
+		 noRefMsgDisplayed = false;
+	    }
 	}	    
     }
 } 
@@ -1129,8 +1135,9 @@ void StatsWindow::ComputeStats()
         }
     }
     
-    statistics = new StatData[numStats];
-    
+    statistics = (StatData *) malloc(comp_pack->children() * sizeof(StatData));
+    memset(statistics, 0x00, comp_pack->children() * sizeof(StatData));
+
     // Find the reference structure
     RNAStructure* reference = 
                       structureManager->GetStructure(m_structures[referenceIndex]);
@@ -1151,11 +1158,11 @@ void StatsWindow::ComputeStats()
     int statsIndex;
     int counter = 1; 
     // Use a different counter so statsIndex will be 0 if it's the reference and counter otherwise
-    for (int i = 0; i < comp_pack->children(); i++)
+    for (int i = comp_pack->children() - 1; i >= 0; i--)
     {
         Fl_Check_Button* button = 
                 (Fl_Check_Button*)comp_pack->child(i);
-        if (button->value() == 1)
+	if(button->value() == 1)
         {
             // Find the corresponding structure
             // index corresponds to index of checkbox
@@ -1164,7 +1171,7 @@ void StatsWindow::ComputeStats()
             // Initialize values
             if (strcmp(predicted->GetFilename(), reference->GetFilename()))
             {
-                statsIndex = counter - 1;
+                statsIndex = counter;
                 statistics[statsIndex].ref = false;
             }
             else
@@ -1172,7 +1179,8 @@ void StatsWindow::ComputeStats()
                 statsIndex = 0;
                 statistics[statsIndex].ref = true;
             }
-            statistics[statsIndex].filename = predicted->GetFilenameNoExtension();
+            statistics[statsIndex].isValid = true;
+	    statistics[statsIndex].filename = predicted->GetFilenameNoExtension();
             statistics[statsIndex].base_pair_count = 0;
             statistics[statsIndex].gc_count = 0;
             statistics[statsIndex].au_count = 0;
@@ -1320,10 +1328,15 @@ void StatsWindow::ComputeStats()
                      "Filename\t\t\t\tPairs\tTPs\tFPs\tFNs\tSensi.\tSelec.\tPPV\tConfl.\tContr.\tCompa.\tG-C\tA-U\tG-U\tOther\n" 
                 );
     
-    for (unsigned int ui=0; ui<numStats; ui++)
+    unsigned int activeStatsCount = 0;
+    for (unsigned int ui=0; ui < comp_pack->children(); ui++)
     {
         
-        char tempc[38];
+        if(!statistics[ui].isValid) {
+	     continue;
+	}
+	activeStatsCount++;
+	char tempc[38];
         strncpy(tempc, statistics[ui].filename, 36);
         tempc[37] = '\0';
         if (strlen(statistics[ui].filename) >= 36) 
@@ -1389,7 +1402,7 @@ void StatsWindow::ComputeStats()
         sprintf(tempc,"%d\t",statistics[ui].gu_count);
         buff->append(tempc);
         sprintf(statistics[ui].nc_char,"%d",statistics[ui].non_canon_count);
-        if (ui == numStats-1) {
+        if (activeStatsCount == numStats-1) {
             sprintf(tempc,"%d",statistics[ui].non_canon_count);
         }
         else {
@@ -1408,8 +1421,9 @@ void StatsWindow::ComputeStats()
         Lighter(RGBColor(0xaa, 0xaa, 0xaa), 0.61f),
     };
     
-    for (unsigned int ui = 0; ui < numStats; ui++)
+    for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
     {
+	if(!statistics[ui].isValid) continue;
         if (statistics[ui].ref) 
         {
             statistics[ui].color = GUI_TEXT_COLOR;
@@ -1448,9 +1462,11 @@ void StatsWindow::DrawHistograms()
     non_canon_chart->clear();
     
     unsigned int bound = 0;
-    for (unsigned int ui = 0; ui < numStats; ui++)
+    unsigned int activeBarsCount = 0;
+    for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
     {
-        if (statistics[ui].base_pair_count > bound)
+        if(!statistics[ui].isValid) continue;
+	if (statistics[ui].base_pair_count > bound)
         {
             bound = statistics[ui].base_pair_count;
         }
@@ -1472,9 +1488,10 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+            if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1502,9 +1519,11 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].true_pos_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].true_pos_count), statistics[ui].tp_char);
@@ -1532,9 +1551,11 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].false_pos_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].false_pos_count),statistics[ui].fp_char);
@@ -1562,9 +1583,11 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].false_neg_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].false_neg_count),statistics[ui].fn_char);
@@ -1592,15 +1615,21 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = cbh - 20.0;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].sensitivity),
                                      col_w,
                                      (int)(hscale*statistics[ui].sensitivity),statistics[ui].sens_char);
             box->color(statistics[ui].color);
+            box->labelsize(MAX(MIN(16 / numStats * 6, 6), 3));
+	    box->labelfont(FL_HELVETICA);
             box->align(FL_ALIGN_TOP);
-        }
+            box->copy_tooltip((const char *) statistics[ui].sens_char);
+
+	}
         
     }
     sens_chart->end();
@@ -1622,14 +1651,19 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = cbh - 20.0;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].selectivity),
                                      col_w,
                                      (int)(hscale*statistics[ui].selectivity),statistics[ui].sel_char);
             box->color(statistics[ui].color);
-            box->align(FL_ALIGN_TOP);
+            box->labelsize(MAX(MIN(16 / numStats * 6, 6), 3));
+	    box->labelfont(FL_HELVETICA);
+	    box->align(FL_ALIGN_TOP);
+	    box->copy_tooltip((const char *) statistics[ui].sel_char);
         }
         
     }
@@ -1652,15 +1686,20 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = cbh - 20.0;
         
+	activeBarsCount = 0;
         for (unsigned int ui = 0; ui < numStats; ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].pos_pred_value),
                                      col_w,
                                      (int)(hscale*statistics[ui].pos_pred_value),statistics[ui].ppv_char);
-            box->color(statistics[ui].color);
+            box->labelsize(MAX(MIN(16 / numStats * 6, 6), 3));
+	    box->labelfont(FL_HELVETICA);
+	    box->color(statistics[ui].color);
             box->align(FL_ALIGN_TOP);
-        }
+            box->copy_tooltip((const char *) statistics[ui].ppv_char);
+	}
         
     }
     ppv_chart->end();
@@ -1681,9 +1720,11 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1717,9 +1758,11 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1753,9 +1796,11 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
+	activeBarsCount = 0;
         for (unsigned int ui = 0; ui < numStats; ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1789,9 +1834,11 @@ void StatsWindow::DrawHistograms()
         // by the largest base pair count
         double hscale = (cbh - 20.0)/bound;
         
-        for (unsigned int ui = 0; ui < numStats; ui++)
+	activeBarsCount = 0;
+        for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+	    if(!statistics[ui].isValid) continue;
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1832,8 +1879,9 @@ void StatsWindow::DrawRoc()
         int rpw = roc_plot->w();
         int rph = roc_plot->h();
         
-        for (unsigned int ui=0; ui < numStats; ui++)
+        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
         {
+	    if(!statistics[ui].isValid) continue;
             Fl_Box* box = new Fl_Box(FL_NO_BOX,
                                      (int)(rpw * statistics[ui].selectivity)+rpx-11,
                                      (int)(rph * (1-statistics[ui].sensitivity))+rpy-10,
@@ -1873,8 +1921,9 @@ void StatsWindow::DrawLegend()
     leg1_pack->begin();
     {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < numStats; ui++)
+        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
         {
+	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
             {    
                 leg1_ref->label(statistics[ui].filename);
@@ -1903,8 +1952,9 @@ void StatsWindow::DrawLegend()
     leg2_pack->begin();
         {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < numStats; ui++)
+        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
         {
+	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
             {    
                 leg2_ref->label(statistics[ui].filename);
@@ -1933,8 +1983,9 @@ void StatsWindow::DrawLegend()
     leg3_pack->begin();
     {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < numStats; ui++)
+        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
         {
+	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
             {    
                 leg3_ref->label(statistics[ui].filename);
@@ -1963,8 +2014,9 @@ void StatsWindow::DrawLegend()
     leg4_pack->begin();
     {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < numStats; ui++)
+        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
         {
+	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
             {    
                 leg4_ref->label(statistics[ui].filename);
@@ -2111,8 +2163,9 @@ void StatsWindow::ExportTable()
             fprintf(expFile,
                     "G-C_Pairs,A-U_Pairs,G-U_Pairs,Non-Canonical_Pairs\n"); 
             
-            for (unsigned int ui=0; ui<numStats; ui++)
+            for (unsigned int ui=0; ui < comp_pack->children(); ui++)
             {
+		if(!statistics[ui].isValid) continue;
                 // print the row of statistics for each structure
                 fprintf(expFile,
                         "%s,%d,%d,%d,%d,%d,%d,%d,%d,%.10f,%.10f,%.10f,%d,%d,%d,%d\n",

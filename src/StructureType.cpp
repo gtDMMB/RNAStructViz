@@ -56,9 +56,19 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      navCloseBtn->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
      navCloseBtn->box(FL_PLASTIC_UP_BOX);
 
-     bool isAutoloaded = ConfigParser::fileExists((std::string(USER_AUTOLOAD_PATH) + structFileBaseName).c_str());
-     autoloadToggleBtn = new AutoloadIndicatorButton(structFileBaseDir + structFileBaseName, 
-		                                     structFileBaseName, isAutoloaded);
+     char exactBaseName[MAX_BUFFER_SIZE];
+     const char *exactPathName = structure->GetFilename(true);
+     const char *lastSlashPos = strrchr(exactPathName, '/');
+     if(lastSlashPos == NULL) {
+          strcpy(exactBaseName, exactPathName);
+     }
+     else {
+	  strcpy(exactBaseName, lastSlashPos + 1);
+     }
+     const char *autoLoadBaseName = (const char *) exactBaseName;
+     bool isAutoloaded = ConfigParser::fileExists((std::string(USER_AUTOLOAD_PATH) + autoLoadBaseName).c_str());
+     autoloadToggleBtn = new AutoloadIndicatorButton(structFileBaseDir + autoLoadBaseName, 
+		                                     autoLoadBaseName, isAutoloaded);
      autoloadToggleBtn->position(pack->x() + pack->w() - 32, offsetY + 2);
      
      xmlExportBtn = new XMLExportButton(index);

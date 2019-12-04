@@ -466,13 +466,15 @@ RNAStructure * RNAStructure::CreateFromDotBracketData(const char *fileName,
           return NULL;
      }
      seqLength = baseIdx; // allows for space characters in the parsing
-     rnaStruct->m_sequenceLength = seqLength;    
+    rnaStruct->m_sequenceLength = seqLength;    
      #if PERFORM_BRANCH_TYPE_ID
      rnaStruct->branchType = (RNABranchType_t*) malloc( 
                              sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
      #endif
+     rnaStruct->m_exactPathName = strdup(fileName);
      if(index == -1) {
-          rnaStruct->m_pathname = strdup(fileName);
+          fprintf(stderr, "BAD CASE!!\n");
+	  rnaStruct->m_pathname = strdup(fileName);
      }
      else {
           // we will have multiple samples in this files, need to append a sample number suffix to 
@@ -486,7 +488,6 @@ RNAStructure * RNAStructure::CreateFromDotBracketData(const char *fileName,
           }
           strncpy(rnaStruct->m_pathname, fileName, fileExtPos - fileName);
           rnaStruct->m_pathname[fileExtPos - fileName] = '\0';
-          rnaStruct->m_exactPathName = strdup(fileName);
           char sampleSuffix[MAX_BUFFER_SIZE];
           snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", index + 1);
           strcat(rnaStruct->m_pathname, sampleSuffix);
@@ -864,7 +865,7 @@ void RNAStructure::GenerateDotFormatDataFromPairings() {
 const char* RNAStructure::GetFilename(bool exactPath) const
 {
     // Get the base file name 
-    char *m_pathNameVersion = exactPath && m_exactPathName ? m_exactPathName : m_pathname;                             
+    char *m_pathNameVersion = exactPath && m_exactPathName != NULL ? m_exactPathName : m_pathname;
     const char* basename = strrchr(m_pathNameVersion, '/');        
     if (!basename) {
         return m_pathname;
@@ -926,7 +927,7 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
       if(orgNamePos != std::string::npos) {
            size_t newlinePos = commentLines.find_first_of("\n", orgNamePos);
            if(newlinePos != std::string::npos) {
-            size_t orgNameStartPos = orgNamePos + strlen("Organism: ");
+            size_t orgNameStartPos = orgNamePos + searchStr.length();
                 orgName = commentLines.substr(orgNameStartPos, newlinePos - orgNameStartPos);
             size_t orgSecondWordPos = orgName.find(" ");
             if(orgSecondWordPos != std::string::npos && orgSecondWordPos + 1 < orgName.length()) {

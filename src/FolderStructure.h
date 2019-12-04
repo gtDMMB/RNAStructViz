@@ -95,10 +95,10 @@ class Folder {
 	 nextFolder->folderName = (char *) malloc(DEFAULT_FOLDER_NAME_BUFSIZE * sizeof(char));
 	 nextFolder->fileType = ClassifyInputFileType(structure->GetFilename());
          if(strlen(structure->GetFilename()) < DEFAULT_FOLDER_NAME_BUFSIZE - 4) {
-              strcpy(nextFolder->folderName, structure->GetFilename(nextFolder->IsFASTAFormatOnly()));
+              strcpy(nextFolder->folderName, structure->GetFilename());
          }
          else {
-              strncpy(nextFolder->folderName, structure->GetFilename(nextFolder->IsFASTAFormatOnly()), DEFAULT_FOLDER_NAME_BUFSIZE - 4);
+              strncpy(nextFolder->folderName, structure->GetFilename(), DEFAULT_FOLDER_NAME_BUFSIZE - 4);
               nextFolder->folderName[DEFAULT_FOLDER_NAME_BUFSIZE - 4] = '\0';
          }
          nextFolder->folderNameFileCount = (char *) malloc(DEFAULT_FOLDER_NAME_LBLSIZE * sizeof(char));

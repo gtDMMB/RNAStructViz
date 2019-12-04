@@ -102,7 +102,8 @@ public:
     {
         const char *filename; // The filename of the structure the stats correspond to
         bool ref; // True if this structure is the reference
-        int color; // Color assigned to the structure for the histograms
+        bool isValid; // whether the structure has been initialized
+	int color; // Color assigned to the structure for the histograms
         unsigned int base_pair_count; // Number of base pairs in the structure
         unsigned int gc_count; // Number of G-C base pairs
         unsigned int au_count; // Number of A-U base pairs
