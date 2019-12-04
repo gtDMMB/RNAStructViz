@@ -1963,8 +1963,8 @@ void StatsWindow::DrawLegend()
             if (statistics[ui].ref)
             {    
                 leg2_ref->label(statistics[ui].filename);
-                leg2_ref->color(GUI_WINDOW_BGCOLOR);
-		leg2_ref->labelcolor(GUI_BTEXT_COLOR);
+                leg2_ref->color(GUI_TEXT_COLOR);
+		leg2_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 		leg2_ref->labelsize(11);
 		leg2_ref->show();
             }
@@ -1997,8 +1997,8 @@ void StatsWindow::DrawLegend()
             if (statistics[ui].ref)
             {    
                 leg3_ref->label(statistics[ui].filename);
-                leg3_ref->color(GUI_WINDOW_BGCOLOR);
-		leg3_ref->labelcolor(GUI_BTEXT_COLOR);
+                leg3_ref->color(GUI_TEXT_COLOR);
+		leg3_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 		leg3_ref->labelsize(11);
 		leg3_ref->show();
             }
@@ -2031,8 +2031,8 @@ void StatsWindow::DrawLegend()
             if (statistics[ui].ref)
             {    
                 leg4_ref->label(statistics[ui].filename);
-                leg4_ref->color(GUI_WINDOW_BGCOLOR);
-		leg4_ref->labelcolor(GUI_BTEXT_COLOR);
+                leg4_ref->color(GUI_TEXT_COLOR);
+		leg4_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 		leg4_ref->labelsize(11);
 		leg4_ref->show();
                 if (ui%28 >= 0 && ui%28 <7)
