@@ -11,6 +11,7 @@
 #include "ConfigOptions.h"
 #include "ConfigExterns.h"
 #include "ImageNavButton.h"
+#include "BaseSequenceIDs.h"
 
 #define DEFAULT_FOLDER_NAME_BUFSIZE        (64)
 #define DEFAULT_FOLDER_NAME_LBLSIZE        (72)
@@ -92,11 +93,12 @@ class Folder {
     static Folder * AddNewFolderFromData(const RNAStructure *structure, const int index, bool isSelected = false) {
          Folder *nextFolder = new Folder();
 	 nextFolder->folderName = (char *) malloc(DEFAULT_FOLDER_NAME_BUFSIZE * sizeof(char));
+	 nextFolder->fileType = ClassifyInputFileType(structure->GetFilename());
          if(strlen(structure->GetFilename()) < DEFAULT_FOLDER_NAME_BUFSIZE - 4) {
-              strcpy(nextFolder->folderName, structure->GetFilename());
+              strcpy(nextFolder->folderName, structure->GetFilename(nextFolder->IsFASTAFormatOnly()));
          }
          else {
-              strncpy(nextFolder->folderName, structure->GetFilename(), DEFAULT_FOLDER_NAME_BUFSIZE - 4);
+              strncpy(nextFolder->folderName, structure->GetFilename(nextFolder->IsFASTAFormatOnly()), DEFAULT_FOLDER_NAME_BUFSIZE - 4);
               nextFolder->folderName[DEFAULT_FOLDER_NAME_BUFSIZE - 4] = '\0';
          }
          nextFolder->folderNameFileCount = (char *) malloc(DEFAULT_FOLDER_NAME_LBLSIZE * sizeof(char));
@@ -295,7 +297,7 @@ class Folder {
     }
     
     inline bool IsFASTAFormatOnly() const {
-	 return structCount == 0 && fileType == FILETYPE_FASTA_ONLY;
+	 return fileType == FILETYPE_FASTA_ONLY;
     }
 
     inline Fl_Widget* GetGUIParent() const {

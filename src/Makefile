@@ -136,7 +136,7 @@ RNASTRUCTVIZ_OBJECTS = \
 	Main.$(OBJEXT) MainWindow.$(OBJEXT) OptionParser.$(OBJEXT) \
 	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
 	StructureManager.$(OBJEXT) StructureType.$(OBJEXT) \
-	TerminalPrinting.$(OBJEXT) XMLExportButton.$(OBJEXT)
+	TerminalPrinting.$(OBJEXT) ViennaBoltzmannSampling.$(OBJEXT) XMLExportButton.$(OBJEXT)
 
 default: prelims $(RNASTRUCTVIZ_OBJECTS)
 	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
@@ -339,6 +339,11 @@ StructureType.$(OBJEXT): ConfigOptions.h ImageNavButton.h ConfigExterns.h \
 TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h ConfigExterns.h \
 	TerminalPrinting.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c TerminalPrinting.cpp
+
+ViennaBoltzmannSampling.$(OBJEXT): RNAStructVizTypes.h RNAStructure.h \
+	ConfigOptions.h TerminalPrinting.h \
+	ViennaBoltzmannSampling.h ViennaBoltzmannSampling.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c ViennaBoltzmannSampling.cpp
 
 XMLExportButton.$(OBJEXT): ConfigOptions.h RNAStructVizTypes.h ThemesConfig.h \
 	pixmaps/XMLExportButtonIcon.c \

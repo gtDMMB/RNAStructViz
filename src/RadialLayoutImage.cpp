@@ -549,13 +549,13 @@ CairoContext_t * RadialLayoutDisplayWindow::GetVRNARadialLayoutData(const char *
       defaultScrollToY = MAX(0, imageHeight - DEFAULT_RLWIN_HEIGHT);
      }
 
-     free(effectiveRNASubseq);
-     free(vfc);
-     free(mfeStructure);
-     free(pairTable);
-     free(pairTableG);
-     free(xPosArr);
-     free(yPosArr);
+     Free(effectiveRNASubseq);
+     vrna_fold_compound_free(vfc);
+     Free(mfeStructure);
+     Free(pairTable);
+     Free(pairTableG);
+     Free(xPosArr);
+     Free(yPosArr);
      
      return plotCanvas;
 

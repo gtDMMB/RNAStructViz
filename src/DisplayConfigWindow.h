@@ -34,7 +34,7 @@
 #define CFGWIN_CDIALOG_Y            (100)
 #define CFGWIN_CDIALOG_WIDTH        (250)
 #define CFGWIN_CDIALOG_HEIGHT       (250)
-#define CFGWIN_MAX_FPATH_LENGTH     (45)
+#define CFGWIN_MAX_FPATH_LENGTH     (256)
 
 class DisplayConfigWindow : public Fl_Cairo_Window { 
 

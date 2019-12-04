@@ -84,7 +84,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         dividerTextBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 
         comp_menu = new Fl_Scroll(mwx+20,mwy+ 120, mww-65, 
-                mwh-120-90, 
+                mwh-120-90 - 50, 
                 "Structures for Comparison:");
         {    
             comp_pack = new Fl_Pack(mwx+20,mwy+120,mww-60,150);
@@ -100,10 +100,17 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         comp_menu->end();
         
         calc_button = new Fl_Toggle_Button(mwx+20, mwy+ mwh-60, 185, 
-                                           30, "@refresh Calculate");
+                                           30, "@refresh   Calculate");
         calc_button->callback(CalcCallback);
         calc_button->labelcolor(GUI_BTEXT_COLOR); 
         calc_button->labelfont(FL_HELVETICA);
+
+        selectAllCompsBtn = new Fl_Button(mwx + 20, mwy + mwh - 100, 
+                                          185, 30, "@redo   Compare All");
+        selectAllCompsBtn->callback(SelectAllButtonCallback);
+        selectAllCompsBtn->labelcolor(GUI_BTEXT_COLOR);
+        selectAllCompsBtn->labelfont(FL_HELVETICA);
+
 
         menu_window->resizable(comp_menu);
     }
@@ -125,7 +132,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 bp_chart->box(FL_RSHADOW_BOX);
                 bp_chart->align(FL_ALIGN_BOTTOM);
                 bp_chart->labelcolor(GUI_TEXT_COLOR);
-                                bp_chart->labelfont(FL_HELVETICA);
+                bp_chart->labelfont(FL_HELVETICA);
                 bp_chart->color(GUI_WINDOW_BGCOLOR);
                 bp_chart->end();
                 
@@ -133,7 +140,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 tp_chart->box(FL_RSHADOW_BOX);
                 tp_chart->align(FL_ALIGN_BOTTOM);
                 tp_chart->labelcolor(GUI_TEXT_COLOR);
-                                tp_chart->labelfont(FL_HELVETICA);
+                tp_chart->labelfont(FL_HELVETICA);
                 tp_chart->color(GUI_WINDOW_BGCOLOR);
                 tp_chart->end();
                 
@@ -141,7 +148,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 fp_chart->box(FL_RSHADOW_BOX);
                 fp_chart->align(FL_ALIGN_BOTTOM);
                 fp_chart->labelcolor(GUI_TEXT_COLOR);
-                                fp_chart->labelfont(FL_HELVETICA);
+                fp_chart->labelfont(FL_HELVETICA);
                 fp_chart->color(GUI_WINDOW_BGCOLOR);
                 fp_chart->end();
                 
@@ -149,7 +156,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 fn_chart->box(FL_RSHADOW_BOX);
                 fn_chart->align(FL_ALIGN_BOTTOM);
                 fn_chart->labelcolor(GUI_TEXT_COLOR);
-                                fn_chart->labelfont(FL_HELVETICA);
+                fn_chart->labelfont(FL_HELVETICA);
                 fn_chart->color(GUI_WINDOW_BGCOLOR);
                 fn_chart->end();
                 
@@ -192,7 +199,6 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                                         leg1_pack->color(GUI_WINDOW_BGCOLOR);
                 }
                 leg1_scroll->type(Fl_Scroll::VERTICAL);
-                //leg1_scroll->box(FL_UP_BOX);
                 leg1_scroll->end();
                 leg1_scroll->color(GUI_WINDOW_BGCOLOR);
                 
@@ -966,13 +972,17 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
         button->selection_color(GUI_WINDOW_BGCOLOR);    
         if (!strcmp(button->label(), window->ref_menu->mvalue()->label()))
         {
-            button->value(1);
+            //button->value(0);
             button->deactivate();
         }
         else
         {
-            button->activate();
+             button->value(1);
+             button->activate();
         }
+	if(button->value()) {
+	     button->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	}
     }
     
 }
@@ -1005,7 +1015,8 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
             {
                 Fl_Check_Button* button = 
                         (Fl_Check_Button*) window->comp_pack->child(i);
-                
+		button->value(0);
+		button->labelfont(FL_HELVETICA);
             }
             
             
@@ -1017,6 +1028,11 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
         ((Fl_Toggle_Button*)widget)->value(1);
     }
     ((Fl_Check_Button*) widget)->deactivate();
+    Fl_Window *parentWin = widget->parent()->as_window();
+    if(parentWin != NULL) {
+         StatsWindow *statsWin = (StatsWindow *) parentWin;
+	 statsWin->selectAllCompsBtn->deactivate();
+    }
 }
 
 void StatsWindow::ExportCallback(Fl_Widget* widget, void* userData)
@@ -1042,7 +1058,7 @@ void StatsWindow::SelectAllButtonCallback(Fl_Widget *saBtn, void *udata) {
 	    cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
         }
         else {
-	    //cb->value(0);
+	    cb->value(0);
             cb->deactivate();
 	    cb->labelfont(FL_HELVETICA);
 	}	    
@@ -1391,7 +1407,7 @@ void StatsWindow::ComputeStats()
         }
         else
         {
-            float darkerPct = 1.0 - 0.15 * (ui / 7);
+            float darkerPct = 1.0 - 0.25 * (ui / 7);
             statistics[ui].color = Darker(colors[ui % 7], darkerPct);
         }
     }
@@ -2142,10 +2158,10 @@ void StatsWindow::BuildRefMenu()
 
 void StatsWindow::BuildCompMenu()
 {
+    int lastBtnX = 0, lastBtnY = 0;
     comp_pack->clear();
     comp_pack->begin();
     {
-        int lastBtnX = 0, lastBtnY = 0;
         for (unsigned int ui=0; ui < m_structures.size(); ui++)
         {
             RNAStructure* structure = 
@@ -2153,7 +2169,7 @@ void StatsWindow::BuildCompMenu()
             if (strcmp(ref_menu->mvalue()->label(), structure->GetFilename()))
             {
                 Fl_Check_Button* button = new Fl_Check_Button(comp_pack->x(),
-                                                              comp_pack->y()+30, comp_pack->w(), 30, 
+                                                              comp_pack->y() + 30 + lastBtnY, comp_pack->w(), 24, 
                                                               structure->GetFilename());
                 button->color(GUI_WINDOW_BGCOLOR);
                 button->labelcolor(GUI_TEXT_COLOR);
@@ -2165,13 +2181,11 @@ void StatsWindow::BuildCompMenu()
                     lastBtnX = button->x();
                     lastBtnY = button->y();
                 }
+		else {
+		    //lastBtnY += 30;
+		}
             }
         }
-        selectAllCompsBtn = new Fl_Button(lastBtnX + 20, lastBtnY + 120, 
-                                          95, 35, "Compare All Structures @redo");
-        selectAllCompsBtn->callback(SelectAllButtonCallback);
-        selectAllCompsBtn->labelcolor(GUI_BTEXT_COLOR);
-        selectAllCompsBtn->labelfont(FL_HELVETICA);
     }
     comp_pack->end();
 

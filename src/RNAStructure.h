@@ -116,10 +116,14 @@ class RNAStructure
         */
         static RNAStructure* CreateFromFile(const char* filename, const bool isBPSEQ);
         static RNAStructure* CreateFromDotBracketFile(const char *filename); 
-	
+	static RNAStructure* CreateFromDotBracketData(const char *fileName, 
+			                              const char *baseSeq, const char *dotData, 
+						      int index = -1);
+
         #define RNASTRUCT_ARRAY_SIZE        (16)
 	static RNAStructure** CreateFromBoltzmannFormatFile(const char *filename, int *arrayCount);
 	static RNAStructure** CreateFromHelixTripleFormatFile(const char *filename, int *arrayCount);
+	static RNAStructure** CreateFromFASTAFile(const char *filename, int *arrayCount);
 
     private:
 	void GenerateDotFormatDataFromPairings();

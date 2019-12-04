@@ -157,8 +157,8 @@ char * DisplayConfigWindow::TrimFilePathDisplay(const char *path, int maxlen = C
      }
      else {
           truncPath[0] = truncPath[1] = truncPath[2] = '.';
-      strncpy(truncPath + 3, path + strlen(path) - maxlen, maxlen);
-      truncPath[maxlen + 2] = '\0';
+          strncpy(truncPath + 3, path + strlen(path) - maxlen, maxlen);
+          truncPath[maxlen] = '\0';
      }
      return truncPath;
 }

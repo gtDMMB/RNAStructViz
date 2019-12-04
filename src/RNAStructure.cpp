@@ -17,6 +17,7 @@ using std::stack;
 #include "ThemesConfig.h"
 #include "TerminalPrinting.h"
 #include "ConfigParser.h"
+#include "ViennaBoltzmannSampling.h"
 
 #if PERFORM_BRANCH_TYPE_ID
      #include "BranchTypeIdentification.h"
@@ -330,16 +331,16 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     for(unsigned i = 0; i < tempSeq.size(); i++)
     {
         result->charSeq[i] = toupper(tempSeq.at(i));
-    RNAStructure::BaseData *curBaseData = result->GetBaseAt(i);
-    if(curBaseData->m_pair == UNPAIRED) { 
-         result->dotFormatCharSeq[i] = '.';
-    }
-    else if(curBaseData->m_index < curBaseData->m_pair) {
-         result->dotFormatCharSeq[i] = '(';
-    }
-    else { 
-         result->dotFormatCharSeq[i] = ')';
-    }
+        RNAStructure::BaseData *curBaseData = result->GetBaseAt(i);
+        if(curBaseData->m_pair == UNPAIRED) { 
+             result->dotFormatCharSeq[i] = '.';
+        }
+        else if(curBaseData->m_index < curBaseData->m_pair) {
+             result->dotFormatCharSeq[i] = '(';
+        }
+        else { 
+             result->dotFormatCharSeq[i] = ')';
+        }
     }
     result->charSeq[result->charSeqSize] = '\0';
     result->dotFormatCharSeq[result->charSeqSize] = '\0';
@@ -358,6 +359,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      }
      char lineBuf[MAX_SEQUENCE_SIZE + 1];
      char baseDataBuf[MAX_SEQUENCE_SIZE + 1], pairingDataBuf[MAX_SEQUENCE_SIZE + 1];
+     baseDataBuf[0] = pairingDataBuf[0] = '\0';
      bool haveBaseData = false, havePairData = false;
      while(true) {
           char *lineReturn = fgets(lineBuf, MAX_SEQUENCE_SIZE, fpDotBracketFile);
@@ -389,8 +391,17 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
       }
      }
      fclose(fpDotBracketFile);
+     return RNAStructure::CreateFromDotBracketData(filename, (const char *) baseDataBuf, (const char *) pairingDataBuf);
+
+}     
+     
+RNAStructure * RNAStructure::CreateFromDotBracketData(const char *fileName, 
+		                                      const char *baseDataBuf, const char *pairingDataBuf, int index) {
+
+     bool haveBaseData = baseDataBuf != NULL && strlen(baseDataBuf) > 0;
+     bool havePairData = pairingDataBuf != NULL && strlen(pairingDataBuf) > 0;
      if(!haveBaseData || !havePairData || strlen(baseDataBuf) != strlen(pairingDataBuf)) {
-      TerminalText::PrintError("Problem parsing the DOT file \"%s\" (is your syntax correct?)\n", filename);
+      TerminalText::PrintError("Problem parsing the DOT file \"%s\" (is your syntax correct?)\n", fileName);
       return NULL;
      }
      int seqLength = strlen(baseDataBuf);
@@ -460,7 +471,27 @@ RNAStructure * RNAStructure::CreateFromDotBracketFile(const char *filename) {
      rnaStruct->branchType = (RNABranchType_t*) malloc( 
                              sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
      #endif
-     rnaStruct->m_pathname = strdup(filename);
+     if(index == -1) {
+          rnaStruct->m_pathname = strdup(fileName);
+     }
+     else {
+          // we will have multiple samples in this files, need to append a sample number suffix to 
+          // distinguish between them for the users in the GUI: 
+          int nextFileIdentifierLen = strlen(fileName) + 16;
+          rnaStruct->m_pathname = (char *) malloc(nextFileIdentifierLen * sizeof(char));
+          rnaStruct->m_pathname[0] = '\0';
+          char *fileExtPos = strrchr((char *) fileName, '.');
+          if(fileExtPos == NULL) {
+               fileExtPos = ((char *) fileName) + strlen(fileName);
+          }
+          strncpy(rnaStruct->m_pathname, fileName, fileExtPos - fileName);
+          rnaStruct->m_pathname[fileExtPos - fileName] = '\0';
+          rnaStruct->m_exactPathName = strdup(fileName);
+          char sampleSuffix[MAX_BUFFER_SIZE];
+          snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", index + 1);
+          strcat(rnaStruct->m_pathname, sampleSuffix);
+          strcat(rnaStruct->m_pathname, fileExtPos);
+     }
      rnaStruct->charSeqSize = seqLength;
      rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
      strncpy(rnaStruct->charSeq, baseDataBuf, seqLength + 1);
@@ -598,16 +629,16 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
       strcat(rnaStruct->m_pathname, sampleSuffix);
       strcat(rnaStruct->m_pathname, fileExtPos);
 
-          rnaStruct->charSeqSize = seqLength;
-          rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
-          strncpy(rnaStruct->charSeq, baseDataBuf, seqLength + 1);
-          rnaStruct->charSeq[rnaStruct->charSeqSize] = '\0';
-          rnaStruct->GenerateDotFormatDataFromPairings();
-          #if PERFORM_BRANCH_TYPE_ID    
-          RNABranchType_t::PerformBranchClassification(rnaStruct, rnaStruct->m_sequenceLength);
-          #endif
+      rnaStruct->charSeqSize = seqLength;
+      rnaStruct->charSeq = (char *) malloc((rnaStruct->charSeqSize + 1) * sizeof(char));
+      strncpy(rnaStruct->charSeq, baseDataBuf, seqLength + 1);
+      rnaStruct->charSeq[rnaStruct->charSeqSize] = '\0';
+      rnaStruct->GenerateDotFormatDataFromPairings();
+      #if PERFORM_BRANCH_TYPE_ID    
+      RNABranchType_t::PerformBranchClassification(rnaStruct, rnaStruct->m_sequenceLength);
+      #endif
      
-          *arrayCount += 1;
+      *arrayCount += 1;
       if(*arrayCount >= rnaStructArraySize) {
                rnaStructArraySize *= 2;
            rnaStructsArray = (RNAStructure **) 
@@ -788,6 +819,27 @@ RNAStructure ** RNAStructure::CreateFromHelixTripleFormatFile(const char *filena
 
 }
 
+RNAStructure** RNAStructure::CreateFromFASTAFile(const char *filename, int *arrayCount) {
+     if(filename == NULL || arrayCount == NULL) {
+          return NULL;
+     }
+     try {
+          vector<ViennaBoltzmannSampling::StructureData_t> sdv = 
+		 ViennaBoltzmannSampling::GetBoltzmannSamples(filename);
+	  *arrayCount = sdv.size();
+	  RNAStructure** rnaStructsArr = ViennaBoltzmannSampling::GenerateStructuresFromSampleData(filename, sdv);
+	  if(rnaStructsArr == NULL) {
+	       *arrayCount = 0;
+	       return NULL;
+	  }
+	  return rnaStructsArr;
+     } catch(std::string errorMsg) {
+          TerminalText::PrintError("Unable to parse FASTA file \"%s\": %s\n", filename, errorMsg.c_str());
+	  return NULL;
+     }
+     return NULL;
+}
+
 void RNAStructure::GenerateDotFormatDataFromPairings() {
      if(dotFormatCharSeq != NULL) {
           free(dotFormatCharSeq);
@@ -859,7 +911,18 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
      else if(m_fileType == FILETYPE_NOPCT && m_fileCommentLine != NULL) {
       std::string commentLines = std::string(m_fileCommentLine);
       std::string orgName, accNo;
-      size_t orgNamePos = commentLines.find("Organism: ");
+      std::string searchStr = "Organism: ";
+      auto orgNameIt = search(commentLines.begin(), commentLines.end(), 
+		              searchStr.begin(), searchStr.end(), 
+		              [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); });
+      size_t orgNamePos = orgNameIt == searchStr.end() ? std::string::npos : orgNameIt - searchStr.begin();
+      if(orgNamePos == std::string::npos) {
+           searchStr = "Name: ";
+	   orgNameIt = search(commentLines.begin(), commentLines.end(), 
+		              searchStr.begin(), searchStr.end(), 
+			      [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }); 
+	   orgNamePos = orgNameIt == searchStr.end() ? std::string::npos : orgNameIt - searchStr.begin();
+      }
       if(orgNamePos != std::string::npos) {
            size_t newlinePos = commentLines.find_first_of("\n", orgNamePos);
            if(newlinePos != std::string::npos) {
@@ -871,7 +934,11 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
             }
            }
       }
-      size_t accNoPos = commentLines.find("Accession");
+      searchStr = "Accession";
+      auto accNoIt = search(commentLines.begin(), commentLines.end(), 
+		            searchStr.begin(), searchStr.end(), 
+			    [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); });
+      size_t accNoPos = accNoIt == searchStr.end() ? std::string::npos : accNoIt - searchStr.begin();
       if(accNoPos != std::string::npos) {
                size_t colonPos = commentLines.find_first_of(":", accNoPos);
            if(colonPos != std::string::npos) {
@@ -916,13 +983,13 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
      };
      bool foundMatch = false;
      for(int sidx = 0; sidx < searchForStructStrings.size(); sidx++) { 
-    strncpy(m_suggestedFolderName, searchForStructStrings[sidx].c_str(), MAX_BUFFER_SIZE + 1);
-    m_suggestedFolderName[MAX_BUFFER_SIZE] = '\0';
+        strncpy(m_suggestedFolderName, searchForStructStrings[sidx].c_str(), MAX_BUFFER_SIZE + 1);
+        m_suggestedFolderName[MAX_BUFFER_SIZE] = '\0';
         for(int rsidx = 0; rsidx < GetArrayLength(filePathReplaceChars); rsidx++) { 
          StringTranslateCharacters(m_suggestedFolderName, 
                            filePathReplaceChars[rsidx][0], 
                        filePathReplaceChars[rsidx][1]);
-    }
+     }
     char *dotPos = NULL, *checkStr = m_suggestedFolderName;
     size_t strOffset = 0, sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
     while(*(dotPos = strchrnul(checkStr, '.')) != '\0') {
@@ -946,19 +1013,19 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
           }
          }
         }
-    if(foundMatch) { 
+        if(foundMatch) { 
              break;
-    }
+        }
      }
      if(!foundMatch) {
           Free(m_suggestedFolderName);
-      return NULL;
+          return NULL;
      }
      
      size_t sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
      if(sfnLen + 1 < MAX_BUFFER_SIZE) {
           m_suggestedFolderName = (char *) realloc(m_suggestedFolderName, sfnLen + 1);
-      m_suggestedFolderName[sfnLen] = '\0';
+          m_suggestedFolderName[sfnLen] = '\0';
      }
      return m_suggestedFolderName;
 }
@@ -1245,16 +1312,15 @@ void RNAStructure::GenerateString()
                                sizeof(char) * (size - remainingSize + 1));
     m_ctDisplayFormatString[size - remainingSize] = '\0';
     
-    m_seqDisplayString = (char *) malloc(DEFAULT_BUFFER_SIZE * sizeof(char));
-    size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, 
-                                     DEFAULT_BUFFER_SIZE);
+    m_seqDisplayString = (char *) malloc((DEFAULT_BUFFER_SIZE + 1) * sizeof(char));
+    size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, DEFAULT_BUFFER_SIZE);
     if(seqDSLen + 1 < DEFAULT_BUFFER_SIZE) { 
         m_seqDisplayString = (char *) realloc(m_seqDisplayString, (seqDSLen + 1) * sizeof(char));
-    m_seqDisplayString[seqDSLen] = '\0';
+        m_seqDisplayString[seqDSLen] = '\0';
     }
     else {
-     m_seqDisplayString[DEFAULT_BUFFER_SIZE - 5] = '\0';
-     strcat(m_seqDisplayString, " ...");
+        m_seqDisplayString[DEFAULT_BUFFER_SIZE - 5] = '\0';
+        strcat(m_seqDisplayString, " ...");
     }
     m_seqDisplayFormatString = (char *) malloc((seqDSLen + 1) * sizeof(char));
     strcpy(m_seqDisplayFormatString, m_seqDisplayString);
@@ -1268,7 +1334,7 @@ void RNAStructure::GenerateString()
 }
 
 size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars, 
-                                    size_t clusterSize) const { 
+                                            size_t clusterSize) const { 
      if(strBuf == NULL || charSeq == NULL) { 
           return 0;
      }
@@ -1297,7 +1363,7 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
           strBufActivePtr[0] = '\0';
      }
      else {
-      strBufActivePtr[maxChars - 1] = '\0';
+          strBufActivePtr[MIN(charSeqSize, maxChars - 1)] = '\0';
      }
      return MAX(0, charsCopied - 1);
 }
