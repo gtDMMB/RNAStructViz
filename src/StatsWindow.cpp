@@ -256,7 +256,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         ppv_chart->box(FL_RSHADOW_BOX);
         ppv_chart->align(FL_ALIGN_BOTTOM);
         ppv_chart->labelcolor(GUI_TEXT_COLOR);
-                ppv_chart->labelfont(FL_HELVETICA);
+        ppv_chart->labelfont(FL_HELVETICA);
         ppv_chart->color(GUI_WINDOW_BGCOLOR);
         ppv_chart->end();
                 
@@ -974,6 +974,7 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
         {
             button->value(1);
             button->deactivate();
+	    // TODO: draw legend here ... 
         }
         else
         {
@@ -1069,7 +1070,7 @@ void StatsWindow::SelectAllButtonCallback(Fl_Widget *saBtn, void *udata) {
 	    cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
         }
         else {
-	    cb->value(0);
+	    cb->value(1);
             cb->deactivate();
 	    cb->labelfont(FL_HELVETICA);
 	    if(cbidx != window->referenceIndex && noRefMsgDisplayed) {
@@ -1420,17 +1421,19 @@ void StatsWindow::ComputeStats()
         Lighter(RGBColor(0xaa, 0xaa, 0xaa), 0.61f),
     };
     
+    int haveSeenRefStruct = 0;
     for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
     {
 	if(!statistics[ui].isValid) continue;
         if (statistics[ui].ref) 
         {
             statistics[ui].color = GUI_TEXT_COLOR;
+	    haveSeenRefStruct = 1;
         }
         else
         {
-            float darkerPct = 1.0 - 0.25 * (ui / 7);
-            statistics[ui].color = Darker(colors[ui % 7], darkerPct);
+            float darkerPct = 1.0 - 0.25 * ((ui - haveSeenRefStruct) / 7);
+            statistics[ui].color = Darker(colors[(ui - haveSeenRefStruct) % 7], darkerPct);
         }
     }
     
@@ -1926,7 +1929,10 @@ void StatsWindow::DrawLegend()
             if (statistics[ui].ref)
             {    
                 leg1_ref->label(statistics[ui].filename);
-                leg1_ref->show();
+                leg1_ref->color(GUI_TEXT_COLOR);
+		leg1_ref->labelcolor(GUI_WINDOW_BGCOLOR);
+		leg1_ref->labelsize(11);
+		leg1_ref->show();
             }
             else
             {
@@ -1957,7 +1963,10 @@ void StatsWindow::DrawLegend()
             if (statistics[ui].ref)
             {    
                 leg2_ref->label(statistics[ui].filename);
-                leg2_ref->show();
+                leg2_ref->color(GUI_WINDOW_BGCOLOR);
+		leg2_ref->labelcolor(GUI_BTEXT_COLOR);
+		leg2_ref->labelsize(11);
+		leg2_ref->show();
             }
             else
             {
@@ -1988,7 +1997,10 @@ void StatsWindow::DrawLegend()
             if (statistics[ui].ref)
             {    
                 leg3_ref->label(statistics[ui].filename);
-                leg3_ref->show();
+                leg3_ref->color(GUI_WINDOW_BGCOLOR);
+		leg3_ref->labelcolor(GUI_BTEXT_COLOR);
+		leg3_ref->labelsize(11);
+		leg3_ref->show();
             }
             else
             {
@@ -2019,7 +2031,10 @@ void StatsWindow::DrawLegend()
             if (statistics[ui].ref)
             {    
                 leg4_ref->label(statistics[ui].filename);
-                leg4_ref->show();
+                leg4_ref->color(GUI_WINDOW_BGCOLOR);
+		leg4_ref->labelcolor(GUI_BTEXT_COLOR);
+		leg4_ref->labelsize(11);
+		leg4_ref->show();
                 if (ui%28 >= 0 && ui%28 <7)
                 {
                     leg4_ref_symbol->label("@circle");
@@ -2162,7 +2177,7 @@ void StatsWindow::ExportTable()
             fprintf(expFile,
                     "G-C_Pairs,A-U_Pairs,G-U_Pairs,Non-Canonical_Pairs\n"); 
             
-            for (unsigned int ui=0; ui < comp_pack->children(); ui++)
+            for (unsigned int ui = comp_pack->children() - 1; ui >= 0; ui--)
             {
 		if(!statistics[ui].isValid) continue;
                 // print the row of statistics for each structure
