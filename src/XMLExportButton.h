@@ -34,7 +34,6 @@ namespace XMLExport {
 	  XMLEXPORTFMT_FULL_FOLDER     = 2,
      } XMLExportFormat_t;
 
-     static std::string GetXMLExportPathFromUser(unsigned int options);
      static int ExportStructureToXML(std::string outFilePath, XMLExportFormat_t xmlExportFmt, 
 		                     unsigned int dataIndex = -1, unsigned int optionFlags = 0x00);
 
@@ -96,10 +95,44 @@ namespace XMLExport {
 
 #include <FL/Enumerations.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_RGB_Image.H>
+
+#include "ConfigOptions.h"
+#include "RNAStructVizTypes.h"
+#include "ThemesConfig.h"
+#include "StructureType.h"
 
 #include "pixmaps/XMLExportButtonIcon.c"
 
 public class XMLExportButton : public Fl_Button {
+
+     public:
+          XMLExportButton(unsigned int sindex);
+	  XMLExportButton(StructureData *stdata);
+
+     protected:
+          void InitializeButtonData(RNAStructure *rnaStruct);
+
+	  static std::string GetXMLExportPathFromUser(unsigned int options = 0x00);
+          static void WriteStructureToXMLFileCallback(Fl_Widget *xmlBtn, void *udata);
+
+	  static inline Fl_RGB_Image *XMLEXPORT_BUTTON_IMAGE = new Fl_RGB_Image( 
+	       XMLExportButtonIcon.pixel_data,
+	       XMLExportButtonIcon.width, 
+	       XMLExportButtonIcon.height,
+	       XMLExportButtonIcon.bytes_per_pixel
+	  );
+	  static inline bool staticDataInit = false;
+	  static inline const char *exportButtonTooltipText = "Export structure to XML file";
+
+     public:
+	  static inline void InitStaticData() {
+               if(staticDataInit) {
+	            return;
+	       }
+	       XMLEXPORT_BUTTON_IMAGE->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.7), 0.65);
+               staticDataInit = true;
+	  }
 };
 
 #endif
