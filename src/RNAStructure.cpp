@@ -473,7 +473,6 @@ RNAStructure * RNAStructure::CreateFromDotBracketData(const char *fileName,
      #endif
      rnaStruct->m_exactPathName = strdup(fileName);
      if(index == -1) {
-          fprintf(stderr, "BAD CASE!!\n");
 	  rnaStruct->m_pathname = strdup(fileName);
      }
      else {

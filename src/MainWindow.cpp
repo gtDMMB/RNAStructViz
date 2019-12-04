@@ -276,7 +276,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
         fl_alert("Unable to re-create the file chooser! Returning without loading files ...");
 	return;
     }
-    //ms_instance->m_fileChooser->show();
+    ms_instance->m_fileChooser->show();
+    ms_instance->m_fileChooserSelectAllBtn->redraw();
     while(ms_instance->m_fileChooser->visible()) {
         Fl::wait();
     }
@@ -504,6 +505,7 @@ bool MainWindow::CreateFileChooser() {
 	TerminalText::PrintError("Error: getcwd failed. Cannot create file chooser.\n");
         return false;
     }
+    Delete(m_fileChooser, Fl_File_Chooser);
     if(m_fileChooser == NULL) {
          m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
     }
@@ -529,11 +531,6 @@ bool MainWindow::CreateFileChooser() {
     Delete(m_fileChooserSelectAllBtn, SelectAllButton);
     m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
-    m_fileChooser->show();
-    m_fileChooserSelectAllBtn->show();
-    while(!m_fileChooserSelectAllBtn->visible()) { Fl::wait(0.1); }
-    m_fileChooserSelectAllBtn->set_active();
-    m_fileChooserSelectAllBtn->redraw();
 
     return true;
 }
