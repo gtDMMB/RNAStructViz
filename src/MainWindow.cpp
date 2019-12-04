@@ -220,11 +220,11 @@ MainWindow::~MainWindow() {
         delete folderDataBtns[w];
         folderDataBtns[w] = NULL;
     }
-    for(int cw = m_mainWindow->children() - 1; cw >= 0; cw--) {
+    for(int cw = 0; cw < m_mainWindow->children(); cw++) {
          Fl_Group *winGroupContainer = (Fl_Group *) m_mainWindow->child(cw)->as_group();
 	 if(winGroupContainer != NULL) {
               m_mainWindow->remove(cw);
-	      ++cw;
+	      --cw;
 	      //break;
 	 }
     }

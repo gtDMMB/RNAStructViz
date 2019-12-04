@@ -61,7 +61,7 @@ class Folder {
 
     inline void HideGUIWidgets(bool waitForNoVisible = true) {
 	 //Folder::WaitForHiddenWidget(guiPackingContainerRef);
-	 Folder::WaitForHiddenWidget(guiPackingGroup);
+	 //Folder::WaitForHiddenWidget(guiPackingGroup);
          Folder::WaitForHiddenWidget(mainWindowFolderBtn);
 	 Folder::WaitForHiddenWidget(navUpBtn);
 	 Folder::WaitForHiddenWidget(navDownBtn);
