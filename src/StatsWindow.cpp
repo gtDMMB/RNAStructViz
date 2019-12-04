@@ -1020,7 +1020,7 @@ void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
         if(strncmp(window->ref_menu->mvalue()->label(),
                   "Please select a reference", 25))
         {
-            for (int i=0; i < window->comp_pack->children() - 1; i++)
+            for (int i=0; i < window->comp_pack->children(); i++)
             {
                 //Fl_Check_Button* button = 
                 //        (Fl_Check_Button*) window->comp_pack->child(i);
@@ -1114,7 +1114,7 @@ void StatsWindow::ClearStats()
 {
     if (statistics != NULL) 
     {
-        delete[] statistics;
+        Free(statistics);
         statistics = NULL;
     }
     numStats = 0;
@@ -1335,7 +1335,6 @@ void StatsWindow::ComputeStats()
         if(!statistics[ui].isValid) {
 	     continue;
 	}
-	activeStatsCount++;
 	char tempc[38];
         strncpy(tempc, statistics[ui].filename, 36);
         tempc[37] = '\0';
@@ -1402,7 +1401,7 @@ void StatsWindow::ComputeStats()
         sprintf(tempc,"%d\t",statistics[ui].gu_count);
         buff->append(tempc);
         sprintf(statistics[ui].nc_char,"%d",statistics[ui].non_canon_count);
-        if (activeStatsCount == numStats-1) {
+        if (activeStatsCount++ == 0) {
             sprintf(tempc,"%d",statistics[ui].non_canon_count);
         }
         else {
@@ -1728,10 +1727,10 @@ void StatsWindow::DrawHistograms()
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
-            box->color(FL_BACKGROUND_COLOR);
+            box->color();
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount* col_w,
                              cbh + cby - (int)(hscale * statistics[ui].gc_count),
                              col_w,
                              (int)(hscale*statistics[ui].gc_count),statistics[ui].gc_char);
@@ -1769,7 +1768,7 @@ void StatsWindow::DrawHistograms()
             box->color(FL_BACKGROUND_COLOR);
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
                              cbh + cby - (int)(hscale * statistics[ui].au_count),
                              col_w,
                              (int)(hscale*statistics[ui].au_count),statistics[ui].au_char);
@@ -1807,7 +1806,7 @@ void StatsWindow::DrawHistograms()
             box->color(FL_BACKGROUND_COLOR);
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
                              cbh + cby - (int)(hscale * statistics[ui].gu_count),
                              col_w,
                              (int)(hscale*statistics[ui].gu_count),statistics[ui].gu_char);
@@ -1845,7 +1844,7 @@ void StatsWindow::DrawHistograms()
             box->color(FL_BACKGROUND_COLOR);
             box->align(FL_ALIGN_TOP);
             
-            box = new Fl_Box(FL_BORDER_BOX,cbx+ui*col_w,
+            box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount * col_w,
                              cbh + cby - (int)(hscale * statistics[ui].non_canon_count),
                              col_w,
                              (int)(hscale*statistics[ui].non_canon_count),statistics[ui].nc_char);
