@@ -1491,7 +1491,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
             if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1523,7 +1523,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx+ activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].true_pos_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].true_pos_count), statistics[ui].tp_char);
@@ -1555,7 +1555,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].false_pos_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].false_pos_count),statistics[ui].fp_char);
@@ -1587,7 +1587,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].false_neg_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].false_neg_count),statistics[ui].fn_char);
@@ -1619,7 +1619,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].sensitivity),
                                      col_w,
                                      (int)(hscale*statistics[ui].sensitivity),statistics[ui].sens_char);
@@ -1655,7 +1655,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].selectivity),
                                      col_w,
                                      (int)(hscale*statistics[ui].selectivity),statistics[ui].sel_char);
@@ -1690,7 +1690,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < numStats; ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].pos_pred_value),
                                      col_w,
                                      (int)(hscale*statistics[ui].pos_pred_value),statistics[ui].ppv_char);
@@ -1724,7 +1724,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1762,7 +1762,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1800,7 +1800,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < numStats; ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
@@ -1838,7 +1838,7 @@ void StatsWindow::DrawHistograms()
         for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
-            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + ++activeBarsCount * col_w,
+            Fl_Box *box = new Fl_Box(FL_BORDER_BOX,cbx + activeBarsCount++ * col_w,
                                      cbh + cby - (int)(hscale * statistics[ui].base_pair_count),
                                      col_w,
                                      (int)(hscale*statistics[ui].base_pair_count),statistics[ui].bp_char);
