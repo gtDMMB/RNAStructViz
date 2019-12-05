@@ -138,8 +138,12 @@ RNASTRUCTVIZ_OBJECTS = \
 	StructureManager.$(OBJEXT) StructureType.$(OBJEXT) \
 	TerminalPrinting.$(OBJEXT) ViennaBoltzmannSampling.$(OBJEXT) XMLExportButton.$(OBJEXT)
 
-default: prelims $(RNASTRUCTVIZ_OBJECTS)
-	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
+BINEXE = $(BINARY_OUTPUT)
+
+RNASTRUCTVIZ_BUILD_DEPS = $(RNASTRUCTVIZ_OBJECTS) $(BINEXE)
+
+default: prelims $(RNASTRUCTVIZ_BUILD_DEPS)
+
 
 help: 
 	@echo "RNAStructViz Makefile targets and options:"
@@ -231,6 +235,9 @@ git-push: git-commit
 
 %: #accept not explicitly defined targets
 @: #ditto
+
+$(BINEXE): $(RNASTRUCTVIZ_OBJECTS)
+	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
 
 AutoloadIndicatorButton.$(OBJEXT): AutoloadIndicatorButton.h ConfigOptions.h RNAStructViz.h \
 	pixmaps/LinkSetIcon.c pixmaps/LinkUnsetIcon.c \

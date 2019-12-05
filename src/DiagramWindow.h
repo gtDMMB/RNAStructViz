@@ -239,7 +239,8 @@ private:
     int structureFolderIndex, sequenceLength;
     int pixelWidth;
     bool userConflictAlerted;
-    
+    static bool errorAlertDisplayShown;
+
     cairo_surface_t *crZoomSurface;
     cairo_t *crZoom;
     bool zoomButtonDown, haveZoomBuffer;

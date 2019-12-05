@@ -47,6 +47,7 @@ const int DiagramWindow::ms_menu_minx[3] = {
 };
 const int DiagramWindow::ms_menu_width = 190;
 vector<string> DiagramWindow::errorMsgQueue;
+bool DiagramWindow::errorAlertDisplayShown = false;
 
 volatile DiagramWindow * DiagramWindow::currentDiagramWindowInstance = NULL;
 bool DiagramWindow::redrawRefreshTimerSet = false;
@@ -1570,7 +1571,6 @@ int DiagramWindow::handle(int flEvent) {
 
      switch(flEvent) { 
       case FL_SHOW:
-           //make_current();
            m_redrawStructures = true;
            redraw();
            Fl::flush();
@@ -1630,12 +1630,12 @@ int DiagramWindow::handle(int flEvent) {
                             }
                             int minArcPairIndex = MIN(zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
                             if(minArcPairIndex <= 0) {
-                                      const char * errMsg = "Invalid arc index bounds selected! Try zooming again.";
+                                      const char *errMsg = "Invalid arc index bounds selected! Try zooming again.";
                                       AddNewErrorMessageToDisplay(string(errMsg));
                                       return 1;
                             }
                             else if(!RNAStructure::ScrollOpenCTFileViewerWindow(structIndex, minArcPairIndex)) { 
-                                      const char * errMsg = "CT view operation failed. Try zooming again?";
+                                      const char *errMsg = "CT view operation failed. Try zooming again?";
                                       AddNewErrorMessageToDisplay(string(errMsg));
                                       return 1;
                             }
@@ -2076,10 +2076,20 @@ void DiagramWindow::AddNewErrorMessageToDisplay(string errorMsg, float callbackT
 }
 
 void DiagramWindow::DisplayErrorDialogTimerCallback(void *handlerRef) {
+     if(errorAlertDisplayShown) {
+          Fl::add_timeout(0.5, DisplayErrorDialogTimerCallback);
+          return;
+     }
      Fl::lock();
      string errorMsg = errorMsgQueue.back();
      errorMsgQueue.pop_back();
      Fl::unlock();
      TerminalText::PrintError("%s\n", errorMsg.c_str());
+     Fl::lock();
+     errorAlertDisplayShown = true;
+     Fl::unlock();
      fl_alert(errorMsg.c_str());
+     Fl::lock();
+     errorAlertDisplayShown = false;
+     Fl::unlock();
 }
