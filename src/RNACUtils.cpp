@@ -235,3 +235,14 @@ static inline bool FileFormatSortCmp(boost::filesystem::path filePathV1, boost::
      return fileV1 < fileV2;
 
 }
+
+static inline size_t StringFindNoCase(std::string needle, std::string haystack) {
+     auto findIt = std::search(haystack.begin(), haystack.end(), 
+		               needle.begin(), needle.end(), 
+			       [](char ch1, char ch2) { return std::tolower(ch1) == std::tolower(ch2); }
+		   );
+     if(findIt == haystack.end()) {
+          return std::string::npos;
+     }
+     return findIt - haystack.begin();
+}

@@ -115,7 +115,7 @@ CXXFLAGS_PKGCONFIG=$(shell ../build-scripts/pkg-config-flags.sh --cflags)
 CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags)
 CXXFLAGS_DEFINES=$(shell ../build-scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg))
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
-	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE \
+	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -DBOOST_MPL_LIMIT_LIST_SIZE=10 \
 	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -freciprocal-math \
 	       -ffinite-math-only $(CXXFLAGS_DEFINES)
 
@@ -279,7 +279,7 @@ $(OBJ_BUILD_DIR)/CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h Config
 	RNAStructViz.h ConfigExterns.h CommonDialogs.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp -o $@
 
-$(OBJ_BUILD_DIR)/ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp \
+ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp \
 	../build-scripts/BuildTargetInfo.h.in $(BUILD_TARGET_HEADER)
 
 $(OBJ_BUILD_DIR)/ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \

@@ -126,14 +126,14 @@ void RNAStructViz::ExitApplication(bool promptUser) {
       return;
      }
      const char *promptQMsg = "Are you really sure you want to quit? All unsaved data and loaded structures will be lost!";
-     int userResp = fl_choice(promptQMsg, "Yes, QUIT!", "No, CANCEL", NULL);
+     int userResp = fl_choice("%s", "Yes, QUIT!", "No, CANCEL", NULL, promptQMsg);
      switch(userResp) {
           case 0:
-           RNAStructViz::Shutdown();
-           return;
-      case 1:
-      default:
-           break;
+               RNAStructViz::Shutdown();
+               return;
+          case 1:
+          default:
+               break;
      }
      return;
 }

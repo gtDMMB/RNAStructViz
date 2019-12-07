@@ -48,13 +48,13 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
         basename = localCopy;
     else
         basename++;
-    
+
     // Don't load if it shares a filename with another loaded structure
     for (int i = 0; i < m_structureCount; ++i)
     {
         if (m_structures[i])
         {
-            if (!strcmp(m_structures[i]->GetFilename(false), basename))
+            if (!strcmp(m_structures[i]->GetFilename(true), basename))
             {
                 TerminalText::PrintInfo("Skipping ... Already have a structure loaded with filename: %s\n", 
                                         basename);

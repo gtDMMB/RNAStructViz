@@ -893,9 +893,7 @@ const char* RNAStructure::GetInitialFileComment() const {
 }
 
 void RNAStructure::SetFileCommentLines(std::string commentLineData, InputFileTypeSpec fileType) {
-     if(m_fileCommentLine != NULL) {
-          Free(m_fileCommentLine);
-     }
+     Free(m_fileCommentLine);
      int clineDataLen = strlen(commentLineData.c_str());
      m_fileCommentLine = (char *) malloc((clineDataLen + 1) * sizeof(char));
      strncpy(m_fileCommentLine, commentLineData.c_str(), clineDataLen);
@@ -909,62 +907,71 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
           return m_suggestedFolderName;
      }
      else if(m_fileType == FILETYPE_NOPCT && m_fileCommentLine != NULL) {
-      std::string commentLines = std::string(m_fileCommentLine);
-      std::string orgName, accNo;
-      std::string searchStr = "Organism: ";
-      auto orgNameIt = search(commentLines.begin(), commentLines.end(), 
-		              searchStr.begin(), searchStr.end(), 
-		              [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); });
-      size_t orgNamePos = orgNameIt == searchStr.end() ? std::string::npos : orgNameIt - searchStr.begin();
-      if(orgNamePos == std::string::npos) {
-           searchStr = "Name: ";
-	   orgNameIt = search(commentLines.begin(), commentLines.end(), 
-		              searchStr.begin(), searchStr.end(), 
-			      [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }); 
-	   orgNamePos = orgNameIt == searchStr.end() ? std::string::npos : orgNameIt - searchStr.begin();
-      }
-      if(orgNamePos != std::string::npos) {
-           size_t newlinePos = commentLines.find_first_of("\n", orgNamePos);
-           if(newlinePos != std::string::npos) {
-            size_t orgNameStartPos = orgNamePos + searchStr.length();
-                orgName = commentLines.substr(orgNameStartPos, newlinePos - orgNameStartPos);
-            size_t orgSecondWordPos = orgName.find(" ");
-            if(orgSecondWordPos != std::string::npos && orgSecondWordPos + 1 < orgName.length()) {
-                 orgName = orgName.substr(0, 1) + std::string(".") + orgName.substr(orgSecondWordPos);
-            }
-           }
-      }
-      searchStr = "Accession";
-      auto accNoIt = search(commentLines.begin(), commentLines.end(), 
-		            searchStr.begin(), searchStr.end(), 
-			    [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); });
-      size_t accNoPos = accNoIt == searchStr.end() ? std::string::npos : accNoIt - searchStr.begin();
-      if(accNoPos != std::string::npos) {
-               size_t colonPos = commentLines.find_first_of(":", accNoPos);
+	 std::string commentLines = std::string(m_fileCommentLine);
+         std::string orgName, accNo;
+	 std::string searchStr = "Organism: ";
+	 size_t orgNamePos = StringFindNoCase(searchStr, commentLines);
+         if(orgNamePos == std::string::npos) {
+	      searchStr = "Name: ";
+	      orgNamePos = StringFindNoCase(searchStr, commentLines);
+         }
+         if(orgNamePos != std::string::npos) {
+             size_t newlinePos = commentLines.find_first_of("\n", orgNamePos);
+             if(newlinePos != std::string::npos) {
+               size_t orgNameStartPos = orgNamePos + searchStr.length();
+               orgName = commentLines.substr(orgNameStartPos, newlinePos - orgNameStartPos);
+               size_t orgSecondWordPos = orgName.find(" ");
+               if(orgSecondWordPos != std::string::npos && orgSecondWordPos + 1 < orgName.length()) {
+                    orgName = orgName.substr(0, 1) + std::string(".") + orgName.substr(orgSecondWordPos);
+               }
+             }
+         }
+         searchStr = "Accession Number: ";
+	 size_t accNoPos = StringFindNoCase(searchStr, commentLines);
+         if(accNoPos == std::string::npos) {
+	      searchStr = "Accession";
+	      accNoPos = StringFindNoCase(searchStr, commentLines);
+	 }
+	 if(accNoPos == std::string::npos) {
+	      searchStr = "Acc";
+	      accNoPos = StringFindNoCase(searchStr, commentLines);
+	 }
+	 if(accNoPos == std::string::npos) {
+	      searchStr = "No";
+	      accNoPos = StringFindNoCase(searchStr, commentLines);
+	 }
+	 if(accNoPos != std::string::npos) {
+           size_t colonPos = commentLines.find(": ", accNoPos);
            if(colonPos != std::string::npos) {
-                    size_t accNoStart = colonPos + 2;
-            size_t newlinePos = commentLines.find_first_of("\n", accNoStart);
-            if(newlinePos == std::string::npos) {
-                 accNo = commentLines.substr(accNoStart);
-            }
-            else {
-                         accNo = commentLines.substr(accNoStart, newlinePos - accNoStart);
-            }
+                size_t accNoStart = colonPos + 2;
+                size_t newlinePos = commentLines.find("\n", accNoStart);
+		size_t nextSpacePos = commentLines.find(" ", accNoStart);
+                if(newlinePos == std::string::npos && nextSpacePos == std::string::npos) {
+                     accNo = commentLines.substr(accNoStart);
+                }
+		else if(newlinePos == std::string::npos || nextSpacePos < newlinePos) {
+	             accNo = commentLines.substr(accNoStart, nextSpacePos - accNoStart);
+		}
+                else {
+                     accNo = commentLines.substr(accNoStart, newlinePos - accNoStart);
+                }
            }
-      }
-      std::string sfNameStr;
-      if(orgName.length() > 0 && accNo.length() > 0) {
-          sfNameStr = orgName + std::string(" (") + accNo + std::string(")");
-      }
-      else if(orgName.length() > 0) {
-           sfNameStr = orgName;
-      }
-      else if(accNo.length() > 0) {
-           sfNameStr = accNo;
-      }
-      m_suggestedFolderName = (char *) malloc((sfNameStr.length() + 1) * sizeof(char));
-      strcpy(m_suggestedFolderName, sfNameStr.c_str());
-          return m_suggestedFolderName;
+         }
+         std::string sfNameStr;
+         if(orgName.length() > 0 && accNo.length() > 0) {
+             sfNameStr = orgName + std::string(" (") + accNo + std::string(")");
+         }
+         else if(orgName.length() > 0) {
+             sfNameStr = orgName;
+         }
+         else if(accNo.length() > 0) {
+             sfNameStr = accNo;
+         }
+         if(sfNameStr.length() > 0) {
+	     m_suggestedFolderName = (char *) malloc((sfNameStr.length() + 1) * sizeof(char));
+             strcpy(m_suggestedFolderName, sfNameStr.c_str());
+             return m_suggestedFolderName;
+	 }
      }
      m_suggestedFolderName = (char *) malloc((MAX_BUFFER_SIZE + 1) * sizeof(char));
      
@@ -1058,7 +1065,6 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
                             titleSuffix == NULL ? "" : titleSuffix);
          m_contentWindow = new Fl_Double_Window(subwinWidth, subwinTotalHeight);
          m_contentWindow->copy_label(contentWinTitleString);
-         //m_contentWindow->set_non_modal();
 	 
 	 int curYOffset = 6, windowSpacing = 10;
          int curXOffset = 5; 

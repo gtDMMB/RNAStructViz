@@ -1,17 +1,17 @@
 default:
-	cd src && make -f Makefile default
+	cd src && make -j3 -f Makefile default
 
 help:
-	cd src && make -f Makefile help
+	cd src && make -j3 -f Makefile help
 
 diagnostic:
-	cd src && make -f Makefile diagnostic
+	cd src && make -j3 -f Makefile diagnostic
 
 run:
-	cd src && make -f Makefile run
+	cd src && make -j3 -f Makefile run
 
 clean:
-	cd src && make -f Makefile clean
+	cd src && make -j3 -f Makefile clean
 
 install:
-	cd src && make -f Makefile install
+	cd src && make -j3 -f Makefile install

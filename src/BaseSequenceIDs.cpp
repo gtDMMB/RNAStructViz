@@ -240,22 +240,22 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
      // have appended sample numbers to the GTB files (need to remove this data to open the files):
      char actualFilePath[MAX_BUFFER_SIZE];
      if(fileType == FILETYPE_GTB) {
-      strcpy(actualFilePath, filePath);
-      const char *lastDashPos = strrchr(actualFilePath, '-');
-      const char *extPos = strrchr(actualFilePath, '.');
-      if(lastDashPos != NULL && extPos != NULL) {
-               const char *origExtPos = strrchr(filePath, '.');
-           size_t extStrLen = strlen(extPos);
-           char *lastDashPosWritable = (char *) lastDashPos;
-           strncpy(lastDashPosWritable, origExtPos, extStrLen);
-           lastDashPosWritable[extStrLen] = '\0';
-           filePath = (const char *) actualFilePath;
-      }
+        strcpy(actualFilePath, filePath);
+        const char *lastDashPos = strrchr(actualFilePath, '-');
+        const char *extPos = strrchr(actualFilePath, '.');
+        if(lastDashPos != NULL && extPos != NULL) {
+             const char *origExtPos = strrchr(filePath, '.');
+             size_t extStrLen = strlen(extPos);
+             char *lastDashPosWritable = (char *) lastDashPos;
+             strncpy(lastDashPosWritable, origExtPos, extStrLen);
+             lastDashPosWritable[extStrLen] = '\0';
+             filePath = (const char *) actualFilePath;
+        }
      }
      FILE *fpInputSeq = fopen(filePath, "r");
      if(!fpInputSeq) {
           TerminalText::PrintError("Unable to open file \"%s\" : %s V\n", filePath, strerror(errno));
-      return "";
+          return "";
      }
      std::string headerLines;
      char lineBuf[MAX_BUFFER_SIZE];
@@ -263,59 +263,61 @@ std::string GetSequenceFileHeaderLines(const char *filePath, InputFileTypeSpec f
      int lineCount = 0;
      while(!feof(fpInputSeq) && fgets(lineBuf, MAX_BUFFER_SIZE, fpInputSeq)) {
           int lineLength = strlen(lineBuf);
-      ++lineCount;
-      if(lineLength == 0) {
-           stopParsing = true;
-           break;
-      }
+          ++lineCount;
+          if(lineLength == 0) {
+               stopParsing = true;
+               break;
+          }
           switch(fileType) {
-           case FILETYPE_NOPCT: {
+                 case FILETYPE_NOPCT: {
                     std::string searchStr = std::string(lineBuf);
-            if(searchStr.find("Filename") != std::string::npos || 
-               searchStr.find("Organism") != std::string::npos || 
-               searchStr.find("Accession") != std::string::npos) {
-                 addToHeaderStr = true;
-            }
-            else {
-             stopParsing = true;
-            }
-            break;
-           }
-           case FILETYPE_CT:
-                if(lineCount == 1) {
-                 addToHeaderStr = true;
-                }
-            else {
-                 stopParsing = true;
-                }
-            break;
-           case FILETYPE_BPSEQ:
-                if(lineBuf[0] != ';') {
-                 addToHeaderStr = true;
-             stopParsing = true;
-                }
-                break;
-           case FILETYPE_DOTBRACKET:
-           case FILETYPE_GTB:
-           case FILETYPE_HLXTRIPLE:
-                if(lineBuf[0] == '>') {
-                 addToHeaderStr = true;
-                }
-            else {
-                 stopParsing = true;
-                }
-            break;
-           default:
-                stopParsing = true;
-                break;
-      }
-      if(addToHeaderStr) {
-           headerLines += string(lineBuf);
-      }
-      if(stopParsing) {
-           break;
-      }
-      addToHeaderStr = false;
+                    if(searchStr.length() > 0 && searchStr.at(0) == '>' || 
+		       StringFindNoCase("Filename:", searchStr) != std::string::npos || 
+                       StringFindNoCase("Organism:", searchStr) != std::string::npos || 
+                       StringFindNoCase("Accession", searchStr) != std::string::npos || 
+		       StringFindNoCase("Name:", searchStr) != std::string::npos) {
+                        addToHeaderStr = true;
+                    }
+                    else {
+                        stopParsing = true;
+                   }
+                   break;
+                 }
+                 case FILETYPE_CT:
+                      if(lineCount == 1) {
+                          addToHeaderStr = true;
+                      } 
+                      else {
+                          stopParsing = true;
+                      }
+                      break;
+                 case FILETYPE_BPSEQ:
+                      if(lineBuf[0] != ';') {
+                          addToHeaderStr = true;
+                          stopParsing = true;
+                      }
+                      break;
+                 case FILETYPE_DOTBRACKET:
+                 case FILETYPE_GTB:
+                 case FILETYPE_HLXTRIPLE:
+                      if(lineBuf[0] == '>') {
+                          addToHeaderStr = true;
+                      }
+                      else {
+                          stopParsing = true;
+                      }
+                      break;
+                 default:
+                      stopParsing = true;
+                      break;
+          }
+          if(addToHeaderStr) {
+               headerLines += string(lineBuf);
+          }
+          if(stopParsing) {
+               break;
+          }
+          addToHeaderStr = false;
      }
      fclose(fpInputSeq);
      return headerLines;
