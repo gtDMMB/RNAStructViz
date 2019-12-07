@@ -555,7 +555,7 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
           stack<int> unpairedBasePairs;
           RNAStructure *rnaStruct = new RNAStructure();
           rnaStructsArray[*arrayCount] = rnaStruct;
-      rnaStruct->m_sequenceLength = seqLength;
+          rnaStruct->m_sequenceLength = seqLength;
           rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
           for(int baseIdx = 0; baseIdx < seqLength; baseIdx++) { 
                RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
@@ -615,7 +615,7 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
       // we will have multiple samples in this files, need to append a sample number suffix to 
       // distinguish between them for the users in the GUI: 
       int nextFileIdentifierLen = strlen(filename) + 16;
-          rnaStruct->m_pathname = (char *) malloc(nextFileIdentifierLen * sizeof(char));
+      rnaStruct->m_pathname = (char *) malloc(nextFileIdentifierLen * sizeof(char));
       rnaStruct->m_pathname[0] = '\0';
       char *fileExtPos = strrchr((char *) filename, '.');
           if(fileExtPos == NULL) {
@@ -623,7 +623,7 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
       }
       strncpy(rnaStruct->m_pathname, filename, fileExtPos - filename);
       rnaStruct->m_pathname[fileExtPos - filename] = '\0';
-      rnaStruct->m_exactPathName = rnaStruct->m_pathname;
+      rnaStruct->m_exactPathName = strdup(filename);
       char sampleSuffix[MAX_BUFFER_SIZE];
       snprintf(sampleSuffix, MAX_BUFFER_SIZE, "-S%06d", *arrayCount + 1);
       strcat(rnaStruct->m_pathname, sampleSuffix);
