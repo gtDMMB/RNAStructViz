@@ -1618,11 +1618,11 @@ int DiagramWindow::handle(int flEvent) {
            return 1;
       case FL_KEYDOWN: {
                             if(Fl::event_length() == 1 && *(Fl::event_text()) == 'G') { 
-                                     if(!haveZoomBuffer || !zoomBufferContainsArc) { 
-                                               const char *errMsg = "Select a zoom area containing a displayed arc before trying to view the structure's CT file contents!";
-                                      AddNewErrorMessageToDisplay(string(errMsg));
-                                      return 1;
-                            }
+                                      if(!haveZoomBuffer || !zoomBufferContainsArc) { 
+                                           const char *errMsg = "Select a zoom area containing a displayed arc before trying to view the structure's CT file contents!";
+                                           AddNewErrorMessageToDisplay(string(errMsg));
+                                           return 1;
+                                      }
                             int structIndex = RNAStructure::ActionOpenCTFileViewerWindow(folderIndex, 
                                                          zoomBufferMinArcIndex, zoomBufferMaxArcIndex);
                             if(structIndex < 0) {

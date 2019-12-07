@@ -22,7 +22,6 @@
 
 #include "ConfigOptions.h"
 #include "ConfigExterns.h"
-#include "ImageNavButton.h"
 #include "RNAStructVizTypes.h"
 #include "AutoloadIndicatorButton.h"
 #include "XMLExportButton.h"
@@ -55,7 +54,6 @@ class StructureData {
 	  Fl_Group  *guiPackingGroup;
 	  Fl_Button *mainViewerDisplayBtn;
           Fl_Button *navCloseBtn;
-	  ImageNavButton *fileFormatBtn;
 	  AutoloadIndicatorButton *autoloadToggleBtn;
 	  XMLExportButton *xmlExportBtn;
 
@@ -66,7 +64,7 @@ class StructureData {
           inline StructureData() : structure(NULL), parentMainFolderWin(NULL), 
 	                           index(-1), guiPackingContainerRef(NULL), guiPackingGroup(NULL), 
 	                           mainViewerDisplayBtn(NULL), navCloseBtn(NULL), 
-			           fileFormatBtn(NULL), autoloadToggleBtn(NULL), xmlExportBtn(NULL) {} 
+			           autoloadToggleBtn(NULL), xmlExportBtn(NULL) {} 
 	  
 	  inline ~StructureData() {
                DeleteGUIWidgets();
@@ -90,7 +88,6 @@ class StructureData {
 	       }
 	       Delete(mainViewerDisplayBtn, Fl_Button);
 	       Delete(navCloseBtn, Fl_Button);
-	       Delete(fileFormatBtn, ImageNavButton);
 	       Delete(autoloadToggleBtn, AutoloadIndicatorButton);
 	       Delete(xmlExportBtn, XMLExportButton);
 	       Delete(guiPackingGroup, Fl_Group);

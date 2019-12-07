@@ -10,7 +10,6 @@
 #include "RNAStructure.h"
 #include "ConfigOptions.h"
 #include "ConfigExterns.h"
-#include "ImageNavButton.h"
 #include "BaseSequenceIDs.h"
 
 #define DEFAULT_FOLDER_NAME_BUFSIZE        (64)
@@ -28,8 +27,8 @@ class Folder {
 	              structCount(NULL), selected(false), fileType(FILETYPE_NONE), 
 		      capacity(2 * DEFAULT_FOLDER_NAME_BUFSIZE), folderWindow(NULL), 
 		      mainWindowFolderBtn(NULL), navUpBtn(NULL), navDownBtn(NULL), 
-		      navCloseBtn(NULL), toggleStickyBtn(NULL), exportXMLBtn(NULL),
-                      displayInfoBtn(NULL), doWidgetDeletion(true) {
+		      navCloseBtn(NULL), 
+		      doWidgetDeletion(true) {
         folderStructs = (int *) malloc(capacity * sizeof(int));
         memset(folderStructs, -1, capacity);
         tooltipText[0] = '\0';
@@ -69,9 +68,6 @@ class Folder {
 	 Folder::WaitForHiddenWidget(navUpBtn);
 	 Folder::WaitForHiddenWidget(navDownBtn);
 	 Folder::WaitForHiddenWidget(navCloseBtn);
-	 Folder::WaitForHiddenWidget((Fl_Widget *) toggleStickyBtn);
-	 Folder::WaitForHiddenWidget((Fl_Widget *) exportXMLBtn);
-	 Folder::WaitForHiddenWidget((Fl_Widget *) displayInfoBtn);
     }
 
     inline void DeleteGUIWidgetData() {
@@ -85,9 +81,6 @@ class Folder {
 	 Delete(navDownBtn, Fl_Button);
          Delete(navCloseBtn, Fl_Button);
 	 Delete(guiPackingGroup, Fl_Group);
-	 Delete(toggleStickyBtn, ImageNavButton);
-	 Delete(exportXMLBtn, ImageNavButton);
-	 Delete(displayInfoBtn, ImageNavButton);
     }
 
     static Folder * AddNewFolderFromData(const RNAStructure *structure, const int index, bool isSelected = false) {
@@ -208,7 +201,6 @@ class Folder {
     Fl_Group  *guiPackingGroup;
     Fl_Button *mainWindowFolderBtn;
     Fl_Button *navUpBtn, *navDownBtn, *navCloseBtn;
-    ImageNavButton *toggleStickyBtn, *exportXMLBtn, *displayInfoBtn;
 
   protected:
     bool doWidgetDeletion;

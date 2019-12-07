@@ -95,10 +95,12 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
               !strncasecmp(extension, ".hlx", 4))) {
         structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
     }
+    #if WITH_FASTA_FORMAT_SUPPORT > 0
     else if(extension && !strncasecmp(extension, ".fasta", 6)) {
         structures = RNAStructure::CreateFromFASTAFile(localCopy, &newStructCount);
 	isFASTAFile = true;
     }
+    #endif
     else {
         if (strlen(filename) > 1000) {
 	    if(!guiQuiet) {

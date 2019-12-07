@@ -19,7 +19,7 @@ class RNAStructure;
 class StructureData;
 
 /* Other smaller-order types defined, and configuration settings includes: */
-#include "BuildTargetInfo.h"
+#include "BuildInclude/BuildTargetInfo.h"
 
 typedef struct {
      Fl_Color windowBGColor;

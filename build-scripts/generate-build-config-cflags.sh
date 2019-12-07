@@ -33,6 +33,7 @@ CFGFILE_OPTIONS_LIST=(\
 	"NCBIDB_SUPPORT" \
 	"BETA_TESTING_FEATURES_SUPPORT" \
 	"USE_LEAK_SANITIZER" \
+	"WITH_FASTA_FORMAT_SUPPORT" \
 )
 
 DASHD_DEFINES_CFLAG_SPECS=(\
@@ -43,6 +44,7 @@ DASHD_DEFINES_CFLAG_SPECS=(\
 	"BUILD_WITH_NCBI_LOOKUP_SUPPORT" \
 	"__RNASTRUCTVIZ_ENABLE_BETA_TESTING_FEATURES" \
 	"WITHGPERFTOOLS" \
+	"WITH_FASTA_FORMAT_SUPPORT" \
 )
 
 EXTRA_CFLAGS_LIST=""
@@ -51,9 +53,10 @@ for sidx in $(seq 1 $numSettings); do
 	arrIndex=$(($sidx - 1));
 	cfgSetting=$(GetBuildConfigSetting $BUILD_CONFIG_SRCFILE ${CFGFILE_OPTIONS_LIST[$arrIndex]});
 	defineName=${DASHD_DEFINES_CFLAG_SPECS[$arrIndex]};
-	if [[ "${cfgSetting}" != "" ]]; then
-		EXTRA_CFLAGS_LIST="${EXTRA_CFLAGS_LIST} -D${defineName}=${cfgSetting}";
+	if [[ "${cfgSetting}" == "" ]]; then
+		cfgSetting=0;
 	fi
+	EXTRA_CFLAGS_LIST="${EXTRA_CFLAGS_LIST} -D${defineName}=${cfgSetting}";
 done
 
 echo -n "${EXTRA_CFLAGS_LIST}"

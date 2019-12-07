@@ -21,7 +21,7 @@
 #include <string>
 using std::string;
 
-#include "BuildTargetInfo.h"
+#include "BuildInclude/BuildTargetInfo.h"
 #include "CairoDrawingUtils.h"
 
 #ifndef PERFORM_BRANCH_TYPE_ID

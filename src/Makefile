@@ -126,30 +126,43 @@ LDFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms 
 LDFLAGS_EXTRA=$(LDFLAGS_FLTK) $(LDFLAGS_PKGCONFIG) -lssl -lcrypto -lboost_system -lboost_filesystem
 LDFLAGS_FULL=$(BUILD_LDFLAGS_USER_EXTRAS) $(LDFLAGS_EXTRA) $(LDFLAGS) 
 
+OBJ_BUILD_DIR=./BuildObjects
+BUILD_TARGET_HEADER_DIR=./BuildInclude
+BUILD_TARGET_HEADER=$(BUILD_TARGET_HEADER_DIR)/BuildTargetInfo.h
 RNASTRUCTVIZ_OBJECTS = \
-	AutoloadIndicatorButton.$(OBJEXT) \
-	BaseSequenceIDs.$(OBJEXT) BranchTypeIdentification.$(OBJEXT) CairoDrawingUtils.$(OBJEXT) \
-	CommonDialogs.$(OBJEXT) ConfigParser.$(OBJEXT) DiagramWindow.$(OBJEXT) \
-	DisplayConfigWindow.$(OBJEXT)\
-	StatsWindow.$(OBJEXT) InputWindow.$(OBJEXT) LoadFileSelectAllButton.$(OBJEXT) \
-	FolderWindow.$(OBJEXT) Fl_Rotated_Text.$(OBJEXT) \
-	Main.$(OBJEXT) MainWindow.$(OBJEXT) OptionParser.$(OBJEXT) \
-	RadialLayoutImage.$(OBJEXT) RNAStructure.$(OBJEXT) RNAStructViz.$(OBJEXT) \
-	StructureManager.$(OBJEXT) StructureType.$(OBJEXT) \
-	TerminalPrinting.$(OBJEXT) ViennaBoltzmannSampling.$(OBJEXT) XMLExportButton.$(OBJEXT)
-
+	$(OBJ_BUILD_DIR)/AutoloadIndicatorButton.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/BaseSequenceIDs.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/BranchTypeIdentification.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/CairoDrawingUtils.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/CommonDialogs.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/ConfigParser.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/DiagramWindow.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/DisplayConfigWindow.$(OBJEXT)\
+	$(OBJ_BUILD_DIR)/Fl_Rotated_Text.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/FolderWindow.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/InputWindow.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/LoadFileSelectAllButton.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/Main.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/MainWindow.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/OptionParser.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/RadialLayoutImage.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/RNAStructure.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/RNAStructViz.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/StatsWindow.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/StructureManager.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/StructureType.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/TerminalPrinting.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/ViennaBoltzmannSampling.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/XMLExportButton.$(OBJEXT)
 BINEXE = $(BINARY_OUTPUT)
+RNASTRUCTVIZ_BUILD_DEPS = $(OBJ_BUILD_DIR) $(BUILD_TARGET_HEADER) $(RNASTRUCTVIZ_OBJECTS) $(BINEXE)
 
-RNASTRUCTVIZ_BUILD_DEPS = $(RNASTRUCTVIZ_OBJECTS) $(BINEXE)
-
-default: prelims $(RNASTRUCTVIZ_BUILD_DEPS)
-
+default: $(RNASTRUCTVIZ_BUILD_DEPS)
 
 help: 
 	@echo "RNAStructViz Makefile targets and options:"
 	@echo "  >> default, e.g., run \'make\'     : Build the application, but do not clean sources or run it"
 	@echo "  >> default_with_gperf              : Debugging target for developers"
-	@echo "  >> prelims                         : Copy the local build header using a script (called by some targets automatically)"
 	@echo "  >> diagnostic                      : Print diagnostic information about the compiler and library source locations"
 	@echo "  >> run                             : Build and run RNAStructViz"
 	@echo "  >> run-debug                       : Build and run RNAStructViz in the local debugger"
@@ -166,14 +179,8 @@ help:
 	@echo "  >> STRUCTVIZ_EXTRA_CFLAGS  [exported env variable] : For local installs and local include paths"
 	@echo "  >> STRUCTVIZ_EXTRA_LDFLAGS [exported env variable] : For local installs and local library paths"
 
-default_with_gperf: prelims $(RNASTRUCTVIZ_OBJECTS)
+default_with_gperf: $(RNASTRUCTVIZ_BUILD_DEPS)
 	$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL) -lprofiler -ltcmalloc
-
-prelims:
-	@rm -f BuildTargetInfo.h
-	@/bin/bash $(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
-		$(shell $(READLINK) -f ./BuildTargetInfo.h) \
-		$(shell $(READLINK) -f $(FLTKCONFIG))
 
 diagnostic:
 	@echo "BuildFLTKLocal: " $(BUILD_FLTK_LOCAL)
@@ -193,8 +200,9 @@ run-debug: clean default
 	$(DEBUGGER) $(shell $(READLINK) -f ./RNAStructViz)
 
 clean:
-	@rm -f *.o *.code *.log *.callgrind *.out *.ps *.pdf *.heap \
-		BuildTargetInfo.h* $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS)
+	@rm -f *.$(OBJEXT) *.code *.log *.callgrind *.out *.ps *.pdf *.heap \
+		$(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) \
+		$(OBJ_BUILD_DIR)/* $(BUILD_TARGET_HEADER)
 
 install: default
 	if test -z "$$INSTALL_PREFIX"; then INSTALL_PREFIX=/usr/local/; fi;\
@@ -239,121 +247,132 @@ git-push: git-commit
 $(BINEXE): $(RNASTRUCTVIZ_OBJECTS)
 	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
 
-AutoloadIndicatorButton.$(OBJEXT): AutoloadIndicatorButton.h ConfigOptions.h RNAStructViz.h \
+$(OBJ_BUILD_DIR):
+	@mkdir -p $(OBJ_BUILD_DIR)
+
+$(BUILD_TARGET_HEADER):
+	@mkdir -p $(BUILD_TARGET_HEADER_DIR)
+	@rm -f $(BUILD_TARGET_HEADER)
+	@/bin/bash $(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
+		$(shell $(READLINK) -f $(BUILD_TARGET_HEADER)) \
+		$(shell $(READLINK) -f $(FLTKCONFIG))
+
+$(OBJ_BUILD_DIR)/AutoloadIndicatorButton.$(OBJEXT): AutoloadIndicatorButton.h ConfigOptions.h RNAStructViz.h \
 	pixmaps/LinkSetIcon.c pixmaps/LinkUnsetIcon.c \
 	AutoloadIndicatorButton.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c AutoloadIndicatorButton.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c AutoloadIndicatorButton.cpp -o $@
 
-BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h TerminalPrinting.h \
+$(OBJ_BUILD_DIR)/BaseSequenceIDs.$(OBJEXT): BaseSequenceIDs.h TerminalPrinting.h \
 	ConfigParser.h BaseSequenceIDs.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c BaseSequenceIDs.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c BaseSequenceIDs.cpp -o $@
 
-BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
+$(OBJ_BUILD_DIR)/BranchTypeIdentification.$(OBJEXT): RNAStructure.h BranchTypeIdentification.h\
 	BranchTypeIdentification.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c BranchTypeIdentification.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c BranchTypeIdentification.cpp -o $@
 
-CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h TerminalPrinting.h CairoDrawingUtils.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c CairoDrawingUtils.cpp
+$(OBJ_BUILD_DIR)/CairoDrawingUtils.$(OBJEXT): CairoDrawingUtils.h TerminalPrinting.h CairoDrawingUtils.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c CairoDrawingUtils.cpp -o $@
 
-CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
+$(OBJ_BUILD_DIR)/CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h ConfigParser.h \
 	RNAStructViz.h ConfigExterns.h CommonDialogs.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp -o $@
 
-ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp ../build-scripts/BuildTargetInfo.h.in
+$(OBJ_BUILD_DIR)/ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp \
+	../build-scripts/BuildTargetInfo.h.in $(BUILD_TARGET_HEADER)
 
-ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
+$(OBJ_BUILD_DIR)/ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
 	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \
 	DisplayConfigWindow.h ConfigExterns.h ThemesConfig.h \
 	ConfigParser.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c ConfigParser.cpp -o $@
 
-DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
+$(OBJ_BUILD_DIR)/DiagramWindow.$(OBJEXT): DiagramWindow.h RNAStructViz.h \
 	BranchTypeIdentification.h RNAStructure.h TerminalPrinting.h \
 	pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c DiagramWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c DiagramWindow.cpp -o $@
 
-DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
+$(OBJ_BUILD_DIR)/DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOptions.h \
 	pixmaps/ConfigPathsIcon.c pixmaps/ConfigThemesIcon.c \
 	pixmaps/PNGNewPathIcon.c pixmaps/ConfigWindowIcon.xbm \
 	pixmaps/ConfigCheckBoxParams.c \
 	ThemesConfig.h DisplayConfigWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp -o $@
 
-Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c Fl_Rotated_Text.cpp
+$(OBJ_BUILD_DIR)/Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c Fl_Rotated_Text.cpp -o $@
 
-FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h \
+$(OBJ_BUILD_DIR)/FolderWindow.$(OBJEXT): FolderWindow.h StructureManager.h RNAStructViz.h \
 	ConfigOptions.h MainWindow.h ThemesConfig.h \
 	pixmaps/StructureOperationIcon.c \
 	FolderWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c FolderWindow.cpp -o $@
 
-InputWindow.$(OBJEXT): InputWindow.h MainWindow.h ConfigOptions.h \
+$(OBJ_BUILD_DIR)/InputWindow.$(OBJEXT): InputWindow.h MainWindow.h ConfigOptions.h \
 	ConfigParser.h RNAStructViz.h StructureManager.h \
 	FolderStructure.h BaseSequenceIDs.h ConfigExterns.h \
 	InputWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp -o $@
 
-LoadFileSelectAllButton.$(OBJEXT): LoadFileSelectAllButton.h ConfigOptions.h\
+$(OBJ_BUILD_DIR)/LoadFileSelectAllButton.$(OBJEXT): LoadFileSelectAllButton.h ConfigOptions.h\
 	ConfigExterns.h LoadFileSelectAllButton.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c LoadFileSelectAllButton.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c LoadFileSelectAllButton.cpp -o $@
 
-Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
+$(OBJ_BUILD_DIR)/Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	TerminalPrinting.h OptionParser.h ConfigExterns.h \
 	Main.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp -o $@
 
-MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
+$(OBJ_BUILD_DIR)/MainWindow.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	TerminalPrinting.h ThemesConfig.h \
 	pixmaps/RNAWindowIcon.xbm pixmaps/HelpIcon.c MainWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c MainWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c MainWindow.cpp -o $@
 
-OptionParser.$(OBJEXT): OptionParser.h ConfigOptions.h TerminalPrinting.h \
+$(OBJ_BUILD_DIR)/OptionParser.$(OBJEXT): OptionParser.h ConfigOptions.h TerminalPrinting.h \
 	OptionParser.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c OptionParser.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c OptionParser.cpp -o $@
 
-RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h\
+$(OBJ_BUILD_DIR)/RadialLayoutImage.$(OBJEXT): ConfigOptions.h CairoDrawingUtils.h DiagramWindow.h\
 	RNAStructure.h ThemesConfig.h ConfigOptions.h ConfigParser.h\
 	RadialLayoutImage.h RadialLayoutImage.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c RadialLayoutImage.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c RadialLayoutImage.cpp -o $@
 
-RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
+$(OBJ_BUILD_DIR)/RNAStructure.$(OBJEXT): RNAStructure.h ConfigOptions.h \
 	BranchTypeIdentification.h pixmaps/RNAStructVizLogo.c\
 	ThemesConfig.h TerminalPrinting.h BaseSequenceIDs.h InputWindow.h \
 	ConfigParser.h RNAStructure.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c RNAStructure.cpp -o $@
 
-RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
+$(OBJ_BUILD_DIR)/RNAStructViz.$(OBJEXT): StructureManager.h RNAStructViz.h\
 	MainWindow.h FolderStructure.h DiagramWindow.h\
 	StatsWindow.h TerminalPrinting.h BaseSequenceIDs.h RNAStructViz.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c RNAStructViz.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c RNAStructViz.cpp -o $@
 
-StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
+$(OBJ_BUILD_DIR)/StatsWindow.$(OBJEXT): StatsWindow.h StructureManager.h ConfigOptions.h \
 	RNAStructViz.h RNAStructure.h InputWindow.h TerminalPrinting.h \
 	pixmaps/StatsFormula.c pixmaps/StatsWindowIcon.xbm \
 	ConfigParser.h StatsWindow.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c StatsWindow.cpp -o $@
 
-StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
+$(OBJ_BUILD_DIR)/StructureManager.$(OBJEXT): StructureManager.h FolderStructure.h\
 	FolderWindow.h MainWindow.h RNAStructViz.h InputWindow.h\
 	RNAStructure.h TerminalPrinting.h StructureManager.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c StructureManager.cpp -o $@
 
-StructureType.$(OBJEXT): ConfigOptions.h ImageNavButton.h ConfigExterns.h \
+$(OBJ_BUILD_DIR)/StructureType.$(OBJEXT): ConfigOptions.h ConfigExterns.h \
 	RNAStructVizTypes.h StructureType.h StructureType.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c StructureType.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c StructureType.cpp -o $@
 
-TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h ConfigExterns.h \
+$(OBJ_BUILD_DIR)/TerminalPrinting.$(OBJEXT): TerminalPrinting.h ConfigOptions.h ConfigExterns.h \
 	TerminalPrinting.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c TerminalPrinting.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c TerminalPrinting.cpp -o $@
 
-ViennaBoltzmannSampling.$(OBJEXT): RNAStructVizTypes.h RNAStructure.h \
+$(OBJ_BUILD_DIR)/ViennaBoltzmannSampling.$(OBJEXT): RNAStructVizTypes.h RNAStructure.h \
 	ConfigOptions.h TerminalPrinting.h \
 	ViennaBoltzmannSampling.h ViennaBoltzmannSampling.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c ViennaBoltzmannSampling.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c ViennaBoltzmannSampling.cpp -o $@
 
-XMLExportButton.$(OBJEXT): ConfigOptions.h RNAStructVizTypes.h ThemesConfig.h \
+$(OBJ_BUILD_DIR)/XMLExportButton.$(OBJEXT): ConfigOptions.h RNAStructVizTypes.h ThemesConfig.h \
 	pixmaps/XMLExportButtonIcon.c \
 	XMLExportButton.h XMLExportButton.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c XMLExportButton.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c XMLExportButton.cpp -o $@
 
