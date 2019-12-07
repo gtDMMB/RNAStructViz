@@ -330,7 +330,9 @@ int RNAStructViz::CopySampleStructures() {
                return -1;
           }
      }
-     
+     strcpy((char *) CTFILE_SEARCH_DIRECTORY, USER_SAMPLE_STRUCTS_PATH.c_str());
+     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+
      // have system path, made local directory, now copy the files:
      fs::directory_iterator ssFile(sampleStructDir.c_str());
      boost::filesystem::path const & destDir(USER_SAMPLE_STRUCTS_PATH.c_str());
@@ -346,10 +348,6 @@ int RNAStructViz::CopySampleStructures() {
            }
            ++ssFile;
      }
-     //stdfs::copy(sampleStructDir.c_str(), USER_SAMPLE_STRUCTS_PATH, 
-     //         stdfs::copy_options::overwrite_existing);
-     strcpy((char *) CTFILE_SEARCH_DIRECTORY, USER_SAMPLE_STRUCTS_PATH.c_str());
-     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
      std::string successMsg = std::string("Successfully copied the sample structure files! ") + 
                   std::string("They are now located in \n« ") + 
                   std::string(USER_SAMPLE_STRUCTS_PATH) + 
