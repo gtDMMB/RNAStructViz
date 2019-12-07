@@ -250,8 +250,10 @@ $(BINEXE): $(RNASTRUCTVIZ_OBJECTS)
 $(OBJ_BUILD_DIR):
 	@mkdir -p $(OBJ_BUILD_DIR)
 
-$(BUILD_TARGET_HEADER):
+$(BUILD_TARGET_HEADER_DIR):
 	@mkdir -p $(BUILD_TARGET_HEADER_DIR)
+
+$(BUILD_TARGET_HEADER): $(BUILD_TARGET_HEADER_DIR)
 	@rm -f $(BUILD_TARGET_HEADER)
 	@/bin/bash $(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
 		$(shell $(READLINK) -f $(BUILD_TARGET_HEADER)) \
