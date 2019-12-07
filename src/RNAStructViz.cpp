@@ -323,13 +323,9 @@ int RNAStructViz::CopySampleStructures() {
                                   USER_SAMPLE_STRUCTS_PATH.c_str());
      }
      else {
-          mode_t mkdirModes = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
-          const int mkdirStatus1 = mkdir(USER_SAMPLE_STRUCTS_BASE_PATH.c_str(), mkdirModes);
-          const int mkdirStatus2 = mkdir(USER_SAMPLE_STRUCTS_PATH.c_str(),      mkdirModes); 
-          if(mkdirStatus1 == -1 || mkdirStatus2 == -1) {
+	  fs::path lastDirPath(USER_SAMPLE_STRUCTS_PATH);
+          if(!fs::create_directories(lastDirPath)) {
                TerminalText::PrintError("Unable to create user home sample directory: \"%s\"\n", 
-                                         mkdirStatus1 == -1 ? 
-			                 USER_SAMPLE_STRUCTS_BASE_PATH.c_str() : 
 				         USER_SAMPLE_STRUCTS_PATH.c_str());
                return -1;
           }
@@ -393,12 +389,6 @@ bool RNAStructViz::CopyStructureFileToAutoloadDirectory(const char *structFileBa
      }
      try {
 	  fs::path toPath(autoloadStructPath.c_str()), fromPath(structFileDiskPath);
-	  //bool isSymlink = fs::symlink_status(fromPath).type() == fs::symlink_file;
-          //if(isSymlink) {
-          //     fs::path nextFromPath(fs::read_symlink(fromPath));
-	  //     fromPath = nextFromPath;
-	  //}
-	  //fs::copy_file(fromPath, toPath, fs::copy_option::none);
 	  fs::create_symlink(fromPath, toPath);
 	  return true;
      } catch(fs::filesystem_error fse) {
