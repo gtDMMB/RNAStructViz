@@ -348,13 +348,18 @@ bool ConfigParser::directoryExists(const char *dirPath) {
 void ConfigParser::WriteUserConfigFile(const char *fpath) {
      bool writeCfgFile = true;
      if(!ConfigParser::directoryExists(USER_CONFIG_DIR)) {
-	  fs::path dirPath(USER_CONFIG_DIR);
-          if(!fs::create_directory(dirPath)) { 
-               TerminalText::PrintError("Unable to create directory \"%s\" ... Aborting\n", 
-                                        USER_CONFIG_DIR);
-               perror("Directory Creation Error");
-               writeCfgFile = false;
-          }
+	  try {
+	       fs::path dirPath(USER_CONFIG_DIR);
+               if(!fs::create_directories(dirPath)) { 
+                    TerminalText::PrintError("Unable to create directory \"%s\" ... Aborting\n", 
+                                             USER_CONFIG_DIR);
+                    perror("Directory Creation Error");
+                    writeCfgFile = false;
+               }
+	  } catch(fs::filesystem_error fse) {
+	       TerminalText::PrintError("Unable to create directory \"%s\": %s\n", USER_CONFIG_DIR, fse.what());
+	       writeCfgFile = false;
+	  }
      }
      if(writeCfgFile) {
           ConfigParser cfgParser;
@@ -365,11 +370,17 @@ void ConfigParser::WriteUserConfigFile(const char *fpath) {
 
 bool ConfigParser::ParseAutoloadStructuresDirectory(const char *autoloadDirPath) {
      if(!ConfigParser::directoryExists(autoloadDirPath)) {
-	  fs::path dirPath(autoloadDirPath);
-	  if(!fs::create_directory(dirPath)) {
-	       TerminalText::PrintError("Unable to create directory \"%s\" ... Skipping autoloading of structure files\n", 
-			                autoloadDirPath);
-	       perror("Local autoload directory creation error");
+	  try {
+	       fs::path dirPath(autoloadDirPath);
+	       if(!fs::create_directories(dirPath)) {
+	            TerminalText::PrintError("Unable to create directory \"%s\" ... Skipping autoloading of structure files\n", 
+			                     autoloadDirPath);
+	            perror("Local autoload directory creation error");
+	            return false;
+	       }
+	  } catch(fs::filesystem_error fse) {
+	       TerminalText::PrintError("Unable to create directory \"%s\": %s ... Skipping autoloading of structure files\n", 
+			                autoloadDirPath, fse.what());
 	       return false;
 	  }
      }
