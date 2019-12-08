@@ -762,6 +762,7 @@ void MainWindow::RemoveFolderByIndex(const int index)
          ms_instance->selectedFolderIndex = -1;
     }
 
+    Fl_Group* pane = ms_instance->folderWindowPane;
     bool selectNext = pane->children() > 0;
     if(selectNext && folders.size() > 0) { 
         // select the next folder in line:
@@ -778,7 +779,6 @@ void MainWindow::RemoveFolderByIndex(const int index)
         }
     }
     else {
-	Fl_Group* pane = ms_instance->folderWindowPane;
         if(pane->children() > 0) {
 	     pane->remove(0);
 	}
