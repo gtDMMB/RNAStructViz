@@ -20,9 +20,7 @@
 #include "OptionParser.h"
 #include "ConfigExterns.h"
 
-#ifdef __STRUCTVIZ_INSTALL_SIGNAL_HANDLERS
-     #include <signal.h>
-#endif
+#include <signal.h>
 
 void RNAStructViz_SignalHandler(int signum);
 
