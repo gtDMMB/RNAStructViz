@@ -26,7 +26,9 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
                    const char *label, int folderIndex) : 
           Fl_Group(x, y, wid, hgt, label), 
           folderScroll(NULL), folderPack(NULL), 
-          fileOpsLabel(NULL), fileLabel(NULL)
+          fileOpsLabel(NULL), fileLabel(NULL), 
+	  structIconBox(NULL), structureIcon(NULL), 
+	  statsButton(NULL), diagramButton(NULL) 
 {
 
     // label configuration happens inside FolderWindow::AddStructure ... 
