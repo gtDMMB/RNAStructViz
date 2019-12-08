@@ -94,7 +94,7 @@ class StructureData {
 	  }    
 
 	  inline void SetLabelText() {
-               std::string buttonLabel = "";
+	       std::string buttonLabel = "";
 	       const char *fullFileName = structFileBaseName.c_str();
 	       size_t fileNameCopyChars = (strrchr(fullFileName, '.') ? strrchr(fullFileName, '.') : 
 			                  fullFileName + strlen(fullFileName)) - fullFileName;
@@ -107,10 +107,8 @@ class StructureData {
 	       std::string insertSpacesStr = StructureData::spaceBuffer.substr(0, 
 			                     MAX(0, MAX_FOLDER_LABEL_CHARS - ((int) strlen(fileNameNoExt.c_str()))));
 	       buttonLabel = std::string("@filenew   ") + fileNameNoExt + insertSpacesStr;
-               mainViewerDisplayBtn->hide();
-	       mainViewerDisplayBtn->copy_label(buttonLabel.c_str());
-	       mainViewerDisplayBtn->show();
 	       mainButtonLabel = buttonLabel;
+	       mainViewerDisplayBtn->label(mainButtonLabel.c_str());
 	  }
 
 	  void SetTooltipText(); 

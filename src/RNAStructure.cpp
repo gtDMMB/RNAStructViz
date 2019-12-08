@@ -37,7 +37,8 @@ RNAStructure::RNAStructure()
       m_seqTextDisplay(NULL), m_seqStyleBuffer(NULL), 
       m_exportExtFilesBox(NULL), m_seqSubwindowBox(NULL), 
       m_ctSubwindowBox(NULL), m_ctViewerNotationBox(NULL), 
-      m_exportFASTABtn(NULL), m_exportDBBtn(NULL)     
+      m_exportFASTABtn(NULL), m_exportDBBtn(NULL), 
+      m_cwinResizeBox(NULL) 
 {
      #if PERFORM_BRANCH_TYPE_ID
      branchType = NULL; 
@@ -465,7 +466,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketData(const char *fileName,
           return NULL;
      }
      seqLength = baseIdx; // allows for space characters in the parsing
-    rnaStruct->m_sequenceLength = seqLength;    
+     rnaStruct->m_sequenceLength = seqLength;    
      #if PERFORM_BRANCH_TYPE_ID
      rnaStruct->branchType = (RNABranchType_t*) malloc( 
                              sizeof(RNABranchType_t) * rnaStruct->m_sequenceLength);
@@ -1048,7 +1049,6 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
     }
 
     if(m_contentWindow != NULL && !m_contentWindow->visible()) {
-         Delete(m_contentWindow, Fl_Double_Window);
          DeleteContentWindow();
     }
     if (!m_contentWindow)
@@ -1069,9 +1069,9 @@ void RNAStructure::DisplayFileContents(const char *titleSuffix)
          int curXOffset = 5; 
 	 int exportBtnsXOffset = (m_contentWindow->w() - 2 * btnWidth - 2 * windowSpacing) / 2;
 	 
-	 Fl_Box* resizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
+	 m_cwinResizeBox = new Fl_Box(0, curYOffset, subwinWidth, 
                                         subwinTotalHeight - subwinResizeSpacing);
-         m_contentWindow->resizable(resizeBox);
+         m_contentWindow->resizable(m_cwinResizeBox);
          m_contentWindow->size_range(subwinWidth, subwinWidth - subwinResizeSpacing);
          subwinWidth -= subwinResizeSpacing;
 
@@ -1467,22 +1467,24 @@ void RNAStructure::DeleteContentWindow() {
         while(m_contentWindow->visible()) {
              Fl::wait();
         }
-        //Delete(m_contentWindow, Fl_Double_Window);
         Delete(m_ctTextDisplay, Fl_Text_Display);
         Delete(m_ctTextBuffer, Fl_Text_Buffer);
         Delete(m_ctStyleBuffer, Fl_Text_Buffer);
 	Delete(m_seqTextDisplay, Fl_Text_Display);
-        Delete(m_ctTextBuffer, Fl_Text_Buffer);
+        Delete(m_seqTextBuffer, Fl_Text_Buffer);
         Delete(m_seqStyleBuffer, Fl_Text_Buffer);
         Delete(m_exportExtFilesBox, Fl_Box);
         Delete(m_seqSubwindowBox, Fl_Box);
-        Delete(m_ctSubwindowBox, Fl_Box);
+        Delete(m_ctViewerNotationBox, Fl_Box);
+	Delete(m_ctSubwindowBox, Fl_Box);
         Delete(m_exportFASTABtn, Fl_Button);
         Delete(m_exportDBBtn, Fl_Button);
         Free(m_ctDisplayString);
         Free(m_ctDisplayFormatString);
         Free(m_seqDisplayString);
         Free(m_seqDisplayFormatString);
+        Delete(m_cwinResizeBox, Fl_Box);
+	Delete(m_contentWindow, Fl_Double_Window);
     }
 }
 

@@ -314,7 +314,8 @@ class RNAStructure
 
         // Info for displaying the file contents
         Fl_Double_Window *m_contentWindow;
-        Fl_Text_Display *m_ctTextDisplay, *m_seqTextDisplay;
+        Fl_Box *m_cwinResizeBox;
+	Fl_Text_Display *m_ctTextDisplay, *m_seqTextDisplay;
         Fl_Text_Buffer *m_ctTextBuffer, *m_ctStyleBuffer;
 	Fl_Text_Buffer *m_seqTextBuffer, *m_seqStyleBuffer;
 	Fl_Box *m_exportExtFilesBox, *m_seqSubwindowBox; 

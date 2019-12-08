@@ -8,7 +8,7 @@
 #include "ConfigExterns.h"
 
 SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int height) : 
-     Fl::Fl_Pack(0, 0, width, height), flFileChooserRef(flFileChooser), selectedFileFilter(NULL), 
+     Fl_Pack(0, 0, width, height), flFileChooserRef(flFileChooser), selectedFileFilter(NULL), 
      recursiveDirs(false), searchInHiddenDirs(false), followSymlinks(false), 
      avoidDuplicateStructs(true), selectAll(false), selectAllInHome(false) {
 

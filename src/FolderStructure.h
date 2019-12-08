@@ -39,7 +39,8 @@ class Folder {
     inline ~Folder() {
         Free(folderName);
         if(mainWindowFolderBtn != NULL) {
-	    mainWindowFolderBtn->copy_label("");
+	    mainWindowFolderBtn->label("");
+	    mainWindowFolderBtn->tooltip("");
 	}
 	Free(folderNameFileCount);
         Free(folderStructs); 
@@ -49,10 +50,6 @@ class Folder {
 	          folderWindow->HideFolderWindowGUIDisplay(true);
 	     }
 	     Delete(folderWindow, FolderWindow);
-	}
-	else if(mainWindowFolderBtn != NULL) {
-             mainWindowFolderBtn->label("");
-             mainWindowFolderBtn->tooltip("");
 	}
 	structCount = 0;
         selected = false;
@@ -128,14 +125,18 @@ class Folder {
                  structCount, folderName,
                  strlen(folderName) > FOLDER_LABEL_TRUNC_LENGTH ? "..." : "");
 	 if(mainWindowFolderBtn != NULL) {
+	      mainWindowFolderBtn->hide();
 	      mainWindowFolderBtn->label(folderNameFileCount);
+	      mainWindowFolderBtn->show();
 	 }
     }
 
     inline void SetTooltipTextData() {
          snprintf(tooltipText, MAX_BUFFER_SIZE - 1, Folder::tooltipTextFmt, folderName, structCount);
 	 if(mainWindowFolderBtn != NULL) {
+	      mainWindowFolderBtn->hide();
 	      mainWindowFolderBtn->tooltip(tooltipText);
+	      mainWindowFolderBtn->show();
 	 }
     }
 
