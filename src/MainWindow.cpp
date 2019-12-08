@@ -689,15 +689,13 @@ void MainWindow::HideFolderByIndex(const int index)
 	     containerGroup->redraw();
 	}
     }
+    ms_instance->m_packedInfo->hide();
+    ms_instance->m_packedInfo->show();
+    ms_instance->m_packedInfo->redraw();
+    ms_instance->m_structureInfo->scrollbar.align();
+    ms_instance->m_structureInfo->redraw();
     
-    if (pack->children() > 0)
-    {
-         pack->redraw();
-	 pane->redraw();
-    }
-    else {
-	 pane->redraw();
-    }
+    pane->redraw();
     //pane->hide();
     //pane->show();
 
