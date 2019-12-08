@@ -33,7 +33,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     // label configuration happens inside FolderWindow::AddStructure ... 
 
-    this->end();
+    //this->end();
 
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
@@ -112,7 +112,15 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
-    
+
+    //add(folderPack);
+    //add(folderScroll);
+    //add(fileOpsLabel);
+    //add(fileLabel);
+    //add(structIconBox);
+    //add(statsButton);
+    //add(diagramButton);
+
     this->resizable(folderScroll);
     this->color(GUI_WINDOW_BGCOLOR);
     
