@@ -606,7 +606,7 @@ void MainWindow::ShowFolderSelected()
     Fl_Button *selectedBtn = selectedFolder != NULL ? selectedFolder->mainWindowFolderBtn : NULL;
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if(!strcmp(childLabel->label(), selectedBtn->label())) {
+        if(childLabel->label() != NULL && selectedBtn != NULL && !strcmp(childLabel->label(), selectedBtn->label())) {
 	     childLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
              childLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 	     folderLabel = childLabel;
