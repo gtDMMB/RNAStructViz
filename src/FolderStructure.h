@@ -86,6 +86,9 @@ class Folder {
 	 Delete(navUpBtn, Fl_Button);
 	 Delete(navDownBtn, Fl_Button);
          Delete(navCloseBtn, Fl_Button);
+	 if(guiPackingContainerRef != NULL) {
+	      guiPackingContainerRef->remove(guiPackingGroup);
+	 }
 	 Delete(guiPackingGroup, Fl_Group);
     }
 

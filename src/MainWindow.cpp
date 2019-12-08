@@ -574,16 +574,18 @@ void MainWindow::ShowFolderByIndex(int index) {
     {
         fwindow = new FolderWindow(340, 40, 300, 390, 
                                    folders[index]->folderName, index);
+	folders[index]->folderWindow = fwindow;
     }
     else
     {
         fwindow = folders[index]->folderWindow;
     }
     if (ms_instance->folderWindowPane->children() > 0) {
-        ms_instance->folderWindowPane->remove(0);
+         ms_instance->folderWindowPane->remove(0);
     }
     ms_instance->selectedFolderIndex = index;
     ms_instance->folderWindowPane->add((Fl_Group*) fwindow);
+    ms_instance->ShowFolderSelected();
 
     ExpandAlwaysFolderPane();
     ms_instance->folderWindowPane->hide();
@@ -627,6 +629,7 @@ void MainWindow::ShowFolderSelected()
         if (folders[index]->folderWindow == NULL)
         {
             fwindow = new FolderWindow(340, 40, 300, 390, folders[index]->folderName, index);
+	    folders[index]->folderWindow = fwindow;
         }
         else
         {
@@ -667,8 +670,8 @@ void MainWindow::HideFolderByIndex(const int index)
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childLabel->user_data()), folder->folderName)) {
-            childLabel->color(FL_BACKGROUND_COLOR);
-	    childLabel->labelcolor(FL_BACKGROUND_COLOR);
+             childLabel->color(FL_BACKGROUND_COLOR);
+	     childLabel->labelcolor(FL_BACKGROUND_COLOR);
 	}
 	else {
 	     childLabel->color(GUI_BGCOLOR);
@@ -676,16 +679,16 @@ void MainWindow::HideFolderByIndex(const int index)
 	}
     }
     
-    if (pane->children() > 0)
+    /*if (pack->children() > 0)
     {
-         Fl_Widget *fwinToRemove = pane->child(pane->children() - 1);
-	 pane->remove((Fl_Widget *) fwinToRemove);
-	 delete fwinToRemove;
-         pane->redraw();
+         Fl_Widget *fwinToRemove = pack->child(pack->children() - 1);
+	 pack->remove((Fl_Widget *) fwinToRemove);
+         pack->redraw();
+	 pane->redraw();
     }
     else {
 	 pane->redraw();
-    }
+    }*/
     pane->hide();
     pane->show();
 
@@ -722,14 +725,17 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
     const std::vector<Folder*>& folders = appInstance->GetStructureManager()->GetFolders();
     Fl_Pack* pack = ms_instance->m_packedInfo;
     
+    HideFolderByIndex(index);
     for (int i = 0; i < pack->children(); ++i)
     {
         Fl_Button* childButton = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childButton->user_data()),folders[index]->folderName)) {
             
             Fl_Group* toRemove = (Fl_Group*) pack->child(i);
+            pack->remove(toRemove);
+	    Delete(toRemove, Fl_Group);
             
-            const std::vector<DiagramWindow*>& diagrams = appInstance->GetDiagramWindows();
+	    const std::vector<DiagramWindow*>& diagrams = appInstance->GetDiagramWindows();
             const std::vector<StatsWindow*>& stats = appInstance->GetStatsWindows();
             int structNum = folders[index]->structCount;
             
@@ -757,7 +763,6 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                     stats[ui]->hide();
                 }
             }
-            HideFolderByIndex(index);
             
             int shift = 0;
             for (int j = 0; j < folders[index]->structCount; j++)
@@ -772,12 +777,14 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                     appInstance->GetStructureManager()->RemoveStructure(structIndex);
                 }
             }
-            //appInstance->GetStructureManager()->RemoveFolder(i);
+            //Delete(toRemove, Fl_Group);
+	    //appInstance->GetStructureManager()->RemoveFolder(i);
 	    break;
         }
         
     }
-    appInstance->GetStructureManager()->DecreaseStructCount(index);
+    appInstance->GetStructureManager()->GetFolderAt(index)->SetPerformWidgetDeletion(false);
+    appInstance->GetStructureManager()->RemoveFolder(index);
     ms_instance->m_packedInfo->hide();
     ms_instance->m_packedInfo->show();
     ms_instance->m_packedInfo->redraw();
@@ -830,7 +837,9 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
         if (!strcmp(folders[index]->folderName, (char*)(folderLabel->user_data())))
             break;
     }
-    for (int i = 0; i < pack->children(); ++i)
+    MainWindow::ms_instance->RemoveFolderByIndex(index, true);
+    
+    /*for (int i = 0; i < pack->children(); ++i)
     {
         Fl_Button* childButton = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(3));
         if (childButton == widget)
@@ -911,6 +920,12 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
         }
     }
     appInstance->GetStructureManager()->DecreaseStructCount(index);
+    ms_instance->m_packedInfo->hide();
+    ms_instance->m_packedInfo->show();
+    ms_instance->m_packedInfo->redraw();
+    ms_instance->m_structureInfo->scrollbar.align();
+    ms_instance->m_structureInfo->redraw();*/
+
 }
 
 void MainWindow::CloseCallback(Fl_Widget* widget, void* userData) {
