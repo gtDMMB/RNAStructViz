@@ -38,21 +38,28 @@ class Folder {
     
     inline ~Folder() {
         Free(folderName);
-        if(mainWindowFolderBtn != NULL) {
+        /*if(mainWindowFolderBtn != NULL) {
 	    mainWindowFolderBtn->label("");
 	    mainWindowFolderBtn->tooltip("");
-	}
+	}*/
 	Free(folderNameFileCount);
         Free(folderStructs); 
         if(doWidgetDeletion) {
 	     DeleteGUIWidgetData();
-	     if(folderWindow != NULL) {
-	          folderWindow->HideFolderWindowGUIDisplay(true);
-	     }
-	     Delete(folderWindow, FolderWindow);
+	     //if(folderWindow != NULL) {
+	     //     folderWindow->HideFolderWindowGUIDisplay(true);
+	     //}
+	     //Delete(folderWindow, FolderWindow);
 	}
 	structCount = 0;
         selected = false;
+    }
+
+    inline void MarkForDeletion() {
+	if(mainWindowFolderBtn != NULL) {
+	    mainWindowFolderBtn->label("");
+	    mainWindowFolderBtn->tooltip("");
+	}
     }
 
     static inline void WaitForHiddenWidget(Fl_Widget *widgetToHide) {
@@ -65,7 +72,7 @@ class Folder {
     }
 
     inline void HideGUIWidgets(bool waitForNoVisible = true) {
-	 Folder::WaitForHiddenWidget(guiPackingContainerRef);
+	 //Folder::WaitForHiddenWidget(guiPackingContainerRef);
 	 Folder::WaitForHiddenWidget(guiPackingGroup);
          Folder::WaitForHiddenWidget(mainWindowFolderBtn);
 	 Folder::WaitForHiddenWidget(navUpBtn);
@@ -74,18 +81,18 @@ class Folder {
     }
 
     inline void DeleteGUIWidgetData() {
-	 if(mainWindowFolderBtn != NULL) {
+	 /*if(mainWindowFolderBtn != NULL) {
               mainWindowFolderBtn->label("");
               mainWindowFolderBtn->tooltip("");
-	 }
+	 }*/
          HideGUIWidgets(true);
-	 Delete(mainWindowFolderBtn, Fl_Button);
+	 /*Delete(mainWindowFolderBtn, Fl_Button);
 	 Delete(navUpBtn, Fl_Button);
 	 Delete(navDownBtn, Fl_Button);
-         Delete(navCloseBtn, Fl_Button);
-	 if(guiPackingContainerRef != NULL) {
-	      guiPackingContainerRef->remove(guiPackingGroup);
-	 }
+         Delete(navCloseBtn, Fl_Button);*/
+	 //if(guiPackingContainerRef != NULL) {
+	 //     guiPackingContainerRef->remove(guiPackingGroup);
+	 //}
 	 Delete(guiPackingGroup, Fl_Group);
     }
 

@@ -63,7 +63,7 @@ class MainWindow
         static void AddFolder(const char* foldername, const int index, 
     	                      const bool isSelected);
     
-        static void RemoveFolderByIndex(const int index, bool selectNext = true);
+        static void RemoveFolderByIndex(const int index);
     
         /*
          Removes the folder contents group from the folder tabs pane.
@@ -167,7 +167,7 @@ class MainWindow
 	    The instance of the window.
 	    Only non-null after a call to Initialize and before the next Shutdown.
         */
-        static MainWindow* ms_instance;
+        static inline MainWindow* ms_instance = NULL;
 
         /*
 	    The main FLTK window.

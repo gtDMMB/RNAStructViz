@@ -26,10 +26,14 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
                    const char *label, int folderIndex) : 
           Fl_Group(x, y, wid, hgt, label), 
           folderScroll(NULL), folderPack(NULL), 
-          fileOpsLabel(NULL), fileLabel(NULL)
+          fileOpsLabel(NULL), fileLabel(NULL), 
+	  structIconBox(NULL), structureIcon(NULL), 
+	  statsButton(NULL), diagramButton(NULL) 
 {
 
     // label configuration happens inside FolderWindow::AddStructure ... 
+
+    //this->end();
 
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
@@ -37,9 +41,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
             StructureOperationIcon.bytes_per_pixel);
     structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.45);
     
-    Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
+    structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
-    this->add(structIconBox);
 
     int dividerTextHeight = 0, spacingHeight = NAVBUTTONS_SPACING;
     int fileOpsLabelHeight = 2 * NAVBUTTONS_BHEIGHT; 
@@ -59,7 +62,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     int opButtonWidth = 135;
     int yOffset = initYOffset + fileOpsLabelHeight + spacingHeight / 2;
-    Fl_Button* diagramButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7, yOffset + spacingHeight,
+    diagramButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7, yOffset + spacingHeight,
                                              opButtonWidth, 30,
                                              "@circle  Diagrams @>|");
     diagramButton->callback(DiagramCallback);
@@ -69,9 +72,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     //diagramButton->box(FL_PLASTIC_UP_BOX);
     diagramButton->labeltype(FL_SHADOW_LABEL);
     diagramButton->tooltip("Open the arc and radial layout diagram viewer windows");
-    this->add(diagramButton);
 
-    Fl_Button* statsButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7 + opButtonWidth + 
+    statsButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7 + opButtonWidth + 
                                            spacingHeight, yOffset + spacingHeight, 
                                            opButtonWidth, 30,
                                            "@square  Statistics @>|");
@@ -82,7 +84,6 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     //statsButton->box(FL_PLASTIC_UP_BOX);
     statsButton->labeltype(FL_SHADOW_LABEL);
     statsButton->tooltip("Open a window to generate comparitive statistics about the selected sequence");
-    this->add(statsButton);
 
     const char *fileInstText = "@filenew   Files.\n  Click on the file buttons to view\n  " 
 	                       "CT-style structure pairing data\n  in new window.";
@@ -111,7 +112,15 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
-    
+
+    //add(folderPack);
+    //add(folderScroll);
+    //add(fileOpsLabel);
+    //add(fileLabel);
+    //add(structIconBox);
+    //add(statsButton);
+    //add(diagramButton);
+
     this->resizable(folderScroll);
     this->color(GUI_WINDOW_BGCOLOR);
     
@@ -120,21 +129,20 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 }
 
 FolderWindow::~FolderWindow() {
-     Delete(structureIcon, Fl_RGB_Image);
-     for(int vi = 0; vi < m_storedStructDisplayData.size(); vi++) {
-          Delete(m_storedStructDisplayData[vi], StructureData);
-     }
-     HideFolderWindowGUIDisplay(true);
+     //HideFolderWindowGUIDisplay(true);
      label("");
+     //remove(folderPack);
+     //remove(folderScroll);
+     //remove(fileOpsLabel);
+     //remove(fileLabel);
      Delete(folderPack, Fl_Pack);
      Delete(folderScroll, Fl_Scroll);
      Delete(fileOpsLabel, Fl_Box);
      Delete(fileLabel, Fl_Box);
-     for(int ci = 0; ci < children(); ci++) {
-          Fl_Widget *wp = child(0);
-	  remove(0);
-	  Delete(wp, Fl_Widget);
-     }
+     Delete(structIconBox, Fl_Box);
+     Delete(structureIcon, Fl_RGB_Image);
+     Delete(statsButton, Fl_Button);
+     Delete(diagramButton, Fl_Button);
 }
 
 void FolderWindow::SetStructures(int folderIndex) {
@@ -222,21 +230,27 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
                  groupToMove->resize(groupToMove->x(), groupToMove->y() - toRemoveHeight, 
                                      groupToMove->w(), groupToMove->h());
             }
-            pack->resize(pack->x(), pack->y(), pack->w(), pack->h() - toRemoveHeight);
-            fwindow->folderScroll->scroll_to(0, 0);
-            fwindow->folderScroll->scroll_to(fwindow->folderScroll->xposition(), 
-                                             fwindow->folderScroll->yposition());
+            pack->remove(toRemove);
+	    pack->resize(pack->x(), pack->y(), pack->w(), pack->h() - toRemoveHeight);
+            pack->redraw();
+	    int scrollToX = fwindow->folderScroll->xposition(), scrollToY = fwindow->folderScroll->yposition();
+	    fwindow->folderScroll->scroll_to(0, 0);
+            fwindow->folderScroll->scroll_to(scrollToX, scrollToY); 
             fwindow->folderScroll->scrollbar.align();
             fwindow->folderScroll->redraw();
-            //pack->remove(tempGroup);
-	    //Delete(tempGroup, Fl_Group);
             
-            appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
+            Folder *folder = appInstance->GetStructureManager()->GetFolderAt(fwindow->m_folderIndex);
+	    if(folder != NULL && folder->structCount > 1) {
+	         appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
+	    }
 	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
-	    Delete(FolderWindow::m_storedStructDisplayData[userDataIdx], StructureData);
 	    break;
         }
+    }	    
+    if(USE_SCHEDULED_DELETION) {
+        RNAStructViz::ScheduledDeletion::ScheduleUpcomingDeletion();
     }
+
 }
 
 void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)

@@ -293,7 +293,10 @@ void StructureManager::RemoveStructure(const int index)
 {
     RNAStructure* structure = m_structures[index];
     m_structures[index] = NULL;
-
+    if(structure == NULL) {
+        return;
+    }
+    
     bool found = false;
     for(int i = 0; i < (int)folders.size(); i++)
     {
@@ -314,7 +317,24 @@ void StructureManager::RemoveStructure(const int index)
         if(found)
             break;
     }
-    Delete(structure, RNAStructure);
+    
+    StructureData *structData = index < FolderWindow::m_storedStructDisplayData.size() ? 
+	                        FolderWindow::m_storedStructDisplayData[index] : NULL;
+    if(structData != NULL) {
+        structData->MarkForDeletion();
+    }
+    if(USE_SCHEDULED_DELETION) {
+        RNAStructViz::ScheduledDeletion::AddRNAStructure(structure);
+	if(FolderWindow::m_storedStructDisplayData.size() > index && structData != NULL) {
+	     RNAStructViz::ScheduledDeletion::AddStructureData(structData);
+             FolderWindow::m_storedStructDisplayData[index] = NULL;
+	     RNAStructViz::ScheduledDeletion::AddFolderWindow(structData->parentMainFolderWin);
+	}
+    }
+    else {
+        Delete(structure, RNAStructure);
+	Delete(FolderWindow::m_storedStructDisplayData[index], StructureData);
+    }
     
 }
 
@@ -323,7 +343,7 @@ void StructureManager::DecreaseStructCount(const int index)
     folders[index]->structCount = folders[index]->structCount - 1;
     if (folders[index]->structCount == 0) 
     {
-        MainWindow::RemoveFolderByIndex(index, true);
+        MainWindow::RemoveFolderByIndex(index);
     }
     else {
         folders[index]->SetTooltipTextData();
@@ -334,8 +354,18 @@ void StructureManager::DecreaseStructCount(const int index)
 
 void StructureManager::RemoveFolder(const int index) {
     TerminalText::PrintDebug("Removing folder at index #%d\n", index);
-    Delete(folders[index], Folder);
+    if(index < 0 || index >= folders.size()) {
+        return;
+    }
+    Folder *folderStruct = folders[index];
     folders.erase(folders.begin() + index);
+    folderStruct->MarkForDeletion();
+    if(USE_SCHEDULED_DELETION) {
+	 RNAStructViz::ScheduledDeletion::AddFolder(folderStruct);
+    }
+    else {
+         Delete(folderStruct, Folder);
+    }
 }
 
 void StructureManager::AddFolder(RNAStructure* structure, const int index) {

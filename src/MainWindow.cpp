@@ -30,8 +30,6 @@ namespace fs = boost::filesystem;
 #include "pixmaps/HelpIcon.c"
 #include "pixmaps/InfoButton.c"
 
-MainWindow* MainWindow::ms_instance = NULL;
-
 Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
            HelpIcon.pixel_data, 
            HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
@@ -547,16 +545,14 @@ bool MainWindow::CreateFileChooser() {
 void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
 {
     //Find the folderName label in the contentsButton widget's group
-    Fl_Button* folderLabel = (Fl_Button*)(widget->parent()->child(0));
     ms_instance->selectedFolderBtn = (Fl_Button *) widget;
+    Fl_Button* folderLabel = ms_instance->selectedFolderBtn;
+    //folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+    //folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 
     Fl_Pack* pack = ms_instance->m_packedInfo;
-    folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-    folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
-    
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
-    int index;
-
+    int index = -1;
     for (index = 0; index < folders.size(); ++index)
     {
         if (!strcmp(folders[index]->folderName, (char*)(folderLabel->user_data())))
@@ -571,7 +567,15 @@ void MainWindow::ShowFolderByIndex(int index) {
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->
                                           GetStructureManager()->GetFolders();
     FolderWindow* fwindow;
-    if (folders[index]->folderWindow == NULL)
+    if(index < 0 || index >= folders.size()) {
+        TerminalText::PrintError("MainWindow::ShowFolderByIndex(%d): Invalid index out of range\n", index);
+	return;
+    }
+    else if(folders[index] == NULL) {
+	TerminalText::PrintError("Attempting to show a NULL folder at index #%d\n", index);
+	return;
+    }
+    else if(folders[index]->folderWindow == NULL)
     {
         fwindow = new FolderWindow(340, 40, 300, 390, 
                                    folders[index]->folderName, index);
@@ -587,11 +591,12 @@ void MainWindow::ShowFolderByIndex(int index) {
     }
     ms_instance->selectedFolderIndex = index;
     ms_instance->folderWindowPane->add((Fl_Group*) fwindow);
+    fwindow->redraw();
     ms_instance->ShowFolderSelected();
 
     ExpandAlwaysFolderPane();
-    //ms_instance->folderWindowPane->hide();
-    //ms_instance->folderWindowPane->show();
+    ms_instance->folderWindowPane->hide();
+    ms_instance->folderWindowPane->show();
     ms_instance->folderWindowPane->redraw();
 
 }
@@ -606,7 +611,8 @@ void MainWindow::ShowFolderSelected()
     Fl_Button *selectedBtn = selectedFolder != NULL ? selectedFolder->mainWindowFolderBtn : NULL;
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if(childLabel == selectedBtn) {
+	//TerminalText::PrintDebug("childLabel->label = \"%s\"\n", childLabel->label());
+	if(childLabel->label() != NULL && selectedBtn != NULL && !strcmp(childLabel->label(), selectedBtn->label())) {
 	     childLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
              childLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 	     folderLabel = childLabel;
@@ -615,6 +621,7 @@ void MainWindow::ShowFolderSelected()
 	     childLabel->color(GUI_BGCOLOR);
 	     childLabel->labelcolor(GUI_BTEXT_COLOR);
 	}
+	childLabel->redraw();
     }
     
     if (folderLabel != NULL) {
@@ -669,8 +676,13 @@ void MainWindow::HideFolderByIndex(const int index)
     
     TerminalText::PrintInfo("Hiding folder with label \"%s\"\n", folder->folderName);
 
+    int toHideYOffset = folder->guiPackingGroup->y();
+    int toHideHeight = folder->guiPackingGroup->h();
+    folder->guiPackingGroup->hide();
+    pack->remove(folder->guiPackingGroup);
     for (int i = 0; i < pack->children(); ++i) {
-        Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
+        Fl_Group *containerGroup = (Fl_Group *) pack->child(i);
+	Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childLabel->user_data()), folder->folderName)) {
              childLabel->color(FL_BACKGROUND_COLOR);
 	     childLabel->labelcolor(FL_BACKGROUND_COLOR);
@@ -679,22 +691,24 @@ void MainWindow::HideFolderByIndex(const int index)
 	     childLabel->color(GUI_BGCOLOR);
 	     childLabel->labelcolor(GUI_BTEXT_COLOR);
 	}
+	if(containerGroup->y() > toHideYOffset) {
+             containerGroup->position(containerGroup->x(), containerGroup->y() - toHideHeight);
+	     containerGroup->redraw();
+	}
     }
+    ms_instance->m_packedInfo->hide();
+    ms_instance->m_packedInfo->show();
+    ms_instance->m_packedInfo->redraw();
+    ms_instance->m_structureInfo->scrollbar.align();
+    ms_instance->m_structureInfo->redraw();
     
-    if (pack->children() > 0)
-    {
-         pack->redraw();
-	 pane->redraw();
-    }
-    else {
-	 pane->redraw();
-    }
+    pane->redraw();
     //pane->hide();
     //pane->show();
 
 }
 
-void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
+void MainWindow::RemoveFolderByIndex(const int index)
 {
     RNAStructViz* appInstance = RNAStructViz::GetInstance();
     const std::vector<Folder*>& folders = appInstance->GetStructureManager()->GetFolders();
@@ -757,6 +771,8 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
          ms_instance->selectedFolderIndex = -1;
     }
 
+    Fl_Group* pane = ms_instance->folderWindowPane;
+    bool selectNext = pane->children() > 0 && ms_instance->selectedFolderIndex == -1;
     if(selectNext && folders.size() > 0) { 
         // select the next folder in line:
         Fl_Group* pane = ms_instance->folderWindowPane;
@@ -766,14 +782,16 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         if(folders[nextIndex] != NULL && folders[nextIndex]->structCount > 0) { 
              ShowFolderByIndex(nextIndex);
 	     Fl_Button *folderLabel = folders[nextIndex]->mainWindowFolderBtn;
-             folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-             folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
+             //folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+             //folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
              ms_instance->selectedFolderBtn = folderLabel;
         }
     }
     else {
-        Fl_Group* pane = ms_instance->folderWindowPane;
-        pane->redraw();
+        if(pane->children() > 0) {
+	     pane->remove(0);
+	}
+	pane->redraw();
 	//pane->hide();
         //pane->show();
     }
@@ -800,7 +818,10 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
         if (!strcmp(folders[index]->folderName, (char*)(folderLabel->user_data())))
             break;
     }
-    ms_instance->RemoveFolderByIndex(index, true);
+    ms_instance->RemoveFolderByIndex(index);
+    if(USE_SCHEDULED_DELETION) {
+        RNAStructViz::ScheduledDeletion::ScheduleUpcomingDeletion();
+    }
 
 }
 

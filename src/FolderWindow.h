@@ -92,6 +92,8 @@ class FolderWindow : public Fl_Group
         int m_folderIndex;
 
 	Fl_Box *fileOpsLabel, *fileLabel;
+        Fl_Box *structIconBox;
+	Fl_Button *statsButton, *diagramButton;
 
     public:
         void RethemeFolderWindow(); 

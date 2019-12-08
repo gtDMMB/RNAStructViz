@@ -18,6 +18,11 @@ namespace fs = boost::filesystem;
 #include "TerminalPrinting.h"
 #include "ConfigParser.h"
 
+vector<RNAStructure *> RNAStructViz::ScheduledDeletion::rnaStructObjs;
+vector<Folder *> RNAStructViz::ScheduledDeletion::folderStructObjs;
+vector<StructureData *> RNAStructViz::ScheduledDeletion::structureDataObjs;
+vector<FolderWindow *> RNAStructViz::ScheduledDeletion::folderWinStructObjs;
+
 static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
         {
           "Standard help key shortcut", 
@@ -114,6 +119,8 @@ bool RNAStructViz::Initialize(int argc, char** argv)
 
 void RNAStructViz::Shutdown()
 {
+    Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
+    RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     MainWindow::Shutdown();
     Delete(RNAStructure::m_ctFileSelectionWin, InputWindow);

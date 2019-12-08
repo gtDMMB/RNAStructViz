@@ -39,6 +39,7 @@ class StructureData {
      protected:
 	  friend class FolderWindow;
 	  friend class XMLExportButton;
+          friend class StructureManager;
 
 	  std::string origFolderWinLabel;
 	  std::string structFileBaseDir;
@@ -73,19 +74,7 @@ class StructureData {
 	       index = -1;
 	  }
 
-     protected:
-	  inline void DeleteGUIWidgets() {
-               if(mainViewerDisplayBtn != NULL && navCloseBtn != NULL && guiPackingGroup != NULL) {
-	            mainViewerDisplayBtn->hide();
-	            navCloseBtn->hide();
-	            guiPackingGroup->hide();
-	            while(mainViewerDisplayBtn->visible() || navCloseBtn->visible() || guiPackingGroup->visible()) {
-	                 Fl::wait(1.0);
-	            }
-	       }
-               if(guiPackingContainerRef != NULL && guiPackingGroup != NULL) {
-	            guiPackingContainerRef->remove(guiPackingGroup);
-	       }
+	  inline void MarkForDeletion() {
 	       if(mainViewerDisplayBtn != NULL) {
 	            mainViewerDisplayBtn->label("");
 		    mainViewerDisplayBtn->tooltip("");
@@ -94,15 +83,41 @@ class StructureData {
 		    navCloseBtn->label("");
 		    navCloseBtn->tooltip("");
 	       }
-	       Delete(mainViewerDisplayBtn, Fl_Button);
+	       //Delete(guiPackingGroup, Fl_Group);
+	       //Fl::delete_widget(guiPackingGroup);
+	       //guiPackingGroup = NULL;
+	  }
+
+     protected:
+	  inline void DeleteGUIWidgets() {
+               /*if(mainViewerDisplayBtn != NULL && navCloseBtn != NULL && guiPackingGroup != NULL) {
+	            mainViewerDisplayBtn->hide();
+	            navCloseBtn->hide();
+	            guiPackingGroup->hide();
+	            while(mainViewerDisplayBtn->visible() || navCloseBtn->visible() || guiPackingGroup->visible()) {
+	                 Fl::wait(1.0);
+	            }
+	       }*/
+               /*if(guiPackingContainerRef != NULL && guiPackingGroup != NULL) {
+	            guiPackingContainerRef->remove(guiPackingGroup);
+	       }*/
+	       /*if(mainViewerDisplayBtn != NULL) {
+	            mainViewerDisplayBtn->label("");
+		    mainViewerDisplayBtn->tooltip("");
+	       }
+	       if(navCloseBtn != NULL) {
+		    navCloseBtn->label("");
+		    navCloseBtn->tooltip("");
+	       }*/
+	       /*Delete(mainViewerDisplayBtn, Fl_Button);
 	       Delete(navCloseBtn, Fl_Button);
 	       Delete(autoloadToggleBtn, AutoloadIndicatorButton);
-	       Delete(xmlExportBtn, XMLExportButton);
+	       Delete(xmlExportBtn, XMLExportButton);*/
 	       Delete(guiPackingGroup, Fl_Group);
 	  }    
 
 	  inline void SetLabelText() {
-	       std::string buttonLabel = "";
+	       std::string buttonLabel = "@filenew   ";
 	       const char *fullFileName = structFileBaseName.c_str();
 	       size_t fileNameCopyChars = (strrchr(fullFileName, '.') ? strrchr(fullFileName, '.') : 
 			                  fullFileName + strlen(fullFileName)) - fullFileName;
@@ -114,7 +129,7 @@ class StructureData {
 	       }
 	       std::string insertSpacesStr = StructureData::spaceBuffer.substr(0, 
 			                     MAX(0, MAX_FOLDER_LABEL_CHARS - ((int) strlen(fileNameNoExt.c_str()))));
-	       buttonLabel = std::string("@filenew   ") + fileNameNoExt + insertSpacesStr;
+	       buttonLabel += fileNameNoExt + insertSpacesStr;
 	       mainButtonLabel = buttonLabel;
 	       mainViewerDisplayBtn->label(mainButtonLabel.c_str());
 	  }

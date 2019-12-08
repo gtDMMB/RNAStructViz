@@ -32,10 +32,10 @@ void ProcessHelpOption() {
 void ProcessDebugOption() {
      DEBUGGING_ON = true;
      CFG_DEBUG_MODE = CFG_VERBOSE_MODE = 1;
-     TerminalText::PrintDebug("THEME WINDOW BGCOLOR: 0x%08x\n", GUI_WINDOW_BGCOLOR);
-     TerminalText::PrintDebug("THEME WIDGET COLOR:   0x%08x\n", GUI_BGCOLOR);
-     TerminalText::PrintDebug("THEME BTEXT COLOR:    0x%08x\n", GUI_BTEXT_COLOR);
-     TerminalText::PrintDebug("THEME TEXT COLOR:     0x%08x\n\n", GUI_TEXT_COLOR);
+     //TerminalText::PrintDebug("THEME WINDOW BGCOLOR: 0x%08x\n", GUI_WINDOW_BGCOLOR);
+     //TerminalText::PrintDebug("THEME WIDGET COLOR:   0x%08x\n", GUI_BGCOLOR);
+     //TerminalText::PrintDebug("THEME BTEXT COLOR:    0x%08x\n", GUI_BTEXT_COLOR);
+     //TerminalText::PrintDebug("THEME TEXT COLOR:     0x%08x\n\n", GUI_TEXT_COLOR);
 }
 
 void ProcessNewConfigOption() {
