@@ -89,15 +89,18 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
         newStructCount = 1;
     }
     else if(extension && !strncasecmp(extension, ".boltz", 6)) {
-        structures = RNAStructure::CreateFromBoltzmannFormatFile(localCopy, &newStructCount);
+        Free(structures);
+	structures = RNAStructure::CreateFromBoltzmannFormatFile(localCopy, &newStructCount);
     }
     else if(extension && (!strncasecmp(extension, ".helix", 6) || 
               !strncasecmp(extension, ".hlx", 4))) {
-        structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
+        Free(structures);
+	structures = RNAStructure::CreateFromHelixTripleFormatFile(localCopy, &newStructCount);
     }
     #if WITH_FASTA_FORMAT_SUPPORT > 0
     else if(extension && !strncasecmp(extension, ".fasta", 6)) {
-        structures = RNAStructure::CreateFromFASTAFile(localCopy, &newStructCount);
+        Free(structures);
+	structures = RNAStructure::CreateFromFASTAFile(localCopy, &newStructCount);
 	isFASTAFile = true;
     }
     #endif
@@ -118,7 +121,9 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 		 TerminalText::PrintWarning("Unknown file type: %s . %s [%s]", filename, extension, basename);
 	    }
 	}
-        return;
+        Free(structures);
+	Free(localCopy);
+	return;
     }
 
     int s = -1;
@@ -128,7 +133,8 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
         
            int count = (int) folders.size();
            RNAStructure *structure = structures[s];
-           if(!structure) { 
+	   TerminalText::PrintDebug("Structure %p [%s]\n", structure, filename);
+	   if(!structure) { 
                 continue;
            }
            int firstEmptyIdx = AddFirstEmpty(structure);
@@ -257,6 +263,9 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 		m_structureCount -= 1;
 		Delete(structure, RNAStructure);
 	   }
+	   else {
+		Delete(structure, RNAStructure);
+	   }
        }
 
       }
@@ -268,6 +277,11 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
     else {
          fl_alert("Error adding structure \"%s\"! Could not parse the specified format for this file.\n", 
                   localCopy);
+    }
+    if(s > -1) {
+         for(int j = s; j < newStructCount; j++) {
+	      Delete(structures[j], RNAStructure);
+	 }
     }
     Free(localCopy); 
     Free(structures);

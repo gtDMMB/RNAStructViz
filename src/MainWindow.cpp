@@ -222,14 +222,6 @@ MainWindow::~MainWindow() {
         delete folderDataBtns[w];
         folderDataBtns[w] = NULL;
     }
-    /*for(int cw = 0; cw < m_mainWindow->children(); cw++) {
-         Fl_Group *winGroupContainer = (Fl_Group *) m_mainWindow->child(cw)->as_group();
-	 if(winGroupContainer != NULL) {
-              m_mainWindow->remove(cw);
-	      --cw;
-	      //break;
-	 }
-    }*/
     Delete(m_mainWindow, Fl_Double_Window);
 }
 

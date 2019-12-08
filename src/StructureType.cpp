@@ -90,7 +90,7 @@ StructureData* StructureData::AddStructureFromData(FolderWindow *fwinRef, const 
      nextStructData->origFolderWinLabel = std::string(fileName);
      size_t dirPrefixLen = ((strrchr(fileName, '/') ? strrchr(fileName, '/') : fileName) - fileName);
      nextStructData->structFileBaseDir = std::string(fileName).substr(0, dirPrefixLen + 1);
-     nextStructData->structFileBaseName = std::string(fileName + dirPrefixLen + 1);
+     nextStructData->structFileBaseName = std::string(fileName).substr(dirPrefixLen + 1);
      nextStructData->index = index;
      nextStructData->CreateGUIElementsDisplay(fwinRef->folderPack);
      return nextStructData;

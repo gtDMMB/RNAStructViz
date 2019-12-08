@@ -27,6 +27,8 @@
 #include "StructureManager.h"
 #include "InputWindow.h"
 #include "ConfigOptions.h"
+#include "Fl_Rotated_Text.H"
+#include "RNAStructVizTypes.h"
 
 #define DEFAULT_STATSWIN_WIDTH        (1400)
 #define DEFAULT_STATSWIN_HEIGHT       (700)
@@ -182,7 +184,11 @@ private:
     Fl_Group *roc_tab; // Group for the ROC plot
     Fl_Group *table_tab; // Group for the statistics table
     
+    /* Misc widgets and objects: */
+    Fl_Rotated_Text *rocplot_rotated_text;
+
     /* Overview tab legend explanation image */
+    friend class RNAStructViz;
     static Fl_RGB_Image *overviewLegendImage;
 
     /* Holds the set of structures being compared */

@@ -118,6 +118,7 @@ void RNAStructViz::Shutdown()
     MainWindow::Shutdown();
     Delete(RNAStructure::m_ctFileSelectionWin, InputWindow);
     Delete(RNAStructViz::ms_instance, RNAStructViz);
+    Delete(StatsWindow::overviewLegendImage, Fl_RGB_Image);
 }
 
 void RNAStructViz::ExitApplication(bool promptUser) {

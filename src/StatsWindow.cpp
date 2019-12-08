@@ -19,7 +19,6 @@
 #include <FL/Fl_Chart.H>
 #include <FL/Fl_Group.H>
 
-#include "Fl_Rotated_Text.H"
 #include "StatsWindow.h"
 #include "StructureManager.h"
 #include "RNAStructViz.h"
@@ -442,9 +441,9 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 
                 /* Draw the labels for the y-axis */
                 Fl_Box* text_rotate = new Fl_Box(rpx+0,roc_plot->y(),20,roc_plot->h());
-                Fl_Rotated_Text* text = new Fl_Rotated_Text("Sensitivity (%)",
-                                                            FL_HELVETICA,14,0,1);
-                text_rotate->image(text);
+                rocplot_rotated_text = new Fl_Rotated_Text("Sensitivity (%)",
+                                                            FL_HELVETICA, 14, 0, 1);
+                text_rotate->image(rocplot_rotated_text);
                 
                 // Put the number to the left of the axis, the dash to the right
                 Fl_Box* label = new Fl_Box(FL_NO_BOX, roc_plot->x(),
@@ -809,7 +808,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 StatsWindow::StatsWindow(int w, int h, const char *label, 
                          const std::vector<int>& structures) : 
 	Fl_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
-	input_window(NULL) {
+	input_window(NULL), rocplot_rotated_text(NULL) {
     Construct(w, h, structures);
 }
 
@@ -831,6 +830,7 @@ StatsWindow::~StatsWindow()
          delete statsFormulasBox;
     }
     Delete(input_window, InputWindow);
+    Delete(rocplot_rotated_text, Fl_Rotated_Text);
 }
 
 void StatsWindow::ResetWindow()
