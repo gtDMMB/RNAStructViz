@@ -154,10 +154,10 @@ RNASTRUCTVIZ_OBJECTS = \
 	$(OBJ_BUILD_DIR)/TerminalPrinting.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/ViennaBoltzmannSampling.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/XMLExportButton.$(OBJEXT)
-BINEXE = $(BINARY_OUTPUT)
-RNASTRUCTVIZ_BUILD_DEPS = $(OBJ_BUILD_DIR) $(BUILD_TARGET_HEADER) $(RNASTRUCTVIZ_OBJECTS) $(BINEXE)
+BINEXE=$(BINARY_OUTPUT)
+RNASTRUCTVIZ_BUILD_DEPS=$(RNASTRUCTVIZ_OBJECTS) $(BINEXE)
 
-default: $(RNASTRUCTVIZ_BUILD_DEPS)
+default: prelims $(RNASTRUCTVIZ_BUILD_DEPS)
 
 help: 
 	@echo "RNAStructViz Makefile targets and options:"
@@ -202,7 +202,7 @@ run-debug: clean default
 clean:
 	@rm -f *.$(OBJEXT) *.code *.log *.callgrind *.out *.ps *.pdf *.heap \
 		$(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) \
-		$(OBJ_BUILD_DIR)/* $(BUILD_TARGET_HEADER)
+		$(OBJ_BUILD_DIR)/* 
 
 install: default
 	if test -z "$$INSTALL_PREFIX"; then INSTALL_PREFIX=/usr/local/; fi;\
@@ -247,16 +247,13 @@ git-push: git-commit
 $(BINEXE): $(RNASTRUCTVIZ_OBJECTS)
 	@$(LD) -o $(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) $(LDFLAGS_FULL)
 
-$(OBJ_BUILD_DIR):
-	@mkdir -p $(OBJ_BUILD_DIR)
-
-$(BUILD_TARGET_HEADER_DIR):
-	@mkdir -p $(BUILD_TARGET_HEADER_DIR)
-
-$(BUILD_TARGET_HEADER): $(BUILD_TARGET_HEADER_DIR)
+prelims:
+	@mkdir -p $(OBJ_BUILD_DIR) $(BUILD_TARGET_HEADER_DIR)
 	@rm -f $(BUILD_TARGET_HEADER)
-	@/bin/bash $(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
-		$(shell $(READLINK) -f $(BUILD_TARGET_HEADER)) \
+	@touch $(BUILD_TARGET_HEADER)
+	@$(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
+		$(shell $(READLINK) -f ../build-scripts/BuildTargetInfo.h.in) \
+		$(shell $(READLINK) -m $(BUILD_TARGET_HEADER)) \
 		$(shell $(READLINK) -f $(FLTKCONFIG))
 
 $(OBJ_BUILD_DIR)/AutoloadIndicatorButton.$(OBJEXT): AutoloadIndicatorButton.h ConfigOptions.h RNAStructViz.h \
@@ -280,7 +277,7 @@ $(OBJ_BUILD_DIR)/CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h Config
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp -o $@
 
 ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp \
-	../build-scripts/BuildTargetInfo.h.in $(BUILD_TARGET_HEADER)
+	../build-scripts/BuildTargetInfo.h.in 
 
 $(OBJ_BUILD_DIR)/ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
 	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \

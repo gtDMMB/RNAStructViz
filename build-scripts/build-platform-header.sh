@@ -26,8 +26,8 @@ ReplaceHeaderComponent() {
      $sedCmd -i "s|${replacePattern}|${replacementStr}|" "${headerFile}";
 }
 
-OUTPUT_HEADER_FILE=$1
-HEADER_SKELETON_FILE="../build-scripts/BuildTargetInfo.h.in"
+OUTPUT_HEADER_FILE=$2
+HEADER_SKELETON_FILE=$1
 
 GIT_COMMITREV_HASHNUM=$(git show | head -n 1 | $sedCmd -e 's/commit //')
 GIT_COMMITREV_HASHNUM_SHORT=$(echo "${GIT_COMMITREV_HASHNUM}" | cut -c-12)
@@ -35,7 +35,7 @@ GIT_COMMITREV_DATE=$(git show | $grepCmd Date: | head -n 1 | $sedCmd -e 's/Date:
 GIT_DESCRIBE_REVSTRING=$(git show --oneline --no-color | head -n 1 | $sedCmd -n 's/[a-zA-Z0-9][a-zA-Z0-9]* \(.*\)/\1/p')
 BUILD_PLATFORM_IDSTRING=$(printf '%s (%s) [%s] @@ %s' $(uname -s) $(uname -r) $(uname -m) $(uname -n))
 LOCAL_BUILD_TIME=$(date +"%c")
-BUILD_FLTK_CONFIG=$2
+BUILD_FLTK_CONFIG=$3
 
 REPL_PATTERNS=("##__GIT_COMMITREV_HASHNUM_SHORT__##" "##__GIT_COMMITREV_HASHNUM__##" \
 	"##__GIT_COMMITREV_DATE__##" "##__GIT_DESCRIBE_REVSTRING__##" \
@@ -53,7 +53,8 @@ if [[ "$PrintVerbose" == "1" ]]; then
 	echo -e "\n";
 fi
 
-cp $HEADER_SKELETON_FILE $OUTPUT_HEADER_FILE;
+echo "Copying \"${HEADER_SKELETON_FILE}\" to \"${OUTPUT_HEADER_FILE}\" ... "
+cp $HEADER_SKELETON_FILE $OUTPUT_HEADER_FILE
 
 for ridx in $(seq 0 6); do
 	ReplaceHeaderComponent "${OUTPUT_HEADER_FILE}" "${REPL_PATTERNS[$ridx]}" "${REPLACEMENTS[$ridx]}" "$PrintVerbose";
