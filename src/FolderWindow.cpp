@@ -37,7 +37,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
             StructureOperationIcon.bytes_per_pixel);
     structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.45);
     
-    Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
+    structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     this->add(structIconBox);
 
@@ -59,7 +59,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     int opButtonWidth = 135;
     int yOffset = initYOffset + fileOpsLabelHeight + spacingHeight / 2;
-    Fl_Button* diagramButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7, yOffset + spacingHeight,
+    diagramButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7, yOffset + spacingHeight,
                                              opButtonWidth, 30,
                                              "@circle  Diagrams @>|");
     diagramButton->callback(DiagramCallback);
@@ -69,9 +69,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     //diagramButton->box(FL_PLASTIC_UP_BOX);
     diagramButton->labeltype(FL_SHADOW_LABEL);
     diagramButton->tooltip("Open the arc and radial layout diagram viewer windows");
-    this->add(diagramButton);
 
-    Fl_Button* statsButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7 + opButtonWidth + 
+    statsButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7 + opButtonWidth + 
                                            spacingHeight, yOffset + spacingHeight, 
                                            opButtonWidth, 30,
                                            "@square  Statistics @>|");
@@ -82,7 +81,6 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     //statsButton->box(FL_PLASTIC_UP_BOX);
     statsButton->labeltype(FL_SHADOW_LABEL);
     statsButton->tooltip("Open a window to generate comparitive statistics about the selected sequence");
-    this->add(statsButton);
 
     const char *fileInstText = "@filenew   Files.\n  Click on the file buttons to view\n  " 
 	                       "CT-style structure pairing data\n  in new window.";
@@ -130,8 +128,10 @@ FolderWindow::~FolderWindow() {
      Delete(folderScroll, Fl_Scroll);
      Delete(fileOpsLabel, Fl_Box);
      Delete(fileLabel, Fl_Box);
-     //clear();
+     Delete(structIconBox, Fl_Box);
      Delete(structureIcon, Fl_RGB_Image);
+     Delete(statsButton, Fl_Button);
+     Delete(diagramButton, Fl_Button);
 }
 
 void FolderWindow::SetStructures(int folderIndex) {
