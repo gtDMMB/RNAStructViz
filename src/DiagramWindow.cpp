@@ -1646,7 +1646,7 @@ int DiagramWindow::handle(int flEvent) {
                                  ctFileSelectWin = new InputWindow(400, 175, 
                                                                    "Select Structure File to View ...", "", 
                                                                    InputWindow::RADIAL_LAYOUT_FILE_INPUT, 
-                                                                   folderIndex);
+                                                                   true, folderIndex);
                             while(ctFileSelectWin->visible()) {
                                  Fl::wait();
                             }
