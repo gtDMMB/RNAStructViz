@@ -86,6 +86,14 @@ class StructureData {
                if(guiPackingContainerRef != NULL && guiPackingGroup != NULL) {
 	            guiPackingContainerRef->remove(guiPackingGroup);
 	       }
+	       if(mainViewerDisplayBtn != NULL) {
+	            mainViewerDisplayBtn->label("");
+		    mainViewerDisplayBtn->tooltip("");
+	       }
+	       if(navCloseBtn != NULL) {
+		    navCloseBtn->label("");
+		    navCloseBtn->tooltip("");
+	       }
 	       Delete(mainViewerDisplayBtn, Fl_Button);
 	       Delete(navCloseBtn, Fl_Button);
 	       Delete(autoloadToggleBtn, AutoloadIndicatorButton);

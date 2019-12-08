@@ -59,7 +59,7 @@ class RadialLayoutWindowCallbackInterface {
 
 	  inline bool DoRadialWindowClose() {
                if(parentCallingWindow == NULL) {
-	            return NULL;
+	            return false;
 	       }
 	       parentCallingWindow->RadialWindowCloseCallback(NULL, NULL);
 	       return true;
