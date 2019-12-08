@@ -82,6 +82,7 @@ class StructureData {
 		    navCloseBtn->label("");
 		    navCloseBtn->tooltip("");
 	       }
+	       Delete(guiPackingGroup, Fl_Group);
 	  }
 
      protected:

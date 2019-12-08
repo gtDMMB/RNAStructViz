@@ -230,7 +230,9 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             fwindow->folderScroll->scrollbar.align();
             fwindow->folderScroll->redraw();
             
-            appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
+            if(appInstance->GetStructureManager()->GetFolderAt(fwindow->m_folderIndex)->structCount > 1) {
+	         appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
+	    }
 	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
 	    break;
         }

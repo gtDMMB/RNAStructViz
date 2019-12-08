@@ -293,7 +293,10 @@ void StructureManager::RemoveStructure(const int index)
 {
     RNAStructure* structure = m_structures[index];
     m_structures[index] = NULL;
-
+    if(structure == NULL) {
+        return;
+    }
+    
     bool found = false;
     for(int i = 0; i < (int)folders.size(); i++)
     {
