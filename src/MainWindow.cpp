@@ -211,6 +211,7 @@ MainWindow::MainWindow(int argc, char **argv)
 MainWindow::~MainWindow() {
     Delete(m_fileChooserSelectAllBtn, SelectAllButton);    
     Delete(m_fileChooser, Fl_File_Chooser);
+    Delete(folderWindowPane, Fl_Group);
     Delete(m_packedInfo, Fl_Pack);
     Delete(m_structureInfo, Fl_Scroll);
     Delete(columnLabel, Fl_Box);

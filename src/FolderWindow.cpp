@@ -37,10 +37,10 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
             StructureOperationIcon.bytes_per_pixel);
     structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.45);
     
-    this->begin(); {
     Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
-    
+    this->add(structIconBox);
+
     int dividerTextHeight = 0, spacingHeight = NAVBUTTONS_SPACING;
     int fileOpsLabelHeight = 2 * NAVBUTTONS_BHEIGHT; 
     int fileOpsLabelWidth = 2 * NAVBUTTONS_BWIDTH + 2 * NAVBUTTONS_SPACING + 4;
@@ -68,6 +68,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     diagramButton->box(FL_SHADOW_BOX);
     diagramButton->labeltype(FL_SHADOW_LABEL);
     diagramButton->tooltip("Open the arc and radial layout diagram viewer windows");
+    this->add(diagramButton);
 
     Fl_Button* statsButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7 + opButtonWidth + 
                                            spacingHeight, yOffset + spacingHeight, 
@@ -79,6 +80,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     statsButton->box(FL_SHADOW_BOX);
     statsButton->labeltype(FL_SHADOW_LABEL);
     statsButton->tooltip("Open a window to generate comparitive statistics about the selected sequence");
+    this->add(statsButton);
 
     const char *fileInstText = "@filenew   Files.\n  Click on the file buttons to view\n  " 
 	                       "CT-style structure pairing data\n  in new window.";
@@ -107,8 +109,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
-    }
-    this->end();
+    
     this->resizable(folderScroll);
     this->color(GUI_WINDOW_BGCOLOR);
     
@@ -122,14 +123,16 @@ FolderWindow::~FolderWindow() {
           Delete(m_storedStructDisplayData[vi], StructureData);
      }
      HideFolderWindowGUIDisplay(true);
-     //for(int cidx = 0; cidx < children(); cidx++) {
-     //     remove(0);
-     //}
      label("");
      Delete(folderPack, Fl_Pack);
      Delete(folderScroll, Fl_Scroll);
      Delete(fileOpsLabel, Fl_Box);
      Delete(fileLabel, Fl_Box);
+     for(int ci = 0; ci < children(); ci++) {
+          Fl_Widget *wp = child(0);
+	  remove(0);
+	  Delete(wp, Fl_Widget);
+     }
 }
 
 void FolderWindow::SetStructures(int folderIndex) {
@@ -148,7 +151,7 @@ void FolderWindow::SetStructures(int folderIndex) {
         RNAStructure *strct = structureManager->GetStructure(i);
 	AddStructure(strct->GetPathname(), i);
     }
-    label(folder->folderName);
+    copy_label(folder->folderName);
     char structLabel[MAX_BUFFER_SIZE];
     snprintf(structLabel, MAX_BUFFER_SIZE - 1, "%s%s", STRUCT_PANE_LABEL_PREFIX, folder->folderName);
     ConfigParser::nullTerminateString(structLabel);
