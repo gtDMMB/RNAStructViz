@@ -228,15 +228,16 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
                                              fwindow->folderScroll->yposition());
             fwindow->folderScroll->scrollbar.align();
             fwindow->folderScroll->redraw();
-            //pack->remove(tempGroup);
-	    //Delete(tempGroup, Fl_Group);
             
             appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
 	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
-	    Delete(FolderWindow::m_storedStructDisplayData[userDataIdx], StructureData);
 	    break;
         }
+    }	    
+    if(USE_SCHEDULED_DELETION) {
+        RNAStructViz::ScheduledDeletion::ScheduleUpcomingDeletion();
     }
+
 }
 
 void FolderWindow::DiagramCallback(Fl_Widget* widget, void* userData)

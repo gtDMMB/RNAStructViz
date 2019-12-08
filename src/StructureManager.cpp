@@ -314,7 +314,15 @@ void StructureManager::RemoveStructure(const int index)
         if(found)
             break;
     }
-    Delete(structure, RNAStructure);
+    if(USE_SCHEDULED_DELETION) {
+        RNAStructViz::ScheduledDeletion::AddRNAStructure(structure);
+	RNAStructViz::ScheduledDeletion::AddStructureData(FolderWindow::m_storedStructDisplayData[index]);
+        FolderWindow::m_storedStructDisplayData[index] = NULL;
+    }
+    else {
+        Delete(structure, RNAStructure);
+	Delete(FolderWindow::m_storedStructDisplayData[index], StructureData);
+    }
     
 }
 
@@ -334,8 +342,14 @@ void StructureManager::DecreaseStructCount(const int index)
 
 void StructureManager::RemoveFolder(const int index) {
     TerminalText::PrintDebug("Removing folder at index #%d\n", index);
-    Delete(folders[index], Folder);
+    Folder *folderStruct = folders[index];
     folders.erase(folders.begin() + index);
+    if(USE_SCHEDULED_DELETION) {
+        RNAStructViz::ScheduledDeletion::AddFolder(folderStruct);
+    }
+    else {
+         Delete(folderStruct, Folder);
+    }
 }
 
 void StructureManager::AddFolder(RNAStructure* structure, const int index) {

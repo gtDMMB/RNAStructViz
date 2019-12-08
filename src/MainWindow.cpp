@@ -772,8 +772,11 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         }
     }
     else {
-        Fl_Group* pane = ms_instance->folderWindowPane;
-        pane->redraw();
+	Fl_Group* pane = ms_instance->folderWindowPane;
+        if(pane->children() > 0) {
+	     pane->remove(0);
+	}
+	pane->redraw();
 	//pane->hide();
         //pane->show();
     }
@@ -801,6 +804,9 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
             break;
     }
     ms_instance->RemoveFolderByIndex(index, true);
+    if(USE_SCHEDULED_DELETION) {
+        RNAStructViz::ScheduledDeletion::ScheduleUpcomingDeletion();
+    }
 
 }
 

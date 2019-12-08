@@ -21,9 +21,9 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	CXXFLAGS+= -std=c++1z -Wno-c++11-narrowing -I/usr/local/opt/openssl/include
 	LDFLAGS+= -L/usr/local/opt/openssl/lib
 	## fallback values since Mac is broken as a platform w.r.t. its make version:
-	#DEBUG=$(shell ../build-scripts/get-build-config-setting.sh \
+	DEBUG=$(shell ../build-scripts/get-build-config-setting.sh \
 	      $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING)
-	DEBUG="0"
+	#DEBUG="0"
 	OPTLEVEL=$(shell ../build-scripts/get-build-config-setting.sh \
 		 $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) OPTLEVEL)
 	DEBUGLEVEL=$(shell ../build-scripts/get-build-config-setting.sh \
