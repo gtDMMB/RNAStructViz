@@ -21,7 +21,9 @@ void StructureData::SetTooltipText() {
           dotPairSeqStart += " /// ->";
           tooltipText += std::string("\n") + baseSeqStart + std::string("\n") + dotPairSeqStart;
      }
+     mainViewerDisplayBtn->hide();
      mainViewerDisplayBtn->copy_tooltip(tooltipText.c_str());
+     mainViewerDisplayBtn->show();
      mainButtonTooltip = tooltipText;
 }
 
