@@ -105,10 +105,10 @@ class StructureData {
 		    navCloseBtn->label("");
 		    navCloseBtn->tooltip("");
 	       }*/
-	       Delete(mainViewerDisplayBtn, Fl_Button);
+	       /*Delete(mainViewerDisplayBtn, Fl_Button);
 	       Delete(navCloseBtn, Fl_Button);
 	       Delete(autoloadToggleBtn, AutoloadIndicatorButton);
-	       Delete(xmlExportBtn, XMLExportButton);
+	       Delete(xmlExportBtn, XMLExportButton);*/
 	       Delete(guiPackingGroup, Fl_Group);
 	  }    
 

@@ -545,16 +545,14 @@ bool MainWindow::CreateFileChooser() {
 void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
 {
     //Find the folderName label in the contentsButton widget's group
-    Fl_Button* folderLabel = (Fl_Button*)(widget->parent()->child(0));
     ms_instance->selectedFolderBtn = (Fl_Button *) widget;
+    Fl_Button* folderLabel = ms_instance->selectedFolderBtn;
+    //folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+    //folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 
     Fl_Pack* pack = ms_instance->m_packedInfo;
-    folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-    folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
-    
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
     int index;
-
     for (index = 0; index < folders.size(); ++index)
     {
         if (!strcmp(folders[index]->folderName, (char*)(folderLabel->user_data())))
@@ -569,7 +567,11 @@ void MainWindow::ShowFolderByIndex(int index) {
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->
                                           GetStructureManager()->GetFolders();
     FolderWindow* fwindow;
-    if (folders[index]->folderWindow == NULL)
+    if(index < 0 || index >= folders.size()) {
+        TerminalText::PrintError("MainWindow::ShowFolderByIndex(%d): Invalid index out of range\n", index);
+	return;
+    }
+    else if(folders[index]->folderWindow == NULL)
     {
         fwindow = new FolderWindow(340, 40, 300, 390, 
                                    folders[index]->folderName, index);

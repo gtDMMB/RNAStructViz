@@ -349,6 +349,9 @@ void StructureManager::DecreaseStructCount(const int index)
 
 void StructureManager::RemoveFolder(const int index) {
     TerminalText::PrintDebug("Removing folder at index #%d\n", index);
+    if(index < 0 || index >= folders.size()) {
+        return;
+    }
     Folder *folderStruct = folders[index];
     folders.erase(folders.begin() + index);
     folderStruct->MarkForDeletion();

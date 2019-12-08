@@ -86,10 +86,10 @@ class Folder {
               mainWindowFolderBtn->tooltip("");
 	 }*/
          HideGUIWidgets(true);
-	 Delete(mainWindowFolderBtn, Fl_Button);
+	 /*Delete(mainWindowFolderBtn, Fl_Button);
 	 Delete(navUpBtn, Fl_Button);
 	 Delete(navDownBtn, Fl_Button);
-         Delete(navCloseBtn, Fl_Button);
+         Delete(navCloseBtn, Fl_Button);*/
 	 //if(guiPackingContainerRef != NULL) {
 	 //     guiPackingContainerRef->remove(guiPackingGroup);
 	 //}
