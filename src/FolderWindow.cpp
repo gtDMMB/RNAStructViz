@@ -33,6 +33,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     // label configuration happens inside FolderWindow::AddStructure ... 
 
+    this->end();
+
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
             StructureOperationIcon.width, StructureOperationIcon.height, 
