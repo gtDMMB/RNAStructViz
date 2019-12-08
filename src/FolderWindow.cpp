@@ -185,11 +185,15 @@ void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData) {
     for(int fi = 0; fi < FolderWindow::m_storedStructDisplayData.size(); fi++) {
          if(FolderWindow::m_storedStructDisplayData[fi] != NULL && 
 	    FolderWindow::m_storedStructDisplayData[fi]->origFolderWinLabel == fwindow->label()) {
-	      Delete(FolderWindow::m_storedStructDisplayData[fi], StructureData);
+	      StructureData *structData = FolderWindow::m_storedStructDisplayData[fi];
+	      int sindex = RNAStructViz::GetInstance()->GetStructureManager()->LookupStructureIndexByCTPath( 
+			   structData->structure->GetFilename());
+	      RNAStructViz::GetInstance()->GetStructureManager()->RemoveStructure(sindex);
+	      RNAStructViz::GetInstance()->GetStructureManager()->DecreaseStructCount(sindex);
+	      Delete(structData, StructureData);
 	      break;
 	 }
     }
-    MainWindow::HideFolderByName(fwindow->label());
 }
 
 void FolderWindow::ShowFileCallback(Fl_Widget* widget, void* userData)
@@ -243,8 +247,8 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             fwindow->folderScroll->redraw();
             //Fl::delete_widget(toRemove);
             
-	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
             appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
+	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
 	    //if(appInstance->GetStructureManager()->GetFolderAt(fwindow->m_folderIndex)->structCount == 0) {
 	    //     appInstance->GetStructureManager()->RemoveFolder(fwindow->m_folderIndex);
 	    //}

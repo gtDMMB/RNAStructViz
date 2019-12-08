@@ -72,6 +72,7 @@ class FolderWindow : public Fl_Group
         static void StatsCallback(Fl_Widget* widget, void* userData);
         
 	friend class StructureData;
+	friend class Folder;
 	static vector<StructureData*> m_storedStructDisplayData;
 
 	/*

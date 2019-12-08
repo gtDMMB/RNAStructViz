@@ -64,6 +64,19 @@ class StructureManager
 	     return NULL;
 	}
 
+	inline int LookupStructureIndexByCTPath(const char *ctPath) {
+	     if(ctPath == NULL) {
+	          return -1;
+	     }
+	     for(int sidx = 0; sidx < m_structureCount; sidx++) {
+	          RNAStructure *rnaStruct = GetStructure(sidx);
+		  if((rnaStruct != NULL) && !strcmp(rnaStruct->GetFilename(), ctPath)) {
+	               return sidx;
+		  }
+	     }
+	     return -1;
+	}
+
 	/* 
 	 * Check if a folder with the same name already exists:
 	 */

@@ -725,7 +725,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
     const std::vector<Folder*>& folders = appInstance->GetStructureManager()->GetFolders();
     Fl_Pack* pack = ms_instance->m_packedInfo;
     
-    HideFolderByIndex(index);
+    //HideFolderByIndex(index);
     for (int i = 0; i < pack->children(); ++i)
     {
         Fl_Button* childButton = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
@@ -733,7 +733,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
             
             Fl_Group* toRemove = (Fl_Group*) pack->child(i);
             pack->remove(toRemove);
-	    Delete(toRemove, Fl_Group);
+	    //Delete(toRemove, Fl_Group);
             
 	    const std::vector<DiagramWindow*>& diagrams = appInstance->GetDiagramWindows();
             const std::vector<StatsWindow*>& stats = appInstance->GetStatsWindows();
@@ -783,7 +783,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         }
         
     }
-    appInstance->GetStructureManager()->GetFolderAt(index)->SetPerformWidgetDeletion(false);
+    //appInstance->GetStructureManager()->GetFolderAt(index)->SetPerformWidgetDeletion(false);
     appInstance->GetStructureManager()->RemoveFolder(index);
     ms_instance->m_packedInfo->hide();
     ms_instance->m_packedInfo->show();
@@ -800,7 +800,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         Fl_Group* pane = ms_instance->folderWindowPane;
         pane->hide();
         pane->show();
-        int nextIndex = (index + 1) % folders.size();    
+        int nextIndex = index % folders.size();    
         if(folders[nextIndex] != NULL && folders[nextIndex]->structCount > 0) { 
              ShowFolderByIndex(nextIndex);
 	     Fl_Button *folderLabel = folders[nextIndex]->mainWindowFolderBtn;
