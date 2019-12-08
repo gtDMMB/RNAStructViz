@@ -224,9 +224,10 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             }
             pack->remove(toRemove);
 	    pack->resize(pack->x(), pack->y(), pack->w(), pack->h() - toRemoveHeight);
-            fwindow->folderScroll->scroll_to(0, 0);
-            fwindow->folderScroll->scroll_to(fwindow->folderScroll->xposition(), 
-                                             fwindow->folderScroll->yposition());
+            pack->redraw();
+	    int scrollToX = fwindow->folderScroll->xposition(), scrollToY = fwindow->folderScroll->yposition();
+	    fwindow->folderScroll->scroll_to(0, 0);
+            fwindow->folderScroll->scroll_to(scrollToX, scrollToY); 
             fwindow->folderScroll->scrollbar.align();
             fwindow->folderScroll->redraw();
             

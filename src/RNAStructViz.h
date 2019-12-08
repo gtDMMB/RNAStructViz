@@ -106,6 +106,7 @@ class RNAStructViz
 		  }
 
 		  static inline void ScheduleUpcomingDeletion(double delaySecs = 4.0) {
+		       Fl::remove_timeout(PerformScheduledDeletion, NULL);
 		       Fl::add_timeout(delaySecs, PerformScheduledDeletion);
 		  }
 
