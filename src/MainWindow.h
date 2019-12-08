@@ -80,7 +80,8 @@ class MainWindow
     
         Fl_Button* menu_collapse;
         Fl_Button* folder_collapse;
-    
+   
+        static inline void SetFolderSelected(int index) { ms_instance->selectedFolderIndex = index; }
         static void ShowFolderSelected();
         static bool CheckDistinctFolderName(const char *nextFolderName);
 

@@ -598,15 +598,18 @@ void MainWindow::ShowFolderSelected()
     //Find the folderName label in the contentsButton widget's group
     Fl_Button* folderLabel = NULL;
     Fl_Pack* pack = ms_instance->m_packedInfo;
-    
+    Folder *selectedFolder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt( 
+		             ms_instance->selectedFolderIndex);
+    Fl_Button *selectedBtn = selectedFolder != NULL ? selectedFolder->mainWindowFolderBtn : NULL;
     for (int i = 0; i < pack->children(); ++i) {
-
-        Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if (childLabel->color() == Lighter(GUI_BGCOLOR, 0.5f)) {
-            folderLabel = childLabel;
-            break;
+        Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
+        if(childLabel == selectedBtn) {
+	     childLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+             folderLabel = childLabel;
         }
-
+	else {
+	     childLabel->color(GUI_BGCOLOR);
+	}
     }
     
     if (folderLabel != NULL) {
@@ -662,8 +665,9 @@ void MainWindow::HideFolderByIndex(const int index)
 
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if (!strcmp((char*)(childLabel->user_data()), folder->folderName))
+        if (!strcmp((char*)(childLabel->user_data()), folder->folderName)) {
             childLabel->color(FL_BACKGROUND_COLOR);
+	}
         childLabel->labelcolor(GUI_BTEXT_COLOR);
     }
     

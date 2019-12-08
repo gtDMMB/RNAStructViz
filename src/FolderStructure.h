@@ -30,8 +30,10 @@ class Folder {
 		      navCloseBtn(NULL), 
 		      doWidgetDeletion(true) {
         folderStructs = (int *) malloc(capacity * sizeof(int));
-        memset(folderStructs, -1, capacity);
-        tooltipText[0] = '\0';
+        for(int fsi = 0; fsi < capacity; fsi++) {
+	     folderStructs[fsi] = -1;
+	}
+	tooltipText[0] = '\0';
     }
     
     inline ~Folder() {
@@ -44,7 +46,6 @@ class Folder {
         if(folderWindow != NULL) {
 	     folderWindow->HideFolderWindowGUIDisplay(true);
 	}
-	Delete(folderWindow, FolderWindow);
         if(doWidgetDeletion) {
 	     DeleteGUIWidgetData();
 	}
@@ -52,6 +53,7 @@ class Folder {
              mainWindowFolderBtn->label("");
              mainWindowFolderBtn->tooltip("");
 	}
+	Delete(folderWindow, FolderWindow);
 	structCount = 0;
         selected = false;
     }
@@ -75,11 +77,11 @@ class Folder {
     }
 
     inline void DeleteGUIWidgetData() {
-         HideGUIWidgets(true);
 	 if(mainWindowFolderBtn != NULL) {
               mainWindowFolderBtn->label("");
               mainWindowFolderBtn->tooltip("");
 	 }
+         HideGUIWidgets(true);
 	 Delete(mainWindowFolderBtn, Fl_Button);
 	 Delete(navUpBtn, Fl_Button);
 	 Delete(navDownBtn, Fl_Button);
@@ -99,7 +101,6 @@ class Folder {
               nextFolder->folderName[DEFAULT_FOLDER_NAME_BUFSIZE - 4] = '\0';
          }
          nextFolder->folderNameFileCount = (char *) malloc(DEFAULT_FOLDER_NAME_LBLSIZE * sizeof(char));
-         
 	 nextFolder->folderStructs[0] = index;
          nextFolder->structCount = 1;
 	 nextFolder->CreateFolderGUIElements();

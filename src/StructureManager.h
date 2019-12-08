@@ -92,7 +92,10 @@ class StructureManager
     
         inline Folder* GetFolderAt(int index)
         {
-            return folders[index];
+             if(index >= 0 && index < folders.size()) {
+	          return folders[index];
+	     }
+	     return NULL;
         }
     
         /*

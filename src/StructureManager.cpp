@@ -339,6 +339,10 @@ void StructureManager::RemoveFolder(const int index) {
 void StructureManager::AddFolder(RNAStructure* structure, const int index) {
      Folder *nextFolder = Folder::AddNewFolderFromData(structure, index, false);
      folders.push_back(nextFolder);
+     if(folders.size() == 1) {
+          MainWindow::SetFolderSelected(0);
+	  MainWindow::ShowFolderSelected();
+     }
 }
 
 int StructureManager::AddFirstEmpty(RNAStructure* structure)
