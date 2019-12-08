@@ -539,7 +539,7 @@ bool MainWindow::CreateFileChooser() {
     Delete(m_fileChooserSelectAllBtn, SelectAllButton);
     m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
-    m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 11, m_fileChooserSelectAllBtn->y() + 3);
+    m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
 
     return true;
 }
