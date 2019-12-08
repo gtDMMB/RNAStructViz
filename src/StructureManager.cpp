@@ -291,6 +291,10 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 
 void StructureManager::RemoveStructure(const int index)
 {
+    if(index < 0 || index >= m_structureCount) {
+        return;
+    }
+
     RNAStructure* structure = m_structures[index];
     m_structures[index] = NULL;
     if(structure == NULL) {
@@ -298,6 +302,7 @@ void StructureManager::RemoveStructure(const int index)
     }
     
     bool found = false;
+    int folderIndex = -1;
     for(int i = 0; i < (int)folders.size(); i++)
     {
         int shift = 0;
@@ -314,8 +319,13 @@ void StructureManager::RemoveStructure(const int index)
                 break;
             }
         }
-        if(found)
+        if(found) {
+	    folderIndex = i;
             break;
+	}
+    }
+    if(folderIndex != -1) {
+        RNAStructViz::GetInstance()->RemoveStructure(folderIndex, index);
     }
     
     StructureData *structData = index < FolderWindow::m_storedStructDisplayData.size() ? 
@@ -328,7 +338,7 @@ void StructureManager::RemoveStructure(const int index)
 	if(FolderWindow::m_storedStructDisplayData.size() > index && structData != NULL) {
 	     RNAStructViz::ScheduledDeletion::AddStructureData(structData);
              FolderWindow::m_storedStructDisplayData[index] = NULL;
-	     RNAStructViz::ScheduledDeletion::AddFolderWindow(structData->parentMainFolderWin);
+	     //RNAStructViz::ScheduledDeletion::AddFolderWindow(structData->parentMainFolderWin);
 	}
     }
     else {
@@ -357,6 +367,7 @@ void StructureManager::RemoveFolder(const int index) {
     if(index < 0 || index >= folders.size()) {
         return;
     }
+    RNAStructViz::GetInstance()->RemoveFolderData(index);
     Folder *folderStruct = folders[index];
     folders.erase(folders.begin() + index);
     folderStruct->MarkForDeletion();

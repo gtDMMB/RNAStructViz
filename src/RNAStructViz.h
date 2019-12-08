@@ -56,8 +56,28 @@ class RNAStructViz
         }
 
 	void AddStatsWindow(int index);
-        void TestFolders();
+        
+	void RemoveStructure(int folderIndex, int structureIndex);
+	void RemoveFolderData(int index);
+	void TestFolders();
 
+	inline int GetDiagramWindowForFolderIndex(int findex) {
+	     for(int dw = 0; dw < m_diagramWindows.size(); dw++) {
+	          if(m_diagramWindows[dw] != NULL && m_diagramWindows[dw]->GetFolderIndex() == findex) {
+		       return dw;
+		  }
+	     }
+	     return -1;
+	}
+
+	inline int GetStatsWindowForFolderIndex(int findex) {
+	     for(int sw = 0; sw < m_statsWindows.size(); sw++) {
+	          if(m_statsWindows[sw] != NULL && m_statsWindows[sw]->GetFolderIndex() == findex) {
+		       return sw;
+		  }
+	     }
+	     return -1;
+	}
 
     public:
 	static int HandleGlobalKeypressEvent(int eventCode);
@@ -81,7 +101,7 @@ class RNAStructViz
 	          static vector<RNAStructure *>  rnaStructObjs;
 		  static vector<Folder *>        folderStructObjs;
 		  static vector<StructureData *> structureDataObjs;
-                  static vector<FolderWindow *>  folderWinStructObjs;
+                  static vector<Fl_Widget *>     widgetObjs;
 
 		  static inline void PerformScheduledDeletion(void *) {
 		       Fl::lock();
@@ -100,10 +120,10 @@ class RNAStructViz
 			    Delete(structureDataObjs[sdi], StructureData);
 		       }
 		       structureDataObjs.clear();
-		       //for(int fwi = 0; fwi < folderWinStructObjs.size(); fwi++) {
-		       //    Delete(folderWinStructObjs[fwi], FolderWindow);
-		       //}
-		       folderWinStructObjs.clear();
+		       for(int wi = 0; wi < widgetObjs.size(); wi++) {
+		           Delete(widgetObjs[wi], Fl_Widget);
+		       }
+		       widgetObjs.clear();
 		       endTime = time(NULL);
 		       TerminalText::PrintDebug("Done performing scehduled deletion of objects ... In %g seconds.\n", 
 				                difftime(endTime, startTime));
@@ -117,25 +137,25 @@ class RNAStructViz
 
 		  static inline void AddRNAStructure(RNAStructure *s) {
 		       Fl::lock();
-		       rnaStructObjs.push_back(s);
+		       if(s != NULL) rnaStructObjs.push_back(s);
 		       Fl::unlock();
 		  }
 
 		  static inline void AddFolder(Folder *f) {
 		       Fl::lock();
-		       folderStructObjs.push_back(f);
+		       if(f != NULL) folderStructObjs.push_back(f);
 		       Fl::unlock();
 		  }
 
 		  static inline void AddStructureData(StructureData *sd) {
 		       Fl::lock();
-		       structureDataObjs.push_back(sd);
+		       if(sd != NULL) structureDataObjs.push_back(sd);
 		       Fl::unlock();
 		  }
 
-		  static inline void AddFolderWindow(FolderWindow *fwin) {
+		  static inline void AddWidget(Fl_Widget *w) {
 		       Fl::lock();
-		       folderWinStructObjs.push_back(fwin);
+		       if(w != NULL) widgetObjs.push_back(w);
 		       Fl::unlock();
 		  }
 

@@ -703,8 +703,6 @@ void MainWindow::HideFolderByIndex(const int index)
     ms_instance->m_structureInfo->redraw();
     
     pane->redraw();
-    //pane->hide();
-    //pane->show();
 
 }
 
@@ -715,47 +713,6 @@ void MainWindow::RemoveFolderByIndex(const int index)
     Fl_Pack* pack = ms_instance->m_packedInfo;
 
     HideFolderByIndex(index);    
-    for (int i = 0; i < pack->children(); ++i)
-    {
-        Fl_Button* childButton = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if (!strcmp((char*)(childButton->user_data()),folders[index]->folderName)) {
-            
-            Fl_Group* toRemove = (Fl_Group*) pack->child(i);
-            pack->remove(toRemove);
-	    pack->insert(*toRemove, 0);
-            
-	    const std::vector<DiagramWindow*>& diagrams = appInstance->GetDiagramWindows();
-            const std::vector<StatsWindow*>& stats = appInstance->GetStatsWindows();
-            int structNum = folders[index]->structCount;
-            
-            for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
-            {
-                if(diagrams[ui]->GetFolderIndex() == index)
-                {
-                    for(int j = structNum - 1; j >= 0; j--)
-                    {
-                        int structIndex = folders[index]->folderStructs[j];
-                        diagrams[ui]->RemoveStructure(structIndex);
-                    }
-                    diagrams[ui]->hide();
-                }
-            }
-            for (unsigned int ui = 0; ui < stats.size(); ++ui)
-            {
-                if(stats[ui]->GetFolderIndex() == index)
-                {
-                    for(int j = structNum - 1; j >= 0; j--)
-                    {
-                        int structIndex = folders[index]->folderStructs[j];
-                        stats[ui]->RemoveStructure(structIndex);
-                    }
-                    stats[ui]->hide();
-                }
-            }
-	    break;
-        }
-        
-    }
     for(int si = 0; si < folders[index]->structCount; si++) {
         int sindex = folders[index]->folderStructs[si];
 	appInstance->GetStructureManager()->RemoveStructure(sindex);
@@ -782,8 +739,6 @@ void MainWindow::RemoveFolderByIndex(const int index)
         if(folders[nextIndex] != NULL && folders[nextIndex]->structCount > 0) { 
              ShowFolderByIndex(nextIndex);
 	     Fl_Button *folderLabel = folders[nextIndex]->mainWindowFolderBtn;
-             //folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-             //folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
              ms_instance->selectedFolderBtn = folderLabel;
         }
     }
@@ -792,8 +747,6 @@ void MainWindow::RemoveFolderByIndex(const int index)
 	     pane->remove(0);
 	}
 	pane->redraw();
-	//pane->hide();
-        //pane->show();
     }
 }
 
@@ -827,6 +780,7 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
 
 void MainWindow::CloseCallback(Fl_Widget* widget, void* userData) {
     widget->hide();
+    RNAStructViz::Shutdown();
     exit(0);
 }
 

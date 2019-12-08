@@ -15,3 +15,7 @@ src/RNAStructViz
 
 #generated at compile time, varies by platform#
 src/BuildTargetInfo.h
+src/BuildInclude
+src/BuildInclude/*
+src/BuildObjects
+src/BuildObjects/*

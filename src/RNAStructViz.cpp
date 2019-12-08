@@ -21,7 +21,7 @@ namespace fs = boost::filesystem;
 vector<RNAStructure *> RNAStructViz::ScheduledDeletion::rnaStructObjs;
 vector<Folder *> RNAStructViz::ScheduledDeletion::folderStructObjs;
 vector<StructureData *> RNAStructViz::ScheduledDeletion::structureDataObjs;
-vector<FolderWindow *> RNAStructViz::ScheduledDeletion::folderWinStructObjs;
+vector<Fl_Widget *> RNAStructViz::ScheduledDeletion::widgetObjs;
 
 static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
         {
@@ -225,7 +225,7 @@ void RNAStructViz::AddStatsWindow(int index)
     {
         stats = m_statsWindows[i];
         if ((stats != NULL) && (stats->GetFolderIndex() == index) && 
-        !stats->visible())
+            !stats->visible())
         {
             stats->SetStructures(structures);
             stats->SetFolderIndex(index);
@@ -244,6 +244,52 @@ void RNAStructViz::AddStatsWindow(int index)
     m_statsWindows.push_back(stats);
     stats->show();
     
+}
+
+void RNAStructViz::RemoveStructure(int folderIndex, int structureIndex) {
+     if(folderIndex < 0) {
+          return;
+     }
+     int dwinIdx = GetDiagramWindowForFolderIndex(folderIndex);
+     if(dwinIdx >= 0) {
+          m_diagramWindows[dwinIdx]->RemoveStructure(structureIndex);
+     }
+     int swinIdx = GetStatsWindowForFolderIndex(folderIndex);
+     if(swinIdx >= 0) {
+          m_statsWindows[swinIdx]->RemoveStructure(structureIndex);
+     }
+}
+
+void RNAStructViz::RemoveFolderData(int index) {
+
+     if(index < 0) {
+          return;
+     }
+     int diagramWinIdx = GetDiagramWindowForFolderIndex(index);
+     DiagramWindow *diagramWin = diagramWinIdx >= 0 ? m_diagramWindows[diagramWinIdx] : NULL;
+     if(diagramWin != NULL) {
+          diagramWin->hide();
+          m_diagramWindows.erase(m_diagramWindows.begin() + diagramWinIdx);
+     }
+     int statsWinIdx = GetStatsWindowForFolderIndex(index);
+     StatsWindow   *statsWin = statsWinIdx >= 0 ? m_statsWindows[statsWinIdx] : NULL;
+     if(statsWin != NULL) {
+	  statsWin->hide();
+          m_statsWindows.erase(m_statsWindows.begin() + statsWinIdx);
+     }
+     while((diagramWin != NULL && diagramWin->visible()) || 
+           (statsWin != NULL && statsWin->visible())) {
+          Fl::wait(1.0);
+     }
+     if(USE_SCHEDULED_DELETION) {
+          ScheduledDeletion::AddWidget(diagramWin);
+	  ScheduledDeletion::AddWidget(statsWin);
+     }
+     else {
+          Delete(diagramWin, DiagramWindow);
+          Delete(statsWin, StatsWindow);
+     }
+
 }
 
 void RNAStructViz::TestFolders()
