@@ -167,7 +167,7 @@ class MainWindow
 	    The instance of the window.
 	    Only non-null after a call to Initialize and before the next Shutdown.
         */
-        static MainWindow* ms_instance;
+        static inline MainWindow* ms_instance = NULL;
 
         /*
 	    The main FLTK window.
