@@ -84,8 +84,9 @@ SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int 
      };
      unsigned int numCheckBoxes = 4;
      for(int cbnum = 0; cbnum < numCheckBoxes; cbnum++) {
-          *(saWidgetCheckButtons[cbnum]) = new Fl_Check_Button(offsetX, offsetY, w() - 6.5 * SAWIDGET_PADDING, 0.75 * NAVBUTTONS_BHEIGHT);
-          (*(saWidgetCheckButtons[cbnum]))->label(saWidgetCBLabels[cbnum]);
+          *(saWidgetCheckButtons[cbnum]) = new Fl_Check_Button(offsetX, offsetY, w() - 6.5 * SAWIDGET_PADDING, 
+			                                       0.75 * NAVBUTTONS_BHEIGHT, saWidgetCBLabels[cbnum]);
+          //(*(saWidgetCheckButtons[cbnum]))->label(saWidgetCBLabels[cbnum]);
           saWidgetCBEnabled[cbnum] ? (*(saWidgetCheckButtons[cbnum]))->activate() : (*(saWidgetCheckButtons[cbnum]))->deactivate();
           *(saWidgetCBValues[cbnum]) ? (*(saWidgetCheckButtons[cbnum]))->set() : (*(saWidgetCheckButtons[cbnum]))->clear();
           (*(saWidgetCheckButtons[cbnum]))->color(Darker(GUI_WINDOW_BGCOLOR, 0.8f));
