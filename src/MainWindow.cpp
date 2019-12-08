@@ -672,6 +672,7 @@ void MainWindow::HideFolderByIndex(const int index)
     int toHideYOffset = folder->guiPackingGroup->y();
     int toHideHeight = folder->guiPackingGroup->h();
     folder->guiPackingGroup->hide();
+    pack->remove(folder->guiPackingGroup);
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Group *containerGroup = (Fl_Group *) pack->child(i);
 	Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
