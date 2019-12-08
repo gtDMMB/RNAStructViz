@@ -112,9 +112,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     cairo_rectangle(crZoom, 0, 0, ZOOM_WIDTH, ZOOM_HEIGHT);
     cairo_fill(crZoom);
     
-    //Fl::cairo_cc(crDraw, false);
     set_draw_cb(Draw);
-    //Fl::cairo_make_current(this);
 
 }
 
@@ -138,12 +136,13 @@ DiagramWindow::DiagramWindow(int x, int y, int w, int h, const char *label,
 }
 
 DiagramWindow::~DiagramWindow() {
+    Free(title);
     Free(m_menuItems);
     if(imageData != NULL) {
         delete imageData;
     }
-    //cairo_surface_destroy(crSurface);
-    //cairo_destroy(crDraw);
+    cairo_surface_destroy(crSurface);
+    cairo_destroy(crDraw);
     cairo_surface_destroy(crZoomSurface);
     cairo_destroy(crZoom);
     cairo_surface_destroy(crBasePairsSurface);

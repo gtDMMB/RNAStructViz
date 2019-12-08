@@ -831,6 +831,7 @@ StatsWindow::~StatsWindow()
     }
     Delete(input_window, InputWindow);
     Delete(rocplot_rotated_text, Fl_Rotated_Text);
+    Delete(buff, Fl_Text_Buffer);
 }
 
 void StatsWindow::ResetWindow()

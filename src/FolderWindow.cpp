@@ -37,7 +37,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
             StructureOperationIcon.bytes_per_pixel);
     structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.45);
     
-    this->begin();
+    this->begin(); {
     Fl_Box *structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
     
@@ -107,7 +107,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     folderScroll->color((Fl_Color) GUI_WINDOW_BGCOLOR);
     folderScroll->labelcolor((Fl_Color) GUI_BTEXT_COLOR);
-    
+    }
     this->end();
     this->resizable(folderScroll);
     this->color(GUI_WINDOW_BGCOLOR);
@@ -122,9 +122,9 @@ FolderWindow::~FolderWindow() {
           Delete(m_storedStructDisplayData[vi], StructureData);
      }
      HideFolderWindowGUIDisplay(true);
-     for(int cidx = 0; cidx < children(); cidx++) {
-          remove(0);
-     }
+     //for(int cidx = 0; cidx < children(); cidx++) {
+     //     remove(0);
+     //}
      label("");
      Delete(folderPack, Fl_Pack);
      Delete(folderScroll, Fl_Scroll);
