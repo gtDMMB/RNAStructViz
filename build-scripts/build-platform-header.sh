@@ -64,7 +64,6 @@ fi
 if [[ -f "$OUTPUT_HEADER_FILE.hash" ]] && [[ "$(echo $updateHash | diff - $OUTPUT_HEADER_FILE.hash)" == "" ]]; then
 	echo -e "${OUTPUT_HEADER_FILE} information already up-to-date ... \n";
 else 
-	echo "DIFF" "$(echo $updateHash | diff - $OUTPUT_HEADER_FILE.hash)" "/DIFF";
 	echo "Copying \"${HEADER_SKELETON_FILE}\" to \"${OUTPUT_HEADER_FILE}\" ... "
 	cp $HEADER_SKELETON_FILE $OUTPUT_HEADER_FILE
 	for ridx in $(seq 0 6); do

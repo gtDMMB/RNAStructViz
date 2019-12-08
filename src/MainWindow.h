@@ -135,6 +135,7 @@ class MainWindow
         static void InfoButtonCallback(Fl_Widget *btn, void *userData);
 	static Fl_RGB_Image *helpIconImage;
         static Fl_RGB_Image *infoButtonImage;
+        Fl_RGB_Image *appLogo;
 
 	/*
         Callbacks for collapsing the two sides of the window.

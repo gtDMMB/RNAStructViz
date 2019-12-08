@@ -6,6 +6,7 @@
 #include "CommonDialogs.h"
 #include "TerminalPrinting.h"
 #include "ThemesConfig.h"
+#include "RNAStructVizTypes.h"
 
 #include <unistd.h>
 #include <iostream>
@@ -55,7 +56,7 @@ MainWindow::MainWindow(int argc, char **argv)
     {
         
         // setup the program logo (for now dynamically loaded):
-        Fl_RGB_Image *appLogo = new Fl_RGB_Image( 
+        appLogo = new Fl_RGB_Image( 
               RNAStructVizLogo.pixel_data, 
               RNAStructVizLogo.width, 
               RNAStructVizLogo.height, 
@@ -216,6 +217,7 @@ MainWindow::~MainWindow() {
     Delete(actionsLabel, Fl_Box);
     Delete(openButton, Fl_Button);
     Delete(configOptionsButton, Fl_Button);
+    Delete(appLogo, Fl_RGB_Image);
     for(int w = 0; w < folderDataBtns.size(); w++) {
         delete folderDataBtns[w];
         folderDataBtns[w] = NULL;
@@ -244,6 +246,8 @@ void MainWindow::Shutdown() {
 	while(ms_instance->m_mainWindow->visible()) { Fl::wait(1.0); }
 	delete ms_instance;
 	ms_instance = NULL;
+	Delete(MainWindow::helpIconImage, Fl_RGB_Image);
+	Delete(MainWindow::infoButtonImage, Fl_RGB_Image);
     }
 }
 

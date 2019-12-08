@@ -11,9 +11,10 @@
      #include <gperftools/heap-profiler.h>
 #endif
 
+#include "RNAStructVizTypes.h"
+#include "ConfigOptions.h"
 #include "MainWindow.h"
 #include "RNAStructViz.h"
-#include "ConfigOptions.h"
 #include "ConfigParser.h"
 #include "DisplayConfigWindow.h"
 #include "TerminalPrinting.h"

@@ -202,7 +202,7 @@ run-debug: clean default
 clean:
 	@rm -f *.$(OBJEXT) *.code *.log *.callgrind *.out *.ps *.pdf *.heap \
 		$(BINARY_OUTPUT) $(RNASTRUCTVIZ_OBJECTS) \
-		$(OBJ_BUILD_DIR)/* 
+		$(OBJ_BUILD_DIR)/* $(BUILD_TARGET_HEADER) $(BUILD_TARGET_HEADER).hash
 
 install: default
 	if test -z "$$INSTALL_PREFIX"; then INSTALL_PREFIX=/usr/local/; fi;\
@@ -249,8 +249,8 @@ $(BINEXE): $(RNASTRUCTVIZ_OBJECTS)
 
 prelims:
 	@mkdir -p $(OBJ_BUILD_DIR) $(BUILD_TARGET_HEADER_DIR)
-	@rm -f $(BUILD_TARGET_HEADER)
-	@touch $(BUILD_TARGET_HEADER)
+	#@rm -f $(BUILD_TARGET_HEADER)
+	#@touch $(BUILD_TARGET_HEADER)
 	@$(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
 		$(shell $(READLINK) -f ../build-scripts/BuildTargetInfo.h.in) \
 		$(shell $(READLINK) -m $(BUILD_TARGET_HEADER)) \
