@@ -2177,7 +2177,7 @@ void StatsWindow::ExportTable()
             fprintf(expFile,
                     "G-C_Pairs,A-U_Pairs,G-U_Pairs,Non-Canonical_Pairs\n"); 
             
-            for (unsigned int ui = comp_pack->children() - 1; ui >= 0; ui--)
+            for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
             {
 		if(!statistics[ui].isValid) continue;
                 // print the row of statistics for each structure
