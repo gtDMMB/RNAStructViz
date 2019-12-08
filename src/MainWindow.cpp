@@ -30,8 +30,6 @@ namespace fs = boost::filesystem;
 #include "pixmaps/HelpIcon.c"
 #include "pixmaps/InfoButton.c"
 
-MainWindow* MainWindow::ms_instance = NULL;
-
 Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
            HelpIcon.pixel_data, 
            HelpIcon.width, HelpIcon.height, HelpIcon.bytes_per_pixel);
