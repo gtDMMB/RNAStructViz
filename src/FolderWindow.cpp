@@ -222,7 +222,8 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
                  groupToMove->resize(groupToMove->x(), groupToMove->y() - toRemoveHeight, 
                                      groupToMove->w(), groupToMove->h());
             }
-            pack->resize(pack->x(), pack->y(), pack->w(), pack->h() - toRemoveHeight);
+            pack->remove(toRemove);
+	    pack->resize(pack->x(), pack->y(), pack->w(), pack->h() - toRemoveHeight);
             fwindow->folderScroll->scroll_to(0, 0);
             fwindow->folderScroll->scroll_to(fwindow->folderScroll->xposition(), 
                                              fwindow->folderScroll->yposition());
