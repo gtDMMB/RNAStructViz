@@ -67,8 +67,6 @@
           return "verbosity=1:malloc_context_size=20:detect_leaks=0:"
 		 "detect_stack_use_after_return=1:print_stats=1:log_threads=1"; 
      }
-     //#define DEBUG_NEW new(__FILE__, __LINE__)
-     //#define new DEBUG_NEW
 #endif
 
 #define FLTK_USE_CAIRO  1
@@ -84,7 +82,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.1.3-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.1.4-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 

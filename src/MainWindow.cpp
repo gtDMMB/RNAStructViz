@@ -547,10 +547,6 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
     ms_instance->selectedFolderBtn = (Fl_Button *) widget;
 
     Fl_Pack* pack = ms_instance->m_packedInfo;
-    /*for (int i = 0; i < pack->children(); ++i) {
-        Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        childLabel->color(FL_BACKGROUND_COLOR);
-    }*/
     folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
     folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
     
@@ -584,7 +580,7 @@ void MainWindow::ShowFolderByIndex(int index) {
         ms_instance->folderWindowPane->remove(0);
     }
     ms_instance->selectedFolderIndex = index;
-    ms_instance->folderWindowPane->add((Fl_Group *) fwindow);
+    ms_instance->folderWindowPane->add((Fl_Group*) fwindow);
 
     ExpandAlwaysFolderPane();
     ms_instance->folderWindowPane->hide();
@@ -605,10 +601,12 @@ void MainWindow::ShowFolderSelected()
         Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if(childLabel == selectedBtn) {
 	     childLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-             folderLabel = childLabel;
+             childLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
+	     folderLabel = childLabel;
         }
 	else {
 	     childLabel->color(GUI_BGCOLOR);
+	     childLabel->labelcolor(GUI_BTEXT_COLOR);
 	}
     }
     
@@ -769,14 +767,15 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                     appInstance->GetStructureManager()->RemoveStructure(structIndex);
                 }
             }
-            folders[index]->structCount = 0;
-            
-            appInstance->GetStructureManager()->RemoveFolder(i);
-	    ms_instance->m_packedInfo->hide();
-	    ms_instance->m_packedInfo->show();
-	    ms_instance->m_packedInfo->redraw();
-            ms_instance->m_structureInfo->scrollbar.align();
-            ms_instance->m_structureInfo->redraw();
+            folders[index]->structCount -= 1;
+	    if(folders[index]->structCount == 0) {
+                 appInstance->GetStructureManager()->RemoveFolder(i);
+	         ms_instance->m_packedInfo->hide();
+	         ms_instance->m_packedInfo->show();
+	         ms_instance->m_packedInfo->redraw();
+                 ms_instance->m_structureInfo->scrollbar.align();
+                 ms_instance->m_structureInfo->redraw();
+	    }
 	    break;
         }
         
@@ -791,7 +790,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         pane->hide();
         pane->show();
         int nextIndex = (index + 1) % folders.size();    
-        if(folders[nextIndex]->structCount > 0) { 
+        if(folders[nextIndex] != NULL && folders[nextIndex]->structCount > 0) { 
              ShowFolderByIndex(nextIndex);
 	     Fl_Button *folderLabel = folders[nextIndex]->mainWindowFolderBtn;
              folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
@@ -880,8 +879,10 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
                     appInstance->GetStructureManager()->RemoveStructure(index);
                 }
             }
-            folder->structCount = 0;
-            appInstance->GetStructureManager()->RemoveFolder(i);
+            folder->structCount -= 1;
+	    if(folder->structCount == 0) {
+                 appInstance->GetStructureManager()->RemoveFolder(i);
+	    }
             
             for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
             {
@@ -966,7 +967,7 @@ void MainWindow::RethemeMainWindow() {
          
          for(int b = 0; b < ms_instance->folderDataBtns.size(); b++) {
               ms_instance->folderDataBtns[b]->color(GUI_BGCOLOR);
-          ms_instance->folderDataBtns[b]->labelcolor(GUI_BTEXT_COLOR);
+              ms_instance->folderDataBtns[b]->labelcolor(GUI_BTEXT_COLOR);
          }
          if(ms_instance->selectedFolderBtn != NULL) {
               ms_instance->selectedFolderBtn->color(Lighter(GUI_BGCOLOR, 0.5f));
