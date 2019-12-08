@@ -133,7 +133,6 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
         
            int count = (int) folders.size();
            RNAStructure *structure = structures[s];
-	   TerminalText::PrintDebug("Structure %p [%s]\n", structure, filename);
 	   if(!structure) { 
                 continue;
            }
@@ -164,7 +163,7 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 		 }
                  m_inputWindow = new InputWindow(525, 210, 
                                                  "New Folder Added", folders[count]->folderName, 
-                                                  InputWindow::FOLDER_INPUT);
+                                                  InputWindow::FOLDER_INPUT, !guiQuiet);
                  while (m_inputWindow->visible()) {
                        Fl::wait();
                  }
@@ -199,7 +198,9 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 		          Delete(m_inputWindow, InputWindow);
 		     }
 		     m_inputWindow = new InputWindow(525, 210, "New Folder Added", 
-                                                     folders[count]->folderName, InputWindow::FOLDER_INPUT);
+                                                     folders[count]->folderName, 
+						     InputWindow::FOLDER_INPUT, 
+                                                     !guiQuiet);
                      while (m_inputWindow->visible()) {
                           Fl::wait();
                      }
@@ -323,6 +324,7 @@ void StructureManager::DecreaseStructCount(const int index)
     if (folders[index]->structCount == 0) 
     {
         MainWindow::RemoveFolderByIndex(index, true);
+	RemoveFolder(index);
     }
     else {
         folders[index]->SetTooltipTextData();
@@ -332,6 +334,7 @@ void StructureManager::DecreaseStructCount(const int index)
 }
 
 void StructureManager::RemoveFolder(const int index) {
+    TerminalText::PrintDebug("Removing folder at index #%d\n", index);
     Delete(folders[index], Folder);
     folders.erase(folders.begin() + index);
 }
@@ -339,10 +342,10 @@ void StructureManager::RemoveFolder(const int index) {
 void StructureManager::AddFolder(RNAStructure* structure, const int index) {
      Folder *nextFolder = Folder::AddNewFolderFromData(structure, index, false);
      folders.push_back(nextFolder);
-     if(folders.size() == 1) {
-          MainWindow::SetFolderSelected(0);
-	  MainWindow::ShowFolderSelected();
-     }
+     //if(folders.size() == 1) {
+     //     MainWindow::SetFolderSelected(0);
+     //	  MainWindow::ShowFolderSelected();
+     //}
 }
 
 int StructureManager::AddFirstEmpty(RNAStructure* structure)

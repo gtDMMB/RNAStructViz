@@ -20,7 +20,8 @@
 int InputWindow::distinctStructureCount = 0;
 
 InputWindow::InputWindow(int w, int h, const char *label, 
-                         const char *defaultName, InputWindowType type, int folderIndex) : 
+                         const char *defaultName, InputWindowType type, 
+			 bool showDisplay, int folderIndex) : 
     Fl_Window(w, h, label), cbUseDefaultNames(NULL), cbKeepStickyFolders(NULL), 
     ctFileChooser(NULL), input(NULL), winString(NULL), inputText(NULL),
     userWindowStatus(OK), fileSelectionIndex(-1), windowDone(false),
@@ -66,7 +67,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         callback(CloseCallback);
     }
     else if(type == InputWindow::FOLDER_INPUT) {    
-        std::string actualStructName = ExtractStructureNameFromFile(defaultName);
+        std::string actualStructName = ExtractStructureNameFromFile(defaultName, this);
         const char *actualStructNameCStr = actualStructName.c_str();
         strcpy(inputText, actualStructNameCStr);
 
@@ -146,8 +147,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
     
     }
         show();
-        if(type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && 
-           (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound)) {
+        if(showDisplay && (type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && 
+           (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound))) {
             show();
         }
         else {
@@ -227,7 +228,7 @@ void InputWindow::CancelCallback(Fl_Widget *w, void *udata) {
      }
 }
 
-std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
+std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath, InputWindow *inputWinRef) {
     
     RNAStructure *rnaStruct = RNAStructViz::GetInstance()->GetStructureManager()->
                               LookupStructureByCTPath(seqFilePath);
@@ -242,15 +243,17 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
                        DEFAULT_STICKY_FOLDERNAME_CFGFILE,
                        stickyFolderExists
          );
-     if(stickyFolderName != NULL) {
-          //// executive decision: save space on the small button labels by not 
-          //// prepending a folder number if there is a saved sticky folder label 
-          //// already there to go from the local user config files:
-          std::string suggestedStickyName = std::string(stickyFolderName);
-          Free(stickyFolderName);
-          stickyFolderNameFound = true;
-          return suggestedStickyName;
-     }
+         if(stickyFolderName != NULL) {
+              //// executive decision: save space on the small button labels by not 
+              //// prepending a folder number if there is a saved sticky folder label 
+              //// already there to go from the local user config files:
+              std::string suggestedStickyName = std::string(stickyFolderName);
+              Free(stickyFolderName);
+	      if(inputWinRef != NULL) {
+                   inputWinRef->stickyFolderNameFound = true;
+	      }
+              return suggestedStickyName;
+         }
     }
     
     // otherwise, use file name and file header comments to guess at a good name for the sequence:
@@ -266,7 +269,9 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath) {
     const char *suggestedFolderName = rnaStruct ? 
                                   rnaStruct->GetSuggestedStructureFolderName() : NULL;
     if(suggestedFolderName != NULL) {
-         suggestedFolderNameFound = true;
+         if(inputWinRef != NULL) {
+	      inputWinRef->suggestedFolderNameFound = true;
+	 }
          return std::string(suggestedFolderName);
     }
     char fileTypeIdStr[MAX_BUFFER_SIZE];

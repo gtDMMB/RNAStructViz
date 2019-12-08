@@ -262,10 +262,13 @@ void MainWindow::AddFolder(const char* foldername, const int index,
                            const bool isSelected) {
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
     Fl_Pack* pack = ms_instance->m_packedInfo;
-    folder->SetFolderLabel();
-    folder->SetTooltipTextData();
+    //folder->SetFolderLabel();
+    //folder->SetTooltipTextData();
     folder->SetSelected(isSelected);
+    ms_instance->m_packedInfo->hide();
+    ms_instance->m_packedInfo->show();
     ms_instance->m_packedInfo->redraw();
+    ms_instance->m_structureInfo->scrollbar.align();
     ms_instance->m_structureInfo->redraw();
 }
 
@@ -767,7 +770,8 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                     appInstance->GetStructureManager()->RemoveStructure(structIndex);
                 }
             }
-            folders[index]->structCount -= 1;
+	    appInstance->GetStructureManager()->DecreaseStructCount(index);
+            /*folders[index]->structCount -= 1;
 	    if(folders[index]->structCount == 0) {
                  appInstance->GetStructureManager()->RemoveFolder(i);
 	         ms_instance->m_packedInfo->hide();
@@ -775,7 +779,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
 	         ms_instance->m_packedInfo->redraw();
                  ms_instance->m_structureInfo->scrollbar.align();
                  ms_instance->m_structureInfo->redraw();
-	    }
+	    }*/
 	    break;
         }
         
@@ -879,10 +883,11 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
                     appInstance->GetStructureManager()->RemoveStructure(index);
                 }
             }
-            folder->structCount -= 1;
+            appInstance->GetStructureManager()->DecreaseStructCount(index);
+	    /*folder->structCount -= 1;
 	    if(folder->structCount == 0) {
                  appInstance->GetStructureManager()->RemoveFolder(i);
-	    }
+	    }*/
             
             for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
             {

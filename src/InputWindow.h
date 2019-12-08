@@ -59,7 +59,7 @@ class InputWindow : public Fl_Window
 	    type - types listed above
 	 */
         InputWindow(int w, int h, const char *label, const char *defaultName,
-    	            InputWindowType type, int folderIndex = -1);
+    	            InputWindowType type, bool showDisplay = true, int folderIndex = -1);
 	~InputWindow();
 
 	    /* Returns the user input from the window*/
@@ -83,7 +83,7 @@ class InputWindow : public Fl_Window
         static void DisplayCTFileCallback(Fl_Widget *w, void *udata);
 	static void CancelCallback(Fl_Widget *w, void *udata);
 
-	std::string ExtractStructureNameFromFile(const char *ctPath);
+	static std::string ExtractStructureNameFromFile(const char *ctPath, InputWindow *inputWinRef = NULL);
 
     private:
         Fl_Input *input; // Text field where the user types in the input
