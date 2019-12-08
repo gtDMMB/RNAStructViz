@@ -39,7 +39,6 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     
     structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
-    this->add(structIconBox);
 
     int dividerTextHeight = 0, spacingHeight = NAVBUTTONS_SPACING;
     int fileOpsLabelHeight = 2 * NAVBUTTONS_BHEIGHT; 
