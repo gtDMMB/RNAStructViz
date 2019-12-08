@@ -18,6 +18,10 @@ namespace fs = boost::filesystem;
 #include "TerminalPrinting.h"
 #include "ConfigParser.h"
 
+vector<RNAStructure *> RNAStructViz::ScheduledDeletion::rnaStructObjs;
+vector<Folder *> RNAStructViz::ScheduledDeletion::folderStructObjs;
+vector<StructureData *> RNAStructViz::ScheduledDeletion::structureDataObjs;
+
 static GlobalKeyPressHandlerData_t GLOBAL_STRUCTVIZ_KEYPRESS_HANDLER_DATA[] = {
         {
           "Standard help key shortcut", 
