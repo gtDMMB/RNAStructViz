@@ -39,28 +39,41 @@ BUILD_FLTK_CONFIG=$3
 
 REPL_PATTERNS=("##__GIT_COMMITREV_HASHNUM_SHORT__##" "##__GIT_COMMITREV_HASHNUM__##" \
 	"##__GIT_COMMITREV_DATE__##" "##__GIT_DESCRIBE_REVSTRING__##" \
-	"##__BUILD_PLATFORM_ID__##" "##__LOCAL_BUILD_TIME__##" \
+	"##__BUILD_PLATFORM_ID__##" \
 	"##__BUILD_FLTK_CONFIG__##" \
+	"##__LOCAL_BUILD_TIME__##" \
 )
 REPLACEMENTS=($GIT_COMMITREV_HASHNUM_SHORT $GIT_COMMITREV_HASHNUM \
 	"${GIT_COMMITREV_DATE}" "${GIT_DESCRIBE_REVSTRING}" \
-	"${BUILD_PLATFORM_IDSTRING}" "${LOCAL_BUILD_TIME}" \
+	"${BUILD_PLATFORM_IDSTRING}" \
 	"${BUILD_FLTK_CONFIG}" \
+	"${LOCAL_BUILD_TIME}" \
 )
+
+updatedStringData="";
+for ridx in $(seq 0 5); do
+	updatedStringData="${updatedStringData}:${REPLACEMENTS[$ridx]}";
+done
+updateHash=$(echo $updatedStringData | sha256sum);
 
 PrintVerbose=$(cat ../build-scripts/BuildConfig.cfg | $sedCmd -n "s/VERBOSE=\([0-9][0-9]*\)/\1/p")
 if [[ "$PrintVerbose" == "1" ]]; then
 	echo -e "\n";
 fi
 
-echo "Copying \"${HEADER_SKELETON_FILE}\" to \"${OUTPUT_HEADER_FILE}\" ... "
-cp $HEADER_SKELETON_FILE $OUTPUT_HEADER_FILE
-
-for ridx in $(seq 0 6); do
-	ReplaceHeaderComponent "${OUTPUT_HEADER_FILE}" "${REPL_PATTERNS[$ridx]}" "${REPLACEMENTS[$ridx]}" "$PrintVerbose";
-done
-if [[ "$PrintVerbose" == "1" ]]; then
-	echo -e "\n";
+if [[ -f "$OUTPUT_HEADER_FILE.hash" ]] && [[ "$(echo $updateHash | diff - $OUTPUT_HEADER_FILE.hash)" == "" ]]; then
+	echo -e "${OUTPUT_HEADER_FILE} information already up-to-date ... \n";
+else 
+	echo "DIFF" "$(echo $updateHash | diff - $OUTPUT_HEADER_FILE.hash)" "/DIFF";
+	echo "Copying \"${HEADER_SKELETON_FILE}\" to \"${OUTPUT_HEADER_FILE}\" ... "
+	cp $HEADER_SKELETON_FILE $OUTPUT_HEADER_FILE
+	for ridx in $(seq 0 6); do
+		ReplaceHeaderComponent "${OUTPUT_HEADER_FILE}" "${REPL_PATTERNS[$ridx]}" "${REPLACEMENTS[$ridx]}" "$PrintVerbose";
+	done
+	if [[ "$PrintVerbose" == "1" ]]; then
+		echo -e "\n";
+	fi
+	echo $updateHash > $OUTPUT_HEADER_FILE.hash;
 fi
 
 PrintLocalBuildHeaderFile=$(cat ../build-scripts/BuildConfig.cfg | $sedCmd -n "s/ECHO_CONFIG_HEADER=\([0-9][0-9]*\)$/\1/p")

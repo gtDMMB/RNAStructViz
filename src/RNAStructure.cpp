@@ -71,12 +71,11 @@ RNAStructure::~RNAStructure()
         free((void *) charSeq); 
         free((void *) dotFormatCharSeq);
     }
-    if(m_pathname != NULL) {
-        free(m_pathname);
+    if(m_exactPathName != NULL && m_exactPathName != m_pathname) {
+        Free(m_exactPathName);
     }
-    if(m_pathname_noext != NULL) {
-        free(m_pathname_noext);
-    }
+    Free(m_pathname);
+    Free(m_pathname_noext);
     #if PERFORM_BRANCH_TYPE_ID
     if(branchType != NULL) {
          delete branchType;
