@@ -331,7 +331,7 @@ void StructureManager::DecreaseStructCount(const int index)
     }
 }
 
-void StructureManager::RemoveFolder(const int folder, const int index) {
+void StructureManager::RemoveFolder(const int index) {
     Delete(folders[index], Folder);
     folders.erase(folders.begin() + index);
 }

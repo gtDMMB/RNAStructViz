@@ -33,7 +33,7 @@ class StructureManager
         /*
          Remove a folder.
         */
-        void RemoveFolder(const int folder, const int index);
+        void RemoveFolder(const int index);
 
         /*
 	    Get the number of structures. Some may be NULL.

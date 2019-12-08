@@ -249,8 +249,6 @@ $(BINEXE): $(RNASTRUCTVIZ_OBJECTS)
 
 prelims:
 	@mkdir -p $(OBJ_BUILD_DIR) $(BUILD_TARGET_HEADER_DIR)
-	#@rm -f $(BUILD_TARGET_HEADER)
-	#@touch $(BUILD_TARGET_HEADER)
 	@$(shell $(READLINK) -f ../build-scripts/build-platform-header.sh) \
 		$(shell $(READLINK) -f ../build-scripts/BuildTargetInfo.h.in) \
 		$(shell $(READLINK) -m $(BUILD_TARGET_HEADER)) \

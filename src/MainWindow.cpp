@@ -712,13 +712,6 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         Fl_Button* childButton = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childButton->user_data()),folders[index]->folderName)) {
             
-            /*for(int btn = 0; btn < ms_instance->folderDataBtns.size(); btn++) {
-                 if(ms_instance->folderDataBtns[btn] == childButton) {
-                      ms_instance->folderDataBtns.erase(ms_instance->folderDataBtns.begin() + btn);
-                      break;
-                 }
-            }*/
-
             Fl_Group* toRemove = (Fl_Group*) pack->child(i);
             
             const std::vector<DiagramWindow*>& diagrams = appInstance->
@@ -763,12 +756,12 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                 if(folders[index]->folderStructs[(j+shift)] != -1)
                 {   
                     int structIndex = folders[index]->folderStructs[(j+shift)];
-                    appInstance->GetStructureManager()->RemoveStructure((structIndex));
+                    appInstance->GetStructureManager()->RemoveStructure(structIndex);
                 }
             }
             folders[index]->structCount = 0;
             
-            appInstance->GetStructureManager()->RemoveFolder(index , i);
+            appInstance->GetStructureManager()->RemoveFolder(i);
 	    ms_instance->m_packedInfo->hide();
 	    ms_instance->m_packedInfo->show();
 	    ms_instance->m_packedInfo->redraw();
@@ -790,15 +783,6 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         int nextIndex = (index + 1) % folders.size();    
         if(folders[nextIndex]->structCount > 0) { 
              ShowFolderByIndex(nextIndex);
-             /*unsigned int labelIndex = 0;
-             for(unsigned int lbl = 0; lbl < ms_instance->folderDataBtns.size(); lbl++) {
-                  Fl_Button *folderLabel = ms_instance->folderDataBtns[lbl];
-                  if(!strcmp(folders[nextIndex]->folderName, (char*) (folderLabel->user_data()))) {
-                       labelIndex = lbl;
-                       break;
-                  }
-             }
-             Fl_Button *folderLabel = ms_instance->folderDataBtns[labelIndex];*/
 	     Fl_Button *folderLabel = folders[nextIndex]->mainWindowFolderBtn;
              folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
              folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
@@ -887,7 +871,7 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
                 }
             }
             folder->structCount = 0;
-            appInstance->GetStructureManager()->RemoveFolder(index, i);
+            appInstance->GetStructureManager()->RemoveFolder(i);
             
             for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
             {

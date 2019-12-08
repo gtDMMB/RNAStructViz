@@ -243,8 +243,11 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
             
 	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
             appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
+	    //if(appInstance->GetStructureManager()->GetFolderAt(fwindow->m_folderIndex)->structCount == 0) {
+	    //     appInstance->GetStructureManager()->RemoveFolder(fwindow->m_folderIndex);
+	    //}
 	    Delete(FolderWindow::m_storedStructDisplayData[userDataIdx], StructureData);
-            break;
+	    break;
         }
     }
 }
