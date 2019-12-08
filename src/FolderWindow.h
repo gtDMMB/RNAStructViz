@@ -73,6 +73,7 @@ class FolderWindow : public Fl_Group
         
 	friend class StructureData;
 	friend class Folder;
+	friend class StructureManager;
 	static vector<StructureData*> m_storedStructDisplayData;
 
 	/*

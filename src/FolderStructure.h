@@ -53,7 +53,7 @@ class Folder {
              mainWindowFolderBtn->label("");
              mainWindowFolderBtn->tooltip("");
 	}
-	Delete(folderWindow, FolderWindow);
+	//Delete(folderWindow, FolderWindow);
 	structCount = 0;
         selected = false;
     }

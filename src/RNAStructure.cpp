@@ -84,7 +84,7 @@ RNAStructure::~RNAStructure()
     #endif
     DeleteContentWindow();
     Free(m_fileCommentLine); 
-    Delete(m_suggestedFolderName, char); 
+    Free(m_suggestedFolderName); 
 }
 
 const RNAStructure::BaseData* RNAStructure::GetBaseAt(unsigned int position) const

@@ -181,7 +181,7 @@ void FolderWindow::AddStructure(const char* filename, const int index) {
 }
 
 void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData) {
-    FolderWindow* fwindow = (FolderWindow *) widget->parent();
+    FolderWindow* fwindow = (FolderWindow *) widget->parent()->parent();
     for(int fi = 0; fi < FolderWindow::m_storedStructDisplayData.size(); fi++) {
          if(FolderWindow::m_storedStructDisplayData[fi] != NULL && 
 	    FolderWindow::m_storedStructDisplayData[fi]->origFolderWinLabel == fwindow->label()) {
@@ -207,12 +207,12 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
     Fl_Pack* pack = fwindow->folderPack;
     for(int i = 0; i < pack->children(); ++i)
     {
-        Fl_Group* tempGroup = (Fl_Group*)pack->child(i);
-        Fl_Button* childButton = (Fl_Button*)tempGroup->child(1); // <--- here
-        intptr_t userDataIdx = (intptr_t) childButton->user_data();
-        if (childButton == widget)
+	Fl_Group* tempGroup = (Fl_Group*)pack->child(i);
+        Fl_Button* childButton = (Fl_Button*) tempGroup->child(1); // <--- here
+	intptr_t userDataIdx = (intptr_t) childButton->user_data();
+        if ((Fl_Widget *) childButton == widget)
         {
-            RNAStructViz* appInstance = RNAStructViz::GetInstance();
+	    RNAStructViz* appInstance = RNAStructViz::GetInstance();
             const std::vector<DiagramWindow*>& diagrams = appInstance->GetDiagramWindows();
             for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
             {
@@ -245,13 +245,11 @@ void FolderWindow::RemoveCallback(Fl_Widget* widget, void* userData)
                                              fwindow->folderScroll->yposition());
             fwindow->folderScroll->scrollbar.align();
             fwindow->folderScroll->redraw();
-            //Fl::delete_widget(toRemove);
+            //pack->remove(tempGroup);
+	    //Delete(tempGroup, Fl_Group);
             
             appInstance->GetStructureManager()->RemoveStructure(userDataIdx);
 	    appInstance->GetStructureManager()->DecreaseStructCount(fwindow->m_folderIndex);
-	    //if(appInstance->GetStructureManager()->GetFolderAt(fwindow->m_folderIndex)->structCount == 0) {
-	    //     appInstance->GetStructureManager()->RemoveFolder(fwindow->m_folderIndex);
-	    //}
 	    Delete(FolderWindow::m_storedStructDisplayData[userDataIdx], StructureData);
 	    break;
         }

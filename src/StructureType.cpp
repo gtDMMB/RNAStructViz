@@ -49,7 +49,7 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      SetTooltipText();
 
      navCloseBtn = new Fl_Button(pack->x() + pack->w() - 8, offsetY + 5, STRUCTURE_NAVBTN_SIZE, STRUCTURE_NAVBTN_SIZE);
-     navCloseBtn->callback(FolderWindow::CloseFolderCallback);
+     navCloseBtn->callback(FolderWindow::RemoveCallback);
      navCloseBtn->user_data((void *) index);
      navCloseBtn->label(StructureData::navCloseBtnLabel);
      navCloseBtn->tooltip("Remove sample from folder");

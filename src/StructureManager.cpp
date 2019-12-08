@@ -314,6 +314,11 @@ void StructureManager::RemoveStructure(const int index)
         if(found)
             break;
     }
+    for(int fi = 0; fi < (int) folders.size(); fi++) {
+         if(folders[fi]->folderWindow != NULL && folders[fi]->folderWindow->m_folderIndex > index) {
+	      folders[fi]->folderWindow->m_folderIndex -= 1;
+	 }
+    }
     Delete(structure, RNAStructure);
     
 }
@@ -321,10 +326,11 @@ void StructureManager::RemoveStructure(const int index)
 void StructureManager::DecreaseStructCount(const int index)
 {
     folders[index]->structCount = folders[index]->structCount - 1;
+    fprintf(stderr, "folders[%d]->structCount = %d\n", index, folders[index]->structCount);
     if (folders[index]->structCount == 0) 
     {
         MainWindow::RemoveFolderByIndex(index, true);
-	RemoveFolder(index);
+	//RemoveFolder(index);
     }
     else {
         folders[index]->SetTooltipTextData();
