@@ -38,10 +38,10 @@ class Folder {
     
     inline ~Folder() {
         Free(folderName);
-        if(mainWindowFolderBtn != NULL) {
+        /*if(mainWindowFolderBtn != NULL) {
 	    mainWindowFolderBtn->label("");
 	    mainWindowFolderBtn->tooltip("");
-	}
+	}*/
 	Free(folderNameFileCount);
         Free(folderStructs); 
         if(doWidgetDeletion) {
@@ -53,6 +53,13 @@ class Folder {
 	}
 	structCount = 0;
         selected = false;
+    }
+
+    inline void MarkForDeletion() {
+	if(mainWindowFolderBtn != NULL) {
+	    mainWindowFolderBtn->label("");
+	    mainWindowFolderBtn->tooltip("");
+	}
     }
 
     static inline void WaitForHiddenWidget(Fl_Widget *widgetToHide) {
@@ -74,10 +81,10 @@ class Folder {
     }
 
     inline void DeleteGUIWidgetData() {
-	 if(mainWindowFolderBtn != NULL) {
+	 /*if(mainWindowFolderBtn != NULL) {
               mainWindowFolderBtn->label("");
               mainWindowFolderBtn->tooltip("");
-	 }
+	 }*/
          HideGUIWidgets(true);
 	 Delete(mainWindowFolderBtn, Fl_Button);
 	 Delete(navUpBtn, Fl_Button);

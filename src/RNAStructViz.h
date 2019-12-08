@@ -105,7 +105,7 @@ class RNAStructViz
 		       Fl::unlock();
 		  }
 
-		  static inline void ScheduleUpcomingDeletion(double delaySecs = 3.0) {
+		  static inline void ScheduleUpcomingDeletion(double delaySecs = 4.0) {
 		       Fl::add_timeout(delaySecs, PerformScheduledDeletion);
 		  }
 

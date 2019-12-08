@@ -73,6 +73,17 @@ class StructureData {
 	       index = -1;
 	  }
 
+	  inline void MarkForDeletion() {
+	       if(mainViewerDisplayBtn != NULL) {
+	            mainViewerDisplayBtn->label("");
+		    mainViewerDisplayBtn->tooltip("");
+	       }
+	       if(navCloseBtn != NULL) {
+		    navCloseBtn->label("");
+		    navCloseBtn->tooltip("");
+	       }
+	  }
+
      protected:
 	  inline void DeleteGUIWidgets() {
                /*if(mainViewerDisplayBtn != NULL && navCloseBtn != NULL && guiPackingGroup != NULL) {
@@ -86,14 +97,14 @@ class StructureData {
                /*if(guiPackingContainerRef != NULL && guiPackingGroup != NULL) {
 	            guiPackingContainerRef->remove(guiPackingGroup);
 	       }*/
-	       if(mainViewerDisplayBtn != NULL) {
+	       /*if(mainViewerDisplayBtn != NULL) {
 	            mainViewerDisplayBtn->label("");
 		    mainViewerDisplayBtn->tooltip("");
 	       }
 	       if(navCloseBtn != NULL) {
 		    navCloseBtn->label("");
 		    navCloseBtn->tooltip("");
-	       }
+	       }*/
 	       Delete(mainViewerDisplayBtn, Fl_Button);
 	       Delete(navCloseBtn, Fl_Button);
 	       Delete(autoloadToggleBtn, AutoloadIndicatorButton);

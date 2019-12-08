@@ -314,10 +314,15 @@ void StructureManager::RemoveStructure(const int index)
         if(found)
             break;
     }
+    
+    StructureData *structData = FolderWindow::m_storedStructDisplayData[index];
+    if(structData != NULL) {
+        structData->MarkForDeletion();
+    }
     if(USE_SCHEDULED_DELETION) {
         RNAStructViz::ScheduledDeletion::AddRNAStructure(structure);
-	if(FolderWindow::m_storedStructDisplayData.size() > index && FolderWindow::m_storedStructDisplayData[index] != NULL) {
-	     RNAStructViz::ScheduledDeletion::AddStructureData(FolderWindow::m_storedStructDisplayData[index]);
+	if(FolderWindow::m_storedStructDisplayData.size() > index && structData != NULL) {
+	     RNAStructViz::ScheduledDeletion::AddStructureData(structData);
              FolderWindow::m_storedStructDisplayData[index] = NULL;
 	}
     }
@@ -346,8 +351,9 @@ void StructureManager::RemoveFolder(const int index) {
     TerminalText::PrintDebug("Removing folder at index #%d\n", index);
     Folder *folderStruct = folders[index];
     folders.erase(folders.begin() + index);
+    folderStruct->MarkForDeletion();
     if(USE_SCHEDULED_DELETION) {
-        RNAStructViz::ScheduledDeletion::AddFolder(folderStruct);
+	 RNAStructViz::ScheduledDeletion::AddFolder(folderStruct);
     }
     else {
          Delete(folderStruct, Folder);
