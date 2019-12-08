@@ -75,17 +75,17 @@ class StructureData {
 
      protected:
 	  inline void DeleteGUIWidgets() {
-               if(mainViewerDisplayBtn != NULL && navCloseBtn != NULL && guiPackingGroup != NULL) {
+               /*if(mainViewerDisplayBtn != NULL && navCloseBtn != NULL && guiPackingGroup != NULL) {
 	            mainViewerDisplayBtn->hide();
 	            navCloseBtn->hide();
 	            guiPackingGroup->hide();
 	            while(mainViewerDisplayBtn->visible() || navCloseBtn->visible() || guiPackingGroup->visible()) {
 	                 Fl::wait(1.0);
 	            }
-	       }
-               if(guiPackingContainerRef != NULL && guiPackingGroup != NULL) {
+	       }*/
+               /*if(guiPackingContainerRef != NULL && guiPackingGroup != NULL) {
 	            guiPackingContainerRef->remove(guiPackingGroup);
-	       }
+	       }*/
 	       if(mainViewerDisplayBtn != NULL) {
 	            mainViewerDisplayBtn->label("");
 		    mainViewerDisplayBtn->tooltip("");
