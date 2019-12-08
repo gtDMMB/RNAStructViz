@@ -125,18 +125,14 @@ class Folder {
                  structCount, folderName,
                  strlen(folderName) > FOLDER_LABEL_TRUNC_LENGTH ? "..." : "");
 	 if(mainWindowFolderBtn != NULL) {
-	      mainWindowFolderBtn->hide();
-	      mainWindowFolderBtn->label(folderNameFileCount);
-	      mainWindowFolderBtn->show();
+	      mainWindowFolderBtn->copy_label(folderNameFileCount);
 	 }
     }
 
     inline void SetTooltipTextData() {
          snprintf(tooltipText, MAX_BUFFER_SIZE - 1, Folder::tooltipTextFmt, folderName, structCount);
 	 if(mainWindowFolderBtn != NULL) {
-	      mainWindowFolderBtn->hide();
-	      mainWindowFolderBtn->tooltip(tooltipText);
-	      mainWindowFolderBtn->show();
+	      mainWindowFolderBtn->copy_tooltip(tooltipText);
 	 }
     }
 
@@ -159,6 +155,7 @@ class Folder {
 	      DeleteGUIWidgetData();
 	 }
 	 guiPackingContainerRef = pack;
+	 pack->hide();
 	 pack->begin();
 	 guiPackingGroup = new Fl_Group(pack->x() + x, pack->y() + y, pack->w(), FOLDER_WIDGET_HEIGHT);
 	 mainWindowFolderBtn = new Fl_Button(pack->x() + x + 8, pack->y() + y, pack->w() - 70, FOLDER_WIDGET_HEIGHT, "");
@@ -190,6 +187,7 @@ class Folder {
          guiPackingGroup->resizable(mainWindowFolderBtn);
 	 guiPackingGroup->redraw();
 	 pack->end();
+	 pack->show();
 	 pack->redraw();
     }
 
