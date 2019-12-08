@@ -63,7 +63,7 @@ class MainWindow
         static void AddFolder(const char* foldername, const int index, 
     	                      const bool isSelected);
     
-        static void RemoveFolderByIndex(const int index, bool selectNext = true);
+        static void RemoveFolderByIndex(const int index);
     
         /*
          Removes the folder contents group from the folder tabs pane.

@@ -333,7 +333,7 @@ void StructureManager::DecreaseStructCount(const int index)
     folders[index]->structCount = folders[index]->structCount - 1;
     if (folders[index]->structCount == 0) 
     {
-        MainWindow::RemoveFolderByIndex(index, true);
+        MainWindow::RemoveFolderByIndex(index);
     }
     else {
         folders[index]->SetTooltipTextData();

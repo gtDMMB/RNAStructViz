@@ -699,7 +699,7 @@ void MainWindow::HideFolderByIndex(const int index)
 
 }
 
-void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
+void MainWindow::RemoveFolderByIndex(const int index)
 {
     RNAStructViz* appInstance = RNAStructViz::GetInstance();
     const std::vector<Folder*>& folders = appInstance->GetStructureManager()->GetFolders();
@@ -762,6 +762,7 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
          ms_instance->selectedFolderIndex = -1;
     }
 
+    bool selectNext = pane->children() > 0;
     if(selectNext && folders.size() > 0) { 
         // select the next folder in line:
         Fl_Group* pane = ms_instance->folderWindowPane;
@@ -771,8 +772,8 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
         if(folders[nextIndex] != NULL && folders[nextIndex]->structCount > 0) { 
              ShowFolderByIndex(nextIndex);
 	     Fl_Button *folderLabel = folders[nextIndex]->mainWindowFolderBtn;
-             folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-             folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
+             //folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
+             //folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
              ms_instance->selectedFolderBtn = folderLabel;
         }
     }
@@ -808,7 +809,7 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
         if (!strcmp(folders[index]->folderName, (char*)(folderLabel->user_data())))
             break;
     }
-    ms_instance->RemoveFolderByIndex(index, true);
+    ms_instance->RemoveFolderByIndex(index);
     if(USE_SCHEDULED_DELETION) {
         RNAStructViz::ScheduledDeletion::ScheduleUpcomingDeletion();
     }
