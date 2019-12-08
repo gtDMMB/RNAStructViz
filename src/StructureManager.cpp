@@ -318,7 +318,8 @@ void StructureManager::RemoveStructure(const int index)
             break;
     }
     
-    StructureData *structData = FolderWindow::m_storedStructDisplayData[index];
+    StructureData *structData = index < FolderWindow::m_storedStructDisplayData.size() ? 
+	                        FolderWindow::m_storedStructDisplayData[index] : NULL;
     if(structData != NULL) {
         structData->MarkForDeletion();
     }
@@ -327,6 +328,7 @@ void StructureManager::RemoveStructure(const int index)
 	if(FolderWindow::m_storedStructDisplayData.size() > index && structData != NULL) {
 	     RNAStructViz::ScheduledDeletion::AddStructureData(structData);
              FolderWindow::m_storedStructDisplayData[index] = NULL;
+	     RNAStructViz::ScheduledDeletion::AddFolderWindow(structData->parentMainFolderWin);
 	}
     }
     else {

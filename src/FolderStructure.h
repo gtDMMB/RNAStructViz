@@ -46,10 +46,10 @@ class Folder {
         Free(folderStructs); 
         if(doWidgetDeletion) {
 	     DeleteGUIWidgetData();
-	     if(folderWindow != NULL) {
-	          folderWindow->HideFolderWindowGUIDisplay(true);
-	     }
-	     Delete(folderWindow, FolderWindow);
+	     //if(folderWindow != NULL) {
+	     //     folderWindow->HideFolderWindowGUIDisplay(true);
+	     //}
+	     //Delete(folderWindow, FolderWindow);
 	}
 	structCount = 0;
         selected = false;

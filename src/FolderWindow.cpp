@@ -120,21 +120,18 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 }
 
 FolderWindow::~FolderWindow() {
-     Delete(structureIcon, Fl_RGB_Image);
-     for(int vi = 0; vi < m_storedStructDisplayData.size(); vi++) {
-          Delete(m_storedStructDisplayData[vi], StructureData);
-     }
-     HideFolderWindowGUIDisplay(true);
+     //HideFolderWindowGUIDisplay(true);
      label("");
+     //remove(folderPack);
+     //remove(folderScroll);
+     //remove(fileOpsLabel);
+     //remove(fileLabel);
      Delete(folderPack, Fl_Pack);
      Delete(folderScroll, Fl_Scroll);
      Delete(fileOpsLabel, Fl_Box);
      Delete(fileLabel, Fl_Box);
-     for(int ci = 0; ci < children(); ci++) {
-          Fl_Widget *wp = child(0);
-	  remove(0);
-	  Delete(wp, Fl_Widget);
-     }
+     //clear();
+     Delete(structureIcon, Fl_RGB_Image);
 }
 
 void FolderWindow::SetStructures(int folderIndex) {

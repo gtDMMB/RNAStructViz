@@ -571,6 +571,10 @@ void MainWindow::ShowFolderByIndex(int index) {
         TerminalText::PrintError("MainWindow::ShowFolderByIndex(%d): Invalid index out of range\n", index);
 	return;
     }
+    else if(folders[index] == NULL) {
+	TerminalText::PrintError("Attempting to show a NULL folder at index #%d\n", index);
+	return;
+    }
     else if(folders[index]->folderWindow == NULL)
     {
         fwindow = new FolderWindow(340, 40, 300, 390, 
@@ -587,11 +591,12 @@ void MainWindow::ShowFolderByIndex(int index) {
     }
     ms_instance->selectedFolderIndex = index;
     ms_instance->folderWindowPane->add((Fl_Group*) fwindow);
+    fwindow->redraw();
     ms_instance->ShowFolderSelected();
 
     ExpandAlwaysFolderPane();
-    //ms_instance->folderWindowPane->hide();
-    //ms_instance->folderWindowPane->show();
+    ms_instance->folderWindowPane->hide();
+    ms_instance->folderWindowPane->show();
     ms_instance->folderWindowPane->redraw();
 
 }
@@ -606,7 +611,8 @@ void MainWindow::ShowFolderSelected()
     Fl_Button *selectedBtn = selectedFolder != NULL ? selectedFolder->mainWindowFolderBtn : NULL;
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if(childLabel->label() != NULL && selectedBtn != NULL && !strcmp(childLabel->label(), selectedBtn->label())) {
+	//TerminalText::PrintDebug("childLabel->label = \"%s\"\n", childLabel->label());
+	if(childLabel->label() != NULL && selectedBtn != NULL && !strcmp(childLabel->label(), selectedBtn->label())) {
 	     childLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
              childLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 	     folderLabel = childLabel;
@@ -615,6 +621,7 @@ void MainWindow::ShowFolderSelected()
 	     childLabel->color(GUI_BGCOLOR);
 	     childLabel->labelcolor(GUI_BTEXT_COLOR);
 	}
+	childLabel->redraw();
     }
     
     if (folderLabel != NULL) {

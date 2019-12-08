@@ -39,6 +39,7 @@ class StructureData {
      protected:
 	  friend class FolderWindow;
 	  friend class XMLExportButton;
+          friend class StructureManager;
 
 	  std::string origFolderWinLabel;
 	  std::string structFileBaseDir;
@@ -83,8 +84,8 @@ class StructureData {
 		    navCloseBtn->tooltip("");
 	       }
 	       //Delete(guiPackingGroup, Fl_Group);
-	       Fl::delete_widget(guiPackingGroup);
-	       guiPackingGroup = NULL;
+	       //Fl::delete_widget(guiPackingGroup);
+	       //guiPackingGroup = NULL;
 	  }
 
      protected:
@@ -116,7 +117,7 @@ class StructureData {
 	  }    
 
 	  inline void SetLabelText() {
-	       std::string buttonLabel = "";
+	       std::string buttonLabel = "@filenew   ";
 	       const char *fullFileName = structFileBaseName.c_str();
 	       size_t fileNameCopyChars = (strrchr(fullFileName, '.') ? strrchr(fullFileName, '.') : 
 			                  fullFileName + strlen(fullFileName)) - fullFileName;
@@ -128,7 +129,7 @@ class StructureData {
 	       }
 	       std::string insertSpacesStr = StructureData::spaceBuffer.substr(0, 
 			                     MAX(0, MAX_FOLDER_LABEL_CHARS - ((int) strlen(fileNameNoExt.c_str()))));
-	       buttonLabel = std::string("@filenew   ") + fileNameNoExt + insertSpacesStr;
+	       buttonLabel += fileNameNoExt + insertSpacesStr;
 	       mainButtonLabel = buttonLabel;
 	       mainViewerDisplayBtn->label(mainButtonLabel.c_str());
 	  }

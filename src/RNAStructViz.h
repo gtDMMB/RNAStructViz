@@ -81,6 +81,7 @@ class RNAStructViz
 	          static vector<RNAStructure *>  rnaStructObjs;
 		  static vector<Folder *>        folderStructObjs;
 		  static vector<StructureData *> structureDataObjs;
+                  static vector<FolderWindow *>  folderWinStructObjs;
 
 		  static inline void PerformScheduledDeletion(void *) {
 		       Fl::lock();
@@ -99,6 +100,10 @@ class RNAStructViz
 			    Delete(structureDataObjs[sdi], StructureData);
 		       }
 		       structureDataObjs.clear();
+		       //for(int fwi = 0; fwi < folderWinStructObjs.size(); fwi++) {
+		       //    Delete(folderWinStructObjs[fwi], FolderWindow);
+		       //}
+		       folderWinStructObjs.clear();
 		       endTime = time(NULL);
 		       TerminalText::PrintDebug("Done performing scehduled deletion of objects ... In %g seconds.\n", 
 				                difftime(endTime, startTime));
@@ -125,6 +130,12 @@ class RNAStructViz
 		  static inline void AddStructureData(StructureData *sd) {
 		       Fl::lock();
 		       structureDataObjs.push_back(sd);
+		       Fl::unlock();
+		  }
+
+		  static inline void AddFolderWindow(FolderWindow *fwin) {
+		       Fl::lock();
+		       folderWinStructObjs.push_back(fwin);
 		       Fl::unlock();
 		  }
 
