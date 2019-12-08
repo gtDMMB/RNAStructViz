@@ -69,7 +69,6 @@ class MainWindow
          Removes the folder contents group from the folder tabs pane.
          */
         static void HideFolderByIndex(const int index);
-        static void HideFolderByName(const char* foldername);
     
         /*
          The tabs for displaying folder contents.

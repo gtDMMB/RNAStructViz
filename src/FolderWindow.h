@@ -62,7 +62,6 @@ class FolderWindow : public Fl_Group
          Callback to show/hide a file.
          */
         static void ShowFileCallback(Fl_Widget* widget, void* userData);
-        static void CloseFolderCallback(Fl_Widget* widget, void* userData);
 
         /*
          Callback to remove a structure.

@@ -143,7 +143,7 @@ void FolderWindow::SetStructures(int folderIndex) {
     Folder* folder = structureManager->GetFolderAt(folderIndex);
     m_folderIndex = folderIndex;
     int shift = 0;
-    for( int ui = 0; ui < folder->structCount; ui++)
+    for(int ui = 0; ui < folder->structCount; ui++)
     {
         if(folder->folderStructs[(ui+shift)] == -1)
         {
@@ -180,24 +180,7 @@ void FolderWindow::AddStructure(const char* filename, const int index) {
      }
 }
 
-void FolderWindow::CloseFolderCallback(Fl_Widget* widget, void* userData) {
-    FolderWindow* fwindow = (FolderWindow *) widget->parent()->parent();
-    for(int fi = 0; fi < FolderWindow::m_storedStructDisplayData.size(); fi++) {
-         if(FolderWindow::m_storedStructDisplayData[fi] != NULL && 
-	    FolderWindow::m_storedStructDisplayData[fi]->origFolderWinLabel == fwindow->label()) {
-	      StructureData *structData = FolderWindow::m_storedStructDisplayData[fi];
-	      int sindex = RNAStructViz::GetInstance()->GetStructureManager()->LookupStructureIndexByCTPath( 
-			   structData->structure->GetFilename());
-	      RNAStructViz::GetInstance()->GetStructureManager()->RemoveStructure(sindex);
-	      RNAStructViz::GetInstance()->GetStructureManager()->DecreaseStructCount(sindex);
-	      Delete(structData, StructureData);
-	      break;
-	 }
-    }
-}
-
-void FolderWindow::ShowFileCallback(Fl_Widget* widget, void* userData)
-{
+void FolderWindow::ShowFileCallback(Fl_Widget* widget, void* userData) {
     RNAStructViz::GetInstance()->GetStructureManager()->DisplayFileContents((intptr_t)userData);
 }
 
