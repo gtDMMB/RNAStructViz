@@ -669,8 +669,12 @@ void MainWindow::HideFolderByIndex(const int index)
     
     TerminalText::PrintInfo("Hiding folder with label \"%s\"\n", folder->folderName);
 
+    int toHideYOffset = folder->guiPackingGroup->y();
+    int toHideHeight = folder->guiPackingGroup->h();
+    folder->guiPackingGroup->hide();
     for (int i = 0; i < pack->children(); ++i) {
-        Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
+        Fl_Group *containerGroup = (Fl_Group *) pack->child(i);
+	Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childLabel->user_data()), folder->folderName)) {
              childLabel->color(FL_BACKGROUND_COLOR);
 	     childLabel->labelcolor(FL_BACKGROUND_COLOR);
@@ -678,6 +682,10 @@ void MainWindow::HideFolderByIndex(const int index)
 	else {
 	     childLabel->color(GUI_BGCOLOR);
 	     childLabel->labelcolor(GUI_BTEXT_COLOR);
+	}
+	if(containerGroup->y() > toHideYOffset) {
+             containerGroup->position(containerGroup->x(), containerGroup->y() - toHideHeight);
+	     containerGroup->redraw();
 	}
     }
     
