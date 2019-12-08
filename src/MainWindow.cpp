@@ -81,7 +81,7 @@ MainWindow::MainWindow(int argc, char **argv)
         helpButton->labeltype(_FL_ICON_LABEL);
         helpButton->shortcut(FL_CTRL + 'h');
         helpButton->box(FL_NO_BOX);
-        helpButton->copy_tooltip("Click for help");
+        helpButton->tooltip("Click for help");
         helpButton->callback(HelpButtonCallback);
 	helpButton->redraw();
 
@@ -99,7 +99,7 @@ MainWindow::MainWindow(int argc, char **argv)
         infoButton->labeltype(_FL_ICON_LABEL);
         infoButton->shortcut(FL_CTRL + 'i');
         infoButton->box(FL_NO_BOX);
-        infoButton->copy_tooltip("Click for information about RNAStructViz");
+        infoButton->tooltip("Click for information about RNAStructViz");
         infoButton->callback(InfoButtonCallback);
 	infoButton->redraw();
 
