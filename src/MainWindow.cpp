@@ -552,7 +552,7 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
 
     Fl_Pack* pack = ms_instance->m_packedInfo;
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
-    int index;
+    int index = -1;
     for (index = 0; index < folders.size(); ++index)
     {
         if (!strcmp(folders[index]->folderName, (char*)(folderLabel->user_data())))
@@ -606,7 +606,7 @@ void MainWindow::ShowFolderSelected()
     Fl_Button *selectedBtn = selectedFolder != NULL ? selectedFolder->mainWindowFolderBtn : NULL;
     for (int i = 0; i < pack->children(); ++i) {
         Fl_Button *childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
-        if(childLabel == selectedBtn) {
+        if(!strcmp(childLabel->label(), selectedBtn->label())) {
 	     childLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
              childLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 	     folderLabel = childLabel;
