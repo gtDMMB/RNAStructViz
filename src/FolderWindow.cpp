@@ -65,7 +65,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     diagramButton->callback(DiagramCallback);
     diagramButton->labelcolor(GUI_BTEXT_COLOR);
     diagramButton->labelfont(FL_HELVETICA);
-    diagramButton->box(FL_SHADOW_BOX);
+    diagramButton->box(FL_RSHADOW_BOX);
+    //diagramButton->box(FL_PLASTIC_UP_BOX);
     diagramButton->labeltype(FL_SHADOW_LABEL);
     diagramButton->tooltip("Open the arc and radial layout diagram viewer windows");
     this->add(diagramButton);
@@ -77,7 +78,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     statsButton->callback(StatsCallback);
     statsButton->labelcolor(GUI_BTEXT_COLOR);
     statsButton->labelfont(FL_HELVETICA);
-    statsButton->box(FL_SHADOW_BOX);
+    statsButton->box(FL_RSHADOW_BOX);
+    //statsButton->box(FL_PLASTIC_UP_BOX);
     statsButton->labeltype(FL_SHADOW_LABEL);
     statsButton->tooltip("Open a window to generate comparitive statistics about the selected sequence");
     this->add(statsButton);
@@ -159,7 +161,7 @@ void FolderWindow::SetStructures(int folderIndex) {
     labelfont(FL_HELVETICA_BOLD);
     labeltype(_FL_SHADOW_LABEL);
     labelsize(1.25 * LOCAL_TEXT_SIZE);
-    align(FL_ALIGN_TOP);
+    align(FL_ALIGN_CENTER | FL_ALIGN_TOP);
 
 }
 

@@ -61,7 +61,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
         Fl_Button *button = new Fl_Button(305, 50, 125, 30, "Export to CSV @->");
         button->callback(InputCallback, (void*)0);
         button->set_active();
-        input->callback(InputCallback, (void*)0);
+        button->box(FL_PLASTIC_UP_BOX);
+	input->callback(InputCallback, (void*)0);
         callback(CloseCallback);
     }
     else if(type == InputWindow::FOLDER_INPUT) {    
@@ -85,6 +86,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         button->callback(InputCallback, (void*)0);
         button->labelcolor(GUI_BTEXT_COLOR);
         button->set_active();
+	button->box(FL_PLASTIC_UP_BOX);
         input->callback(InputCallback, (void*)0);
         input->labelcolor(GUI_TEXT_COLOR);
         const char *cbText = " Use only default names for structure folders";
@@ -123,11 +125,12 @@ InputWindow::InputWindow(int w, int h, const char *label,
         displayButton->labelcolor(GUI_BTEXT_COLOR);
         displayButton->set_active();
         displayButton->shortcut(FL_Enter);
-        Fl_Button *cancelButton = new Fl_Button(260, 100, 75, 30, "Cancel @1+");
+        displayButton->box(FL_PLASTIC_UP_BOX);
+	Fl_Button *cancelButton = new Fl_Button(260, 100, 75, 30, "Cancel @1+");
         cancelButton->callback(CancelCallback); 
         cancelButton->color(GUI_BGCOLOR);
         cancelButton->labelcolor(GUI_BTEXT_COLOR);
-            
+        cancelButton->box(FL_PLASTIC_UP_BOX);
         ctFileChooser = new Fl_Choice(150, 55, 240, 30, "Choose Structure: ");
         ctFileChooser->color(GUI_BGCOLOR);
         ctFileChooser->labelcolor(GUI_BTEXT_COLOR);

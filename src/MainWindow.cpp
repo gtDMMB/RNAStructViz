@@ -129,7 +129,8 @@ MainWindow::MainWindow(int argc, char **argv)
                            "@search   Load Files @>|");
         openButton->callback(OpenFileCallback);
         openButton->labelcolor(GUI_BTEXT_COLOR);
-        openButton->box(FL_SHADOW_BOX);
+        openButton->box(FL_RSHADOW_BOX);
+	//openButton->box(FL_PLASTIC_UP_BOX);
 	openButton->labelfont(FL_HELVETICA);
 	openButton->labeltype(FL_SHADOW_LABEL);
 
@@ -143,7 +144,8 @@ MainWindow::MainWindow(int argc, char **argv)
         configOptionsButton->callback(ConfigOptionsCallback);
         configOptionsButton->labelcolor(GUI_BTEXT_COLOR);
         configOptionsButton->labelfont(FL_HELVETICA);
-	configOptionsButton->box(FL_SHADOW_BOX);
+	configOptionsButton->box(FL_RSHADOW_BOX);
+	//configOptionsButton->box(FL_PLASTIC_UP_BOX);
 	configOptionsButton->labeltype(FL_SHADOW_LABEL);
 
         const char *foldersInstText = "@fileopen   Folders.\n  A list of sequences for which\n  "
