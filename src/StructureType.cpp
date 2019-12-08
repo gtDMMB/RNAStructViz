@@ -22,7 +22,7 @@ void StructureData::SetTooltipText() {
           tooltipText += std::string("\n") + baseSeqStart + std::string("\n") + dotPairSeqStart;
      }
      mainButtonTooltip = tooltipText;
-     mainViewerDisplayBtn->copy_tooltip(mainButtonTooltip.c_str());
+     mainViewerDisplayBtn->tooltip(mainButtonTooltip.c_str());
 }
 
 void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {

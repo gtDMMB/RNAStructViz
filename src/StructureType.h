@@ -116,7 +116,7 @@ class StructureData {
 			                     MAX(0, MAX_FOLDER_LABEL_CHARS - ((int) strlen(fileNameNoExt.c_str()))));
 	       buttonLabel = std::string("@filenew   ") + fileNameNoExt + insertSpacesStr;
 	       mainButtonLabel = buttonLabel;
-	       mainViewerDisplayBtn->copy_label(mainButtonLabel.c_str());
+	       mainViewerDisplayBtn->label(mainButtonLabel.c_str());
 	  }
 
 	  void SetTooltipText(); 
