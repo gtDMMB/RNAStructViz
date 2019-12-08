@@ -262,8 +262,8 @@ void MainWindow::AddFolder(const char* foldername, const int index,
                            const bool isSelected) {
     Folder* folder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(index);
     Fl_Pack* pack = ms_instance->m_packedInfo;
-    //folder->SetFolderLabel();
-    //folder->SetTooltipTextData();
+    folder->SetFolderLabel();
+    folder->SetTooltipTextData();
     folder->SetSelected(isSelected);
     ms_instance->m_packedInfo->hide();
     ms_instance->m_packedInfo->show();
@@ -668,15 +668,19 @@ void MainWindow::HideFolderByIndex(const int index)
         Fl_Button* childLabel = ((Fl_Button*)((Fl_Group*)pack->child(i))->child(0));
         if (!strcmp((char*)(childLabel->user_data()), folder->folderName)) {
             childLabel->color(FL_BACKGROUND_COLOR);
+	    childLabel->labelcolor(FL_BACKGROUND_COLOR);
 	}
-        childLabel->labelcolor(GUI_BTEXT_COLOR);
+	else {
+	     childLabel->color(GUI_BGCOLOR);
+	     childLabel->labelcolor(GUI_BTEXT_COLOR);
+	}
     }
     
     if (pane->children() > 0)
     {
-         FolderWindow *fwinToRemove = (FolderWindow *) pane->child(pane->children() - 1);
+         Fl_Widget *fwinToRemove = pane->child(pane->children() - 1);
 	 pane->remove((Fl_Widget *) fwinToRemove);
-	 Delete(fwinToRemove, FolderWindow);
+	 delete fwinToRemove;
          pane->redraw();
     }
     else {
@@ -725,10 +729,8 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
             
             Fl_Group* toRemove = (Fl_Group*) pack->child(i);
             
-            const std::vector<DiagramWindow*>& diagrams = appInstance->
-            GetDiagramWindows();
-            const std::vector<StatsWindow*>& stats = appInstance->
-            GetStatsWindows();
+            const std::vector<DiagramWindow*>& diagrams = appInstance->GetDiagramWindows();
+            const std::vector<StatsWindow*>& stats = appInstance->GetStatsWindows();
             int structNum = folders[index]->structCount;
             
             for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
@@ -770,20 +772,18 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                     appInstance->GetStructureManager()->RemoveStructure(structIndex);
                 }
             }
-	    appInstance->GetStructureManager()->DecreaseStructCount(index);
-            /*folders[index]->structCount -= 1;
-	    if(folders[index]->structCount == 0) {
-                 appInstance->GetStructureManager()->RemoveFolder(i);
-	         ms_instance->m_packedInfo->hide();
-	         ms_instance->m_packedInfo->show();
-	         ms_instance->m_packedInfo->redraw();
-                 ms_instance->m_structureInfo->scrollbar.align();
-                 ms_instance->m_structureInfo->redraw();
-	    }*/
+            //appInstance->GetStructureManager()->RemoveFolder(i);
 	    break;
         }
         
     }
+    appInstance->GetStructureManager()->DecreaseStructCount(index);
+    ms_instance->m_packedInfo->hide();
+    ms_instance->m_packedInfo->show();
+    ms_instance->m_packedInfo->redraw();
+    ms_instance->m_structureInfo->scrollbar.align();
+    ms_instance->m_structureInfo->redraw();
+
     if(index == ms_instance->selectedFolderIndex) {
          ms_instance->selectedFolderIndex = -1;
     }
@@ -883,11 +883,7 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
                     appInstance->GetStructureManager()->RemoveStructure(index);
                 }
             }
-            appInstance->GetStructureManager()->DecreaseStructCount(index);
-	    /*folder->structCount -= 1;
-	    if(folder->structCount == 0) {
-                 appInstance->GetStructureManager()->RemoveFolder(i);
-	    }*/
+            //appInstance->GetStructureManager()->RemoveFolder(i);
             
             for (unsigned int ui = 0; ui < diagrams.size(); ++ui)
             {
@@ -914,6 +910,7 @@ void MainWindow::RemoveFolderCallback(Fl_Widget* widget, void* userData)
             break;
         }
     }
+    appInstance->GetStructureManager()->DecreaseStructCount(index);
 }
 
 void MainWindow::CloseCallback(Fl_Widget* widget, void* userData) {

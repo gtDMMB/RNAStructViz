@@ -2087,7 +2087,7 @@ void DiagramWindow::DisplayErrorDialogTimerCallback(void *handlerRef) {
      Fl::lock();
      errorAlertDisplayShown = true;
      Fl::unlock();
-     fl_alert(errorMsg.c_str());
+     fl_alert("%s", errorMsg.c_str());
      Fl::lock();
      errorAlertDisplayShown = false;
      Fl::unlock();
