@@ -644,8 +644,9 @@ void MainWindow::ShowFolderSelected()
         ms_instance->folderWindowPane->add((Fl_Group*)fwindow);
 
         ExpandAlwaysFolderPane();
-        ms_instance->folderWindowPane->hide();
-        ms_instance->folderWindowPane->show();
+        //ms_instance->folderWindowPane->hide();
+        //ms_instance->folderWindowPane->show();
+        ms_instance->folderWindowPane->redraw();
 
     }
 }
