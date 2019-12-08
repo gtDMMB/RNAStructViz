@@ -314,11 +314,6 @@ void StructureManager::RemoveStructure(const int index)
         if(found)
             break;
     }
-    for(int fi = 0; fi < (int) folders.size(); fi++) {
-         if(folders[fi]->folderWindow != NULL && folders[fi]->folderWindow->m_folderIndex > index) {
-	      folders[fi]->folderWindow->m_folderIndex -= 1;
-	 }
-    }
     Delete(structure, RNAStructure);
     
 }

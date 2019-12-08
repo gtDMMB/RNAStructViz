@@ -43,17 +43,17 @@ class Folder {
 	}
 	Free(folderNameFileCount);
         Free(folderStructs); 
-        if(folderWindow != NULL) {
-	     folderWindow->HideFolderWindowGUIDisplay(true);
-	}
         if(doWidgetDeletion) {
 	     DeleteGUIWidgetData();
+	     if(folderWindow != NULL) {
+	          folderWindow->HideFolderWindowGUIDisplay(true);
+	     }
+	     Delete(folderWindow, FolderWindow);
 	}
 	else if(mainWindowFolderBtn != NULL) {
              mainWindowFolderBtn->label("");
              mainWindowFolderBtn->tooltip("");
 	}
-	Delete(folderWindow, FolderWindow);
 	structCount = 0;
         selected = false;
     }

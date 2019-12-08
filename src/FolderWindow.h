@@ -49,7 +49,8 @@ class FolderWindow : public Fl_Group
 	     }
 	     this->hide();
 	     if(waitForNoVisible) {
-	          while(folderPack->visible() || folderScroll->visible() || this->visible()) {
+	          while(folderPack != NULL && folderPack->visible() || 
+		        folderScroll != NULL && folderScroll->visible() || this->visible()) {
 		       Fl::wait();
 		  }
 	     }
