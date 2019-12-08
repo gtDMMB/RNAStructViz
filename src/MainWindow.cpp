@@ -723,7 +723,6 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
 {
     RNAStructViz* appInstance = RNAStructViz::GetInstance();
     const std::vector<Folder*>& folders = appInstance->GetStructureManager()->GetFolders();
-    fprintf(stderr, "MainWindow::RemoveFolderByIndex(%d / %d)\n", index, folders.size());
     Fl_Pack* pack = ms_instance->m_packedInfo;
     
     for (int i = 0; i < pack->children(); ++i)
@@ -763,29 +762,16 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
                     stats[ui]->hide();
                 }
             }
-            
-            //HideFolderByIndex(i);
-            /*int shift = 0;
-            for (int j = 0; j < folders[index]->structCount; j++)
-            {
-                if(folders[index]->folderStructs[(j+shift)] == -1)
-                {
-                    shift++;
-                }
-                if(folders[index]->folderStructs[(j+shift)] != -1)
-                {   
-                    int structIndex = folders[index]->folderStructs[(j+shift)];
-                    appInstance->GetStructureManager()->RemoveStructure(structIndex);
-                }
-            }*/
-            //Delete(toRemove, Fl_Group);
-	    //appInstance->GetStructureManager()->RemoveFolder(i);
 	    break;
         }
         
     }
+    for(int si = 0; si < folders[index]->structCount; si++) {
+        int sindex = folders[index]->folderStructs[si];
+	appInstance->GetStructureManager()->RemoveStructure(sindex);
+	//Delete(FolderWindow::m_storedStructDisplayData[sindex], StructureData);
+    }
     //appInstance->GetStructureManager()->GetFolderAt(index)->SetPerformWidgetDeletion(false);
-    fprintf(stderr, "HERE ... \n");
     appInstance->GetStructureManager()->RemoveFolder(index);
     ms_instance->m_packedInfo->hide();
     ms_instance->m_packedInfo->show();

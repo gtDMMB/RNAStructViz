@@ -326,11 +326,9 @@ void StructureManager::RemoveStructure(const int index)
 void StructureManager::DecreaseStructCount(const int index)
 {
     folders[index]->structCount = folders[index]->structCount - 1;
-    fprintf(stderr, "folders[%d]->structCount = %d\n", index, folders[index]->structCount);
     if (folders[index]->structCount == 0) 
     {
         MainWindow::RemoveFolderByIndex(index, true);
-	//RemoveFolder(index);
     }
     else {
         folders[index]->SetTooltipTextData();
