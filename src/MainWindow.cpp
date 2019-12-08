@@ -590,8 +590,8 @@ void MainWindow::ShowFolderByIndex(int index) {
     ms_instance->ShowFolderSelected();
 
     ExpandAlwaysFolderPane();
-    ms_instance->folderWindowPane->hide();
-    ms_instance->folderWindowPane->show();
+    //ms_instance->folderWindowPane->hide();
+    //ms_instance->folderWindowPane->show();
     ms_instance->folderWindowPane->redraw();
 
 }
@@ -683,16 +683,14 @@ void MainWindow::HideFolderByIndex(const int index)
     
     if (pack->children() > 0)
     {
-         //Fl_Widget *fwinToRemove = pack->child(0);
-	 //pack->remove((Fl_Widget *) fwinToRemove);
          pack->redraw();
 	 pane->redraw();
     }
     else {
 	 pane->redraw();
     }
-    pane->hide();
-    pane->show();
+    //pane->hide();
+    //pane->show();
 
 }
 
@@ -775,8 +773,9 @@ void MainWindow::RemoveFolderByIndex(const int index, bool selectNext)
     }
     else {
         Fl_Group* pane = ms_instance->folderWindowPane;
-        pane->hide();
-        pane->show();
+        pane->redraw();
+	//pane->hide();
+        //pane->show();
     }
 }
 
