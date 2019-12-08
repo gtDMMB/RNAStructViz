@@ -316,8 +316,10 @@ void StructureManager::RemoveStructure(const int index)
     }
     if(USE_SCHEDULED_DELETION) {
         RNAStructViz::ScheduledDeletion::AddRNAStructure(structure);
-	RNAStructViz::ScheduledDeletion::AddStructureData(FolderWindow::m_storedStructDisplayData[index]);
-        FolderWindow::m_storedStructDisplayData[index] = NULL;
+	if(FolderWindow::m_storedStructDisplayData.size() > index && FolderWindow::m_storedStructDisplayData[index] != NULL) {
+	     RNAStructViz::ScheduledDeletion::AddStructureData(FolderWindow::m_storedStructDisplayData[index]);
+             FolderWindow::m_storedStructDisplayData[index] = NULL;
+	}
     }
     else {
         Delete(structure, RNAStructure);
