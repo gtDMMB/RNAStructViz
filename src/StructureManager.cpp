@@ -58,7 +58,7 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
             {
                 TerminalText::PrintInfo("Skipping ... Already have a structure loaded with filename: %s\n", 
                                         basename);
-                free(localCopy);
+                Free(localCopy);
                 return;
             }
         }
@@ -121,9 +121,10 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
         return;
     }
 
+    int s = -1;
     if(structures != NULL && newStructCount > 0)
     {
-        for(int s = 0; s < newStructCount; s++) { 
+        for(s = 0; s < newStructCount; s++) { 
         
            int count = (int) folders.size();
            RNAStructure *structure = structures[s];
@@ -254,6 +255,7 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 	   else if(firstEmptyIdx != -1) {
                 m_structures[firstEmptyIdx] = NULL;
 		m_structureCount -= 1;
+		Delete(structure, RNAStructure);
 	   }
        }
 

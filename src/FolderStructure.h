@@ -48,6 +48,10 @@ class Folder {
         if(doWidgetDeletion) {
 	     DeleteGUIWidgetData();
 	}
+	else if(mainWindowFolderBtn != NULL) {
+             mainWindowFolderBtn->label("");
+             mainWindowFolderBtn->tooltip("");
+	}
 	structCount = 0;
         selected = false;
     }
@@ -73,8 +77,8 @@ class Folder {
     inline void DeleteGUIWidgetData() {
          HideGUIWidgets(true);
 	 if(mainWindowFolderBtn != NULL) {
-              mainWindowFolderBtn->copy_label("");
-              mainWindowFolderBtn->copy_tooltip("");
+              mainWindowFolderBtn->label("");
+              mainWindowFolderBtn->tooltip("");
 	 }
 	 Delete(mainWindowFolderBtn, Fl_Button);
 	 Delete(navUpBtn, Fl_Button);

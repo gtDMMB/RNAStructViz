@@ -91,7 +91,7 @@ void RNAStructViz_SignalHandler(int signum) {
      else if(signum == SIGSEGV) {
           TerminalText::PrintError("Handling unexpected SEGFAULT (SIGSEGV) signal.\n\n");
           std::string aboutInfoMsg = CommonDialogs::GetInfoAboutMessageString();
-      ApplicationBuildInfo::PrintAboutListing(aboutInfoMsg.c_str(), stderr);
+          ApplicationBuildInfo::PrintAboutListing(aboutInfoMsg.c_str(), stderr);
      }
      exit(signum);
 
