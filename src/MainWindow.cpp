@@ -667,7 +667,9 @@ void MainWindow::HideFolderByIndex(const int index)
     
     if (pane->children() > 0)
     {
-         pane->remove(pane->children() - 1);
+         FolderWindow *fwinToRemove = (FolderWindow *) pane->child(pane->children() - 1);
+	 pane->remove((Fl_Widget *) fwinToRemove);
+	 Delete(fwinToRemove, FolderWindow);
          pane->redraw();
     }
     else {
@@ -694,7 +696,9 @@ void MainWindow::HideFolderByName(const char* foldername)
     {
         Fl_Group* childGroup = (Fl_Group*)(pane->child(0));
         if (!strcmp(childGroup->label(), foldername)) {
-            pane->remove(pane->children() - 1);
+             FolderWindow *fwinToRemove = (FolderWindow *) pane->child(pane->children() - 1);
+             pane->remove((Fl_Widget *) fwinToRemove);
+	     Delete(fwinToRemove, FolderWindow);
         }
     }
     pane->hide();

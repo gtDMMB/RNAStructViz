@@ -54,7 +54,6 @@ class Folder {
 	}
 	structCount = 0;
         selected = false;
-	Delete(folderWindow, FolderWindow);
     }
 
     static inline void WaitForHiddenWidget(Fl_Widget *widgetToHide) {

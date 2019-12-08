@@ -89,8 +89,9 @@ StructureData* StructureData::AddStructureFromData(FolderWindow *fwinRef, const 
      nextStructData->structure = RNAStructViz::GetInstance()->GetStructureManager()->GetStructure(index);
      nextStructData->origFolderWinLabel = std::string(fileName);
      size_t dirPrefixLen = ((strrchr(fileName, '/') ? strrchr(fileName, '/') : fileName) - fileName);
-     nextStructData->structFileBaseDir = std::string(fileName).substr(0, dirPrefixLen + 1);
-     nextStructData->structFileBaseName = std::string(fileName).substr(dirPrefixLen + 1);
+     std::string fileNameStr = std::string(fileName);
+     nextStructData->structFileBaseDir = fileNameStr.substr(0, dirPrefixLen + 1);
+     nextStructData->structFileBaseName = fileNameStr.substr(dirPrefixLen + 1);
      nextStructData->index = index;
      nextStructData->CreateGUIElementsDisplay(fwinRef->folderPack);
      return nextStructData;

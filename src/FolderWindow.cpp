@@ -47,8 +47,8 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     int initYOffset = NAVBUTTONS_OFFSETY + RNAStructVizLogo.height + 5; 
     const char *fileOpsLabelText = "@reload   Structure Operations.\n  Each comparision operation\n  button click opens a new window.";
     fileOpsLabel = new Fl_Box(x - 2 + NAVBUTTONS_SPACING / 2, initYOffset, 
-                             fileOpsLabelWidth + 10, fileOpsLabelHeight + spacingHeight / 2, 
-                             fileOpsLabelText);
+                              fileOpsLabelWidth + 10, fileOpsLabelHeight + spacingHeight / 2, 
+                              fileOpsLabelText);
     fileOpsLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);  
     fileOpsLabel->color(GUI_BGCOLOR);
     fileOpsLabel->labelcolor(GUI_BTEXT_COLOR);
@@ -85,7 +85,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     const char *fileInstText = "@filenew   Files.\n  Click on the file buttons to view\n  " 
 	                       "CT-style structure pairing data\n  in new window.";
     fileLabel = new Fl_Box(x - 2 + NAVBUTTONS_SPACING / 2, y + yOffset + spacingHeight, 
-               fileOpsLabelWidth + 10, fileOpsLabelHeight + spacingHeight, fileInstText);
+                           fileOpsLabelWidth + 10, fileOpsLabelHeight + spacingHeight, fileInstText);
     fileLabel->align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
     fileLabel->color(GUI_BGCOLOR);
     fileLabel->labelcolor(GUI_BTEXT_COLOR);
