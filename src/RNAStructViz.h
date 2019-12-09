@@ -135,6 +135,14 @@ class RNAStructViz
 		       Fl::add_timeout(delaySecs, PerformScheduledDeletion);
 		  }
 
+		  static inline bool CleanupWaiting() {
+		       Fl::lock();
+		       bool status = rnaStructObjs.size() > 0 || folderStructObjs.size() > 0 || 
+			             structureDataObjs.size() > 0 || widgetObjs.size() > 0;
+		       Fl::unlock();
+		       return status;
+		  }
+
 		  static inline void AddRNAStructure(RNAStructure *s) {
 		       Fl::lock();
 		       if(s != NULL) rnaStructObjs.push_back(s);

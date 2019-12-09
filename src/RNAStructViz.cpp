@@ -125,9 +125,12 @@ void RNAStructViz::Shutdown()
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     Delete(RNAStructViz::ms_instance, RNAStructViz);
     MainWindow::Shutdown();
-    RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
     Delete(RNAStructure::m_ctFileSelectionWin, InputWindow);
     Delete(StatsWindow::overviewLegendImage, Fl_RGB_Image);
+    while(RNAStructViz::ScheduledDeletion::CleanupWaiting()) {
+         Fl::wait(1.0);
+    }
+    RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
 }
 
 void RNAStructViz::ExitApplication(bool promptUser) {
