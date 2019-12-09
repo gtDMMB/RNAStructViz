@@ -101,11 +101,13 @@ RNAStructViz::RNAStructViz()
 
 RNAStructViz::~RNAStructViz()
 {
+    Delete(m_structureManager, StructureManager);
     for (unsigned int i = 0; i < m_diagramWindows.size(); ++i)
-         delete m_diagramWindows[i];
+         Delete(m_diagramWindows[i], DiagramWindow);
     for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
-         delete m_statsWindows[i];
-    delete m_structureManager;
+         Delete(m_statsWindows[i], StatsWindow);
+    Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
+    RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
 }
 
 bool RNAStructViz::Initialize(int argc, char** argv)
@@ -122,9 +124,9 @@ void RNAStructViz::Shutdown()
     Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
     RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+    Delete(RNAStructViz::ms_instance, RNAStructViz);
     MainWindow::Shutdown();
     Delete(RNAStructure::m_ctFileSelectionWin, InputWindow);
-    Delete(RNAStructViz::ms_instance, RNAStructViz);
     Delete(StatsWindow::overviewLegendImage, Fl_RGB_Image);
 }
 

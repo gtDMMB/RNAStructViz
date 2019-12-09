@@ -266,8 +266,7 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath, I
     if(fileHeaderLines.size() > 0) {
          rnaStruct->SetFileCommentLines(fileHeaderLines, inputFileType);
     }
-    const char *suggestedFolderName = rnaStruct ? 
-                                  rnaStruct->GetSuggestedStructureFolderName() : NULL;
+    const char *suggestedFolderName = rnaStruct ? rnaStruct->GetSuggestedStructureFolderName() : NULL;
     if(suggestedFolderName != NULL) {
          if(inputWinRef != NULL) {
 	      inputWinRef->suggestedFolderNameFound = true;

@@ -338,7 +338,6 @@ void StructureManager::RemoveStructure(const int index)
 	if(FolderWindow::m_storedStructDisplayData.size() > index && structData != NULL) {
 	     RNAStructViz::ScheduledDeletion::AddStructureData(structData);
              FolderWindow::m_storedStructDisplayData[index] = NULL;
-	     //RNAStructViz::ScheduledDeletion::AddFolderWindow(structData->parentMainFolderWin);
 	}
     }
     else {
@@ -373,6 +372,7 @@ void StructureManager::RemoveFolder(const int index) {
     folderStruct->MarkForDeletion();
     if(USE_SCHEDULED_DELETION) {
 	 RNAStructViz::ScheduledDeletion::AddFolder(folderStruct);
+         RNAStructViz::ScheduledDeletion::AddWidget(folderStruct->folderWindow);
     }
     else {
          Delete(folderStruct, Folder);

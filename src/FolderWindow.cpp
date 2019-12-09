@@ -33,14 +33,11 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
 
     // label configuration happens inside FolderWindow::AddStructure ... 
 
-    //this->end();
-
     // icon configuration:
     structureIcon = new Fl_RGB_Image(StructureOperationIcon.pixel_data, 
             StructureOperationIcon.width, StructureOperationIcon.height, 
             StructureOperationIcon.bytes_per_pixel);
     structureIcon->color_average(Lighter(*(LOCAL_COLOR_THEME->bwImageAvgColor), 0.45), 0.45);
-    
     structIconBox = new Fl_Box(x, y - 39, structureIcon->w(), structureIcon->h());
     structIconBox->image(structureIcon);
 
@@ -161,7 +158,6 @@ void FolderWindow::SetStructures(int folderIndex) {
         RNAStructure *strct = structureManager->GetStructure(i);
 	AddStructure(strct->GetPathname(), i);
     }
-    copy_label(folder->folderName);
     char structLabel[MAX_BUFFER_SIZE];
     snprintf(structLabel, MAX_BUFFER_SIZE - 1, "%s%s", STRUCT_PANE_LABEL_PREFIX, folder->folderName);
     ConfigParser::nullTerminateString(structLabel);

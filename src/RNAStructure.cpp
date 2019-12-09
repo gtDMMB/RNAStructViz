@@ -882,6 +882,7 @@ const char* RNAStructure::GetFilenameNoExtension() {
           return fullFilename;
      }
      size_t basePathLen = dotPosPtr - fullFilename;
+     Free(m_pathname_noext);
      m_pathname_noext = (char *) malloc((basePathLen + 1) * sizeof(char));
      strncpy(m_pathname_noext, fullFilename, basePathLen);
      m_pathname_noext[basePathLen] = '\0';
