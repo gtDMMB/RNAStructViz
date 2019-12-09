@@ -102,7 +102,7 @@ RNAStructViz::RNAStructViz()
 RNAStructViz::~RNAStructViz()
 {
     Delete(m_structureManager, StructureManager);
-    Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
+    //Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
     for (unsigned int i = 0; i < m_diagramWindows.size(); ++i)
          Delete(m_diagramWindows[i], DiagramWindow);
     for (unsigned int i = 0; i < m_statsWindows.size(); ++i)
