@@ -122,7 +122,7 @@ int ConfigParser::parseFile(const char *userCfgFile, bool silenceErrors) {
                guiDisplayFirstRunMessage = !strcasecmp(parsedLine.cfgValue, "true");
       }
       else if(!strcmp(parsedLine.cfgOption, "GUI_KEEP_STICKY_FOLDER_NAMES")) {
-           guiKeepStickyFolderNames = !strcasecmp(parsedLine.cfgValue, "true");
+           guiKeepStickyFolderNames = !strcasecmp(parsedLine.cfgValue, "true") ? true : false;
       }
       else if(!strncmp(parsedLine.cfgOption, "DWIN_COLORS_STRUCT", 18) && 
               strlen(parsedLine.cfgOption) == 19) {

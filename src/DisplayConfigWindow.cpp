@@ -488,8 +488,8 @@ void DisplayConfigWindow::ConstructWindow() {
           windowWidgets.push_back(bpBox);
           workingOffsetX += bulletPointBoxWidth + CFGWIN_SPACING;
           Fl_Check_Button *cbParam = new Fl_Check_Button(workingOffsetX, workingYOffset, 
-                                                     2.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
-                             checkBoxLabels[cbi]);
+                                                         2.5 * CFGWIN_LABEL_WIDTH, CFGWIN_LABEL_HEIGHT, 
+                                                         checkBoxLabels[cbi]);
           cbParam->type(FL_TOGGLE_BUTTON);
           cbParam->labelcolor(GUI_BTEXT_COLOR);
           cbParam->selection_color(GUI_TEXT_COLOR);

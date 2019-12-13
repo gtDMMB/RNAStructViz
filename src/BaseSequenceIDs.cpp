@@ -123,8 +123,11 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, RNAStructure *rnaStru
 }
 
 int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string baseSeq, 
-                                  std::string folderName) {
+                                          std::string folderName) {
 
+     if(FolderNameForSequenceExists(cfgFilePath, baseSeq.c_str())) {
+          return 0;
+     }
      FILE *fpCfgFile = fopen(cfgFilePath, "w+");
      if(!fpCfgFile) {
           TerminalText::PrintError("Unable to open \"%s\": %s IV\n", cfgFilePath, strerror(errno));
@@ -140,20 +143,23 @@ int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string b
 
                      
 int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSeq, 
-                             std::string folderName, off_t replacePos) {
+                                     std::string folderName, off_t replacePos) {
      
      if(cfgFilePath == NULL) {
           return EINVAL;
      }
+     else if(FolderNameForSequenceExists(cfgFilePath, baseSeq.c_str())) {
+          return EXIT_SUCCESS;
+     }
      std::string fullCfgFilePath = GetStickyFolderConfigPath(cfgFilePath);
      if(!ConfigParser::fileExists(fullCfgFilePath.c_str())) {
-      return SaveStickyFolderNameToFirstConfigFile(fullCfgFilePath.c_str(), baseSeq, folderName);
+          return SaveStickyFolderNameToFirstConfigFile(fullCfgFilePath.c_str(), baseSeq, folderName);
      }
 
      FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r");
      if(!fpCfgFile) {
           TerminalText::PrintError("Unable to open \"%s\" : %s III\n", fullCfgFilePath.c_str(), strerror(errno));
-      return errno;
+          return errno;
      }
      int fdCfgFile = fileno(fpCfgFile);
      char tempFilePath[MAX_BUFFER_SIZE];
@@ -162,8 +168,8 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      FILE *fpTempFile = fopen(tempFilePath, "w+");
      if(!fpTempFile) {
           TerminalText::PrintError("Unable to open \"%s\": %s IV\n", tempFilePath, strerror(errno));
-      fclose(fpCfgFile);
-      return errno;
+          fclose(fpCfgFile);
+          return errno;
      }
 
      std::string baseSeqHash = HashBaseSequence(baseSeq.c_str());
@@ -171,14 +177,14 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      char lineBuf[MAX_BUFFER_SIZE];
      off_t curCfgFileOffset = 0;
      while(fgets(lineBuf, MAX_BUFFER_SIZE, fpCfgFile)) {
-      off_t nextOffset = ftell(fpCfgFile);
-      if(curCfgFileOffset != replacePos) {
-               fprintf(fpTempFile, "%s", lineBuf);
-      }
-      else {
-               fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
-      }
-      curCfgFileOffset = nextOffset;
+           off_t nextOffset = ftell(fpCfgFile);
+           if(curCfgFileOffset != replacePos) {
+                fprintf(fpTempFile, "%s", lineBuf);
+           }
+           else {
+                fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
+           }
+           curCfgFileOffset = nextOffset;
      }
      if(replacePos == LSEEK_NOT_FOUND) {
           fprintf(fpTempFile, "%s;\"%s\"\n", baseSeqHash.c_str(), folderName.c_str());
@@ -188,7 +194,7 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      fclose(fpTempFile);
      if(rename(tempFilePath, fullCfgFilePath.c_str())) {
           TerminalText::PrintError("Unable to move \"%s\" to \"%s\" : %s\n", 
-                       tempFilePath, cfgFilePath, strerror(errno));
+                                   tempFilePath, cfgFilePath, strerror(errno));
            return errno;
      }
 

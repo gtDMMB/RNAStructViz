@@ -281,6 +281,14 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     while(ms_instance->m_fileChooser->visible()) {
         Fl::wait();
     }
+    if(!(ms_instance->m_fileChooserSelectAllBtn->SelectAllFilesActivated()) && 
+       !(ms_instance->m_fileChooserSelectAllBtn->SelectAllFilesInHomeActivated()) && 
+       ms_instance->m_fileChooser->count() == 0) {
+         return;
+    }
+    else {
+        ms_instance->m_fileChooserSelectAllBtn->SetWidgetState();
+    }
 
     const char *nextWorkingDir = ms_instance->m_fileChooser->directory();
     if(nextWorkingDir != NULL && strcmp(nextWorkingDir, (char *) CTFILE_SEARCH_DIRECTORY)) { 
@@ -297,7 +305,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
 	SelectAllButton::LoadAllFilesFromDirectory(GetUserHome(), *(ms_instance->m_fileChooserSelectAllBtn));
     }
     else {
-        for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i) {
+        bool avoidDuplicateStructs = ms_instance->m_fileChooserSelectAllBtn->AvoidDuplicateStructures();
+	for (int i = 0; i < ms_instance->m_fileChooser->count(); ++i) {
             const char *nextFilename = strrchr(ms_instance->m_fileChooser->value(i), '/');
             nextFilename = nextFilename ? nextFilename : ms_instance->m_fileChooser->value(i);
             if(!strcmp(nextFilename, "") || !strcmp(nextFilename, ".") || 
@@ -314,7 +323,7 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
             snprintf(nextFilePath, MAX_BUFFER_SIZE, "%s%s%s\0", nextWorkingDir, 
                      nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/", 
                      nextFilename);
-            RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath);
+            RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath, avoidDuplicateStructs, false);
         }
     }
     

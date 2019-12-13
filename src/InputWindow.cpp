@@ -147,6 +147,8 @@ InputWindow::InputWindow(int w, int h, const char *label,
     
     }
         show();
+	fprintf(stderr, "showDisplay(%d), !GUI_USE(%d), !GUI_KEEP(%d), !stickyFolderNameFound(%d)\n", 
+		(int) showDisplay, (int) !GUI_USE_DEFAULT_FOLDER_NAMES, (int) !GUI_KEEP_STICKY_FOLDER_NAMES, (int) !stickyFolderNameFound);
         if(showDisplay && (type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && 
            (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound))) {
             show();

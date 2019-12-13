@@ -6,11 +6,13 @@
 #include "LoadFileSelectAllButton.h"
 #include "ConfigOptions.h"
 #include "ConfigExterns.h"
+#include "RNAStructViz.h"
+#include "TerminalPrinting.h"
 
 SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int height) : 
      Fl_Pack(0, 0, width, height), flFileChooserRef(flFileChooser), selectedFileFilter(NULL), 
      recursiveDirs(false), searchInHiddenDirs(false), followSymlinks(false), 
-     avoidDuplicateStructs(true), selectAll(false), selectAllInHome(false) {
+     avoidDuplicateStructs(false), selectAll(false), selectAllInHome(false) {
 
      color(Darker(GUI_WINDOW_BGCOLOR, 0.7f));
      labelcolor(GUI_BTEXT_COLOR);
@@ -165,9 +167,6 @@ void SelectAllButton::FileChooserSelectAllInHomeCallback(Fl_Widget *wbtn, void *
      saBtn->SetWidgetState();
      saBtn->flFileChooserRef->hide();
 }
-
-#include "RNAStructViz.h"
-#include "TerminalPrinting.h"
 
 bool SelectAllButton::LoadAllFilesFromDirectory(std::string dirPathStr, const char *fileFilter, 
 		                                bool recursive, bool hidden, 

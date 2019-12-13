@@ -42,6 +42,7 @@ class SelectAllButton : public Fl_Pack {
 			  int h = DEFAULT_SAWIDGET_HEIGHT);
           ~SelectAllButton();
 
+          void SetWidgetState();
 	  bool SelectAllFilesActivated() const;
 	  bool SelectAllFilesInHomeActivated() const;
 	  const char * GetSelectedFileFilter() const;
@@ -51,8 +52,6 @@ class SelectAllButton : public Fl_Pack {
 	  bool AvoidDuplicateStructures() const;
 
      protected:
-          void SetWidgetState();
-
           Fl_File_Chooser *flFileChooserRef;
 	  char *selectedFileFilter;
           bool recursiveDirs, searchInHiddenDirs;

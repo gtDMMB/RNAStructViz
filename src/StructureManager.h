@@ -85,11 +85,29 @@ class StructureManager
 	          return true;
 	     }
 	     for(unsigned int fi = 0; fi < folders.size(); fi++) {
-                  if(!strcmp(folders[fi]->folderName, newFolderName)) {
+                  if(folders[fi] != NULL && !strcmp(folders[fi]->folderName, newFolderName)) {
 		       return true;
 		  }
 	     }
              return false;
+	}
+
+	/* 
+	 * Check if a duplicate structure already exists in the folder: 
+	 */
+	inline bool DuplicateStructureExistsInFolder(RNAStructure *structToLoad) {
+	     if(structToLoad == NULL) {
+	          return false;
+	     }
+	     for(unsigned int fi = 0; fi < folders.size(); fi++) {
+	          for(int j = 0; j < folders[fi]->structCount; j++) {
+	               RNAStructure *compStruct = m_structures[folders[fi]->folderStructs[j]];
+		       if(compStruct != NULL && SequenceCompare(compStruct, structToLoad)) {
+	                    return true;
+		       }
+		  }
+	     }
+	     return false;
 	}
 
         /*
@@ -134,7 +152,7 @@ class StructureManager
          Add structures to program
          Initializes folders and m_structures on the first occurance
          */
-        int AddFirstEmpty(RNAStructure* structure);
+        int AddFirstEmpty(RNAStructure* structure, bool excludeDuplicateStructs = false);
     
         // Creates a new folder for that structure
         void AddFolder(RNAStructure* structure, const int index);

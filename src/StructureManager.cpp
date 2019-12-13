@@ -136,7 +136,7 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 	   if(!structure) { 
                 continue;
            }
-           int firstEmptyIdx = AddFirstEmpty(structure);
+           int firstEmptyIdx = AddFirstEmpty(structure, removeDuplicateStructs);
            if(count == (int) folders.size()-1) // we added a new folder ... 
            {
                  
@@ -167,7 +167,7 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
                  while (m_inputWindow->visible()) {
                        Fl::wait();
                  }
-            
+                 m_inputWindow->Cleanup(false);
                  bool same = false;
                  for(unsigned int ui = 0; ui < folders.size(); ui++)
                  {
@@ -204,7 +204,8 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
                      while (m_inputWindow->visible()) {
                           Fl::wait();
                      }
-                     same = !strcmp(m_inputWindow->getName(), "");
+                     m_inputWindow->Cleanup(false);
+		     same = !strcmp(m_inputWindow->getName(), "");
                      for(unsigned int ui = 0; ui < folders.size(); ui++)
                      {
                            if (!strcmp(folders[ui]->folderName, m_inputWindow->getName()))
@@ -218,30 +219,30 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
                  if(!skipLoadingFile && m_inputWindow != NULL && strcmp(m_inputWindow->getName(), "")) {
                      strcpy(folders[count]->folderName, m_inputWindow->getName());
                      if(GUI_KEEP_STICKY_FOLDER_NAMES) {
-                     const char *baseSeq = structure->GetSequenceString();
-                     int saveStatus = SaveStickyFolderNameToConfigFile(
-                        DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
-                        std::string(baseSeq), 
-                        std::string(folders[count]->folderName), 
-                        LSEEK_NOT_FOUND
-                     );
-                     if(saveStatus) {
-                          TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
-                                                     folders[count]->folderName);
-                     }
-                     else {
-                          TerminalText::PrintDebug("Saved sticky folder name \"%s\" to local config file\n", 
-                                                   folders[count]->folderName);
-                     }
-               }
+                        const char *baseSeq = structure->GetSequenceString();
+                        int saveStatus = SaveStickyFolderNameToConfigFile(
+                           DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
+                           std::string(baseSeq), 
+                           std::string(folders[count]->folderName), 
+                           LSEEK_NOT_FOUND
+                        );
+                        if(saveStatus) {
+                             TerminalText::PrintWarning("Unable to save sticky folder name \"%s\"\n", 
+                                                        folders[count]->folderName);
+                        }
+                        else {
+                             TerminalText::PrintDebug("Saved sticky folder name \"%s\" to local config file\n", 
+                                                      folders[count]->folderName);
+                        }
+                  }
            }
            bool haveDuplicateStruct = false;
-	   Folder *nextFolder = RNAStructViz::GetInstance()->GetStructureManager()->GetFolderAt(count);
+	   Folder *nextFolder = GetFolderAt(count);
 	   if(nextFolder != NULL) {
                 for(int si = 0; si < nextFolder->structCount; si++) {
                      int structIdx = nextFolder->folderStructs[si];
 		     RNAStructure *compStruct = structIdx != -1 ? 
-			                        RNAStructViz::GetInstance()->GetStructureManager()->GetStructure(structIdx) : 
+			                        GetStructure(structIdx) : 
 						NULL;
 		     if(compStruct == NULL) {
 		          continue;
@@ -255,7 +256,6 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
 	   bool okToLoad = !haveDuplicateStruct || !removeDuplicateStructs;
            if(!skipLoadingFile && okToLoad && m_inputWindow != NULL) {
 	      MainWindow::AddFolder(folders[count]->folderName, count, false);
-              m_inputWindow->Cleanup(false);
 	      while(m_inputWindow->visible()) { Fl::wait(); }
               Delete(m_inputWindow, InputWindow);
            }
@@ -388,7 +388,7 @@ void StructureManager::AddFolder(RNAStructure* structure, const int index) {
      //}
 }
 
-int StructureManager::AddFirstEmpty(RNAStructure* structure)
+int StructureManager::AddFirstEmpty(RNAStructure* structure, bool excludeDuplicateStructs)
 {
     int index;
     bool added = false;
@@ -403,6 +403,10 @@ int StructureManager::AddFirstEmpty(RNAStructure* structure)
         found = true;
         return 0;
     }
+    if(excludeDuplicateStructs && DuplicateStructureExistsInFolder(structure)) {
+         return -1;
+    }
+    
     for (int i = 0; i < m_structureCount; ++i)
     {
         if (!m_structures[i])
