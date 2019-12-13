@@ -1563,7 +1563,7 @@ int RNAStructure::ActionOpenCTFileViewerWindow(int structureFolderIndex,
      }	  
      m_ctFileSelectionWin = new InputWindow(400, 175, "Select Structure File to Highlight ...", 
                                             "", InputWindow::CTVIEWER_FILE_INPUT, 
-                                            structureFolderIndex);
+                                            true, structureFolderIndex);
      while(m_ctFileSelectionWin->visible()) {
           Fl::wait();
      }
