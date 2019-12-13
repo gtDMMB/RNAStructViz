@@ -121,7 +121,7 @@ bool RNAStructViz::Initialize(int argc, char** argv)
 void RNAStructViz::Shutdown()
 {
     Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
-    RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
+    //RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     Delete(RNAStructViz::ms_instance, RNAStructViz);
     MainWindow::Shutdown();
@@ -130,20 +130,22 @@ void RNAStructViz::Shutdown()
     //while(RNAStructViz::ScheduledDeletion::CleanupWaiting()) {
     //     Fl::wait(1.0);
     //}
-    //RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
+    RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
 }
 
 void RNAStructViz::ExitApplication(bool promptUser) {
      if(!promptUser) {
           RNAStructViz::Shutdown();
-      return;
+          exit(0);
+	  return;
      }
      const char *promptQMsg = "Are you really sure you want to quit? All unsaved data and loaded structures will be lost!";
      int userResp = fl_choice("%s", "Yes, QUIT!", "No, CANCEL", NULL, promptQMsg);
      switch(userResp) {
           case 0:
                RNAStructViz::Shutdown();
-               return;
+               exit(0);
+	       return;
           case 1:
           default:
                break;
@@ -302,6 +304,13 @@ void RNAStructViz::TestFolders()
     m_structureManager->PrintFolders();
     TerminalText::PrintDebug("Number of Diagram / Stats Windows: %d/%d\n\n", 
                              m_diagramWindows.size(), m_statsWindows.size());
+}
+
+int RNAStructViz::HandleEscapeKeypressEvent(int eventCode) {
+     if(eventCode == FL_KEYBOARD && Fl::get_key(FL_Escape)) {
+          RNAStructViz::ExitApplication(true);
+     }
+     return eventCode == FL_KEYBOARD && Fl::get_key(FL_Escape);
 }
 
 int RNAStructViz::HandleGlobalKeypressEvent(int eventCode) {

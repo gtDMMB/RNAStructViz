@@ -70,6 +70,10 @@ class InputWindow : public Fl_Window
 	int getFileSelectionIndex() const;
 	bool isCanceled() const;
 	
+	inline bool saveStickyFolderName() const {
+	     return (stickyFolderNameFound || suggestedFolderNameFound);
+	}
+
 	static int distinctStructureCount;
     
     protected:

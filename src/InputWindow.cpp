@@ -147,8 +147,6 @@ InputWindow::InputWindow(int w, int h, const char *label,
     
     }
         show();
-	fprintf(stderr, "showDisplay(%d), !GUI_USE(%d), !GUI_KEEP(%d), !stickyFolderNameFound(%d)\n", 
-		(int) showDisplay, (int) !GUI_USE_DEFAULT_FOLDER_NAMES, (int) !GUI_KEEP_STICKY_FOLDER_NAMES, (int) !stickyFolderNameFound);
         if(showDisplay && (type != InputWindow::FOLDER_INPUT || !GUI_USE_DEFAULT_FOLDER_NAMES && 
            (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound))) {
             show();
@@ -187,8 +185,9 @@ void InputWindow::InputCallback(Fl_Widget *widget, void *userdata) {
 	          window->input->value());
     }
     else {
-	GUI_USE_DEFAULT_FOLDER_NAMES = window->cbUseDefaultNames->value();
-        GUI_KEEP_STICKY_FOLDER_NAMES = window->cbKeepStickyFolders->value();
+	GUI_USE_DEFAULT_FOLDER_NAMES = window->cbUseDefaultNames->value() ? true : false;
+        GUI_KEEP_STICKY_FOLDER_NAMES = window->cbKeepStickyFolders->value() ? true : false;
+        ConfigParser::WriteUserConfigFile();
     }    
     window->hide();
     while(window->visible()) { Fl::wait(); }
@@ -252,7 +251,8 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath, I
               std::string suggestedStickyName = std::string(stickyFolderName);
               Free(stickyFolderName);
 	      if(inputWinRef != NULL) {
-                   inputWinRef->stickyFolderNameFound = true;
+		   TerminalText::PrintDebug(" I : %s\n", suggestedStickyName.c_str());
+		   inputWinRef->stickyFolderNameFound = true;
 	      }
               return suggestedStickyName;
          }
@@ -271,6 +271,7 @@ std::string InputWindow::ExtractStructureNameFromFile(const char *seqFilePath, I
     const char *suggestedFolderName = rnaStruct ? rnaStruct->GetSuggestedStructureFolderName() : NULL;
     if(suggestedFolderName != NULL) {
          if(inputWinRef != NULL) {
+	      TerminalText::PrintDebug(" II : %s\n", suggestedFolderName);
 	      inputWinRef->suggestedFolderNameFound = true;
 	 }
          return std::string(suggestedFolderName);

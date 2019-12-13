@@ -209,7 +209,7 @@ bool SelectAllButton::LoadAllFilesFromDirectory(std::string dirPathStr, const ch
                               nextWorkingDir[strlen(nextWorkingDir) - 1] == '/' ? "" : "/",
                               curFileEntryPath.filename().c_str());
                      TerminalText::PrintDebug("Adding structure with path \"%s\" [%s]\n", nextFilePath, nextWorkingDir);
-                     RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath, avoidDuplicates, true);
+                     RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath, avoidDuplicates, false);
 		     Free(nextWorkingDir);
              }
         }

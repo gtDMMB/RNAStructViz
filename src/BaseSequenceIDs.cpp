@@ -94,7 +94,7 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, const char *baseSeqSp
      FILE *fpCfgFile = fopen(fullCfgFilePath.c_str(), "r");
      if(!fpCfgFile) {
           TerminalText::PrintDebug("Unable to open \"%s\" : %s II\n", fullCfgFilePath.c_str(), strerror(errno));
-      return LSEEK_NOT_FOUND;
+          return LSEEK_NOT_FOUND;
      }
      std::string baseSeqHash = HashBaseSequence(baseSeqSpec);
      char lineBuf[MAX_BUFFER_SIZE];
@@ -125,7 +125,7 @@ off_t FolderNameForSequenceExists(const char *cfgFilePath, RNAStructure *rnaStru
 int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string baseSeq, 
                                           std::string folderName) {
 
-     if(FolderNameForSequenceExists(cfgFilePath, baseSeq.c_str())) {
+     if(FolderNameForSequenceExists(cfgFilePath, baseSeq.c_str()) != LSEEK_NOT_FOUND) {
           return 0;
      }
      FILE *fpCfgFile = fopen(cfgFilePath, "w+");
@@ -140,7 +140,6 @@ int SaveStickyFolderNameToFirstConfigFile(const char *cfgFilePath, std::string b
      return EXIT_SUCCESS;
 
 }
-
                      
 int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSeq, 
                                      std::string folderName, off_t replacePos) {
@@ -148,7 +147,7 @@ int SaveStickyFolderNameToConfigFile(const char *cfgFilePath, std::string baseSe
      if(cfgFilePath == NULL) {
           return EINVAL;
      }
-     else if(FolderNameForSequenceExists(cfgFilePath, baseSeq.c_str())) {
+     else if(FolderNameForSequenceExists(cfgFilePath, baseSeq.c_str()) != LSEEK_NOT_FOUND) {
           return EXIT_SUCCESS;
      }
      std::string fullCfgFilePath = GetStickyFolderConfigPath(cfgFilePath);

@@ -62,6 +62,8 @@ int main(int argc, char **argv) {
     Fl::scheme((char *) FLTK_THEME);
     MainWindow::ResetThemeColormaps();
     fl_font(LOCAL_BFFONT, LOCAL_TEXT_SIZE);
+    
+    Fl::add_handler(RNAStructViz::HandleEscapeKeypressEvent);
     //Fl::add_handler(RNAStructViz::HandleGlobalKeypressEvent);
 
     if(DISPLAY_FIRSTRUN_MESSAGE) {

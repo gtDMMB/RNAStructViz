@@ -80,6 +80,7 @@ class RNAStructViz
 	}
 
     public:
+	static int HandleEscapeKeypressEvent(int eventCode);
 	static int HandleGlobalKeypressEvent(int eventCode);
 	
 	static std::string LocateSampleStructuresOnSystem();

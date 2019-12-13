@@ -137,14 +137,14 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
                 continue;
            }
            int firstEmptyIdx = AddFirstEmpty(structure, removeDuplicateStructs);
-           if(count == (int) folders.size()-1) // we added a new folder ... 
+           if(count == (int) folders.size() - 1) // we added a new folder ... 
            {
                  
               off_t stickyFolderExists = FolderNameForSequenceExists(
                                       DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
                                       structure
                      );
-              if(stickyFolderExists != LSEEK_NOT_FOUND && GUI_KEEP_STICKY_FOLDER_NAMES) {
+                 if(stickyFolderExists != LSEEK_NOT_FOUND && GUI_KEEP_STICKY_FOLDER_NAMES) {
                     char *stickyFolderName = LookupStickyFolderNameForSequence(
                                     DEFAULT_STICKY_FOLDERNAME_CFGFILE, 
                                     stickyFolderExists
@@ -215,10 +215,11 @@ void StructureManager::AddFile(const char* filename, bool removeDuplicateStructs
                            }
                      }
                  }
-                        
+
                  if(!skipLoadingFile && m_inputWindow != NULL && strcmp(m_inputWindow->getName(), "")) {
                      strcpy(folders[count]->folderName, m_inputWindow->getName());
-                     if(GUI_KEEP_STICKY_FOLDER_NAMES) {
+                     if(GUI_KEEP_STICKY_FOLDER_NAMES && m_inputWindow->saveStickyFolderName()) {
+		        TerminalText::PrintDebug("Saving sticky folder name \"%s\" to file ...\n", m_inputWindow->getName());
                         const char *baseSeq = structure->GetSequenceString();
                         int saveStatus = SaveStickyFolderNameToConfigFile(
                            DEFAULT_STICKY_FOLDERNAME_CFGFILE, 

@@ -276,7 +276,7 @@ $(OBJ_BUILD_DIR)/CommonDialogs.$(OBJEXT): CommonDialogs.h ConfigOptions.h Config
 	$(CXX) $(CXXFLAGS_FULL) -c CommonDialogs.cpp -o $@
 
 ConfigOptions.h: ThemesConfig.h ConfigExterns.h RNACUtils.cpp \
-	../build-scripts/BuildTargetInfo.h.in 
+	../build-scripts/BuildTargetInfo.h.in BuildInclude/BuildTargetInfo.h
 
 $(OBJ_BUILD_DIR)/ConfigParser.$(OBJEXT): ConfigOptions.h ConfigParser.h \
 	TerminalPrinting.h ConfigOptions.h CommonDialogs.h RNAStructViz.h \
