@@ -120,7 +120,10 @@ bool RNAStructViz::Initialize(int argc, char** argv)
 
 void RNAStructViz::Shutdown()
 {
-    Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
+    while(RNAStructViz::ScheduledDeletion::CleanupWaiting()) {
+         Fl::wait(1.0);
+    }
+    //Fl::remove_timeout(RNAStructViz::ScheduledDeletion::PerformScheduledDeletion, NULL);
     //RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
     ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
     Delete(RNAStructViz::ms_instance, RNAStructViz);
@@ -130,7 +133,7 @@ void RNAStructViz::Shutdown()
     //while(RNAStructViz::ScheduledDeletion::CleanupWaiting()) {
     //     Fl::wait(1.0);
     //}
-    RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
+    //RNAStructViz::ScheduledDeletion::PerformScheduledDeletion(NULL);
 }
 
 void RNAStructViz::ExitApplication(bool promptUser) {

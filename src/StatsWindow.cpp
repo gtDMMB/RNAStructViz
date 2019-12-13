@@ -942,7 +942,7 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
     
     StatsWindow* window = (StatsWindow*)widget->parent()->parent();
     if(strncmp(window->ref_menu->mvalue()->label(),
-              "Please select a reference", 25))
+              "Please select a reference", 25) && window->GetCheckedStructuresCount() > 0)
     {
         window->calc_button->value(0);
         window->calc_button->activate();
@@ -985,6 +985,7 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
 	if(button->value()) {
 	     button->labelfont(FL_HELVETICA_BOLD_ITALIC);
 	}
+	button->redraw();
     }
     
 }
@@ -992,33 +993,35 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
 void StatsWindow::MenuCallback(Fl_Widget* widget, void* userData)
 {
     StatsWindow* window = (StatsWindow *) widget->parent()->parent()->parent()->parent();
-    if(strncmp(window->ref_menu->mvalue()->label(),
-              "Please select a reference", 25))
+    if(!strncmp(window->ref_menu->mvalue()->label(),
+                "Please select a reference", 25) || window->GetCheckedStructuresCount() == 0)
     {
         window->calc_button->value(1);
         window->calc_button->deactivate();
     }
-    else
+    else if(window->GetCheckedStructuresCount() > 0) 
     {
 	window->calc_button->value(0);
         window->calc_button->activate();
     }
     Fl_Check_Button *cb = (Fl_Check_Button *) widget;
-    if(cb->value()) {
+    if(cb->value() && strcmp(cb->label(), window->ref_menu->mvalue()->label())) {
          cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	 cb->activate();
     }
     else {
 	 cb->labelfont(FL_HELVETICA);
     }
+    cb->redraw();
 
 }
 
 void StatsWindow::CalcCallback(Fl_Widget* widget, void* userData)
 {    
+    StatsWindow* window = (StatsWindow*)widget->parent()->parent();
     Fl_Toggle_Button *cb = (Fl_Toggle_Button*) widget;
-    if(cb->value() == 1)
+    if(cb->value() == 1 && window->GetCheckedStructuresCount() > 0)
     {
-        StatsWindow* window = (StatsWindow*)widget->parent()->parent();
         if(strncmp(window->ref_menu->mvalue()->label(),
                   "Please select a reference", 25))
         {
@@ -1078,7 +1081,12 @@ void StatsWindow::SelectAllButtonCallback(Fl_Widget *saBtn, void *udata) {
 	         fl_alert("Please select a reference structure first.");
 		 noRefMsgDisplayed = false;
 	    }
-	}	    
+	}
+        cb->redraw();	
+    }
+    if(window->GetCheckedStructuresCount() > 0) {
+         window->calc_button->value(0);
+	 window->calc_button->activate();
     }
 } 
 

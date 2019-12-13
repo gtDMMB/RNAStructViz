@@ -97,7 +97,23 @@ public:
     /* Populates the comparison structure list with options from the structures
     folder */
     void BuildCompMenu();
-    
+   
+    inline int GetCheckedStructuresCount() const {
+	 if(comp_pack == NULL || ref_menu == NULL) {
+	      return 0;
+	 }
+	 int compStructsCount = 0;
+         for (int i=0; i < comp_pack->children(); i++)
+         {
+             Fl_Check_Button* button = (Fl_Check_Button *) comp_pack->child(i);
+             if (button->value() && strcmp(button->label(), ref_menu->mvalue()->label()))
+             {
+	          compStructsCount++;
+	     }
+        }
+        return compStructsCount;
+    }
+
     void ResetWindow();
     
     struct StatData
