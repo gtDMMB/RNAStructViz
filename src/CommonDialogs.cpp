@@ -32,7 +32,7 @@ std::string CommonDialogs::GetHelpInstructionsMessageString() {
           "and/or leave us general feedback on your user experience by \n",
           "by posting a new GitHub issue thread using the instructions at the following link:\n",
           "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »\n\n",
-	  "This dialog is displayed by default at start-up until you disable showing this message. ", 
+	  "This dialog is displayed by default at start-up until you disable showing this message.\n", 
 	  "To stop showing this message, uncheck the relevant checkbox under configuration settings\n", 
 	  "(view these by clicking on the \"User Config\" button in the left side window pane below).", 
      };
