@@ -142,6 +142,7 @@ RNASTRUCTVIZ_OBJECTS = \
 	$(OBJ_BUILD_DIR)/Fl_Rotated_Text.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/FolderWindow.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/InputWindow.$(OBJEXT) \
+	$(OBJ_BUILD_DIR)/InputWindowExportImage.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/LoadFileSelectAllButton.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/Main.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/MainWindow.$(OBJEXT) \
@@ -310,6 +311,11 @@ $(OBJ_BUILD_DIR)/InputWindow.$(OBJEXT): InputWindow.h MainWindow.h ConfigOptions
 	FolderStructure.h BaseSequenceIDs.h ConfigExterns.h \
 	InputWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c InputWindow.cpp -o $@
+
+$(OBJ_BUILD_DIR)/InputWindowExportImage.$(OBJEXT): InputWindow.h InputWindowExportImage.h \
+	ConfigOptions.h TerminalPrinting.h \
+	InputWindowExportImage.cpp
+	$(CXX) $(CXXFLAGS_FULL) -c InputWindowExportImage.cpp -o $@
 
 $(OBJ_BUILD_DIR)/LoadFileSelectAllButton.$(OBJEXT): LoadFileSelectAllButton.h ConfigOptions.h\
 	ConfigExterns.h LoadFileSelectAllButton.cpp

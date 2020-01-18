@@ -111,7 +111,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
         InitCleanupParams();
         callback(CloseCallback);
     }
-    else { 
+    else if(type != InputWindow::EXPORT_IMAGE) { 
         
         const char *windowDisplayMsg = "Which structure do you want to\n display in the radial diagram?";
         Fl_Box *box = new Fl_Box(70, 5, 260, 40, windowDisplayMsg);
@@ -151,7 +151,7 @@ InputWindow::InputWindow(int w, int h, const char *label,
            (!GUI_KEEP_STICKY_FOLDER_NAMES || !stickyFolderNameFound))) {
             show();
         }
-        else {
+        else if(type != InputWindow::EXPORT_IMAGE) {
             InputCallback((Fl_Widget *) cbUseDefaultNames, (void *) NULL);
         }
 }

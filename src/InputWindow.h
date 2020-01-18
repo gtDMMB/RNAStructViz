@@ -46,7 +46,8 @@ class InputWindow : public Fl_Window
 	        FOLDER_INPUT,
         	FILE_INPUT, 
 		CTVIEWER_FILE_INPUT, 
-		RADIAL_LAYOUT_FILE_INPUT
+		RADIAL_LAYOUT_FILE_INPUT, 
+		EXPORT_IMAGE
     	};
 	
     	/* 
@@ -89,7 +90,7 @@ class InputWindow : public Fl_Window
 
 	static std::string ExtractStructureNameFromFile(const char *ctPath, InputWindow *inputWinRef = NULL);
 
-    private:
+    protected:
         Fl_Input *input; // Text field where the user types in the input
         Fl_Check_Button *cbUseDefaultNames;
 	Fl_Check_Button *cbKeepStickyFolders;
@@ -102,7 +103,12 @@ class InputWindow : public Fl_Window
 	int fileSelectionIndex;
 	bool windowDone;
 	bool stickyFolderNameFound, suggestedFolderNameFound;
-	
+
+    public:
+	int done() const { return windowDone; }
+
+    private:
+
 	/*
 	 * Even when GUI_KEEP_STICKY_FOLDER_NAMES is set to true, the prefered 
 	 * behavior is to uncheck the auto folder naming (and auto hashing to 

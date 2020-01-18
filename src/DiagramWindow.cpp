@@ -23,6 +23,7 @@
 #include "CairoDrawingUtils.h"
 #include "DisplayConfigWindow.h"
 #include "TerminalPrinting.h"
+#include "InputWindowExportImage.h"
 
 #include "pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c"
 #include "pixmaps/BaseColorPaletteButtonImage.c"
@@ -216,18 +217,17 @@ void DiagramWindow::checkBoxChangedStateCallback(Fl_Widget *, void *v) {
 }
 
 void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
-    Fl_Button *buttonPressed = (Fl_Button *) v;
-    if (buttonPressed->changed()) {
-        DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
+         Fl_Button *buttonPressed = (Fl_Button *) v;
+         DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
          bool userImageSaved = false;
          std::string exportFilePath = thisWindow->GetExportPNGFilePath();
-         if(exportFilePath.length() == 0) {
-              buttonPressed->clear_changed();          
-              return;
-         }
+         //if(exportFilePath.length() == 0) {
+         //     //buttonPressed->clear_changed();          
+         //     return;
+         //}
          cairo_surface_t *pngInitSource = cairo_get_target(thisWindow->crDraw);
          cairo_surface_t *pngSource = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
-                                                                                                                                       IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
+                                                                 IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
 							         IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
 							         PNG_IMAGE_PADDING + DWIN_PNG_FOOTER_HEIGHT);
          cairo_t *crImageOutput = cairo_create(pngSource);
@@ -245,10 +245,10 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
          cairo_set_line_width(crImageOutput, 2);
          cairo_move_to(crImageOutput, 0, IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2); 
          cairo_line_to(crImageOutput, IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
-		  IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2);
+		       IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + PNG_IMAGE_PADDING / 2);
          cairo_stroke(crImageOutput);
          cairo_select_font_face(crImageOutput, "Courier New", 
-                                                         CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+                                CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
          cairo_set_font_size(crImageOutput, 12);
          int offsetY = IMAGE_HEIGHT + GLWIN_TRANSLATEY + STRAND_MARKER_IMAGE_HEIGHT + 
 		  PNG_IMAGE_PADDING / 2 + 25;
@@ -281,16 +281,24 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
          //cairo_set_source_surface(crImageOutput, pngInitSource, 0, 0);
          //         cairo_rectangle(crImageOutput, 0, 0, IMAGE_HEIGHT, IMAGE_WIDTH);
          //         cairo_fill(crImageOutput);
-         if(cairo_surface_write_to_png(pngSource, exportFilePath.c_str()) != CAIRO_STATUS_SUCCESS) {
-	         TerminalText::PrintError("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));          
-                           fl_alert("ERROR WRITING PNG TO FILE: %s\n", strerror(errno));
+         Delete(thisWindow->ctFileSelectWin, InputWindow);
+	 thisWindow->ctFileSelectWin = new InputWindowExportImage(exportFilePath);
+	 InputWindowExportImage *imageTypeSelectWin = (InputWindowExportImage *) thisWindow->ctFileSelectWin;
+	 //while(!imageTypeSelectWin->visible()) {
+         //     Fl::wait(0.3);
+	 //}
+	 while(imageTypeSelectWin->visible() || !imageTypeSelectWin->done()) {
+	      Fl::wait(1.0);
+	 }
+	 if(!imageTypeSelectWin->WriteImageToFile(pngSource)) {
+	         TerminalText::PrintError("ERROR WRITING IMAGE \"%s\" TO FILE: %s\n", 
+				          imageTypeSelectWin->GetOutputFileSavePath().c_str(), strerror(errno));          
          }
          cairo_surface_destroy(pngSource);
          cairo_destroy(crImageOutput);
-         buttonPressed->clear_changed();
+         //buttonPressed->clear_changed();
          thisWindow->drawWidgets(NULL);
          thisWindow->redraw();
-    }
 }
 
 void DiagramWindow::resize(int x, int y, int w, int h) {
@@ -1413,12 +1421,12 @@ void DiagramWindow::RebuildMenus() {
               
               int offsetY = 25;
               exportButton = new Fl_Button(horizCheckBoxPos, offsetY, 
-                                           EXPORT_BUTTON_WIDTH, 25, "@filesaveas   Export PNG");
+                                           EXPORT_BUTTON_WIDTH, 25, "@filesaveas   Export Image");
               exportButton->type(FL_NORMAL_BUTTON);
               exportButton->callback(exportToPNGButtonPressHandler, exportButton);
               exportButton->labelcolor(GUI_BTEXT_COLOR);
               exportButton->labelfont(FL_HELVETICA);
-              exportButton->tooltip("Export the displayed arc diagram to PNG file");
+              exportButton->tooltip("Export the displayed arc diagram to image file");
      	      offsetY += 25;
      
               m_cbShowTicks = new Fl_Check_Button(horizCheckBoxPos + 4, offsetY, 
@@ -2019,21 +2027,25 @@ void DiagramWindow::WarnUserDrawingConflict() {
 
 std::string DiagramWindow::GetExportPNGFilePath() {
     const char *chooserMsg = "Choose a file name for your PNG output image ...";
-    const char *fileExtMask = "*.png";
+    const char *fileExtMask = "*.{png,svg,c}";
     time_t currentTime = time(NULL);
     struct tm *tmCurrentTime = localtime(&currentTime);
     char defaultFilePath[MAX_BUFFER_SIZE];
     defaultFilePath[0] = '\0';
-    //strcat(defaultFilePath, (char *) PNG_OUTPUT_DIRECTORY);
-    //strcat(defaultFilePath, defaultFilePath[strlen(defaultFilePath) - 1] == '/' ? "" : "/");
+    strcpy(defaultFilePath, (char *) PNG_OUTPUT_DIRECTORY);
+    size_t dirPathLength = strlen(defaultFilePath);
+    if(dirPathLength > 0 && defaultFilePath[dirPathLength - 1] != '/') {
+        strcat(defaultFilePath, "/");
+    }
     strftime(defaultFilePath + strlen(defaultFilePath), MAX_BUFFER_SIZE - 1, (char *) PNG_OUTPUT_PATH, 
              tmCurrentTime);
     Fl_Native_File_Chooser fileChooser;
-    fileChooser.directory((char *) PNG_OUTPUT_DIRECTORY);
+    //char *pngOutputDir = (char *) PNG_OUTPUT_DIRECTORY;
+    //fileChooser.directory(pngOutputDir);
     fileChooser.title(chooserMsg);
     fileChooser.type(Fl_Native_File_Chooser::BROWSE_SAVE_FILE);
     fileChooser.options(Fl_Native_File_Chooser::NEW_FOLDER | 
-                Fl_Native_File_Chooser::SAVEAS_CONFIRM);
+                        Fl_Native_File_Chooser::SAVEAS_CONFIRM);
     fileChooser.preset_file(defaultFilePath);
     switch(fileChooser.show()) {
         case -1: // ERROR
@@ -2048,7 +2060,7 @@ std::string DiagramWindow::GetExportPNGFilePath() {
       default:
          const char *outFileFullPath = fileChooser.filename();
 	 const char *dirMarkerPos = strrchr(outFileFullPath, '/');
-	 if(dirMarkerPos != NULL || (dirMarkerPos = strrchr(fileChooser.directory(), '/')) != NULL) {
+	 if(dirMarkerPos != NULL) {
 	      unsigned int charsToCopy = (unsigned int) (dirMarkerPos - outFileFullPath + 1);
 	      strncpy((char *) PNG_OUTPUT_DIRECTORY, outFileFullPath, charsToCopy);
               PNG_OUTPUT_DIRECTORY[charsToCopy] = '\0';
