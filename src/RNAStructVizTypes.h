@@ -44,6 +44,20 @@ typedef enum {
      FILETYPE_NONE,
 } InputFileTypeSpec;
 
+typedef enum {
+     OSTYPE_UNKNOWN          = 0, 
+     OSTYPE_MACOSX_DARWIN    = 1, 
+     OSTYPE_LINUX_GENERIC    = 2, 
+     OSTYPE_BSDUNIX_GENERIC  = 4, 
+     OSTYPE_OPENBSD          = 8,
+     OSTYPE_FREEBSD          = 32, 
+     OSTYPE_GNUHURD          = 64, 
+     OSTYPE_UNIX_GENERIC     = 128, 
+     OSTYPE_WINDOWS          = 256, 
+     OSTYPE_UNIX_ALL         = 0xffff & ~0x100, 
+     OSTYPE_ALL              = 0xffff,
+} OSPlatformType_t; 
+
 /* Custom widget classes: */
 class AutoloadIndicatorButton;
 class XMLExportButton;

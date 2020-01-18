@@ -35,9 +35,9 @@
 #endif
 
 static const char *BASE_LINE_INCL_LABELS[3][7] = {
-     { "► 1", "", "", "", "", "", "" }, 
-     { "► 1 & 2", "► 1", "► 2", "", "", "", "" }, 
-     { "► 1 & 2 & 3", "► 1", "► 2", "► 1 & 2", "► 1 & 3", "► 2 & 3", "► 3" },
+     { "> 1", "", "", "", "", "", "" }, 
+     { "> 1 & 2", "> 1", "> 2", "", "", "", "" }, 
+     { "> 1 & 2 & 3", "> 1", "> 2", "> 1 & 2", "> 1 & 3", "> 2 & 3", "> 3" },
 };
 
 const int DiagramWindow::ms_menu_minx[3] = { 
@@ -1065,62 +1065,67 @@ void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
             const RNAStructure::BaseData *baseData1 =
                     structures[0]->GetBaseAt(ui);
             if (baseData1->m_pair != RNAStructure::UNPAIRED &&
-                baseData1->m_pair > ui)
+		ui < baseData1->m_pair) {
                 counter1++;
+	    }
         }
         numPairs[0] = counter1;
     } else if (numStructures == 2) {
-        unsigned int counter1 = 0; //black
-        unsigned int counter2 = 0; //red
-        unsigned int counter3 = 0; //green
+        unsigned int counter1 = 0; // black (both structure 1 and 2)
+        unsigned int counter2 = 0; // red (structure 1 only)
+        unsigned int counter3 = 0; // green (structure 2 only)
         for (unsigned int ui = 0; ui < numBases; ++ui) {
             const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
             const RNAStructure::BaseData *baseData2 = structures[1]->GetBaseAt(ui);
-            if (baseData1->m_pair != RNAStructure::UNPAIRED &&
-                baseData1->m_pair > ui) {
-                if (baseData1->m_pair == baseData2->m_pair) {
+	    if (baseData1->m_pair != RNAStructure::UNPAIRED && 
+		baseData1->m_pair == baseData2->m_pair && 
+		baseData1->m_pair > ui) {
                     counter1++;
-                } else {
-                    if (baseData2->m_pair != RNAStructure::UNPAIRED &&
-                        baseData2->m_pair > ui) {
-                        counter3++;
-                    }
+		    //fprintf(stderr, "1 & 2: %d/%d/%d\n", ui, baseData1->m_index, baseData1->m_pair);
+            } 
+	    else {
+	         if (baseData1->m_pair != RNAStructure::UNPAIRED &&
+                     baseData1->m_pair > ui) {
                     counter2++;
-                }
-            } else if (baseData2->m_pair != RNAStructure::UNPAIRED &&
-                       baseData2->m_pair > ui) {
-                counter3++;
-            }
+		    //fprintf(stderr, "1: %d/%d/%d\n", ui, baseData1->m_index, baseData1->m_pair);
+                 } 
+	         if (baseData2->m_pair != RNAStructure::UNPAIRED &&
+                     baseData2->m_pair > ui) {
+		    counter3++;
+		    //fprintf(stderr, "2: %d/%d/%d\n", ui, baseData2->m_index, baseData2->m_pair);
+                 }
+	    }
         }
         numPairs[0] = counter1;
         numPairs[1] = counter2;
         numPairs[2] = counter3;
     } else if (numStructures == 3) {
-        unsigned int counter1 = 0; //black = in all 3 structures
-        unsigned int counter2 = 0; //red = in only structure 1
-        unsigned int counter3 = 0; //green = in only structure 2 
-        unsigned int counter4 = 0; //yellow = in structures 1 & 2
-        unsigned int counter5 = 0; //magenta = in structures 1 & 3
-        unsigned int counter6 = 0; //cyan = in structures 2 & 3
-        unsigned int counter7 = 0; //blue = in only structure 3
+        unsigned int counter1 = 0; // black = in all 3 structures
+        unsigned int counter2 = 0; // red = in only structure 1
+        unsigned int counter3 = 0; // green = in only structure 2 
+        unsigned int counter4 = 0; // yellow = in structures 1 & 2
+        unsigned int counter5 = 0; // magenta = in structures 1 & 3
+        unsigned int counter6 = 0; // cyan = in structures 2 & 3
+        unsigned int counter7 = 0; // blue = in only structure 3
         for (unsigned int ui = 0; ui < numBases; ++ui) {
             const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
             const RNAStructure::BaseData *baseData2 = structures[1]->GetBaseAt(ui);
             const RNAStructure::BaseData *baseData3 = structures[2]->GetBaseAt(ui);
             if (baseData1->m_pair != RNAStructure::UNPAIRED &&
                 baseData1->m_pair > ui) {
-                if (baseData1->m_pair == baseData2->m_pair) {
+                if (baseData1->m_pair == baseData2->m_pair && 
+		    baseData1->m_pair > ui) {
                     if (baseData1->m_pair == baseData3->m_pair) {
                         counter1++;
                     } else {
                         counter4++;
-
                         if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                             baseData3->m_pair > ui) {
                             counter7++;
                         }
                     }
-                } else if (baseData1->m_pair == baseData3->m_pair) {
+                } else if (baseData1->m_pair == baseData3->m_pair && 
+		           baseData1->m_pair > ui) {
                     counter5++;
 
                     if (baseData2->m_pair != RNAStructure::UNPAIRED &&
@@ -1129,7 +1134,6 @@ void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
                     }
                 } else {
                     counter2++;
-
                     if (baseData2->m_pair != RNAStructure::UNPAIRED &&
                         baseData2->m_pair > ui) {
                         if (baseData2->m_pair == baseData3->m_pair) {
@@ -1149,7 +1153,7 @@ void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
                 }
             } else if (baseData2->m_pair != RNAStructure::UNPAIRED &&
                        baseData2->m_pair > ui) {
-                if (baseData2->m_pair == baseData3->m_pair) {
+                if (baseData2->m_index == baseData3->m_pair) {
                     counter6++;
                 } else {
                     counter3++;

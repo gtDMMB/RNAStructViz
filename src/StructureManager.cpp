@@ -385,7 +385,7 @@ void StructureManager::AddFolder(RNAStructure* structure, const int index) {
      folders.push_back(nextFolder);
      //if(folders.size() == 1) {
      //     MainWindow::SetFolderSelected(0);
-     //	  MainWindow::ShowFolderSelected();
+     //	    MainWindow::ShowFolderSelected();
      //}
 }
 

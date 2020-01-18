@@ -192,6 +192,7 @@ class Folder {
 	 navCloseBtn->box(FL_PLASTIC_UP_BOX);
 	 navCloseBtn->callback(MainWindow::RemoveFolderCallback);
          guiPackingGroup->resizable(mainWindowFolderBtn);
+	 guiPackingGroup->show();
 	 guiPackingGroup->redraw();
 	 pack->end();
 	 pack->show();

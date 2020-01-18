@@ -246,3 +246,24 @@ static inline size_t StringFindNoCase(std::string needle, std::string haystack) 
      }
      return findIt - haystack.begin();
 }
+
+static inline std::string StringTextReplace(std::string initStr, std::string what, std::string with) {
+     size_t strStartWhere = initStr.find(what);
+     if(strStartWhere == std::string::npos)
+        return initStr;
+     initStr.replace(strStartWhere, what.length(), with);
+     return initStr;
+}
+
+#include <iostream>
+#include <sstream>
+
+static inline std::vector< std::string > SplitStringAt(std::string origStr, char splitDelim) {
+     std::vector< std::string > tokens_v;
+     std::istringstream iss(origStr);
+     std::string tokenStr;
+     while (std::getline(iss, tokenStr, splitDelim)) {
+          tokens_v.push_back(tokenStr);
+     }
+     return tokens_v;
+}
