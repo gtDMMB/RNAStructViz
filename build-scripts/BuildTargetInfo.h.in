@@ -9,11 +9,25 @@
 #ifdef TARGETOS_LINUX
      #define __TARGETOS_LINUX__
      #define TARGETOS "GNU/Linux"
+#elif defined(TARGETOS_OPENBSD)
+     #define __TARGETOS_OPENBSD__
+     #define TARGETOS "OpenBSD"
+#elif defined(TARGETOS_FREEBSD) 
+     #define __TARGETOS_FREEBSD__
+     #define TARGETOS "FreeBSD"
+#elif defined(TARGETOS_GNUHURD) 
+     #define __TARGETOS_GNUHURD__
+     #define TARGETOS "GNU/Hurd"
+#elif defined(TARGETOS_MACOSX)
+     #define __TARGETOS_APPLE__
+     #define TARGETOS "MacOSX/Darwin"
+#else 
+     #define TARGETOS_GENERIC_UNIX
+     #define __TARGETOS_UNIX__
+     #define TARGETOS "Generic Unix (Unknown Build Target)"
 #endif
 
 #ifdef TARGETOS_MACOSX
-     #define __TARGETOS_APPLE__
-     #define TARGETOS "Mac/OSX"
      #ifndef __APPLE__
           #define __APPLE__
      #endif
@@ -30,15 +44,6 @@
        }
           return strchrResult;
      }        
-#endif
-
-#ifdef TARGETOS_GENERIC_UNIX
-     #define __TARGETOS_UNIX__
-     #define TARGETOS "Unix"
-#endif
-
-#ifndef TARGETOS
-     #define TARGETOS "Unknown Build Target"
 #endif
 
 #ifdef __LOCAL_NOUSE_THREADS
@@ -82,7 +87,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.2.2-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.2.4-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 

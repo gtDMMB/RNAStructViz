@@ -30,8 +30,11 @@ std::string CommonDialogs::GetHelpInstructionsMessageString() {
           "Thank you for using our application! ", 
           "Please feel free to send us questions, comments, \n",
           "and/or leave us general feedback on your user experience by \n",
-          "by posting a new \nGitHub issue thread using the instructions at the following link:\n",
-          "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »", 
+          "by posting a new GitHub issue thread using the instructions at the following link:\n",
+          "« https://github.com/gtDMMB/RNAStructViz/wiki/BugReportingAndErrors »\n\n",
+	  "This dialog is displayed by default at start-up until you disable showing this message. ", 
+	  "To stop showing this message, uncheck the relevant checkbox under configuration settings\n", 
+	  "(view these by clicking on the \"User Config\" button in the left side window pane below).", 
      };
      std::string fullInstText;
      for(int bufline = 0; bufline < GetArrayLength(instTextBuffer); bufline++) {
@@ -54,21 +57,23 @@ void CommonDialogs::DisplayFirstRunInstructions() {
      int userHelpSelection = fl_choice("%s",
                                        "Copy WIKI link to clipboard", 
                                        "Copy sample structures to your home directory", 
-                                       "Do not show again at start-up", fullInstText.c_str());
+                                       "Load example structures", fullInstText.c_str());
      switch(userHelpSelection) {
           case 0: {
-               const char *firstTimeRunLink =
-                           "https://github.com/gtDMMB/RNAStructViz/wiki";
+               const char *firstTimeRunLink = "https://github.com/gtDMMB/RNAStructViz/wiki";
                Fl::copy(firstTimeRunLink, strlen(firstTimeRunLink), 1, Fl::clipboard_plain_text);
                break;
           }
           case 1: 
-           RNAStructViz::CopySampleStructures();
-           break;
-      case 2: {
-               DISPLAY_FIRSTRUN_MESSAGE = false;
-               ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+               RNAStructViz::CopySampleStructures();
                break;
+          case 2: {
+               //DISPLAY_FIRSTRUN_MESSAGE = false;
+               //ConfigParser::WriteUserConfigFile(USER_CONFIG_PATH);
+               RNAStructViz::CopySampleStructures();
+	       MainWindow *mainWinInst = MainWindow::GetInstance();
+	       mainWinInst->OpenFileCallback();
+	       break;
           }
           default:
                break;
