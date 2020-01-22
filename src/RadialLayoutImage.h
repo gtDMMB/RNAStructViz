@@ -28,13 +28,14 @@ extern "C" {
 
 #include "ConfigOptions.h"
 #include "CairoDrawingUtils.h"
+#include "InputWindowExportImage.h"
 
-#define DEFAULT_RLWIN_WIDTH           (750)
+#define DEFAULT_RLWIN_WIDTH           (825)
 #define DEFAULT_RLWIN_HEIGHT          (550)
 
 #define RADIAL_WIDGET_HEIGHT          (35)
 #define RADIAL_WIDGET_WIDTH           (50)
-#define RADIAL_BUTTON_WIDTH           (140)
+#define RADIAL_BUTTON_WIDTH           (150)
 #define RADIAL_WIDGET_SPACING         (10)
 #define SCROLL_SIZE                   (20)
 
@@ -111,7 +112,9 @@ class RadialLayoutDisplayWindow : public Fl_Cairo_Window, public RadialLayoutWin
 	  Fl_Box *scrollerFillBox;
 	  Fl_Button *scalePlusBtn, *scaleMinusBtn, *resetBtn;
 	  Fl_Button *exportToPNGBtn;
+	  Fl_Button *windowCloseBtn;
 	  Fl_Scroll *windowScroller;
+	  InputWindowExportImage *imgExportSelectWin;
 	  
 	  int buttonToolbarHeight;
 	  int cairoWinTranslateX, cairoWinTranslateY;

@@ -23,7 +23,6 @@
 #include "CairoDrawingUtils.h"
 #include "DisplayConfigWindow.h"
 #include "TerminalPrinting.h"
-#include "InputWindowExportImage.h"
 
 #include "pixmaps/FivePrimeThreePrimeStrandEdgesMarker.c"
 #include "pixmaps/BaseColorPaletteButtonImage.c"
@@ -77,8 +76,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     baseColorPaletteChangeBtn = NULL;
     radialDisplayWindow = NULL;
     ctFileSelectWin = NULL;
+    imgExportSelectWin = NULL;
 
-    //Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE);
     Fl::visual(FL_RGB);
     default_cursor(DIAGRAMWIN_DEFAULT_CURSOR);
     cursor(DIAGRAMWIN_DEFAULT_CURSOR);
@@ -221,10 +220,6 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
          DiagramWindow *thisWindow = (DiagramWindow *) buttonPressed->parent();
          bool userImageSaved = false;
          std::string exportFilePath = thisWindow->GetExportPNGFilePath();
-         //if(exportFilePath.length() == 0) {
-         //     //buttonPressed->clear_changed();          
-         //     return;
-         //}
          cairo_surface_t *pngInitSource = cairo_get_target(thisWindow->crDraw);
          cairo_surface_t *pngSource = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 
                                                                  IMAGE_WIDTH + GLWIN_TRANSLATEX + 5 * PNG_IMAGE_PADDING, 
@@ -278,25 +273,17 @@ void DiagramWindow::exportToPNGButtonPressHandler(Fl_Widget *, void *v) {
          // draw the source diagram image onto the PNG output image:
          thisWindow->m_redrawStructures = true;
          thisWindow->Draw(thisWindow, crImageOutput, false);
-         //cairo_set_source_surface(crImageOutput, pngInitSource, 0, 0);
-         //         cairo_rectangle(crImageOutput, 0, 0, IMAGE_HEIGHT, IMAGE_WIDTH);
-         //         cairo_fill(crImageOutput);
-         Delete(thisWindow->ctFileSelectWin, InputWindow);
-	 thisWindow->ctFileSelectWin = new InputWindowExportImage(exportFilePath);
-	 InputWindowExportImage *imageTypeSelectWin = (InputWindowExportImage *) thisWindow->ctFileSelectWin;
-	 //while(!imageTypeSelectWin->visible()) {
-         //     Fl::wait(0.3);
-	 //}
-	 while(imageTypeSelectWin->visible() || !imageTypeSelectWin->done()) {
+         Delete(thisWindow->imgExportSelectWin, InputWindowExportImage);
+	 thisWindow->imgExportSelectWin = new InputWindowExportImage(exportFilePath);
+	 while(thisWindow->imgExportSelectWin->visible() || !thisWindow->imgExportSelectWin->done()) {
 	      Fl::wait(1.0);
 	 }
-	 if(!imageTypeSelectWin->WriteImageToFile(pngSource)) {
-	         TerminalText::PrintError("ERROR WRITING IMAGE \"%s\" TO FILE: %s\n", 
-				          imageTypeSelectWin->GetOutputFileSavePath().c_str(), strerror(errno));          
+	 if(!thisWindow->imgExportSelectWin->WriteImageToFile(pngSource)) {
+	         TerminalText::PrintError("WRITING IMAGE \"%s\" TO FILE: %s\n", 
+				          thisWindow->imgExportSelectWin->GetOutputFileSavePath().c_str(), strerror(errno));          
          }
          cairo_surface_destroy(pngSource);
          cairo_destroy(crImageOutput);
-         //buttonPressed->clear_changed();
          thisWindow->drawWidgets(NULL);
          thisWindow->redraw();
 }

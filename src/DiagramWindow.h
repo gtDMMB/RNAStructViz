@@ -30,6 +30,7 @@ using std::max_element;
 #include "BranchTypeIdentification.h"
 #include "RadialLayoutImage.h"
 #include "InputWindow.h"
+#include "InputWindowExportImage.h"
 
 #define IMAGE_DIM                    (485)
 #define DIAGRAM_TO_IMAGE_RATIO       (0.85f)
@@ -266,6 +267,7 @@ private:
     std::string GetExportPNGFilePath();
 
     InputWindow *ctFileSelectWin;
+    InputWindowExportImage *imgExportSelectWin;
     volatile static DiagramWindow *currentDiagramWindowInstance;
     static bool redrawRefreshTimerSet;
     static vector<string> errorMsgQueue;
