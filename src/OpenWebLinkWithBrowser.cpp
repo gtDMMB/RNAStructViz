@@ -8,13 +8,14 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <sstring>
+#include <sstream>
 #include <array>
+#include <vector>
 
 #include "OpenWebLinkWithBrowser.h"
 #include "ConfigOptions.h"
 
-OSPlatformType_t WebBrowserUtils::GetActiveOSPlatform() {
+int WebBrowserUtils::GetActiveOSPlatform() {
      if(!strcmp(TARGETOS, "GNU/Linux")) {
           return OSTYPE_LINUX_GENERIC | OSTYPE_UNIX_GENERIC;
      }
@@ -37,8 +38,8 @@ OSPlatformType_t WebBrowserUtils::GetActiveOSPlatform() {
 }
 
 std::string WebBrowserUtils::GetActiveTerminalCommand() {
-     OSPlatformType_t osPlatform = WebBrowserUtils::GetActiveOSPlatform();
-     if(osPlatform == OSTYPE_MACOSX_DARWIN) {
+     int osPlatform = WebBrowserUtils::GetActiveOSPlatform();
+     if(osPlatform & OSTYPE_MACOSX_DARWIN) {
           static const char *macosTerminalCmd = "open -b com.apple.terminal @@#1@@";
 	  return std::string(macosTerminalCmd);
      }
@@ -50,10 +51,11 @@ std::string WebBrowserUtils::GetActiveTerminalCommand() {
      return std::string(termFromEnv) + "@@#1@@";
 }
 
-char * WebBrowserUtils::GetBaseWebBrowserCommand(bool includePath) {
+char * WebBrowserUtils::GetWebBrowserLaunchCommand(bool includePath) {
      unsigned int numDefinedBrowsers = GetArrayLength(WebBrowserUtils::WEBBROWSER_SPECS);
-     vector< std::pair<int, int> > availWebBrowserData;
-     vector<string> availWebBrowserCmdPaths;
+     std::vector< std::pair<int, int> > availWebBrowserData;
+     std::vector<string> availWebBrowserCmdPaths;
+     std::string cmdOutputStr = "";
      for(unsigned int wbi = 0; wbi < numDefinedBrowsers; wbi++) {
           if(system(WebBrowserUtils::WEBBROWSER_SPECS[wbi].webBrowserName) == -1) {
 	       continue;
@@ -61,7 +63,6 @@ char * WebBrowserUtils::GetBaseWebBrowserCommand(bool includePath) {
 	  char whichCmdSyntax[MAX_BUFFER_SIZE];
 	  snprintf(whichCmdSyntax, MAX_BUFFER_SIZE, "which %s", WebBrowserUtils::WEBBROWSER_SPECS[wbi].webBrowserName);
 	  char cmdOutputBuf[MAX_BUFFER_SIZE];
-          std::string cmdOutputStr = "";
           FILE* pipe = popen(whichCmdSyntax, "r");
           if (!pipe) throw std::runtime_error("popen() failed!");
           try {
@@ -73,6 +74,7 @@ char * WebBrowserUtils::GetBaseWebBrowserCommand(bool includePath) {
                throw stdoutReadExcpt;
           }
           pclose(pipe);
+	  fprintf(stderr, "WHICH CMD OUTPUT [% 2d]: %s\n", wbi + 1, cmdOutputStr.c_str());
 	  if(cmdOutputStr.empty() && includePath) {
 	       continue;
 	  }
@@ -88,13 +90,13 @@ char * WebBrowserUtils::GetBaseWebBrowserCommand(bool includePath) {
      if(availWebBrowserData.empty()) {
           return NULL;
      }
-     auto wbSortCompareFunc = [](const int &i, const int &j) { return i < j; };
+     auto wbSortCompareFunc = [](const std::pair<int, int> &i, const std::pair<int, int> &j) { return i.first < j.first; };
      std::sort(availWebBrowserData.begin(), availWebBrowserData.end(), wbSortCompareFunc);
      int wbSpecsDefaultIdx = availWebBrowserData[0].second;
 
      std::string wbBinaryCmd = std::string(includePath ? WebBrowserUtils::WEBBROWSER_SPECS[wbSpecsDefaultIdx].webBrowserName : 
 		                                         cmdOutputStr.c_str());
-     std::string wbRuntimeCmd += std::string(WebBrowserUtils::WEBBROWSER_SPECS[wbSpecsDefaultIdx].launchArgs);
+     std::string wbRuntimeCmd = std::string(WebBrowserUtils::WEBBROWSER_SPECS[wbSpecsDefaultIdx].launchArgs);
      if(WebBrowserUtils::WEBBROWSER_SPECS[wbSpecsDefaultIdx].standAloneAppLaunch) {
           std::string termRunCmdSyntax = WebBrowserUtils::GetActiveTerminalCommand();
 	  wbBinaryCmd = StringTextReplace(termRunCmdSyntax, TERMINAL_SYNTAX_COMMAND_PLACEHOLDER, wbRuntimeCmd.c_str());
@@ -104,7 +106,7 @@ char * WebBrowserUtils::GetBaseWebBrowserCommand(bool includePath) {
      size_t browserCmdNumChars = wbRuntimeCmd.length();
      char *returnBrowserRunCmd = (char *) malloc((browserCmdNumChars + 1) * sizeof(char));
      sprintf(returnBrowserRunCmd, "%s", 
-	     includePath ? WebBrowserUtils::WEBBROWSER_SPECS[wbi].webBrowserName : cmdOutputStr.c_str());
+	     includePath ? WebBrowserUtils::WEBBROWSER_SPECS[wbSpecsDefaultIdx].webBrowserName : cmdOutputStr.c_str());
      return returnBrowserRunCmd;
 }
 
@@ -112,15 +114,16 @@ bool WebBrowserUtils::LaunchWebBrowserAtLink(const char *linkURL, bool copyToCli
      char *wbLaunchSyntax = WebBrowserUtils::GetWebBrowserLaunchCommand(true);
      bool writeClipboard = copyToClipboard || (wbLaunchSyntax == NULL && copyToClipboardOnFail);
      if(writeClipboard) {
-          Fl::copy(linkURL, strlen(linkURL), 1, Fl::);
+          Fl::copy(linkURL, strlen(linkURL), 1, Fl::clipboard_plain_text);
      }
      if(wbLaunchSyntax == NULL) {
           return false;
      }
-     std::string wbLaunchCmd = std::string(wbLaunchSytntax);
+     std::string wbLaunchCmd = std::string(wbLaunchSyntax);
      wbLaunchCmd = StringTextReplace(wbLaunchCmd, WEBBROWSER_SYNTAX_COMMAND_PLACEHOLDER, linkURL);
-     std::vector< std::string > commandLineArgs = SplitString(wbLaunchCmd, ' ');
-     const char **execArgv = (char **) malloc(commandLineArgs.size() * sizeof(char *));
+     fprintf(stderr, "WEB START CMD: %s\n", wbLaunchCmd.c_str());
+     std::vector< std::string > commandLineArgs = SplitStringAt(wbLaunchCmd, ' ');
+     char **execArgv = (char **) malloc(commandLineArgs.size() * sizeof(char *));
      for(int cli = 0; cli < commandLineArgs.size(); cli++) {
           execArgv[cli] = (char *) malloc((commandLineArgs[cli].length() + 1) * sizeof(char));
 	  sprintf(execArgv[cli], "%s", commandLineArgs[cli].c_str());

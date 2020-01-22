@@ -10,6 +10,7 @@
 #include "ConfigParser.h"
 #include "RNAStructViz.h"
 #include "ConfigExterns.h"
+#include "OpenWebLinkWithBrowser.h"
 
 std::string CommonDialogs::GetHelpInstructionsMessageString() {
 
@@ -62,7 +63,8 @@ void CommonDialogs::DisplayFirstRunInstructions() {
           case 0: {
                const char *firstTimeRunLink = "https://github.com/gtDMMB/RNAStructViz/wiki";
                Fl::copy(firstTimeRunLink, strlen(firstTimeRunLink), 1, Fl::clipboard_plain_text);
-               break;
+	       //WebBrowserUtils::LaunchWebBrowserAtLink(firstTimeRunLink);
+	       break;
           }
           case 1: 
                RNAStructViz::CopySampleStructures();

@@ -21,7 +21,7 @@
 
 namespace WebBrowserUtils {
 
-     OSPlatformType_t GetActiveOSPlatform();
+     int GetActiveOSPlatform();
      
      static inline const char *TERMINAL_SYNTAX_COMMAND_PLACEHOLDER = "@@#1@@";
      std::string GetActiveTerminalCommand();
@@ -49,7 +49,7 @@ namespace WebBrowserUtils {
           },
           { 
 	        "chrome",                  
-                "",          
+                "@@#1@@ --new-window \"@@#2@@\"",          
                 WEBLINK_SYNTAX_COMMAND_PLACEHOLDER,  
                 true,   
                 OSTYPE_ALL,          
@@ -57,7 +57,7 @@ namespace WebBrowserUtils {
           }, 
 	  { 
 	        "google-chrome",                  
-                "",          
+                "@@#1@@ --new-window \"@@#2@@\"",          
                 WEBLINK_SYNTAX_COMMAND_PLACEHOLDER,  
                 true,   
                 OSTYPE_ALL,          
@@ -81,15 +81,15 @@ namespace WebBrowserUtils {
           }, 
           { 
 	        "opera",                   
-                "",          
+                "@@#1@@ --ran-launcher --remote \"@@#2@@\"",          
                 WEBLINK_SYNTAX_COMMAND_PLACEHOLDER,  
                 true,   
                 OSTYPE_UNIX_ALL,     
                 9 
           },
           { 
-                "epiphany",                
-     	        "",          
+                "epiphany-browser",                
+     	        "@@#1@@ \"@@#2@@\"",          
 		WEBLINK_SYNTAX_COMMAND_PLACEHOLDER,  
 		true,   
 		OSTYPE_UNIX_ALL,     
@@ -97,7 +97,7 @@ namespace WebBrowserUtils {
 	  },
           { 
 		"konqueror",               
-	        "",          
+	        "@@#1@@ \"@@#2@@\"",          
 		WEBLINK_SYNTAX_COMMAND_PLACEHOLDER,  
 		true,   
 		OSTYPE_UNIX_ALL,     
@@ -140,7 +140,7 @@ namespace WebBrowserUtils {
                 "open -b @@#1@@ @@#2@@ TODO",          
 		WEBLINK_SYNTAX_COMMAND_PLACEHOLDER,  
 		true,   
-		OSTYPE_MACOS_DARWIN, 
+		OSTYPE_MACOSX_DARWIN, 
 		3 
 	  },  
      };
