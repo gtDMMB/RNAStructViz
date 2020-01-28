@@ -8,7 +8,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
-#include <Fl/Fl_Box.H>
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 
 #include <stdio.h>
