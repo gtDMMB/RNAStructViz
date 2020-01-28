@@ -783,9 +783,9 @@ void DiagramWindow::Draw3(cairo_t *cr, RNAStructure **structures, const int reso
     for (unsigned int ui = 0; ui < numBases; ++ui) {
         const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
         if(m_cbDrawBases->value()) {
-         DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
+             DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
                       radius + 7.5f);
-    }
+        }
 
         const RNAStructure::BaseData *baseData2 = structures[1]->GetBaseAt(ui);
         const RNAStructure::BaseData *baseData3 = structures[2]->GetBaseAt(ui);
@@ -1188,18 +1188,17 @@ void DiagramWindow::ComputeCircle(
     if (denom < 0.001) {
         cX = cY = 0.0f;
         r = 0.0f;
+        return;
     }
 
     double sq1 = x1 * x1 + y1 * y1;
     double sq2 = x2 * x2 + y2 * y2;
     double sq3 = x3 * x3 + y3 * y3;
 
-    cX = (sq1 * (y2 - y3) - y1 * (sq2 - sq3) + sq2 * y3 - y2 * sq3) / (2.0 *
-                                                                       denom);
-    cY = (x1 * (sq2 - sq3) - sq1 * (x2 - x3) + sq3 * x2 - x3 * sq2) / (2.0 *
-                                                                       denom);
-
+    cX = (sq1 * (y2 - y3) - y1 * (sq2 - sq3) + sq2 * y3 - y2 * sq3) / (2.0 * denom);
+    cY = (x1 * (sq2 - sq3) - sq1 * (x2 - x3) + sq3 * x2 - x3 * sq2) / (2.0 * denom);
     r = sqrt((x1 - cX) * (x1 - cX) + (y1 - cY) * (y1 - cY));
+
 }
 
 void DiagramWindow::DrawArc(
@@ -1314,11 +1313,14 @@ void DiagramWindow::ComputeDiagramParams(
         float &angleBase,
         float &angleDelta,
         float &radius) {
-    angleDelta = (M_PI * 2.0f - 0.05f) / (float) numBases;
-    angleBase = 1.5f * M_PI - 0.025f;
+    //angleDelta = (M_PI * 2.0f - 0.05f) / (float) numBases;
+    //angleBase = 1.5f * M_PI - 0.025f;
+    angleDelta = (M_PI * 2.0f) / (float) numBases;
+    angleBase = 1.5f * M_PI;
     centerX = (float) resolution / DIAGRAM_TO_IMAGE_RATIO / 2.0f;
     centerY = (float) resolution / DIAGRAM_TO_IMAGE_RATIO / 2.0f;
-    radius = (resolution + 10.f) / 2.0f;
+    //radius = (resolution + 10.f) / 2.0f;
+    radius = resolution / 2.0f;
 }
 
 void DiagramWindow::AddStructure(const int index) {
@@ -1730,7 +1732,7 @@ bool DiagramWindow::ParseZoomSelectionArcIndices() {
      for(int idx = 0; idx < 2; idx++) { 
 
       int hlineC = horizLineConsts[idx];
-          int hlineSqrtTerm = (int) sqrt(abs(radiusR - Square(hlineC - y0)));
+      int hlineSqrtTerm = (int) sqrt(abs(radiusR - Square(hlineC - y0)));
       bool alreadyHitPoint = false;
       term = x0 - hlineSqrtTerm;
       if(term >= 0 && term >= zx0 && term <= zx0 + zw) { 
@@ -1930,7 +1932,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      
      int firstStructIndex = m_structures[0];
      size_t totalNumTicks = RNAStructViz::GetInstance()->GetStructureManager()->
-                                      GetStructure(firstStructIndex)->GetLength();
+                                          GetStructure(firstStructIndex)->GetLength();
      size_t numTicks = MIN(totalNumTicks, DWINARC_MAX_TICKS) + 1;
      double arcOriginX = IMAGE_WIDTH / 2, arcOriginY = IMAGE_HEIGHT / 2; 
      double arcRadius = DIAGRAM_WIDTH / 2, arcRadiusDelta = 2, arcRadiusTextDelta = 4;
@@ -1955,7 +1957,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
           cairo_line_to(curWinContext, tickOuterX, tickOuterY);
           cairo_stroke(curWinContext);
           int numericLabel = (int) (totalNumTicks * t * DWINARC_LABEL_PCT);
-          snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d\0", numericLabel);
+          snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d", numericLabel);
           cairo_text_extents_t textDims;
           cairo_text_extents(curWinContext, numericLabelStr, &textDims);
           int textSize = MAX(textDims.width, textDims.height);

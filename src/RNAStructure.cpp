@@ -994,32 +994,33 @@ const char* RNAStructure::GetSuggestedStructureFolderName() {
         strncpy(m_suggestedFolderName, searchForStructStrings[sidx].c_str(), MAX_BUFFER_SIZE + 1);
         m_suggestedFolderName[MAX_BUFFER_SIZE] = '\0';
         for(int rsidx = 0; rsidx < GetArrayLength(filePathReplaceChars); rsidx++) { 
-         StringTranslateCharacters(m_suggestedFolderName, 
-                           filePathReplaceChars[rsidx][0], 
-                       filePathReplaceChars[rsidx][1]);
+           StringTranslateCharacters(m_suggestedFolderName, 
+                                     filePathReplaceChars[rsidx][0], 
+                                     filePathReplaceChars[rsidx][1]);
      }
     char *dotPos = NULL, *checkStr = m_suggestedFolderName;
     size_t strOffset = 0, sfnLen = strnlen(m_suggestedFolderName, MAX_BUFFER_SIZE);
     while(*(dotPos = strchrnul(checkStr, '.')) != '\0') {
          strOffset = (size_t) (dotPos - m_suggestedFolderName);
          checkStr = dotPos + 1;
-         if(strOffset > 0 && isupper(m_suggestedFolderName[strOffset - 1])) { 
+         if(strOffset > 0 && (isupper(m_suggestedFolderName[strOffset - 1]) || strOffset == 1)) { 
               size_t endingLowerPos = strOffset + 1;
-          while((endingLowerPos < sfnLen) && islower(m_suggestedFolderName[endingLowerPos])) {
-               endingLowerPos++;
+              while((endingLowerPos < sfnLen) && islower(m_suggestedFolderName[endingLowerPos])) {
+                  endingLowerPos++;
+              }
+              size_t orgSubnameLen = endingLowerPos - strOffset - 1;
+              if(orgSubnameLen > 0) {
+                   char structName[MAX_BUFFER_SIZE + 1];
+                   strncpy(structName, &(m_suggestedFolderName[strOffset - 1]), 2);
+                   structName[0] = toupper(structName[0]);
+		   structName[2] = ' ';
+                   strncpy(structName + 3, &(m_suggestedFolderName[strOffset + 1]), orgSubnameLen);
+                   structName[orgSubnameLen + 3] = '\0';
+                   strcpy(m_suggestedFolderName, structName);
+                   foundMatch = true;
+                   break;
+              }
           }
-          size_t orgSubnameLen = endingLowerPos - strOffset - 1;
-          if(orgSubnameLen > 0) {
-               char structName[MAX_BUFFER_SIZE + 1];
-               strncpy(structName, &(m_suggestedFolderName[strOffset - 1]), 2);
-               structName[2] = ' ';
-               strncpy(structName + 3, &(m_suggestedFolderName[strOffset + 1]), orgSubnameLen);
-               structName[orgSubnameLen + 3] = '\0';
-               strcpy(m_suggestedFolderName, structName);
-               foundMatch = true;
-               break;
-          }
-         }
         }
         if(foundMatch) { 
              break;
