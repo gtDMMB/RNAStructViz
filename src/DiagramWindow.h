@@ -33,7 +33,7 @@ using std::max_element;
 #include "InputWindowExportImage.h"
 
 #define IMAGE_DIM                    (485)
-#define DIAGRAM_TO_IMAGE_RATIO       (0.85f)
+#define DIAGRAM_TO_IMAGE_RATIO       (0.9f)
 #define IMAGE_WIDTH                  (IMAGE_DIM)
 #define DIAGRAM_WIDTH                (DIAGRAM_TO_IMAGE_RATIO * IMAGE_WIDTH)
 #define IMAGE_HEIGHT                 (IMAGE_DIM)

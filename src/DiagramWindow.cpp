@@ -343,10 +343,12 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
                     (intptr_t) (m_menuItems[m_menus[j]->value()].user_data()));
             if (sequences[j]->GetLength() > 1000) {
                 pixelWidth = 1;
-            } else if (sequences[j]->GetLength() <= 1000 && 
+            } 
+	    else if (sequences[j]->GetLength() <= 1000 && 
                        sequences[j]->GetLength() >= 500) {
                 pixelWidth = 2;
-            } else {
+            } 
+	    else {
                 pixelWidth = 3;
             }
         }
@@ -406,7 +408,7 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
 
 void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr, bool redrawWidgets) {
 
-     DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
+    DiagramWindow *thisWindow = (DiagramWindow *) thisCairoWindow;
     thisWindow->cursor(FL_CURSOR_WAIT);
     if(redrawWidgets) {
          thisWindow->drawWidgets(cr);
@@ -483,7 +485,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr, bool red
 
 void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
                                  const int *structParams, 
-                 const int resolution) {
+                                 const int resolution) {
 
     int priorFont = fl_font();
     int priorFontSize = fl_size();
@@ -1031,11 +1033,11 @@ void DiagramWindow::Draw1(cairo_t *cr, RNAStructure **structures, const int reso
     for (unsigned int ui = 0; ui < numBases; ++ui) {
         const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
         if(m_cbDrawBases->value()) { 
-         DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
+             DrawBase(ui, baseData1->m_base, centerX, centerY, angleBase, angleDelta,
                       radius + 7.5f);
-    }
+        }
 
-        if (baseData1->m_pair != RNAStructure::UNPAIRED
+	if (baseData1->m_pair != RNAStructure::UNPAIRED
             && baseData1->m_pair > ui) {
             fl_color(STRUCTURE_DIAGRAM_COLORS[0][0]);
              SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[0][0]);
@@ -1183,13 +1185,13 @@ void DiagramWindow::ComputeCircle(
         double &cX,
         double &cY,
         double &r) {
+    
     double denom = x1 * (y2 - y3) - y1 * (x2 - x3) + x2 * y3 - y2 * x3;
-
-    if (denom < 0.001) {
-        cX = cY = 0.0f;
-        r = 0.0f;
-        return;
-    }
+    //if (denom < 0.25) {
+    //    cX = cY = 0.0f;
+    //    r = 0.0f;
+    //    return;
+    //}
 
     double sq1 = x1 * x1 + y1 * y1;
     double sq2 = x2 * x2 + y2 * y2;
@@ -1227,12 +1229,11 @@ void DiagramWindow::DrawArc(
     double arcX = 0.0f;
     double arcY = 0.0f;
     double arcR = 0.0f;
-    ComputeCircle(xPosn1, yPosn1, xPosn2, yPosn2, xPosn3, yPosn3, arcX, arcY,
-                  arcR);
+    ComputeCircle(xPosn1, yPosn1, xPosn2, yPosn2, xPosn3, yPosn3, arcX, arcY, arcR);
 
     int boundX = (int) (arcX - arcR);
     int boundY = (int) (arcY - arcR);
-    int boundSize = (int) (2.0f * arcR);
+    int boundSize = (int) (2.0 * arcR);
     double arc1 = 180.0 / M_PI * atan2(arcY - yPosn1, xPosn1 - arcX);
     double arc2 = 180.0 / M_PI * atan2(arcY - yPosn2, xPosn2 - arcX);
 
@@ -1245,12 +1246,14 @@ void DiagramWindow::DrawArc(
         arc1 += 360.0;
     if (arc1 - arc2 > 180.0)
         arc2 += 360.0;
+    while(arc1 < 0.0) arc1 += 360.0;
+    while(arc2 < 0.0) arc2 += 360.0;
     if (arc2 > arc1) {
         cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, 
-          boundingBoxRadius, arc1, arc2);
+                  boundingBoxRadius, arc1, arc2);
     } else {
         cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, 
-              boundingBoxRadius, arc2, arc1);
+                  boundingBoxRadius, arc2, arc1);
     }
     cairo_stroke(cr);
 }
