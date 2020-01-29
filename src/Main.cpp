@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     
     Fl_Tooltip::enable(1);
     Fl_Tooltip::color(Darker(GUI_WINDOW_BGCOLOR, 0.91f));
-    Fl_Tooltip::font(FL_HELVETICA_ITALIC);
+    Fl_Tooltip::font(FL_HELVETICA);
     Fl_Tooltip::textcolor(Lighter(GUI_BTEXT_COLOR, 0.75f));
     Fl_Tooltip::wrap_width(290);
     //Fl_Tooltip::size(LOCAL_TEXT_SIZE);

@@ -1335,8 +1335,8 @@ bool DiagramWindow::GetMouseoverArcDiagramBoundingCircle(int x, int y, int &sele
      while(biCoordTheta < 0.0) biCoordTheta += 2.0f * M_PI;
      int biCoordThetaIntMod = biCoordTheta * 180.0 / M_PI;
      biCoordThetaIntMod = fmod(biCoordThetaIntMod, 360);
-     fprintf(stderr, "  >> (X, Y) = (%d, %d), InitTheta=%d,%d\n", biCoordX, biCoordY, 
-             (int) (biCoordTheta * 180.0 / M_PI), (int) (biCoordTheta * 180.0 / M_PI) % 360);
+     //fprintf(stderr, "  >> (X, Y) = (%d, %d), InitTheta=%d,%d\n", biCoordX, biCoordY, 
+     //        (int) (biCoordTheta * 180.0 / M_PI), (int) (biCoordTheta * 180.0 / M_PI) % 360);
      selectedBaseIdx = (int) ceilf(DiagramWindow::lastClickSequenceLength / 360.0 * biCoordThetaIntMod);
      double edist = sqrt(Square(x - biCoordX) + Square(y - biCoordY));
      return (int) edist <= GLWIN_ARCTOL;
