@@ -46,7 +46,7 @@ using std::max_element;
 
 #define GLWIN_TRANSLATEX             (85)
 #define GLWIN_TRANSLATEY             (110)
-#define GLWIN_ARCTOL                 (25)
+#define GLWIN_ARCTOL                 (10)
 
 #define WIDGET_SPACING               (35)
 #define EXPORT_BUTTON_WIDTH          (140)
@@ -213,9 +213,10 @@ private:
 		float& angleDelta,
 		float& radius);
 
+    static inline Fl_Cursor currentCursor = DIAGRAMWIN_DEFAULT_CURSOR;
     static inline char m_baseIndexTooltipLabel[64] = { '\0' };
-    bool GetMouseoverArcDiagramBoundingCircle(int x, int y, int &selectedBaseIdx, 
-		                              int &biCoordX, int &biCoordY) const;
+    static bool GetMouseoverArcDiagramBoundingCircle(int x, int y, int &selectedBaseIdx, 
+		                                     int &biCoordX, int &biCoordY);
 
     static void MenuCallback(Fl_Widget *widget, void *userData);
     static void ChangeBaseColorPaletteCallback(Fl_Widget *btn, void *udata);
@@ -273,9 +274,13 @@ private:
     void WarnUserDrawingConflict();
     std::string GetExportPNGFilePath();
 
+    static inline int lastClickX = -1, lastClickY = -1;
+    static inline int lastClickSequenceLength = 0;
+    static void DisplayBaseIndexTimerCallback(void *udata);
+
     InputWindow *ctFileSelectWin;
     InputWindowExportImage *imgExportSelectWin;
-    volatile static DiagramWindow *currentDiagramWindowInstance;
+    static DiagramWindow *currentDiagramWindowInstance;
     static bool redrawRefreshTimerSet;
     static vector<string> errorMsgQueue;
 

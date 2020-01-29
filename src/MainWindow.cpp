@@ -29,7 +29,6 @@ namespace fs = boost::filesystem;
 #include "pixmaps/RNAWindowIcon.xbm"
 #include "pixmaps/HelpIcon.c"
 #include "pixmaps/InfoButton.c"
-#include "pixmaps/ShortcutsIcon.c"
 
 Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
            HelpIcon.pixel_data, 

@@ -50,7 +50,7 @@ const int DiagramWindow::ms_menu_width = 190;
 vector<string> DiagramWindow::errorMsgQueue;
 bool DiagramWindow::errorAlertDisplayShown = false;
 
-volatile DiagramWindow * DiagramWindow::currentDiagramWindowInstance = NULL;
+DiagramWindow * DiagramWindow::currentDiagramWindowInstance = NULL;
 bool DiagramWindow::redrawRefreshTimerSet = false;
 
 void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) {
@@ -1317,28 +1317,29 @@ void DiagramWindow::ComputeDiagramParams(
         float &angleBase,
         float &angleDelta,
         float &radius) {
-    //angleDelta = (M_PI * 2.0f - 0.05f) / (float) numBases;
-    //angleBase = 1.5f * M_PI - 0.025f;
     angleDelta = (M_PI * 2.0f) / (float) numBases;
     angleBase = 1.5f * M_PI;
     centerX = (float) resolution / DIAGRAM_TO_IMAGE_RATIO / 2.0f;
     centerY = (float) resolution / DIAGRAM_TO_IMAGE_RATIO / 2.0f;
-    //radius = (resolution + 10.f) / 2.0f;
     radius = resolution / 2.0f;
 }
 
-bool DiagramWindow::GetMouseoverArcDiagramBoundingCircle(int x, int y, int &selectedBaseIdx, int &biCoordX, int &biCoordY) const {
+bool DiagramWindow::GetMouseoverArcDiagramBoundingCircle(int x, int y, int &selectedBaseIdx, int &biCoordX, int &biCoordY) {
      double originX = GLWIN_TRANSLATEX + IMAGE_DIM / 2;
      double originY = GLWIN_TRANSLATEY + IMAGE_DIM / 2;
-     double radius = IMAGE_DIM / 2;
+     double radius = DIAGRAM_WIDTH / 2;
      double denom = sqrt((x - originX) * (x - originX) + (y - originY) * (y - originY));
      biCoordX = originX + radius * (x - originX) / denom;
      biCoordY = originY + radius * (y - originY) / denom;
-     double biCoordTheta = -atan2(biCoordX - originX, biCoordY - originY) * 180.0 / M_PI - 90.0;
-     while(biCoordTheta < 0.0) biCoordTheta += 360.0;
-     selectedBaseIdx = (int) (sequenceLength * 360.0 / biCoordTheta);
+     double biCoordTheta = atan2(-(biCoordY - originY), -(biCoordX - originX)) + M_PI_2;
+     while(biCoordTheta < 0.0) biCoordTheta += 2.0f * M_PI;
+     int biCoordThetaIntMod = biCoordTheta * 180.0 / M_PI;
+     biCoordThetaIntMod = fmod(biCoordThetaIntMod, 360);
+     fprintf(stderr, "  >> (X, Y) = (%d, %d), InitTheta=%d,%d\n", biCoordX, biCoordY, 
+             (int) (biCoordTheta * 180.0 / M_PI), (int) (biCoordTheta * 180.0 / M_PI) % 360);
+     selectedBaseIdx = (int) ceilf(DiagramWindow::lastClickSequenceLength / 360.0 * biCoordThetaIntMod);
      double edist = sqrt(Square(x - biCoordX) + Square(y - biCoordY));
-     return edist <= GLWIN_ARCTOL;
+     return (int) edist <= GLWIN_ARCTOL;
 }
 
 void DiagramWindow::AddStructure(const int index) {
@@ -1596,34 +1597,50 @@ int DiagramWindow::handle(int flEvent) {
       case FL_HIDE:
            return 1;
       case FL_PUSH: { // mouse down
-           int bcx, bcy, bcBaseIdx;
-	   if(GetMouseoverArcDiagramBoundingCircle(Fl::event_x(), Fl::event_y(), bcx, bcy, bcBaseIdx)) {
-		Fl::lock();
-		sprintf(DiagramWindow::m_baseIndexTooltipLabel, "%d", bcBaseIdx + 1);
-		Fl::unlock();
-                Fl_Tooltip::enter_area(this, bcx, bcy, 5, 1, DiagramWindow::m_baseIndexTooltipLabel);
+           if(Fl::event_x() < GLWIN_TRANSLATEX || 
+              Fl::event_y() < (int) 1.25 * GLWIN_TRANSLATEY) {
+	        Fl_Cairo_Window::handle(flEvent);
+	        return 1;
 	   }
-	   if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
-                Fl::event_y() >= (int) 1.25 * GLWIN_TRANSLATEY) {
+	   Fl::lock();
+	   DiagramWindow::lastClickX = Fl::event_x();
+	   DiagramWindow::lastClickY = Fl::event_y();
+	   DiagramWindow::lastClickSequenceLength = sequenceLength;
+	   DiagramWindow::currentDiagramWindowInstance = this;
+	   //if(!zoomButtonDown) {
+	   //     DiagramWindow::currentCursor = FL_CURSOR_HELP;
+	   //     this->cursor(FL_CURSOR_HELP);
+	   //}
+	   Fl::unlock();
+	   Fl::remove_timeout(DiagramWindow::DisplayBaseIndexTimerCallback);
+	   Fl::add_timeout(0.6, DiagramWindow::DisplayBaseIndexTimerCallback);
+	   if(!zoomButtonDown) {
                 zoomButtonDown = true;
                 initZoomX = Fl::event_x();
                 initZoomY = Fl::event_y();
-                this->cursor(FL_CURSOR_MOVE);
-                Fl_Cairo_Window::handle(flEvent);
            }
-           return 1;
+           Fl_Cairo_Window::handle(flEvent);
+	   return 1;
       }
       case FL_RELEASE:
-           if(zoomButtonDown) {
-                lastZoomX = Fl::event_x();
+           Fl::lock();
+	   DiagramWindow::lastClickX = -1;
+	   DiagramWindow::lastClickY = -1;
+	   Fl::unlock();
+	   if(zoomButtonDown) {
+                DiagramWindow::currentCursor = DIAGRAMWIN_DEFAULT_CURSOR;
+	        this->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
+		lastZoomX = Fl::event_x();
                 lastZoomY = Fl::event_y();
-                this->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
                 zoomButtonDown = false;
                 haveZoomBuffer = true;
                 HandleUserZoomAction();
            }
+	   return 1;
       case FL_DRAG:
            if(zoomButtonDown) {
+	       DiagramWindow::currentCursor = FL_CURSOR_MOVE;
+	       this->cursor(FL_CURSOR_MOVE);
                lastZoomX = Fl::event_x();
                lastZoomY = Fl::event_y();
                zx0 = initZoomX;
@@ -2085,8 +2102,39 @@ std::string DiagramWindow::GetExportPNGFilePath() {
     }
 }
 
+void DiagramWindow::DisplayBaseIndexTimerCallback(void *udata) {
+     Fl::lock();
+     int lastClickX = DiagramWindow::lastClickX, lastClickY = DiagramWindow::lastClickY;
+     DiagramWindow::lastClickX = -1;
+     DiagramWindow::lastClickY = -1;
+     //if(DiagramWindow::currentCursor == FL_CURSOR_HELP) {
+     //     DiagramWindow::currentCursor = FL_CURSOR_MOVE;
+     //	  DiagramWindow::currentDiagramWindowInstance->cursor(FL_CURSOR_MOVE);
+     //}
+     //else {
+     //     DiagramWindow::currentCursor = DIAGRAMWIN_DEFAULT_CURSOR;
+     //	  DiagramWindow::currentDiagramWindowInstance->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
+     //}
+     Fl::unlock();
+     if(lastClickX > 0 && lastClickY > 0) {
+	   int bcx, bcy, bcBaseIdx;
+	   if(DiagramWindow::GetMouseoverArcDiagramBoundingCircle(lastClickX, lastClickY, bcBaseIdx, bcx, bcy)) {
+		int baseIdxLower = MAX(0, bcBaseIdx + 1 - DiagramWindow::lastClickSequenceLength * DWINARC_LABEL_PCT / 2);
+		int baseIdxUpper = MIN(DiagramWindow::lastClickSequenceLength, 
+				       lastClickSequenceLength * DWINARC_LABEL_PCT / 2 + bcBaseIdx + 1);
+		Fl::lock();
+		sprintf(DiagramWindow::m_baseIndexTooltipLabel, "Base Index: [%d, %d]", baseIdxLower, baseIdxUpper);
+		Fl::unlock();
+		Fl::belowmouse(DiagramWindow::currentDiagramWindowInstance);
+		Fl_Tooltip::enter_area(DiagramWindow::currentDiagramWindowInstance, 
+				       0, bcy, 0, 0, DiagramWindow::m_baseIndexTooltipLabel);
+		TerminalText::PrintInfo("Identified target base index as #%d\n", bcBaseIdx + 1);
+	   }
+     }
+}
+
 void DiagramWindow::setAsCurrentDiagramWindow() const {
-     DiagramWindow::currentDiagramWindowInstance = (volatile DiagramWindow *) this;
+     DiagramWindow::currentDiagramWindowInstance = (DiagramWindow *) this;
 }
 
 void DiagramWindow::RedrawWidgetsTimerCallback(void *udata) {
