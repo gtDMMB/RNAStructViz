@@ -68,7 +68,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     diagramButton->box(FL_RSHADOW_BOX);
     //diagramButton->box(FL_PLASTIC_UP_BOX);
     diagramButton->labeltype(FL_SHADOW_LABEL);
-    diagramButton->tooltip("Open the arc and radial layout diagram viewer windows");
+    diagramButton->tooltip("Open the arc and radial layout diagram viewer windows ... ");
 
     statsButton = new Fl_Button(x + NAVBUTTONS_OFFSETX + 7 + opButtonWidth + 
                                            spacingHeight, yOffset + spacingHeight, 
@@ -80,7 +80,7 @@ FolderWindow::FolderWindow(int x, int y, int wid, int hgt,
     statsButton->box(FL_RSHADOW_BOX);
     //statsButton->box(FL_PLASTIC_UP_BOX);
     statsButton->labeltype(FL_SHADOW_LABEL);
-    statsButton->tooltip("Open a window to generate comparitive statistics about the selected sequence");
+    statsButton->tooltip("Open a window to view statistics about the selected sequence and loaded structures ... ");
 
     const char *fileInstText = "@filenew   Files.\n  Click on the file buttons to view\n  " 
 	                       "CT-style structure pairing data\n  in new window.";

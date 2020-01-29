@@ -3,6 +3,7 @@
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Enumerations.H>
 #include <FL/names.h>
+#include <FL/Fl_Tooltip.H>
 
 #include <stdio.h>
 #include <string.h>
@@ -1326,6 +1327,20 @@ void DiagramWindow::ComputeDiagramParams(
     radius = resolution / 2.0f;
 }
 
+bool DiagramWindow::GetMouseoverArcDiagramBoundingCircle(int x, int y, int &selectedBaseIdx, int &biCoordX, int &biCoordY) const {
+     double originX = GLWIN_TRANSLATEX + IMAGE_DIM / 2;
+     double originY = GLWIN_TRANSLATEY + IMAGE_DIM / 2;
+     double radius = IMAGE_DIM / 2;
+     double denom = sqrt((x - originX) * (x - originX) + (y - originY) * (y - originY));
+     biCoordX = originX + radius * (x - originX) / denom;
+     biCoordY = originY + radius * (y - originY) / denom;
+     double biCoordTheta = -atan2(biCoordX - originX, biCoordY - originY) * 180.0 / M_PI - 90.0;
+     while(biCoordTheta < 0.0) biCoordTheta += 360.0;
+     selectedBaseIdx = (int) (sequenceLength * 360.0 / biCoordTheta);
+     double edist = sqrt(Square(x - biCoordX) + Square(y - biCoordY));
+     return edist <= GLWIN_ARCTOL;
+}
+
 void DiagramWindow::AddStructure(const int index) {
     if (std::find(m_structures.begin(), m_structures.end(), index) == m_structures.end()) {
         m_structures.push_back(index);
@@ -1580,16 +1595,24 @@ int DiagramWindow::handle(int flEvent) {
            return 1;
       case FL_HIDE:
            return 1;
-      case FL_PUSH: // mouse down
-           if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
+      case FL_PUSH: { // mouse down
+           int bcx, bcy, bcBaseIdx;
+	   if(GetMouseoverArcDiagramBoundingCircle(Fl::event_x(), Fl::event_y(), bcx, bcy, bcBaseIdx)) {
+		Fl::lock();
+		sprintf(DiagramWindow::m_baseIndexTooltipLabel, "%d", bcBaseIdx + 1);
+		Fl::unlock();
+                Fl_Tooltip::enter_area(this, bcx, bcy, 5, 1, DiagramWindow::m_baseIndexTooltipLabel);
+	   }
+	   if(!zoomButtonDown && Fl::event_x() >= GLWIN_TRANSLATEX && 
                 Fl::event_y() >= (int) 1.25 * GLWIN_TRANSLATEY) {
                 zoomButtonDown = true;
                 initZoomX = Fl::event_x();
                 initZoomY = Fl::event_y();
                 this->cursor(FL_CURSOR_MOVE);
                 Fl_Cairo_Window::handle(flEvent);
-                return 1;
            }
+           return 1;
+      }
       case FL_RELEASE:
            if(zoomButtonDown) {
                 lastZoomX = Fl::event_x();
@@ -1894,7 +1917,7 @@ void DiagramWindow::RedrawStrandEdgeMarker(cairo_t *curWinContext) {
           return;
      }
      // __Give the 5' | 3' distinction note below the diagram:__
-     // NOTE: to mark this distinction and avoid "ugly" artifacts 
+     // NOTE: to mark this distinction and avoid uglier artifacts 
      // around the curvature of the circle drawing with pure cairo, 
      // we have just constructed the raw bits for a custom 
      // image we have constructed to distinguish this marker. 

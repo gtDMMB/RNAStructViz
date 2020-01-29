@@ -29,6 +29,7 @@ namespace fs = boost::filesystem;
 #include "pixmaps/RNAWindowIcon.xbm"
 #include "pixmaps/HelpIcon.c"
 #include "pixmaps/InfoButton.c"
+#include "pixmaps/ShortcutsIcon.c"
 
 Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
            HelpIcon.pixel_data, 
@@ -131,6 +132,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	//openButton->box(FL_PLASTIC_UP_BOX);
 	openButton->labelfont(FL_HELVETICA);
 	openButton->labeltype(FL_SHADOW_LABEL);
+        openButton->tooltip("Load structures from the user's hard drive ... ");
 
         // The button to open configuration settings:
         configOptionsButton = new Fl_Button( 
@@ -145,6 +147,7 @@ MainWindow::MainWindow(int argc, char **argv)
 	configOptionsButton->box(FL_RSHADOW_BOX);
 	//configOptionsButton->box(FL_PLASTIC_UP_BOX);
 	configOptionsButton->labeltype(FL_SHADOW_LABEL);
+	configOptionsButton->tooltip("Launch new window to display user configuration settings ... ");
 
         const char *foldersInstText = "@fileopen   Folders.\n  A list of sequences for which\n  "
 		                      "structure files are loaded.";
@@ -865,11 +868,11 @@ void MainWindow::RethemeMainWindow() {
          ms_instance->columnLabel->labelcolor(GUI_BTEXT_COLOR);
          ms_instance->columnLabel->redraw();
          if(ms_instance->selectedFolderIndex >= 0) {
-                  FolderWindow *curFolderWin = (FolderWindow *) 
+             FolderWindow *curFolderWin = (FolderWindow *) 
                    RNAStructViz::GetInstance()->
                    GetStructureManager()->
                    GetFolders()[ms_instance->selectedFolderIndex];
-          curFolderWin->RethemeFolderWindow();
+             curFolderWin->RethemeFolderWindow();
          }
          Fl::scheme((char *) FLTK_THEME);
          Fl::redraw();

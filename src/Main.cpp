@@ -6,6 +6,7 @@
 
 #include <FL/Fl.H>
 #include <FL/Enumerations.H>
+#include <FL/Fl_Tooltip.H>
 
 #if WITHGPERFTOOLS > 0
      #include <gperftools/heap-profiler.h>
@@ -63,6 +64,15 @@ int main(int argc, char **argv) {
     MainWindow::ResetThemeColormaps();
     fl_font(LOCAL_BFFONT, LOCAL_TEXT_SIZE);
     
+    Fl_Tooltip::enable(1);
+    Fl_Tooltip::color(Darker(GUI_WINDOW_BGCOLOR, 0.91f));
+    Fl_Tooltip::font(FL_HELVETICA_ITALIC);
+    Fl_Tooltip::textcolor(Lighter(GUI_BTEXT_COLOR, 0.75f));
+    Fl_Tooltip::wrap_width(290);
+    //Fl_Tooltip::size(LOCAL_TEXT_SIZE);
+    //Fl_Tooltip::margin_height(1);
+    //Fl_Tooltip::margin_width(1);
+
     Fl::add_handler(RNAStructViz::HandleEscapeKeypressEvent);
     //Fl::add_handler(RNAStructViz::HandleGlobalKeypressEvent);
 
