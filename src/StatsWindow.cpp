@@ -69,7 +69,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         mww = menu_window->w();
         mwh = menu_window->h();
         ref_menu = new Fl_Choice(mwx+20,mwy+ 60, mww-65, 30, 
-                   "Select Reference Structure:");
+                                 "Select Reference Structure:");
         ref_menu->labelcolor(GUI_TEXT_COLOR);
         ref_menu->textcolor(GUI_BTEXT_COLOR);
         ref_menu->labelfont(FL_HELVETICA_BOLD_ITALIC);
@@ -83,8 +83,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         dividerTextBox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CENTER);
 
         comp_menu = new Fl_Scroll(mwx+20,mwy+ 120, mww-65, 
-                mwh-120-90 - 50, 
-                "Structures for Comparison:");
+                                  mwh-120-90 - 50, 
+                                  "Structures for Comparison:");
         {    
             comp_pack = new Fl_Pack(mwx+20,mwy+120,mww-60,150);
             comp_pack->type(Fl_Pack::VERTICAL);
@@ -98,20 +98,19 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
         comp_menu->color(GUI_WINDOW_BGCOLOR);
         comp_menu->end();
         
-        calc_button = new Fl_Toggle_Button(mwx+20, mwy+ mwh-60, 185, 
+        calc_button = new Fl_Toggle_Button(mwx+20, mwy+ mwh-60, 205, 
                                            30, "@refresh   Calculate");
         calc_button->callback(CalcCallback);
         calc_button->labelcolor(GUI_BTEXT_COLOR); 
         calc_button->labelfont(FL_HELVETICA);
 
         selectAllCompsBtn = new Fl_Button(mwx + 20, mwy + mwh - 100, 
-                                          185, 30, "@redo   Compare All");
+                                          205, 30, "@redo   Compare All");
         selectAllCompsBtn->callback(SelectAllButtonCallback);
         selectAllCompsBtn->labelcolor(GUI_BTEXT_COLOR);
         selectAllCompsBtn->labelfont(FL_HELVETICA);
 
-
-        menu_window->resizable(comp_menu);
+        //menu_window->resizable(comp_menu);
     }
     menu_window->end();
     ref_menu->callback(ReferenceCallback, &comp_pack);
@@ -967,7 +966,9 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
     for (int i=0; i < window->comp_pack->children(); i++)
     {
         Fl_Check_Button* button = (Fl_Check_Button *) window->comp_pack->child(i);
-        button->color(GUI_WINDOW_BGCOLOR);
+        button->box(FL_PLASTIC_UP_BOX);
+	button->down_box(FL_PLASTIC_DOWN_BOX);
+	button->color(GUI_WINDOW_BGCOLOR);
         button->labelcolor(GUI_TEXT_COLOR);
         button->labelfont(FL_HELVETICA);
         button->selection_color(GUI_WINDOW_BGCOLOR);    
@@ -975,7 +976,6 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
         {
             button->value(1);
             button->deactivate();
-	    // TODO: draw legend here ... 
         }
         else
         {
@@ -983,7 +983,12 @@ void StatsWindow::ReferenceCallback(Fl_Widget* widget, void* userData)
              button->activate();
         }
 	if(button->value()) {
+	     char tempBtnLabel[MAX_BUFFER_SIZE];
+	     strcpy(tempBtnLabel, button->label());
+	     button->label("");
+	     button->redraw();
 	     button->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	     button->copy_label(tempBtnLabel);
 	}
 	button->redraw();
     }
@@ -1006,11 +1011,21 @@ void StatsWindow::MenuCallback(Fl_Widget* widget, void* userData)
     }
     Fl_Check_Button *cb = (Fl_Check_Button *) widget;
     if(cb->value() && strcmp(cb->label(), window->ref_menu->mvalue()->label())) {
-         cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
-	 cb->activate();
+         char tempBtnLabel[MAX_BUFFER_SIZE];
+	 strcpy(tempBtnLabel, cb->label());
+	 cb->label("");
+	 cb->redraw();
+	 cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	 cb->copy_label(tempBtnLabel);
+	 //cb->activate();
     }
     else {
+	 char tempBtnLabel[MAX_BUFFER_SIZE];
+	 strcpy(tempBtnLabel, cb->label());
+	 cb->label("");
+	 cb->redraw();
 	 cb->labelfont(FL_HELVETICA);
+         cb->copy_label(tempBtnLabel);
     }
     cb->redraw();
 
@@ -1070,13 +1085,23 @@ void StatsWindow::SelectAllButtonCallback(Fl_Widget *saBtn, void *udata) {
         if(cbidx != window->referenceIndex && strncmp(window->ref_menu->mvalue()->label(),
                                                       "Please select a reference", 25)) { 
             cb->value(1);
-	    cb->activate();
+	    //cb->activate();
+	    char tempBtnLabel[MAX_BUFFER_SIZE];
+	    strcpy(tempBtnLabel, cb->label());
+	    cb->label("");
+	    cb->redraw();
 	    cb->labelfont(FL_HELVETICA_BOLD_ITALIC);
+	    cb->copy_label(tempBtnLabel);
         }
         else {
 	    cb->value(1);
-            cb->deactivate();
+            //cb->deactivate();
+	    char tempBtnLabel[MAX_BUFFER_SIZE];
+	    strcpy(tempBtnLabel, cb->label());
+	    cb->label("");
+	    cb->redraw();
 	    cb->labelfont(FL_HELVETICA);
+	    cb->copy_label(tempBtnLabel);
 	    if(cbidx != window->referenceIndex && noRefMsgDisplayed) {
 	         fl_alert("Please select a reference structure first.");
 		 noRefMsgDisplayed = false;
@@ -1138,7 +1163,7 @@ void StatsWindow::ComputeStats()
     
     for (int i=0; i < comp_pack->children(); i++)
     {
-        Fl_Check_Button* button = (Fl_Check_Button*)comp_pack->child(i);
+        Fl_Check_Button* button = (Fl_Check_Button *) comp_pack->child(i);
         if (button->value() == 1)
         {
             numStats++;        
@@ -1170,8 +1195,7 @@ void StatsWindow::ComputeStats()
     // Use a different counter so statsIndex will be 0 if it's the reference and counter otherwise
     for (int i = comp_pack->children() - 1; i >= 0; i--)
     {
-        Fl_Check_Button* button = 
-                (Fl_Check_Button*)comp_pack->child(i);
+        Fl_Check_Button* button = (Fl_Check_Button *) comp_pack->child(i);
 	if(button->value() == 1)
         {
             // Find the corresponding structure
@@ -2254,8 +2278,8 @@ void StatsWindow::BuildCompMenu()
             if (strcmp(ref_menu->mvalue()->label(), structure->GetFilename()))
             {
                 Fl_Check_Button* button = new Fl_Check_Button(comp_pack->x(),
-                                                              comp_pack->y() + 30 + lastBtnY, comp_pack->w(), 24, 
-                                                              structure->GetFilename());
+                                                              comp_pack->y() + 30 + lastBtnY, 218, //comp_pack->w() - 12, 
+							      24, structure->GetFilename());
                 button->color(GUI_WINDOW_BGCOLOR);
                 button->labelcolor(GUI_TEXT_COLOR);
                 button->labelfont(FL_HELVETICA);

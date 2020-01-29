@@ -168,7 +168,7 @@ MainWindow::MainWindow(int argc, char **argv)
                                         dividerTextHeight - 50);
         m_structureInfo->type(Fl_Scroll::VERTICAL_ALWAYS);
 	m_structureInfo->color(Darker(GUI_BGCOLOR, 0.23));
-        m_packedInfo = new Fl_Pack(0, 105 + upperYOffset + navButtonsLabelHeight + 
+	m_packedInfo = new Fl_Pack(0, 105 + upperYOffset + navButtonsLabelHeight + 
                        dividerTextHeight + 15, 270,
                        360 - upperYOffset - navButtonsLabelHeight - dividerTextHeight - 50);
         m_packedInfo->type(Fl_Pack::VERTICAL);
@@ -187,14 +187,16 @@ MainWindow::MainWindow(int argc, char **argv)
     menu_collapse = new Fl_Button(300, 0, 15, 450, "@>");
     menu_collapse->callback(CollapseMainCallback);
     menu_collapse->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5));
+    menu_collapse->box(FL_PLASTIC_UP_BOX);
     menu_collapse->tooltip("Click to collapse or expand main menu pane");
-    menu_collapse->deactivate();
+    menu_collapse->activate();
 
     folder_collapse = new Fl_Button(315, 0, 15, 450, "@<");
     folder_collapse->callback(CollapseFolderCallback);
     folder_collapse->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5));
+    folder_collapse->box(FL_PLASTIC_UP_BOX);
     folder_collapse->tooltip("Click to collapse or expand folder menu pane");
-    folder_collapse->deactivate();
+    folder_collapse->activate();
 
     folderWindowPane = new Fl_Group(330, 0, 320, 450, "");
     folderWindowPane->end();
@@ -389,6 +391,7 @@ void MainWindow::CollapseMainMenu()
             ms_instance->folderWindowPane->position(30, 0);
             
             ms_instance->folder_collapse->deactivate();
+	    ms_instance->folder_collapse->box(FL_PLASTIC_DOWN_BOX);
         }
         else 
         {
@@ -409,6 +412,7 @@ void MainWindow::CollapseMainMenu()
             ms_instance->folderWindowPane->position(330, 0);
             
             ms_instance->folder_collapse->activate();
+	    ms_instance->folder_collapse->box(FL_PLASTIC_UP_BOX);
         }
     }
 }
@@ -432,6 +436,7 @@ void MainWindow::CollapseFolderPane()
             ms_instance->m_mainWindow->size(330, 450);
             ms_instance->m_mainWindow->resizable(ms_instance->mainMenuPane);
             ms_instance->menu_collapse->deactivate();
+	    ms_instance->menu_collapse->box(FL_PLASTIC_DOWN_BOX);
         }
         else 
         {
@@ -440,6 +445,7 @@ void MainWindow::CollapseFolderPane()
             button->label("@<");
             folderMenu->show();
             ms_instance->menu_collapse->activate();
+	    ms_instance->menu_collapse->box(FL_PLASTIC_UP_BOX);
         }
     }
 }
@@ -460,6 +466,7 @@ void MainWindow::CollapseAlwaysFolderPane()
         ms_instance->m_mainWindow->size(330, 450);
         ms_instance->m_mainWindow->resizable(ms_instance->mainMenuPane);
         ms_instance->menu_collapse->deactivate();
+	ms_instance->menu_collapse->box(FL_PLASTIC_DOWN_BOX);
     }
 }
 
@@ -472,6 +479,7 @@ void MainWindow::ExpandAlwaysFolderPane()
     button->label("@<");
     folderMenu->show();
     ms_instance->menu_collapse->activate();
+    ms_instance->menu_collapse->box(FL_PLASTIC_UP_BOX);
 }
 
 void MainWindow::CollapseFolderCallback(Fl_Widget* widget, void* userData)
