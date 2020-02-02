@@ -390,8 +390,8 @@ int RNAStructViz::CopySampleStructures() {
           return EINVAL;
      }
      if(ConfigParser::directoryExists(USER_SAMPLE_STRUCTS_PATH.c_str())) {
-          TerminalText::PrintInfo("User home sample structure directory already exists: \"%s\"\n", 
-                                  USER_SAMPLE_STRUCTS_PATH.c_str());
+          TerminalText::PrintWarning("User home sample structure directory already exists: \"%s\"\n", 
+                                     USER_SAMPLE_STRUCTS_PATH.c_str());
      }
      else {
 	  fs::path lastDirPath(USER_SAMPLE_STRUCTS_PATH);
