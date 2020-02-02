@@ -1965,6 +1965,7 @@ void StatsWindow::DrawLegend()
                 leg1_ref->color(GUI_TEXT_COLOR);
 		leg1_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 		leg1_ref->labelsize(11);
+		leg1_ref->copy_tooltip(statistics[ui].filename);
 		leg1_ref->show();
             }
             else
@@ -1979,6 +1980,7 @@ void StatsWindow::DrawLegend()
                 entry->labelcolor(GUI_TEXT_COLOR);
                 entry->labelfont(FL_HELVETICA);
 		entry->labelsize(11);
+		entry->copy_tooltip(statistics[ui].filename);
                 entry->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
                 k++;
             }
@@ -1999,6 +2001,7 @@ void StatsWindow::DrawLegend()
                 leg2_ref->color(GUI_TEXT_COLOR);
 		leg2_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 		leg2_ref->labelsize(11);
+		leg2_ref->copy_tooltip(statistics[ui].filename);
 		leg2_ref->show();
             }
             else
@@ -2014,6 +2017,7 @@ void StatsWindow::DrawLegend()
                 entry->labelfont(FL_HELVETICA);
                 entry->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
                 entry->labelsize(11);
+		entry->copy_tooltip(statistics[ui].filename);
 		k++;
             }
         }
@@ -2033,6 +2037,7 @@ void StatsWindow::DrawLegend()
                 leg3_ref->color(GUI_TEXT_COLOR);
 		leg3_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 		leg3_ref->labelsize(11);
+		leg3_ref->copy_tooltip(statistics[ui].filename);
 		leg3_ref->show();
             }
             else
@@ -2048,6 +2053,7 @@ void StatsWindow::DrawLegend()
                 entry->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
                 entry->labelfont(FL_HELVETICA);
                 entry->labelsize(11);
+		entry->copy_tooltip(statistics[ui].filename);
 		k++;
             }
         }
@@ -2067,6 +2073,7 @@ void StatsWindow::DrawLegend()
                 leg4_ref->color(GUI_TEXT_COLOR);
 		leg4_ref->labelcolor(GUI_WINDOW_BGCOLOR);
 		leg4_ref->labelsize(11);
+		leg4_ref->copy_tooltip(statistics[ui].filename);
 		leg4_ref->show();
                 if (ui%28 >= 0 && ui%28 <7)
                 {
@@ -2103,6 +2110,7 @@ void StatsWindow::DrawLegend()
                     entry->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
                     entry->labelfont(FL_HELVETICA);
                     entry->labelsize(11);
+		    entry->copy_tooltip(statistics[ui].filename);
 
                     // Add symbol label in color
                     entry = new Fl_Box(FL_NO_BOX,leg4_pack->x(),leg4_pack->y()+k*20,
@@ -2110,7 +2118,8 @@ void StatsWindow::DrawLegend()
                     entry->labelcolor(statistics[ui].color);
                     entry->labelfont(FL_HELVETICA);
 		    entry->labelsize(11);
-                    if (ui%28 >= 0 && ui%28 <7)
+                    entry->copy_tooltip(statistics[ui].filename);
+		    if (ui%28 >= 0 && ui%28 <7)
                     {
                         entry->label("@circle");
                     } 
