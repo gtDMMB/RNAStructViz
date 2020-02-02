@@ -413,8 +413,8 @@ int RNAStructViz::CopySampleStructures() {
                 try {
                      fs::copy_file(ssCurPath, destDir / ssCurPath.filename());
                 } catch(boost::filesystem::filesystem_error fse) {
-                     TerminalText::PrintInfo("Cannot copy \"%s\" into home directory (file already exists)\n", 
-                                             ssCurPath.filename().c_str());
+                     TerminalText::PrintWarning("Cannot copy \"%s\" into home directory (file already exists)\n", 
+                                                ssCurPath.filename().c_str());
                 }
            }
            ++ssFile;
