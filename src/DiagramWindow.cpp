@@ -1999,7 +1999,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
           cairo_move_to(curWinContext, tickStartX, tickStartY);
           cairo_line_to(curWinContext, tickOuterX, tickOuterY);
           cairo_stroke(curWinContext);
-          int numericLabel = (int) (totalNumTicks * t * DWINARC_LABEL_PCT);
+          int numericLabel = (int) ((totalNumTicks - 1) * t * DWINARC_LABEL_PCT);
           snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d", numericLabel);
           cairo_text_extents_t textDims;
           cairo_text_extents(curWinContext, numericLabelStr, &textDims);
