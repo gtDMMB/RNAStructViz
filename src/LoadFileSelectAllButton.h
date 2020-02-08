@@ -61,11 +61,13 @@ class SelectAllButton : public Fl_Pack {
 	  Fl_Group        *saSubWidgetGroupContainer;
 	  Fl_Box          *saWidgetInstBox;
 	  Fl_Button       *selectAllBtn, *selectAllHomeBtn;
-	  Fl_Check_Button *cbRecDirSearch, *cbHiddenDirSearch;
+	  Fl_Button       *rescanDirBtn;
+          Fl_Check_Button *cbRecDirSearch, *cbHiddenDirSearch;
 	  Fl_Check_Button *cbFollowSymlinks, *cbAvoidStructDuplicates;
 
 	  static void FileChooserSelectAllCallback(Fl_Widget *saBtn, void *udata);
 	  static void FileChooserSelectAllInHomeCallback(Fl_Widget *saBtn, void *udata);
+          static void FileChooserRescanDirectoryCallback(Fl_Widget *rescanBtn, void *udata);
 
 	  static inline Fl_Boxtype containerWidgetBorderStyle = FL_ROUNDED_FRAME;
 	  static inline Fl_Boxtype instLabelStyle             = FL_RSHADOW_BOX;
@@ -74,6 +76,7 @@ class SelectAllButton : public Fl_Pack {
 
 	  static inline const char *selectAllBtnLabel         = "@filenew  Select All Files";
 	  static inline const char *selectAllHomeBtnLabel     = "@search   Search All In User Home";
+          static inline const char *rescanDirBtnLabel         = "@reload";
 	  static inline const char *selectAllWidgetInstsLabel = "Click on the buttons below to select all files whose\n"
 		                                                "extensions match the file filter settings in the\n"
 								"drop down menu selection at the top of this dialog.";

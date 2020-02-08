@@ -33,7 +33,7 @@ SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int 
      saWidgetInstBox->labelfont(FL_HELVETICA_ITALIC);
      saWidgetInstBox->box(SelectAllButton::instLabelStyle);
      offsetY += 2 * NAVBUTTONS_BHEIGHT + SAWIDGET_PADDING;
-     offsetX += 2 * SAWIDGET_PADDING;
+     offsetX += SAWIDGET_PADDING;
 
      selectAllBtn = new Fl_Button(offsetX, offsetY, NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
 		                  SelectAllButton::selectAllBtnLabel);
@@ -45,9 +45,9 @@ SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int 
      selectAllBtn->user_data((void *) this);
      selectAllBtn->box(SelectAllButton::buttonBoxStyle);
      selectAllBtn->labeltype(SelectAllButton::buttonLabelStyle);
-     offsetX += NAVBUTTONS_BWIDTH + SAWIDGET_PADDING;
+     offsetX += SAWIDGET_PADDING + NAVBUTTONS_BWIDTH;
 
-     selectAllHomeBtn = new Fl_Button(offsetX, offsetY, 1.75 * NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
+     selectAllHomeBtn = new Fl_Button(offsetX, offsetY, 1.6 * NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
 		                      SelectAllButton::selectAllHomeBtnLabel);
      selectAllHomeBtn->color(Lighter(GUI_WINDOW_BGCOLOR, 0.5f));
      selectAllHomeBtn->labelcolor(GUI_BTEXT_COLOR);
@@ -57,6 +57,19 @@ SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int 
      selectAllHomeBtn->user_data((void *) this);
      selectAllHomeBtn->box(SelectAllButton::buttonBoxStyle);
      selectAllHomeBtn->labeltype(SelectAllButton::buttonLabelStyle);
+     offsetX += 1.6 * NAVBUTTONS_BWIDTH + SAWIDGET_PADDING;
+
+     rescanDirBtn = new Fl_Button(offsetX, offsetY, 0.35 * NAVBUTTONS_BWIDTH, NAVBUTTONS_BHEIGHT, 
+		                  SelectAllButton::rescanDirBtnLabel);
+     rescanDirBtn->color(Lighter(GUI_WINDOW_BGCOLOR, 0.5f));
+     rescanDirBtn->labelcolor(GUI_BTEXT_COLOR);
+     rescanDirBtn->labelsize(12);
+     rescanDirBtn->labelfont(FL_HELVETICA_BOLD_ITALIC);
+     rescanDirBtn->callback(SelectAllButton::FileChooserRescanDirectoryCallback);
+     rescanDirBtn->user_data((void *) this);
+     rescanDirBtn->box(SelectAllButton::buttonBoxStyle);
+     rescanDirBtn->labeltype(SelectAllButton::buttonLabelStyle);
+     rescanDirBtn->tooltip("Refresh directory listing ... ");
      offsetY += NAVBUTTONS_BHEIGHT + SAWIDGET_PADDING;
      offsetX = x() + 4.5 * SAWIDGET_PADDING;
 
@@ -88,7 +101,6 @@ SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int 
      for(int cbnum = 0; cbnum < numCheckBoxes; cbnum++) {
           *(saWidgetCheckButtons[cbnum]) = new Fl_Check_Button(offsetX, offsetY, w() - 6.5 * SAWIDGET_PADDING, 
 			                                       0.75 * NAVBUTTONS_BHEIGHT, saWidgetCBLabels[cbnum]);
-          //(*(saWidgetCheckButtons[cbnum]))->label(saWidgetCBLabels[cbnum]);
           saWidgetCBEnabled[cbnum] ? (*(saWidgetCheckButtons[cbnum]))->activate() : (*(saWidgetCheckButtons[cbnum]))->deactivate();
           *(saWidgetCBValues[cbnum]) ? (*(saWidgetCheckButtons[cbnum]))->set() : (*(saWidgetCheckButtons[cbnum]))->clear();
           (*(saWidgetCheckButtons[cbnum]))->color(Darker(GUI_WINDOW_BGCOLOR, 0.8f));
@@ -112,8 +124,9 @@ SelectAllButton::~SelectAllButton() {
      Delete(cbAvoidStructDuplicates, Fl_Check_Button);
      Delete(selectAllBtn, Fl_Button);
      Delete(selectAllHomeBtn, Fl_Button);
+     Delete(rescanDirBtn, Fl_Button);
      Delete(saWidgetInstBox, Fl_Box);
-     remove(saSubWidgetGroupContainer);
+     //remove(saSubWidgetGroupContainer);
      Delete(saSubWidgetGroupContainer, Fl_Group);
      Free(selectedFileFilter);
 }
@@ -166,6 +179,11 @@ void SelectAllButton::FileChooserSelectAllInHomeCallback(Fl_Widget *wbtn, void *
      saBtn->selectAllInHome = true;
      saBtn->SetWidgetState();
      saBtn->flFileChooserRef->hide();
+}
+
+void SelectAllButton::FileChooserRescanDirectoryCallback(Fl_Widget *wbtn, void *udata) {
+     SelectAllButton *saBtn = (SelectAllButton *) wbtn->user_data();
+     saBtn->flFileChooserRef->rescan_keep_filename();
 }
 
 bool SelectAllButton::LoadAllFilesFromDirectory(std::string dirPathStr, const char *fileFilter, 

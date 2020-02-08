@@ -524,6 +524,11 @@ bool MainWindow::CreateFileChooser() {
 	TerminalText::PrintError("Error: getcwd failed. Cannot create file chooser.\n");
         return false;
     }
+    if(m_fileChooser != NULL) {
+        SelectAllButton *saBtnWidget = (SelectAllButton *) m_fileChooser->add_extra(NULL);
+        Delete(saBtnWidget, SelectAllButton);
+        m_fileChooserSelectAllBtn = NULL;
+    }
     Delete(m_fileChooser, Fl_File_Chooser);
     if(m_fileChooser == NULL) {
          m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
@@ -550,13 +555,20 @@ bool MainWindow::CreateFileChooser() {
     m_fileChooser->textcolor(GUI_TEXT_COLOR);
     m_fileChooser->color(GUI_WINDOW_BGCOLOR);
     m_fileChooser->showHiddenButton->value(true); // show hidden files by default
+    m_fileChooser->previewButton->value(true);
+    m_fileChooser->new_directory_label = "@+  New Directory";
+    m_fileChooser->newButton->value(true);
     m_fileChooser->favorites_label = "  @search  Goto Favorites ...";
-     
+    m_fileChooser->show_label = "Filter By:";
+    m_fileChooser->filename_label = "Selected File:";
+    m_fileChooser->ok_label("Load Files  @return");
+ 
     // add select all button:
     Delete(m_fileChooserSelectAllBtn, SelectAllButton);
     m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
     m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
+    m_fileChooserSelectAllBtn->show();
 
     return true;
 }
