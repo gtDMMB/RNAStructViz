@@ -280,7 +280,6 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
         fl_alert("Unable to re-create the file chooser! Returning without loading files ...");
 	return;
     }
-    ms_instance->m_fileChooser->show();
     ms_instance->m_fileChooserSelectAllBtn->redraw();
     while(ms_instance->m_fileChooser->visible()) {
         Fl::wait();
@@ -330,7 +329,6 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
             RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath, avoidDuplicateStructs, false);
         }
     }
-    
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
 
@@ -524,14 +522,17 @@ bool MainWindow::CreateFileChooser() {
 	TerminalText::PrintError("Error: getcwd failed. Cannot create file chooser.\n");
         return false;
     }
-    if(m_fileChooser != NULL) {
+    /*if(m_fileChooser != NULL) {
         SelectAllButton *saBtnWidget = (SelectAllButton *) m_fileChooser->add_extra(NULL);
         Delete(saBtnWidget, SelectAllButton);
         m_fileChooserSelectAllBtn = NULL;
     }
     Delete(m_fileChooser, Fl_File_Chooser);
+    */
+    bool createdFileChooser = false;
     if(m_fileChooser == NULL) {
          m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
+         createdFileChooser = true;
     }
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
@@ -562,14 +563,20 @@ bool MainWindow::CreateFileChooser() {
     m_fileChooser->show_label = "Filter By:";
     m_fileChooser->filename_label = "Selected File:";
     m_fileChooser->ok_label("Load Files  @return");
- 
-    // add select all button:
-    Delete(m_fileChooserSelectAllBtn, SelectAllButton);
-    m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
-    m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
-    m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
-    m_fileChooserSelectAllBtn->show();
 
+    // add select all button:
+    m_fileChooser->add_extra(NULL);
+    Delete(m_fileChooserSelectAllBtn, SelectAllButton);
+    if(m_fileChooserSelectAllBtn == NULL) {
+        m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
+    }
+    m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
+    m_fileChooser->show();
+    if(createdFileChooser || true) {
+        fprintf(stderr, "Adding extra widget to load window...\n");
+        m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
+        m_fileChooserSelectAllBtn->show();
+    }
     return true;
 }
 
