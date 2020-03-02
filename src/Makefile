@@ -337,7 +337,7 @@ $(OBJ_BUILD_DIR)/LoadFileSelectAllButton.$(OBJEXT): LoadFileSelectAllButton.h Co
 
 $(OBJ_BUILD_DIR)/Main.$(OBJEXT): MainWindow.h ConfigOptions.h RNAStructViz.h\
 	TerminalPrinting.h OptionParser.h ConfigExterns.h \
-	Main.cpp
+	MacSystem.h Main.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c Main.cpp -o $@
 	@echo "\n< ============================================= >\n"
 

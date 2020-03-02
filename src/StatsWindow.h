@@ -5,10 +5,15 @@
 #ifndef STATSWINDOW_H
 #define STATSWINDOW_H
 
+#include <cairo.h>
+
+//#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Cairo.H>
+#include <FL/Fl_Cairo_Window.H>
+
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 #include <FL/Enumerations.H>
-#include <FL/Fl_Window.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Pack.H>
@@ -44,7 +49,7 @@ namespace RocBoxPlot {
 
 }
 
-class StatsWindow : public Fl_Window
+class StatsWindow : public Fl_Cairo_Window
 {
 public:
     void Construct(int w, int h, const std::vector<int>& structures);
@@ -55,6 +60,10 @@ public:
     
     virtual ~StatsWindow();
     
+private:
+    static void Draw(Fl_Cairo_Window *crWin, cairo_t *cr);
+
+public:
     
     /*
      Hides the window and closes any InputWindows

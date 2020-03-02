@@ -55,6 +55,9 @@ void RocBoxPlot::roc_box_init() {
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
 
+    Fl::visual(FL_DOUBLE | FL_INDEX | FL_RGB);
+    set_draw_cb(StatsWindow::Draw);
+
     folderIndex = -1;
     referenceIndex = -1;
     numStats = 0;
@@ -806,14 +809,14 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 
 StatsWindow::StatsWindow(int w, int h, const char *label, 
                          const std::vector<int>& structures) : 
-	Fl_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
+	Fl_Cairo_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
 	input_window(NULL), rocplot_rotated_text(NULL) {
     Construct(w, h, structures);
 }
 
 StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label, 
                          const std::vector<int>& structures) : 
-	Fl_Window(x, y, w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
+	Fl_Cairo_Window(x, y, w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
 	input_window(NULL) {
     Construct(w, h, structures);
 }
@@ -833,6 +836,44 @@ StatsWindow::~StatsWindow()
     Delete(buff, Fl_Text_Buffer);
     Delete(text_display, Fl_Text_Display);
 }
+
+void StatsWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
+
+    StatsWindow *thisWin = (StatsWindow *) crWin;
+    cairo_set_source_rgb(cr,
+                         GetRed(GUI_WINDOW_BGCOLOR) / 255.0f,
+                         GetGreen(GUI_WINDOW_BGCOLOR) / 255.0f,
+                         GetBlue(GUI_WINDOW_BGCOLOR) / 255.0f);
+    cairo_scale(cr, thisWin->w(), thisWin->h());
+    cairo_fill(cr);
+    
+    // now redraw all of the widgets:
+    thisWin->bp_chart->redraw();
+    thisWin->tp_chart->redraw();
+    thisWin->fp_chart->redraw();
+    thisWin->fn_chart->redraw();
+    thisWin->sens_chart->redraw();
+    thisWin->sel_chart->redraw();
+    thisWin->ppv_chart->redraw();
+    thisWin->gc_chart->redraw();
+    thisWin->au_chart->redraw();
+    thisWin->gu_chart->redraw();
+    thisWin->non_canon_chart->redraw();
+    thisWin->roc_plot->redraw();
+    thisWin->leg1_ref->redraw();
+    thisWin->leg1_pack->redraw();
+    thisWin->leg2_ref->redraw();
+    thisWin->leg2_pack->redraw();
+    thisWin->leg3_ref->redraw();
+    thisWin->leg3_pack->redraw();
+    thisWin->leg4_ref->redraw();
+    thisWin->leg4_ref_symbol->redraw();
+    thisWin->leg4_pack->redraw();
+    thisWin->exp_button->redraw();
+    thisWin->tab_window->redraw();
+
+}
+
 
 void StatsWindow::ResetWindow()
 {
@@ -1377,12 +1418,15 @@ void StatsWindow::ComputeStats()
         {
             strcpy(tempc + 31, "... ");
 	    buff->append(tempc);
-            buff->append("\t");
+            //buff->append("\t");
         }
         else
         {
             buff->append(tempc);
-            buff->append("\t\t");
+            buff->append("\t");
+            if(strlen(tempc) < 28) {
+                buff->append("\t");
+            }
             if (strlen(tempc) < 21)
             {
                 buff->append("\t");
@@ -1437,7 +1481,7 @@ void StatsWindow::ComputeStats()
         buff->append(tempc);
         sprintf(statistics[ui].nc_char,"%d",statistics[ui].non_canon_count);
         if (activeStatsCount++ == 0) {
-            sprintf(tempc,"%d",statistics[ui].non_canon_count);
+            sprintf(tempc,"%d\n",statistics[ui].non_canon_count);
         }
         else {
             sprintf(tempc,"%d\n",statistics[ui].non_canon_count);

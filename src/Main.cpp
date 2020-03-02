@@ -21,6 +21,7 @@
 #include "TerminalPrinting.h"
 #include "OptionParser.h"
 #include "ConfigExterns.h"
+#include "MacSystem.h"
 
 #include <signal.h>
 
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
      if(__STRUCTVIZ_INSTALL_CTRLC_HANDLER) {
           signal(SIGINT, RNAStructViz_SignalHandler);
      }
+     MacSystem::RegisterMacSystemCallbacks();
     #endif
  
     DisplayConfigWindow::SetupInitialConfig();
