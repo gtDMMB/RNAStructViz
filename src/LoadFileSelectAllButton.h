@@ -42,6 +42,8 @@ class SelectAllButton : public Fl_Pack {
 			  int h = DEFAULT_SAWIDGET_HEIGHT);
           ~SelectAllButton();
 
+          void redraw();
+
           void SetWidgetState();
 	  bool SelectAllFilesActivated() const;
 	  bool SelectAllFilesInHomeActivated() const;

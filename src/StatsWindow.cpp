@@ -769,6 +769,8 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
                 
                 buff = new Fl_Text_Buffer();
                 buff->tab_distance(7);
+                buff->add_predelete_callback((Fl_Text_Predelete_Cb) TextBufferPredeleteCallback, NULL);
+                buff->add_modify_callback((Fl_Text_Modify_Cb) TextBufferModifyCallback, NULL);
                 text_display = new Fl_Text_Display(tdx+10,tdy+10,tdw-20,tdh-10);
                 text_display->buffer(buff);
                 text_display->color(GUI_WINDOW_BGCOLOR);

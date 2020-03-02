@@ -280,7 +280,6 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
         fl_alert("Unable to re-create the file chooser! Returning without loading files ...");
 	return;
     }
-    ms_instance->m_fileChooserSelectAllBtn->redraw();
     while(ms_instance->m_fileChooser->visible()) {
         Fl::wait();
     }
@@ -557,15 +556,23 @@ bool MainWindow::CreateFileChooser() {
     m_fileChooser->ok_label("Load Files  @return");
 
     // add select all button:
-    //Delete(m_fileChooserSelectAllBtn, SelectAllButton);
+    Delete(m_fileChooserSelectAllBtn, SelectAllButton);
     if(m_fileChooserSelectAllBtn == NULL) {
         m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
     }
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
-    m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
-    m_fileChooser->show();
+    //m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
+    m_fileChooserSelectAllBtn->hide();
+    m_fileChooserSelectAllBtn->activate();
     m_fileChooserSelectAllBtn->show();
-    //m_fileChooser->draw();
+    m_fileChooser->show();
+    int maxLoopCount = 0;
+    for(maxLoopCount = 8; maxLoopCount > 0; maxLoopCount--) {
+         if(!m_fileChooser->shown()) {
+              Fl::wait(0.5);
+         }
+    }
+    m_fileChooserSelectAllBtn->redraw();
     return true;
 }
 

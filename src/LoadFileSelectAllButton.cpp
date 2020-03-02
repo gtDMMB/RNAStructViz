@@ -10,7 +10,7 @@
 #include "TerminalPrinting.h"
 
 SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int height) : 
-     Fl_Pack(0, 0, width, height), flFileChooserRef(flFileChooser), selectedFileFilter(NULL), 
+     Fl_Pack(12, 3, width, height), flFileChooserRef(flFileChooser), selectedFileFilter(NULL), 
      recursiveDirs(false), searchInHiddenDirs(false), followSymlinks(false), 
      avoidDuplicateStructs(false), selectAll(false), selectAllInHome(false) {
 
@@ -129,6 +129,16 @@ SelectAllButton::~SelectAllButton() {
      //remove(saSubWidgetGroupContainer);
      Delete(saSubWidgetGroupContainer, Fl_Group);
      Free(selectedFileFilter);
+}
+
+void SelectAllButton::redraw() {
+     saSubWidgetGroupContainer->hide();
+     saSubWidgetGroupContainer->show();
+     for(int ch = 0; ch < saSubWidgetGroupContainer->children(); ch++) {
+          saSubWidgetGroupContainer->child(ch)->redraw();
+     }
+     saSubWidgetGroupContainer->redraw();
+     saSubWidgetGroupContainer->parent()->redraw();
 }
 
 bool SelectAllButton::SelectAllFilesActivated() const {

@@ -62,6 +62,9 @@ public:
     
 private:
     static void Draw(Fl_Cairo_Window *crWin, cairo_t *cr);
+    static inline void TextBufferModifyCallback(int pos, int nins, int ndel, int nres, const char *delText) {}
+    static inline void TextBufferPredeleteCallback(int pos, int ndel, void *udata) {}
+
 
 public:
     
