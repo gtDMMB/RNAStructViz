@@ -341,6 +341,8 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
 
+    Delete(ms_instance->m_fileChooser, Fl_File_Chooser_Custom);
+    Delete(ms_instance->m_fileChooserSelectAllBtn, SelectAllButton);
 }
 
 void MainWindow::OpenFileCallback() {
@@ -531,6 +533,7 @@ bool MainWindow::CreateFileChooser() {
 	TerminalText::PrintError("Error: getcwd failed. Cannot create file chooser.\n");
         return false;
     }
+    //Delete(m_fileChooser, Fl_File_Chooser_Custom);
     if(m_fileChooser == NULL) {
          m_fileChooser = new Fl_File_Chooser_Custom(NULL, NULL, Fl_File_Chooser_Custom::MULTI, NULL);
     }

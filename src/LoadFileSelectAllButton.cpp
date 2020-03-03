@@ -16,7 +16,7 @@ SelectAllButton::SelectAllButton(Fl_File_Chooser_Custom *flFileChooser, int widt
 
      color(Darker(GUI_WINDOW_BGCOLOR, 0.7f));
      labelcolor(GUI_BTEXT_COLOR);
-     box(SelectAllButton::containerWidgetBorderStyle);
+     //box(SelectAllButton::containerWidgetBorderStyle);
      labeltype(FL_ENGRAVED_LABEL);
      begin();
      saSubWidgetGroupContainer = new Fl_Group(x(), y(), w(), h(), "");

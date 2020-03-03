@@ -31,7 +31,7 @@ namespace fs = boost::filesystem;
 #endif
 
 #define DEFAULT_SAWIDGET_WIDTH    (460)
-#define DEFAULT_SAWIDGET_HEIGHT   (200)
+#define DEFAULT_SAWIDGET_HEIGHT   (235)
 #define SAWIDGET_PADDING          (12)
 
 class SelectAllButton : public Fl_Pack {

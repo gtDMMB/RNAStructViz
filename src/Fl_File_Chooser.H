@@ -45,6 +45,18 @@
 #include <FL/Fl_Return_Button.H>
 #include <FL/fl_ask.H>
 
+#include "Fl_System_Driver.H"
+#include <FL/Fl.H>
+#include <FL/filename.H>
+#include <FL/fl_ask.H>
+#include <FL/platform.H>
+#include <FL/Fl_Shared_Image.H>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "flstring.h"
+#include <errno.h>
+
 class FL_EXPORT Fl_File_Chooser_Custom {
 public:
   enum { SINGLE = 0, MULTI = 1, CREATE = 2, DIRECTORY = 4 }; 
@@ -140,6 +152,7 @@ public:
   int filter_value();
   void filter_value(int f);
   void show_window();
+  void show();
   void hide();
   void iconsize(uchar s);
   uchar iconsize();
