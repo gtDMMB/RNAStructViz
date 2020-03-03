@@ -1,12 +1,12 @@
 /* GIMP RGBA C-Source image dump (MainWindowIcon.c) */
 
-static const struct {
-  unsigned int 	 width;
-  unsigned int 	 height;
-  unsigned int 	 bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */ 
-  unsigned char	 pixel_data[128 * 128 * 4 + 1];
-} MainWindowIcon.c = {
-  128, 128, 4,
+#ifndef __MAIN_WINDOW_ICON_C__
+#define __MAIN_WINDOW_ICON_C__
+
+#include "PixelDataStruct.h"
+
+static PixelDataStruct_t MainWindowIcon = {
+  128, 128, 4, (const unsigned char *)
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
@@ -2697,3 +2697,4 @@ static const struct {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
 
+#endif
