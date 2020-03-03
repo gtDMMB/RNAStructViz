@@ -139,7 +139,6 @@ RNASTRUCTVIZ_OBJECTS = \
 	$(OBJ_BUILD_DIR)/ConfigParser.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/DiagramWindow.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/DisplayConfigWindow.$(OBJEXT) \
-	$(OBJ_BUILD_DIR)/Fl_File_Chooser.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/Fl_Rotated_Text.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/FolderWindow.$(OBJEXT) \
 	$(OBJ_BUILD_DIR)/InputWindow.$(OBJEXT) \
@@ -305,11 +304,6 @@ $(OBJ_BUILD_DIR)/DisplayConfigWindow.$(OBJEXT): DisplayConfigWindow.h ConfigOpti
 	pixmaps/ConfigCheckBoxParams.c \
 	ThemesConfig.h DisplayConfigWindow.cpp
 	$(CXX) $(CXXFLAGS_FULL) -c DisplayConfigWindow.cpp -o $@
-	@echo "\n< ============================================= >\n"
-
-$(OBJ_BUILD_DIR)/Fl_File_Chooser.$(OBJEXT): ConfigOptions.h LoadFileSelectAllButton.h \
-	Fl_File_Chooser.H Fl_File_Chooser.cpp
-	$(CXX) $(CXXFLAGS_FULL) -c Fl_File_Chooser.cpp -o $@
 	@echo "\n< ============================================= >\n"
 
 $(OBJ_BUILD_DIR)/Fl_Rotated_Text.$(OBJEXT): Fl_Rotated_Text.H Fl_Rotated_Text.cpp
