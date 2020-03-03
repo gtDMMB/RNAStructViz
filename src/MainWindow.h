@@ -11,7 +11,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Tabs.H>
-#include "Fl_File_Chooser.H"
+#include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
@@ -189,7 +189,7 @@ class MainWindow
         /*
 	    The file chooser dialog.
         */
-        Fl_File_Chooser_Custom *m_fileChooser;
+        Fl_File_Chooser *m_fileChooser;
         SelectAllButton *m_fileChooserSelectAllBtn;
 
 	/* Other widgets that need to be updated when we change the theme settings */

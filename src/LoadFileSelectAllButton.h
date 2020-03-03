@@ -17,7 +17,7 @@ using std::vector;
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-#include "Fl_File_Chooser.H"
+#include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Group.H>
@@ -37,7 +37,7 @@ namespace fs = boost::filesystem;
 class SelectAllButton : public Fl_Pack {
 
      public:
-          SelectAllButton(Fl_File_Chooser_Custom *flFileChooserRef, 
+          SelectAllButton(Fl_File_Chooser *flFileChooserRef, 
 			  int w = DEFAULT_SAWIDGET_WIDTH, 
 			  int h = DEFAULT_SAWIDGET_HEIGHT);
           ~SelectAllButton();
@@ -54,7 +54,7 @@ class SelectAllButton : public Fl_Pack {
 	  bool AvoidDuplicateStructures() const;
 
      protected:
-          Fl_File_Chooser_Custom *flFileChooserRef;
+          Fl_File_Chooser *flFileChooserRef;
 	  char *selectedFileFilter;
           bool recursiveDirs, searchInHiddenDirs;
 	  bool followSymlinks, avoidDuplicateStructs;
