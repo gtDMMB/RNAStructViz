@@ -9,7 +9,7 @@
 #include "RNAStructViz.h"
 #include "TerminalPrinting.h"
 
-SelectAllButton::SelectAllButton(Fl_File_Chooser *flFileChooser, int width, int height) : 
+SelectAllButton::SelectAllButton(Fl_File_Chooser_Custom *flFileChooser, int width, int height) : 
      Fl_Pack(12, 3, width, height), flFileChooserRef(flFileChooser), selectedFileFilter(NULL), 
      recursiveDirs(false), searchInHiddenDirs(false), followSymlinks(false), 
      avoidDuplicateStructs(false), selectAll(false), selectAllInHome(false) {

@@ -31,35 +31,35 @@
 #include "ConfigOptions.h"
 #include "LoadFileSelectAllButton.h"
 
-void Fl_File_Chooser::cb_window_i(Fl_Double_Window*, void*) {
+void Fl_File_Chooser_Custom::cb_window_i(Fl_Double_Window*, void*) {
   fileName->value("");
 fileList->deselect();
 Fl::remove_timeout((Fl_Timeout_Handler)previewCB, this);
 window->hide();
 }
-void Fl_File_Chooser::cb_window(Fl_Double_Window* o, void* v) {
-  ((Fl_File_Chooser*)(o->user_data()))->cb_window_i(o,v);
+void Fl_File_Chooser_Custom::cb_window(Fl_Double_Window* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->user_data()))->cb_window_i(o,v);
 }
 
-void Fl_File_Chooser::cb_showChoice_i(Fl_Choice*, void*) {
+void Fl_File_Chooser_Custom::cb_showChoice_i(Fl_Choice*, void*) {
   showChoiceCB();
 }
-void Fl_File_Chooser::cb_showChoice(Fl_Choice* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_showChoice_i(o,v);
+void Fl_File_Chooser_Custom::cb_showChoice(Fl_Choice* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_showChoice_i(o,v);
 }
 
-void Fl_File_Chooser::cb_favoritesButton_i(Fl_Menu_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_favoritesButton_i(Fl_Menu_Button*, void*) {
   favoritesButtonCB();
 }
-void Fl_File_Chooser::cb_favoritesButton(Fl_Menu_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_favoritesButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_favoritesButton(Fl_Menu_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_favoritesButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_newButton_i(Fl_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_newButton_i(Fl_Button*, void*) {
   newdir();
 }
-void Fl_File_Chooser::cb_newButton(Fl_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_newButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_newButton(Fl_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_newButton_i(o,v);
 }
 
 #include <FL/Fl_Bitmap.H>
@@ -71,110 +71,111 @@ static Fl_Image *image_new() {
   return image;
 }
 
-void Fl_File_Chooser::cb__i(Fl_Tile*, void*) {
+void Fl_File_Chooser_Custom::cb__i(Fl_Tile*, void*) {
   update_preview();
 }
-void Fl_File_Chooser::cb_(Fl_Tile* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->user_data()))->cb__i(o,v);
+void Fl_File_Chooser_Custom::cb_(Fl_Tile* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->user_data()))->cb__i(o,v);
 }
 
-void Fl_File_Chooser::cb_fileList_i(Fl_File_Browser*, void*) {
+void Fl_File_Chooser_Custom::cb_fileList_i(Fl_File_Browser*, void*) {
   fileListCB();
 }
-void Fl_File_Chooser::cb_fileList(Fl_File_Browser* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_fileList_i(o,v);
+void Fl_File_Chooser_Custom::cb_fileList(Fl_File_Browser* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_fileList_i(o,v);
 }
 
-void Fl_File_Chooser::cb_previewButton_i(Fl_Check_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_previewButton_i(Fl_Check_Button*, void*) {
   preview(previewButton->value());
 }
-void Fl_File_Chooser::cb_previewButton(Fl_Check_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->parent()->user_data()))->cb_previewButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_previewButton(Fl_Check_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->parent()->user_data()))->cb_previewButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_showHiddenButton_i(Fl_Check_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_showHiddenButton_i(Fl_Check_Button*, void*) {
   showHidden(showHiddenButton->value());
 }
-void Fl_File_Chooser::cb_showHiddenButton(Fl_Check_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->parent()->user_data()))->cb_showHiddenButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_showHiddenButton(Fl_Check_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->parent()->user_data()))->cb_showHiddenButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_fileName_i(Fl_File_Input*, void*) {
+void Fl_File_Chooser_Custom::cb_fileName_i(Fl_File_Input*, void*) {
   fileNameCB();
 }
-void Fl_File_Chooser::cb_fileName(Fl_File_Input* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_fileName_i(o,v);
+void Fl_File_Chooser_Custom::cb_fileName(Fl_File_Input* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_fileName_i(o,v);
 }
 
-void Fl_File_Chooser::cb_okButton_i(Fl_Return_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_okButton_i(Fl_Return_Button*, void*) {
   window->hide();
 
 // Do any callback that is registered...
 if (callback_)
   (*callback_)(this, data_);
 }
-void Fl_File_Chooser::cb_okButton(Fl_Return_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->parent()->user_data()))->cb_okButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_okButton(Fl_Return_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->parent()->user_data()))->cb_okButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_cancelButton_i(Fl_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_cancelButton_i(Fl_Button*, void*) {
   fileName->value("");
 fileList->deselect();
 Fl::remove_timeout((Fl_Timeout_Handler)previewCB, this);
 window->hide();
 }
-void Fl_File_Chooser::cb_cancelButton(Fl_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->parent()->user_data()))->cb_cancelButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_cancelButton(Fl_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->parent()->user_data()))->cb_cancelButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_favList_i(Fl_File_Browser*, void*) {
+void Fl_File_Chooser_Custom::cb_favList_i(Fl_File_Browser*, void*) {
   favoritesCB(favList);
 }
-void Fl_File_Chooser::cb_favList(Fl_File_Browser* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->user_data()))->cb_favList_i(o,v);
+void Fl_File_Chooser_Custom::cb_favList(Fl_File_Browser* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->user_data()))->cb_favList_i(o,v);
 }
 
-void Fl_File_Chooser::cb_favUpButton_i(Fl_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_favUpButton_i(Fl_Button*, void*) {
   favoritesCB(favUpButton);
 }
-void Fl_File_Chooser::cb_favUpButton(Fl_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_favUpButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_favUpButton(Fl_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_favUpButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_favDeleteButton_i(Fl_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_favDeleteButton_i(Fl_Button*, void*) {
   favoritesCB(favDeleteButton);
 }
-void Fl_File_Chooser::cb_favDeleteButton(Fl_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_favDeleteButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_favDeleteButton(Fl_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_favDeleteButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_favDownButton_i(Fl_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_favDownButton_i(Fl_Button*, void*) {
   favoritesCB(favDownButton);
 }
-void Fl_File_Chooser::cb_favDownButton(Fl_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_favDownButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_favDownButton(Fl_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_favDownButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_favCancelButton_i(Fl_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_favCancelButton_i(Fl_Button*, void*) {
   favWindow->hide();
 }
-void Fl_File_Chooser::cb_favCancelButton(Fl_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_favCancelButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_favCancelButton(Fl_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_favCancelButton_i(o,v);
 }
 
-void Fl_File_Chooser::cb_favOkButton_i(Fl_Return_Button*, void*) {
+void Fl_File_Chooser_Custom::cb_favOkButton_i(Fl_Return_Button*, void*) {
   favoritesCB(favOkButton);
 }
-void Fl_File_Chooser::cb_favOkButton(Fl_Return_Button* o, void* v) {
-  ((Fl_File_Chooser*)(o->parent()->parent()->user_data()))->cb_favOkButton_i(o,v);
+void Fl_File_Chooser_Custom::cb_favOkButton(Fl_Return_Button* o, void* v) {
+  ((Fl_File_Chooser_Custom*)(o->parent()->parent()->user_data()))->cb_favOkButton_i(o,v);
 }
 
-Fl_File_Chooser::Fl_File_Chooser(const char *d, const char *p, int t, const char *title) {
+Fl_File_Chooser_Custom::Fl_File_Chooser_Custom(const char *d, const char *p, int t, const char *title) : 
+  activeWindowGroup(NULL) {
   if (!prefs_) {
     prefs_ = new Fl_Preferences(Fl_Preferences::CORE_USER, "fltk.org", "filechooser");
   }
   Fl_Group *prev_current = Fl_Group::current();
-  { window = new Fl_Double_Window(MAX(490, DEFAULT_SAWIDGET_WIDTH + 20),380 + DEFAULT_SAWIDGET_HEIGHT + 50, "Choose File");
+  { window = new Fl_Double_Window(MAX(490, DEFAULT_SAWIDGET_HEIGHT + 20), 380 + DEFAULT_SAWIDGET_WIDTH + 30, "Choose File");
     window->callback((Fl_Callback*)cb_window, (void*)(this));
     { Fl_Group* o = new Fl_Group(10, 10, 470, 25);
       { showChoice = new Fl_Choice(65, 10, 215, 25, "Show:");
@@ -317,76 +318,79 @@ Fl_File_Chooser::Fl_File_Chooser(const char *d, const char *p, int t, const char
   prefs_->get("preview", e, 1);
   preview(e);
   Fl_Group::current(prev_current);
+  activeWindowGroup = prev_current;
   ext_group=(Fl_Widget*)0;
 }
 
-Fl_File_Chooser::~Fl_File_Chooser() {
+Fl_File_Chooser_Custom::~Fl_File_Chooser_Custom() {
   Fl::remove_timeout((Fl_Timeout_Handler)previewCB, this);
   if(ext_group)window->remove(ext_group);
   delete window;
   delete favWindow;
 }
 
-void Fl_File_Chooser::callback(void (*cb)(Fl_File_Chooser *, void *), void *d ) {
+void Fl_File_Chooser_Custom::callback(void (*cb)(Fl_File_Chooser_Custom *, void *), void *d ) {
   callback_ = cb;
   data_     = d;
 }
 
-void Fl_File_Chooser::color(Fl_Color c) {
+void Fl_File_Chooser_Custom::color(Fl_Color c) {
   fileList->color(c);
 }
 
-Fl_Color Fl_File_Chooser::color() {
+Fl_Color Fl_File_Chooser_Custom::color() {
   return (fileList->color());
 }
 
-char * Fl_File_Chooser::directory() {
+char * Fl_File_Chooser_Custom::directory() {
   return directory_;
 }
 
-const char * Fl_File_Chooser::filter() {
+const char * Fl_File_Chooser_Custom::filter() {
   return (fileList->filter());
 }
 
-int Fl_File_Chooser::filter_value() {
+int Fl_File_Chooser_Custom::filter_value() {
   return showChoice->value();
 }
 
-void Fl_File_Chooser::filter_value(int f) {
+void Fl_File_Chooser_Custom::filter_value(int f) {
   showChoice->value(f);
   showChoiceCB();
 }
 
-void Fl_File_Chooser::show() {
-     window->show();
-     window->redraw();
+void Fl_File_Chooser_Custom::show_window() {
+     if(window) {
+          window->show();
+          window->redraw();
+     }
      if(ext_group) {
           ext_group->redraw();
 	  ext_group->show();
      }
 }
 
-void Fl_File_Chooser::hide() {
+void Fl_File_Chooser_Custom::hide() {
   window->hide();
 }
 
-void Fl_File_Chooser::iconsize(uchar s) {
+void Fl_File_Chooser_Custom::iconsize(uchar s) {
   fileList->iconsize(s);
 }
 
-uchar Fl_File_Chooser::iconsize() {
+uchar Fl_File_Chooser_Custom::iconsize() {
   return (fileList->iconsize());
 }
 
-void Fl_File_Chooser::label(const char *l) {
+void Fl_File_Chooser_Custom::label(const char *l) {
   window->label(l);
 }
 
-const char * Fl_File_Chooser::label() {
+const char * Fl_File_Chooser_Custom::label() {
   return (window->label());
 }
 
-void Fl_File_Chooser::ok_label(const char *l) {
+void Fl_File_Chooser_Custom::ok_label(const char *l) {
   if (l) okButton->label(l);
   int w=0, h=0;
   okButton->measure_label(w, h);
@@ -395,39 +399,39 @@ void Fl_File_Chooser::ok_label(const char *l) {
   okButton->parent()->init_sizes();
 }
 
-const char * Fl_File_Chooser::ok_label() {
+const char * Fl_File_Chooser_Custom::ok_label() {
   return (okButton->label());
 }
 
-int Fl_File_Chooser::shown() {
+int Fl_File_Chooser_Custom::shown() {
   return window->shown();
 }
 
-void Fl_File_Chooser::textcolor(Fl_Color c) {
+void Fl_File_Chooser_Custom::textcolor(Fl_Color c) {
   fileList->textcolor(c);
 }
 
-Fl_Color Fl_File_Chooser::textcolor() {
+Fl_Color Fl_File_Chooser_Custom::textcolor() {
   return (fileList->textcolor());
 }
 
-void Fl_File_Chooser::textfont(Fl_Font f) {
+void Fl_File_Chooser_Custom::textfont(Fl_Font f) {
   fileList->textfont(f);
 }
 
-Fl_Font Fl_File_Chooser::textfont() {
+Fl_Font Fl_File_Chooser_Custom::textfont() {
   return (fileList->textfont());
 }
 
-void Fl_File_Chooser::textsize(Fl_Fontsize s) {
+void Fl_File_Chooser_Custom::textsize(Fl_Fontsize s) {
   fileList->textsize(s);
 }
 
-Fl_Fontsize Fl_File_Chooser::textsize() {
+Fl_Fontsize Fl_File_Chooser_Custom::textsize() {
   return (fileList->textsize());
 }
 
-void Fl_File_Chooser::type(int t) {
+void Fl_File_Chooser_Custom::type(int t) {
   type_ = t;
   if (t & MULTI)
     fileList->type(FL_MULTI_BROWSER);
@@ -443,23 +447,23 @@ void Fl_File_Chooser::type(int t) {
     fileList->filetype(Fl_File_Browser::FILES);
 }
 
-int Fl_File_Chooser::type() {
+int Fl_File_Chooser_Custom::type() {
   return (type_);
 }
 
-void * Fl_File_Chooser::user_data() const {
+void * Fl_File_Chooser_Custom::user_data() const {
   return (data_);
 }
 
-void Fl_File_Chooser::user_data(void *d) {
+void Fl_File_Chooser_Custom::user_data(void *d) {
   data_ = d;
 }
 
-int Fl_File_Chooser::visible() {
+int Fl_File_Chooser_Custom::visible() {
   return window->visible();
 }
 
-Fl_Widget* Fl_File_Chooser::add_extra(Fl_Widget* gr) {
+Fl_Widget* Fl_File_Chooser_Custom::add_extra(Fl_Widget* gr) {
   Fl_Widget* ret=ext_group;
   if (gr==ext_group) {
     return ret;

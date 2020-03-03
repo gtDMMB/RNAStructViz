@@ -224,7 +224,7 @@ MainWindow::MainWindow(int argc, char **argv)
 
 MainWindow::~MainWindow() {
     Delete(m_fileChooserSelectAllBtn, SelectAllButton);    
-    Delete(m_fileChooser, Fl_File_Chooser);
+    Delete(m_fileChooser, Fl_File_Chooser_Custom);
     Delete(folderWindowPane, Fl_Group);
     Delete(m_packedInfo, Fl_Pack);
     Delete(m_structureInfo, Fl_Scroll);
@@ -532,7 +532,7 @@ bool MainWindow::CreateFileChooser() {
         return false;
     }
     if(m_fileChooser == NULL) {
-         m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
+         m_fileChooser = new Fl_File_Chooser_Custom(NULL, NULL, Fl_File_Chooser_Custom::MULTI, NULL);
     }
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
@@ -571,7 +571,7 @@ bool MainWindow::CreateFileChooser() {
     }
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
     //m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
-    m_fileChooser->show();
+    m_fileChooser->show_window();
     return true;
 }
 
