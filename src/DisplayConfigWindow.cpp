@@ -209,6 +209,8 @@ DisplayConfigWindow::~DisplayConfigWindow() {
 
 void DisplayConfigWindow::ConstructWindow() {
 
+     xclass("RMAStructViz");
+	
      // place the widgets in the window:
      int workingYOffset = CFGWIN_WIDGET_OFFSETY;
     

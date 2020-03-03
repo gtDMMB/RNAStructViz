@@ -55,6 +55,7 @@ void RocBoxPlot::roc_box_init() {
 void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 {
 
+    xclass("RNAStructViz");
     Fl::visual(FL_DOUBLE | FL_INDEX | FL_RGB);
     set_draw_cb(StatsWindow::Draw);
 

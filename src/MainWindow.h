@@ -11,8 +11,8 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Tabs.H>
-#include <FL/Fl_File_Chooser.H>
-#include <FL/Fl_Native_File_Chooser.H>
+#include "Fl_File_Chooser.H"
+//#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
 
@@ -135,7 +135,8 @@ class MainWindow
         static void InfoButtonCallback(Fl_Widget *btn, void *userData);
 	static Fl_RGB_Image *helpIconImage;
         static Fl_RGB_Image *infoButtonImage;
-        Fl_RGB_Image *appLogo;
+        static Fl_RGB_Image *mainWindowIcon;
+	Fl_RGB_Image *appLogo;
 
 	/*
         Callbacks for collapsing the two sides of the window.

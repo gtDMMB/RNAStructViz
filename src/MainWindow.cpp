@@ -29,6 +29,7 @@ namespace fs = boost::filesystem;
 #include "pixmaps/RNAWindowIcon.xbm"
 #include "pixmaps/HelpIcon.c"
 #include "pixmaps/InfoButton.c"
+#include "pixmaps/MainWindowIcon.c"
 
 Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image( 
            HelpIcon.pixel_data, 
@@ -37,6 +38,11 @@ Fl_RGB_Image * MainWindow::helpIconImage = new Fl_RGB_Image(
 Fl_RGB_Image * MainWindow::infoButtonImage = new Fl_RGB_Image( 
            InfoButton.pixel_data, 
            InfoButton.width, InfoButton.height, InfoButton.bytes_per_pixel);
+
+Fl_RGB_Image * MainWindow::mainWindowIcon = new Fl_RGB_Image(
+     MainWindowIcon.pixel_data, 
+     MainWindowIcon.width, MainWindowIcon.height, 
+     MainWindowIcon.bytes_per_pixel);
 
 MainWindow::MainWindow(int argc, char **argv)
           : m_fileChooser(NULL), m_fileChooserSelectAllBtn(NULL), 
@@ -49,6 +55,10 @@ MainWindow::MainWindow(int argc, char **argv)
     m_mainWindow->callback(CloseCallback);
     m_mainWindow->color(GUI_WINDOW_BGCOLOR);
     m_mainWindow->begin();    
+
+    m_mainWindow->xclass("RNAStructViz");
+    m_mainWindow->icon(mainWindowIcon);
+    Fl_Double_Window::default_icon(mainWindowIcon);
 
     mainMenuPane = new Fl_Group(0, 0, 300, 450, "");
     {
@@ -524,7 +534,6 @@ bool MainWindow::CreateFileChooser() {
     if(m_fileChooser == NULL) {
          m_fileChooser = new Fl_File_Chooser(NULL, NULL, Fl_File_Chooser::MULTI, NULL);
     }
-    m_fileChooser->add_extra(NULL);
     m_fileChooser->label("Select RNA Structures From File(s) ...");
     m_fileChooser->filter(
                  #if WITH_FASTA_FORMAT_SUPPORT > 0
@@ -556,23 +565,13 @@ bool MainWindow::CreateFileChooser() {
     m_fileChooser->ok_label("Load Files  @return");
 
     // add select all button:
-    Delete(m_fileChooserSelectAllBtn, SelectAllButton);
+    //Delete(m_fileChooserSelectAllBtn, SelectAllButton);
     if(m_fileChooserSelectAllBtn == NULL) {
         m_fileChooserSelectAllBtn = new SelectAllButton(m_fileChooser);
     }
     m_fileChooser->add_extra(m_fileChooserSelectAllBtn);
     //m_fileChooserSelectAllBtn->position(m_fileChooserSelectAllBtn->x() + 12, m_fileChooserSelectAllBtn->y() + 3);
-    m_fileChooserSelectAllBtn->hide();
-    m_fileChooserSelectAllBtn->activate();
-    m_fileChooserSelectAllBtn->show();
     m_fileChooser->show();
-    int maxLoopCount = 0;
-    for(maxLoopCount = 8; maxLoopCount > 0; maxLoopCount--) {
-         if(!m_fileChooser->shown()) {
-              Fl::wait(0.5);
-         }
-    }
-    m_fileChooserSelectAllBtn->redraw();
     return true;
 }
 

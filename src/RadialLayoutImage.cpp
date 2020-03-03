@@ -32,6 +32,8 @@ RadialLayoutDisplayWindow::RadialLayoutDisplayWindow(size_t width, size_t height
     imageHeight(0), imageWidth(0), 
     displayBaseLower(0), displayBaseHigher(0) {
 
+     xclass("RNAStructViz");
+
      int offsetY = 10;
      int offsetX = (w() - 5 * RADIAL_BUTTON_WIDTH - 2 * SCROLL_SIZE) / 2 + RADIAL_WIDGET_WIDTH / 2;
     

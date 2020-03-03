@@ -55,6 +55,8 @@ bool DiagramWindow::redrawRefreshTimerSet = false;
 
 void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) {
 
+    xclass("RNAStructViz");
+
     pixelWidth = 1; 
     zoomButtonDown = false;
     haveZoomBuffer = false;
