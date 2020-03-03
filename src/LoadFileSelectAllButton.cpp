@@ -170,6 +170,7 @@ bool SelectAllButton::AvoidDuplicateStructures() const {
 }
 
 void SelectAllButton::SetWidgetState() {
+     Delete(selectedFileFilter, char);
      selectedFileFilter = strdup(flFileChooserRef->filter());
      recursiveDirs = cbRecDirSearch->value() != 0;
      searchInHiddenDirs = cbHiddenDirSearch->value() != 0;
