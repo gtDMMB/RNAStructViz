@@ -266,7 +266,7 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
          perc_charts_group->resizable(perc_charts_group);
          perc_charts_group->end();
             
-         leg2_group = new Fl_Group(w-200,30,195,h-40,""); // DOUBLEWINDOW
+         leg2_group = new Fl_Group(w-185,30,195,h-40,""); // DOUBLEWINDOW
             {
                 int leg2x = leg2_group->x();
                 int leg2y = leg2_group->y();
@@ -1402,7 +1402,7 @@ void StatsWindow::ComputeStats()
     buff->append("Reference structure: ");
     buff->append(reference->GetFilenameNoExtension());
     buff->append("\n\n");
-    buff->append("Comparison structures:\n\n");
+    //buff->append("Comparison structures:\n\n");
     buff->append(
                      "Filename\t\t\t\tPairs\tTPs\tFPs\tFNs\tSensi.\tSelec.\tPPV\tConfl.\tContr.\tCompa.\tG-C\tA-U\tG-U\tOther\n" 
                 );
@@ -1419,26 +1419,26 @@ void StatsWindow::ComputeStats()
         tempc[37] = '\0';
         if (strlen(statistics[ui].filename) >= 36) 
         {
-            strcpy(tempc + 31, "... ");
+            strcpy(tempc + 31, "...  ");
 	    buff->append(tempc);
             //buff->append("\t");
         }
         else
         {
             buff->append(tempc);
-            buff->append("\t");
-            if(strlen(tempc) < 28) {
+            //buff->append("\t");
+            if(strlen(tempc) < 29) {
                 buff->append("\t");
             }
-            if (strlen(tempc) < 21)
+            if (strlen(tempc) < 22)
             {
                 buff->append("\t");
             }
-            if (strlen(tempc) < 14)
+            if (strlen(tempc) < 15)
             {
                 buff->append("\t");
             }
-            if (strlen(tempc) < 7)
+            if (strlen(tempc) < 8)
             {
                 buff->append("\t");
             }
@@ -1503,18 +1503,17 @@ void StatsWindow::ComputeStats()
     };
     
     int haveSeenRefStruct = 0;
-    for (unsigned int ui = 0; ui < comp_pack->children(); ui++)
+    for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
     {
 	if(!statistics[ui].isValid) continue;
-        if (statistics[ui].ref) 
-        {
+        if (statistics[ui].ref) {
             statistics[ui].color = GUI_TEXT_COLOR;
 	    haveSeenRefStruct = 1;
         }
         else
         {
-            float darkerPct = 1.0 - 0.25 * ((ui - haveSeenRefStruct) / 7);
-            statistics[ui].color = Darker(colors[(ui - haveSeenRefStruct) % 7], darkerPct);
+            float darkerPct = 1.0 - 0.20 * ((comp_pack->children() - ui + haveSeenRefStruct) / 49);
+            statistics[ui].color = Darker(colors[(comp_pack->children() - ui + haveSeenRefStruct) % 7], darkerPct);
         }
     }
     
@@ -2004,7 +2003,7 @@ void StatsWindow::DrawLegend()
     leg1_pack->begin();
     {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
+        for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
@@ -2040,7 +2039,7 @@ void StatsWindow::DrawLegend()
     leg2_pack->begin();
         {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
+        for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
@@ -2076,7 +2075,7 @@ void StatsWindow::DrawLegend()
     leg3_pack->begin();
     {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
+        for (int ui = comp_pack->children() - 1; ui>=0; ui--)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
@@ -2112,7 +2111,7 @@ void StatsWindow::DrawLegend()
     leg4_pack->begin();
     {
         unsigned int k = 0;
-        for (unsigned int ui=0; ui < comp_pack->children(); ui++)
+        for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
