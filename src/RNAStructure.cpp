@@ -142,7 +142,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     int numElements = 0;
     while (true)
     {
-    numElements++;
+        numElements++;
         unsigned int junk;
 
         // Check for a number. If not, ignore the line, or maybe the file is 
@@ -208,7 +208,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
                                  result->m_sequenceLength + 1, filename);
                 }
                 delete result;
-                    inStream.close();
+                inStream.close();
                 return 0;
             }
         }
@@ -326,8 +326,7 @@ RNAStructure* RNAStructure::CreateFromFile(const char* filename, const bool isBP
     result->m_pathname = strdup(filename);
     result->charSeqSize = tempSeq.size();
     result->charSeq = (char *) malloc((result->charSeqSize + 1) * sizeof(char));
-    result->dotFormatCharSeq = (char *) 
-        malloc((result->charSeqSize + 1) * sizeof(char));
+    result->dotFormatCharSeq = (char *) malloc((result->charSeqSize + 1) * sizeof(char));
     for(unsigned i = 0; i < tempSeq.size(); i++)
     {
         result->charSeq[i] = toupper(tempSeq.at(i));
@@ -411,7 +410,7 @@ RNAStructure * RNAStructure::CreateFromDotBracketData(const char *fileName,
      rnaStruct->m_sequence = (BaseData*) malloc(seqLength * sizeof(BaseData));
      int baseIdx = 0;
      for(int bufIdx = 0; bufIdx < seqLength; bufIdx++) { 
-          RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
+      RNAStructure::BaseData *curBaseData = &(rnaStruct->m_sequence[baseIdx]);
       switch(baseDataBuf[bufIdx]) {
            case 'a':
            case 'A':
@@ -1218,8 +1217,8 @@ void RNAStructure::GenerateString()
        <id> [ACGU] - [ACGU] <id>
     */
     int size = (m_sequenceLength + 2) * 38;
-    m_ctDisplayString = (char*) malloc(sizeof(char) * (size + 1));
-    m_ctDisplayFormatString = (char*) malloc(sizeof(char) * (size + 1));
+    m_ctDisplayString = (char *) malloc(sizeof(char) * (size + 1));
+    m_ctDisplayFormatString = (char *) malloc(sizeof(char) * (size + 1));
     
     int remainingSize = size;
     int charsWritten = 0;
@@ -1319,15 +1318,16 @@ void RNAStructure::GenerateString()
                                sizeof(char) * (size - remainingSize + 1));
     m_ctDisplayFormatString[size - remainingSize] = '\0';
     
-    m_seqDisplayString = (char *) malloc((DEFAULT_BUFFER_SIZE + 1) * sizeof(char));
-    size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, DEFAULT_BUFFER_SIZE);
-    if(seqDSLen + 1 < DEFAULT_BUFFER_SIZE) { 
+    m_seqDisplayString = (char *) malloc((MAX_BUFFER_SIZE_CTVIEWER + 1) * sizeof(char));
+    size_t seqDSLen = GenerateSequenceString(m_seqDisplayString, MAX_BUFFER_SIZE_CTVIEWER);
+    if(seqDSLen + 1 < MAX_BUFFER_SIZE_CTVIEWER) { 
         m_seqDisplayString = (char *) realloc(m_seqDisplayString, (seqDSLen + 1) * sizeof(char));
         m_seqDisplayString[seqDSLen] = '\0';
     }
     else {
-        m_seqDisplayString[DEFAULT_BUFFER_SIZE - 5] = '\0';
+        m_seqDisplayString[MAX_BUFFER_SIZE_CTVIEWER - 5] = '\0';
         strcat(m_seqDisplayString, " ...");
+        strcat(m_seqDisplayFormatString, "...");
     }
     m_seqDisplayFormatString = (char *) malloc((seqDSLen + 1) * sizeof(char));
     strcpy(m_seqDisplayFormatString, m_seqDisplayString);
@@ -1351,27 +1351,22 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
      }
      char *strBufActivePtr = strBuf, *destPos = NULL;
      size_t charsCopied = 0, csize = 0;
-     for(int strpos = 0; charsCopied + clusterSize < MIN(charSeqSize, maxChars - 1); strpos += clusterSize) { 
-      strncpy(strBufActivePtr, charSeq + strpos, clusterSize);
+     for(int strpos = 0; charsCopied + clusterSize < maxChars - 1; strpos += clusterSize) { 
       csize = (strpos / clusterSize <= numSpaces) ? clusterSize : 
-          charSeqSize % clusterSize;
-      if(charsCopied + clusterSize < MIN(charSeqSize, maxChars - 1)) {
+              charSeqSize % clusterSize;
+      strncpy(strBufActivePtr, charSeq + strpos - clusterSize + csize, clusterSize);
+      if(charsCopied + clusterSize < maxChars - 1) {
            strBufActivePtr[csize] = ' ';
            strBufActivePtr += csize + 1;
            charsCopied += csize + 1;
       }
       else {
-           strBufActivePtr[MIN(charSeqSize, maxChars - 1)] = '\0';
+           strBufActivePtr[maxChars - 1] = '\0';
            charsCopied += csize;
            break;
       }
      }
-     if(charsCopied < MIN(charSeqSize, maxChars - 1)) {
-          strBufActivePtr[0] = '\0';
-     }
-     else {
-          strBufActivePtr[MIN(charSeqSize, maxChars - 1)] = '\0';
-     }
+     strBufActivePtr[0] = '\0';
      return MAX(0, charsCopied - 1);
 }
 

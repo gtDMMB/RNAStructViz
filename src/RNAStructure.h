@@ -267,7 +267,7 @@ class RNAStructure
         */
         void GenerateString();
 	size_t GenerateSequenceString(char *strBuf, size_t maxChars, 
-			              size_t clusterSize = 8) const; 
+			              size_t clusterSize = 10) const; 
 	size_t GenerateFASTAFormatString(char *strBuf, size_t maxChars) const;
 	size_t GenerateDotBracketFormatString(char *strBuf, size_t maxChars) const; 
 
