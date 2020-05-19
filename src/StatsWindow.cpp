@@ -2003,7 +2003,7 @@ void StatsWindow::DrawLegend()
     leg1_pack->begin();
     {
         unsigned int k = 0;
-        for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
+        for (int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
@@ -2039,7 +2039,7 @@ void StatsWindow::DrawLegend()
     leg2_pack->begin();
         {
         unsigned int k = 0;
-        for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
+        for (int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
@@ -2075,7 +2075,7 @@ void StatsWindow::DrawLegend()
     leg3_pack->begin();
     {
         unsigned int k = 0;
-        for (int ui = comp_pack->children() - 1; ui>=0; ui--)
+        for (int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
@@ -2111,7 +2111,7 @@ void StatsWindow::DrawLegend()
     leg4_pack->begin();
     {
         unsigned int k = 0;
-        for (int ui = comp_pack->children() - 1; ui >= 0; ui--)
+        for (int ui = 0; ui < comp_pack->children(); ui++)
         {
 	    if(!statistics[ui].isValid) continue;
             if (statistics[ui].ref)
