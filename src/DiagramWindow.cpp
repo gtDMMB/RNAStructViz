@@ -502,9 +502,9 @@ void DiagramWindow::RedrawBuffer(cairo_t *cr, RNAStructure **structures,
     int numStructures = structParams[0];
     int keyA = structParams[1], keyB = structParams[2];
     if (numStructures == 1) {
-    Draw1(cr, structures, resolution);
+        Draw1(cr, structures, resolution);
     } else if (cr, numStructures == 2) {
-    Draw2(cr, structures, resolution);
+        Draw2(cr, structures, resolution);
     } else if (numStructures == 3) {
         Draw3(cr, structures, resolution);
     }
@@ -1043,7 +1043,7 @@ void DiagramWindow::Draw1(cairo_t *cr, RNAStructure **structures, const int reso
 	if (baseData1->m_pair != RNAStructure::UNPAIRED
             && baseData1->m_pair > ui) {
             fl_color(STRUCTURE_DIAGRAM_COLORS[0][0]);
-             SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[0][0]);
+            SetCairoToFLColor(cr, STRUCTURE_DIAGRAM_COLORS[0][0]);
             #if PERFORM_BRANCH_TYPE_ID
                  SetCairoBranchColor(cr, structures[0]->GetBranchTypeAt(ui)->getBranchID(),
                                      (int) m_drawBranchesIndicator->value(), CairoColorSpec_t::CR_BLACK);
@@ -1234,31 +1234,46 @@ void DiagramWindow::DrawArc(
     double arcR = 0.0f;
     ComputeCircle(xPosn1, yPosn1, xPosn2, yPosn2, xPosn3, yPosn3, arcX, arcY, arcR);
 
-    int boundX = (int) (arcX - arcR);
-    int boundY = (int) (arcY - arcR);
-    int boundSize = (int) (2.0 * arcR);
+    float boundX = (arcX - arcR);
+    float boundY = (arcY - arcR);
+    float boundSize = 2.0 * arcR;
     double arc1 = 180.0 / M_PI * atan2(arcY - yPosn1, xPosn1 - arcX);
     double arc2 = 180.0 / M_PI * atan2(arcY - yPosn2, xPosn2 - arcX);
 
-    int boundingBoxCenterX = boundX + boundSize / 2;
-    int boundingBoxCenterY = boundY + boundSize / 2;
+    float boundingBoxCenterX = boundX + boundSize / 2;
+    float boundingBoxCenterY = boundY + boundSize / 2;
     float boundingBoxRadius = boundSize / 2.0;
     cairo_set_line_width(cr, pixelWidth);
     
-    if (arc2 - arc1 > 180.0)
-        arc1 += 360.0;
-    if (arc1 - arc2 > 180.0)
-        arc2 += 360.0;
     while(arc1 < 0.0) arc1 += 360.0;
+    while(arc1 > 360.0) arc1 -= 360.0;
     while(arc2 < 0.0) arc2 += 360.0;
+    while(arc2 > 360.0) arc2 -= 360.0;
+    //if (arc1 > 180.0)
+    //    arc1 += 360.0;
+    //if (arc1 - arc2 > 180.0)
+    //    arc2 += 360.0;
+
+    // cairo arc drawing functions require the angles to be in radians:
+    arc1 = arc1 * M_PI / 180.0;
+    arc2 = arc2 * M_PI / 180.0;
+
     if (arc2 > arc1) {
-        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, 
-                  boundingBoxRadius, arc1, arc2);
-    } else {
+        cairo_arc_negative(cr, boundingBoxCenterX, boundingBoxCenterY, 
+                  boundingBoxRadius, arc2, arc1);
+        cairo_stroke(cr);
         cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, 
                   boundingBoxRadius, arc2, arc1);
+        cairo_stroke(cr);
+    } 
+    else {
+        cairo_arc_negative(cr, boundingBoxCenterX, boundingBoxCenterY, 
+                  boundingBoxRadius, arc1, arc2);
+        cairo_stroke(cr);
+        cairo_arc(cr, boundingBoxCenterX, boundingBoxCenterY, 
+                  boundingBoxRadius, arc1, arc2);
+        cairo_stroke(cr);
     }
-    cairo_stroke(cr);
 }
 
 void DiagramWindow::DrawBase(
