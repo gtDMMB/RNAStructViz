@@ -60,9 +60,7 @@ using std::max_element;
 #define DWIN_DRAG_DX                 (3)
 
 #define DWINARC_MAX_TICKS            (12)
-#define DWINARC_LABEL_PCT            (0.0833)
-//#define DWINARC_MAX_TICKS            (27)
-//#define DWINARC_LABEL_PCT            (1.0 / DWINARC_MAX_TICKS)
+#define DWINARC_LABEL_PCT            (1.0 / DWINARC_MAX_TICKS)
 #define BASE_PAIRS_AROUND_CIRCLE     (100)
 
 #define STRUCTURE_INCLBL_XOFFSET     (10)

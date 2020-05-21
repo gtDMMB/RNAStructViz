@@ -1994,11 +1994,13 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      size_t totalNumTicks = RNAStructViz::GetInstance()->GetStructureManager()->
                                           GetStructure(firstStructIndex)->GetLength();
      size_t numTicks = MIN(totalNumTicks, DWINARC_MAX_TICKS) + 1;
+     double DWINARC_LABEL_PCT2 = 1.0 / numTicks;
      double arcOriginX = IMAGE_WIDTH / 2, arcOriginY = IMAGE_HEIGHT / 2; 
      double arcRadius = DIAGRAM_WIDTH / 2, arcRadiusDelta = 2, arcRadiusTextDelta = 4;
      double tickInsetLength = 2;
      char numericLabelStr[MAX_BUFFER_SIZE + 1];
      numericLabelStr[MAX_BUFFER_SIZE] = '\0';
+     double tlabelOffset = (double) numTicks / totalNumTicks;
 
      cairo_set_line_cap(curWinContext, CAIRO_LINE_CAP_ROUND);
      cairo_set_line_width(curWinContext, 2);
@@ -2007,8 +2009,8 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
      cairo_set_font_size(curWinContext, 7);
      SetCairoColor(curWinContext, CairoColorSpec_t::CR_LIGHT_GRAY);
      
-     for(int t = 1; t < numTicks; t++) {
-          double tickAngle = -M_PI_2 - t * 2 * M_PI / numTicks;
+     for(int t = 0; t < numTicks; t++) {
+          double tickAngle = -M_PI_2 - 2.0 * M_PI * ((double) t / numTicks);
           int tickStartX = (int) (arcOriginX + arcRadius * cos(tickAngle));
           int tickStartY = (int) (arcOriginY - arcRadius * sin(tickAngle));
           int tickOuterX = (int) (arcOriginX + (arcRadius + arcRadiusDelta) * cos(tickAngle));
@@ -2016,7 +2018,7 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
           cairo_move_to(curWinContext, tickStartX, tickStartY);
           cairo_line_to(curWinContext, tickOuterX, tickOuterY);
           cairo_stroke(curWinContext);
-          int numericLabel = (int) ((totalNumTicks - 1) * t * DWINARC_LABEL_PCT);
+          int numericLabel = (int) ceil((totalNumTicks) * (t + tlabelOffset) * DWINARC_LABEL_PCT2);
           snprintf(numericLabelStr, MAX_BUFFER_SIZE, "%d", numericLabel);
           cairo_text_extents_t textDims;
           cairo_text_extents(curWinContext, numericLabelStr, &textDims);
@@ -2043,7 +2045,9 @@ void DiagramWindow::RedrawStructureTickMarks(cairo_t *curWinContext) {
                tickTextY += textDims.height;
           }
           cairo_move_to(curWinContext, tickTextX, tickTextY);
-          cairo_show_text(curWinContext, numericLabelStr);
+          if(t > 0) { 
+               cairo_show_text(curWinContext, numericLabelStr);
+          }
      }
 
 }
