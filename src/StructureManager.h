@@ -23,7 +23,7 @@ class StructureManager
         /*
 	    Add a new structure, given as a file name to load.
         */
-        void AddFile(const char* filename, bool removeDuplicateStructs = false, bool guiQuiet = false);
+        void AddFile(const char* filename, bool removeDuplicateStructs = true, bool guiQuiet = false);
 
         /*
 	    Remove a structure.

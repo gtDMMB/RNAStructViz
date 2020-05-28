@@ -338,6 +338,10 @@ void MainWindow::OpenFileCallback(Fl_Widget* widget, void* userData)
             RNAStructViz::GetInstance()->GetStructureManager()->AddFile(nextFilePath, avoidDuplicateStructs, false);
         }
     }
+
+    if(ms_instance->selectedFolderIndex >= 0) {
+         MainWindow::ShowFolderByIndex(ms_instance->selectedFolderIndex, true);
+    }
     ms_instance->m_packedInfo->redraw();
     ms_instance->folderWindowPane->redraw();
 
@@ -583,8 +587,6 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
     //Find the folderName label in the contentsButton widget's group
     ms_instance->selectedFolderBtn = (Fl_Button *) widget;
     Fl_Button* folderLabel = ms_instance->selectedFolderBtn;
-    //folderLabel->color(Lighter(GUI_BGCOLOR, 0.5f));
-    //folderLabel->labelcolor(Darker(GUI_BTEXT_COLOR, 0.5f));
 
     Fl_Pack* pack = ms_instance->m_packedInfo;
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->GetStructureManager()->GetFolders();
@@ -598,7 +600,7 @@ void MainWindow::ShowFolderCallback(Fl_Widget* widget, void* userData)
 
 }
 
-void MainWindow::ShowFolderByIndex(int index) { 
+void MainWindow::ShowFolderByIndex(int index, bool forceReload) { 
 
     const std::vector<Folder*>& folders = RNAStructViz::GetInstance()->
                                           GetStructureManager()->GetFolders();
@@ -611,8 +613,15 @@ void MainWindow::ShowFolderByIndex(int index) {
 	TerminalText::PrintError("Attempting to show a NULL folder at index #%d\n", index);
 	return;
     }
-    else if(folders[index]->folderWindow == NULL)
+    else if(folders[index]->folderWindow == NULL || forceReload)
     {
+        if(folders[index]->folderWindow != NULL) {
+             if(ms_instance->folderWindowPane->children() > 0) {
+                  ms_instance->folderWindowPane->hide();
+                  ms_instance->folderWindowPane->remove(0);
+             }       
+             Delete(folders[index]->folderWindow, FolderWindow);
+        }
         fwindow = new FolderWindow(340, 40, 300, 390, 
                                    folders[index]->folderName, index);
 	folders[index]->folderWindow = fwindow;
@@ -622,7 +631,7 @@ void MainWindow::ShowFolderByIndex(int index) {
         fwindow = folders[index]->folderWindow;
     }
 
-    if (ms_instance->folderWindowPane->children() > 0) {
+    if(ms_instance->folderWindowPane->children() > 0) {
          ms_instance->folderWindowPane->remove(0);
     }
     ms_instance->selectedFolderIndex = index;

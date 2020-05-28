@@ -173,7 +173,7 @@ void FolderWindow::AddStructure(const char* filename, const int index) {
      StructureData *nextStructData = StructureData::AddStructureFromData(this, filename, index);
      RNAStructure *structure = nextStructData->structure;
      if(FolderWindow::m_storedStructDisplayData.size() > index) {
-	  Delete(FolderWindow::m_storedStructDisplayData[index], StructureData);
+	  //Delete(FolderWindow::m_storedStructDisplayData[index], StructureData);
 	  FolderWindow::m_storedStructDisplayData[index] = nextStructData;
      }
      else {

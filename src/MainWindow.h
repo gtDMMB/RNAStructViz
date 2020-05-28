@@ -113,7 +113,7 @@ class MainWindow
          Callback to show/hide a folder
          */
         static void ShowFolderCallback(Fl_Widget* widget, void* userData);
-        static void ShowFolderByIndex(int index); 
+        static void ShowFolderByIndex(int index, bool forceReload = false); 
 
         /*
 	    Callback to remove a structure.
