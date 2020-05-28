@@ -371,6 +371,7 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
         } else {
             if (sequences[2]) {
                 sequences[1] = sequences[2];
+                sequences[2] = NULL;
                 ComputeNumPairs(sequences, 2);
                 *keyA = 0; *keyB = 2;
                 *numToDraw = 2;
@@ -385,11 +386,13 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
             if (sequences[2]) {
                 sequences[0] = sequences[1];
                 sequences[1] = sequences[2];
+                sequences[2] = NULL;
                 ComputeNumPairs(sequences, 2);
                 *keyA = 1; *keyB = 2;
                 *numToDraw = 2;
             } else {
                 sequences[0] = sequences[1];
+                sequences[1] = NULL;
                 ComputeNumPairs(sequences, 1);
                 *keyA = 1;
                 *numToDraw = 1;
@@ -397,6 +400,7 @@ bool DiagramWindow::computeDrawKeyParams(RNAStructure **sequences, int *numToDra
         } else {
             if (sequences[2]) {
                 sequences[0] = sequences[2];
+                sequences[2] = NULL;
                 ComputeNumPairs(sequences, 1);
                 *keyA = 2;
                 *numToDraw = 1;
@@ -1058,6 +1062,13 @@ void DiagramWindow::Draw1(cairo_t *cr, RNAStructure **structures, const int reso
 void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
                                     int numStructures) {
 
+    if(numStructures == 0) {
+         return;
+    }
+    for(int np = 0; np < 7; np++) {
+         numPairs[np] = 0;
+    }
+
     unsigned int numBases = structures[0]->GetLength();
     if (numStructures == 1) {
         unsigned int counter1 = 0;
@@ -1081,18 +1092,15 @@ void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
 		baseData1->m_pair == baseData2->m_pair && 
 		baseData1->m_pair > ui) {
                     counter1++;
-		    //fprintf(stderr, "1 & 2: %d/%d/%d\n", ui, baseData1->m_index, baseData1->m_pair);
             } 
 	    else {
 	         if (baseData1->m_pair != RNAStructure::UNPAIRED &&
                      baseData1->m_pair > ui) {
                     counter2++;
-		    //fprintf(stderr, "1: %d/%d/%d\n", ui, baseData1->m_index, baseData1->m_pair);
                  } 
 	         if (baseData2->m_pair != RNAStructure::UNPAIRED &&
                      baseData2->m_pair > ui) {
 		    counter3++;
-		    //fprintf(stderr, "2: %d/%d/%d\n", ui, baseData2->m_index, baseData2->m_pair);
                  }
 	    }
         }
@@ -1108,10 +1116,37 @@ void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
         unsigned int counter6 = 0; // cyan = in structures 2 & 3
         unsigned int counter7 = 0; // blue = in only structure 3
         for (unsigned int ui = 0; ui < numBases; ++ui) {
+            
             const RNAStructure::BaseData *baseData1 = structures[0]->GetBaseAt(ui);
             const RNAStructure::BaseData *baseData2 = structures[1]->GetBaseAt(ui);
             const RNAStructure::BaseData *baseData3 = structures[2]->GetBaseAt(ui);
-            if (baseData1->m_pair != RNAStructure::UNPAIRED &&
+            
+            // define pair counting functions using C++ lambda expressions:
+            auto PCEligible = [](const RNAStructure::BaseData *bd, unsigned int cidx) {
+                 return (bd->m_pair != RNAStructure::UNPAIRED) && (bd->m_pair > cidx);
+            };
+            auto PC1 = [](const RNAStructure::BaseData *bd1, const RNAStructure::BaseData *bd2, 
+                          const RNAStructure::BaseData *bd3) {
+                 return (bd1->m_pair != bd2->m_pair) && (bd1->m_pair != bd3->m_pair);
+            };
+            auto PC2 = [](const RNAStructure::BaseData *bd1, const RNAStructure::BaseData *bd2, 
+                          const RNAStructure::BaseData *bd3) {
+                 return (bd1->m_pair == bd2->m_pair) && (bd1->m_pair != bd3->m_pair);
+            };
+            auto PC3 = [](const RNAStructure::BaseData *bd1, const RNAStructure::BaseData *bd2, 
+                          const RNAStructure::BaseData *bd3) {
+                 return (bd1->m_pair == bd2->m_pair) && (bd1->m_pair == bd3->m_pair);
+            };
+
+            if(PCEligible(baseData1, ui) && PC3(baseData1, baseData2, baseData3)) counter1++;
+            if(PCEligible(baseData1, ui) && PC2(baseData1, baseData2, baseData3)) counter4++;
+            if(PCEligible(baseData1, ui) && PC2(baseData1, baseData3, baseData2)) counter5++;
+            if(PCEligible(baseData2, ui) && PC2(baseData2, baseData3, baseData1)) counter6++;
+            if(PCEligible(baseData1, ui) && PC1(baseData1, baseData2, baseData3)) counter2++;
+            if(PCEligible(baseData2, ui) && PC1(baseData2, baseData1, baseData3)) counter3++;
+            if(PCEligible(baseData3, ui) && PC1(baseData3, baseData1, baseData2)) counter7++;
+
+            /*if (baseData1->m_pair != RNAStructure::UNPAIRED &&
                 baseData1->m_pair > ui) {
                 if (baseData1->m_pair == baseData2->m_pair && 
 		    baseData1->m_pair > ui) {
@@ -1166,7 +1201,7 @@ void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
             } else if (baseData3->m_pair != RNAStructure::UNPAIRED &&
                        baseData3->m_pair > ui) {
                 counter7++;
-            }
+            }*/
         }
         numPairs[0] = counter1;
         numPairs[1] = counter2;
@@ -1175,7 +1210,8 @@ void DiagramWindow::ComputeNumPairs(RNAStructure **structures,
         numPairs[4] = counter5;
         numPairs[5] = counter6;
         numPairs[6] = counter7;
-    }
+    
+     }
 }
 
 void DiagramWindow::ComputeCircle(
