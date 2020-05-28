@@ -1354,20 +1354,20 @@ size_t RNAStructure::GenerateSequenceString(char *strBuf, size_t maxChars,
      for(int strpos = 0; charsCopied + clusterSize < maxChars - 1; strpos += clusterSize) { 
       csize = (strpos / clusterSize <= numSpaces) ? clusterSize : 
               charSeqSize % clusterSize;
-      strncpy(strBufActivePtr, charSeq + strpos + csize, csize);
-      if(charsCopied + csize < maxChars - 1) {
+      strncpy(strBufActivePtr, charSeq + strpos, csize);
+      if((charsCopied + csize + 1 < maxChars - 1) && (csize == clusterSize)) {
            strBufActivePtr[csize] = ' ';
            strBufActivePtr += csize + 1;
+           strBufActivePtr[0] = '\0';
            charsCopied += csize + 1;
       }
       else {
-           strBufActivePtr[maxChars - 1] = '\0';
+           strBufActivePtr[csize] = '\0';
            charsCopied += csize;
            break;
       }
      }
-     strBufActivePtr[0] = '\0';
-     return MAX(0, charsCopied - 1);
+     return charsCopied;
 }
 
 size_t RNAStructure::GenerateFASTAFormatString(char *strBuf, 
