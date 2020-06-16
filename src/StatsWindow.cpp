@@ -1407,27 +1407,31 @@ void StatsWindow::ComputeStats()
                      "Filename\t\t\t\tPairs\tTPs\tFPs\tFNs\tSensi.\tSelec.\tPPV\tConfl.\tContr.\tCompa.\tG-C\tA-U\tG-U\tOther\n" 
                 );
     
-    unsigned int activeStatsCount = 0;
-    for (unsigned int ui=0; ui < comp_pack->children(); ui++)
-    {
+     unsigned int activeStatsCount = 0;
+     for (unsigned int ui=0; ui < comp_pack->children(); ui++)
+     {
         
         if(!statistics[ui].isValid) {
-	     continue;
-	}
-	char tempc[38];
+	        continue;
+	   }
+	   char tempc[38];
         strncpy(tempc, statistics[ui].filename, 36);
         tempc[37] = '\0';
         if (strlen(statistics[ui].filename) >= 36) 
         {
             strcpy(tempc + 31, "...  ");
-	    buff->append(tempc);
+	       buff->append(tempc);
             //buff->append("\t");
         }
         else
         {
             buff->append(tempc);
-            //buff->append("\t");
-            if(strlen(tempc) < 29) {
+            char spacePaddingBuf[37];
+            memset(spacePaddingBuf, (unsigned char) ' ', 36);
+            int numSpacesRequired = 36 - strlen(statistics[ui].filename);
+            spacePaddingBuf[numSpacesRequired] = '\0';
+            buff->append(spacePaddingBuf);
+            /*if(strlen(tempc) < 29) {
                 buff->append("\t");
             }
             if (strlen(tempc) < 22)
@@ -1441,7 +1445,7 @@ void StatsWindow::ComputeStats()
             if (strlen(tempc) < 8)
             {
                 buff->append("\t");
-            }
+            }*/
         }
         sprintf(statistics[ui].bp_char,"%d",statistics[ui].base_pair_count);
         sprintf(tempc,"%d\t",statistics[ui].base_pair_count);
