@@ -114,7 +114,7 @@ class ApplicationBuildInfo {
 
      public:
        static inline string RNAStructVizFigletTextLogo() {
-            static const char *figletTextLogoLines[] = {
+            tatic const char *figletTextLogoLines[] = {
                  "+-+-+-+-+-+-+-+-+-+-+-+-+",
                  "|R|N|A|S|t|r|u|c|t|V|i|z|",
                  "+-+-+-+-+-+-+-+-+-+-+-+-+",
