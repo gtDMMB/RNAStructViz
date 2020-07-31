@@ -87,7 +87,7 @@
 #define __STRUCTVIZ_INSTALL_SIGSEGV_HANDLER     1
 #define __STRUCTVIZ_INSTALL_CTRLC_HANDLER       1
 
-#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.34.0-testing -- RNA Secondary Structure Comparison Multi-Tool")
+#define RNASTRUCTVIZ_VSTRING         ("🧬  RNAStructViz v2.34.1-testing -- RNA Secondary Structure Comparison Multi-Tool")
 
 #define HUGE_BUFFER_LINE_SIZE        (2048)
 
@@ -104,7 +104,7 @@ class ApplicationBuildInfo {
 
      protected:
           inline static const char *GIT_RELEASE_TYPE      = "BETA-TESTING"; //"##__GIT_RELEASE_TYPE__##";
-	  inline static const char *GIT_COMMIT_HASH       = "##__GIT_COMMITREV_HASHNUM__##";
+	      inline static const char *GIT_COMMIT_HASH       = "##__GIT_COMMITREV_HASHNUM__##";
           inline static const char *GIT_COMMIT_HASH_SHORT = "##__GIT_COMMITREV_HASHNUM_SHORT__##";
           inline static const char *GIT_COMMIT_DATE       = "##__GIT_COMMITREV_DATE__##";
           inline static const char *GIT_BRANCH_REVSTRING  = "##__GIT_DESCRIBE_REVSTRING__##";
@@ -114,11 +114,11 @@ class ApplicationBuildInfo {
 
      public:
        static inline string RNAStructVizFigletTextLogo() {
-            tatic const char *figletTextLogoLines[] = {
+            static const char *figletTextLogoLines[] = {
                  "+-+-+-+-+-+-+-+-+-+-+-+-+",
                  "|R|N|A|S|t|r|u|c|t|V|i|z|",
                  "+-+-+-+-+-+-+-+-+-+-+-+-+",
-	    };
+	        };
             std::string figletTextLogo = std::string("");
             int numLogoLines = sizeof(figletTextLogoLines) / sizeof(figletTextLogoLines[0]);
             for(int line = 0; line < numLogoLines; line++) {
