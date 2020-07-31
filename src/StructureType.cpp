@@ -48,7 +48,7 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      SetLabelText();
      SetTooltipText();
 
-     navCloseBtn = new Fl_Button(pack->x() + pack->w() - 8, offsetY + 5, STRUCTURE_NAVBTN_SIZE, 
+     navCloseBtn = new Fl_Button(pack->x() + pack->w() - 15, offsetY + 5, STRUCTURE_NAVBTN_SIZE, 
 		                 STRUCTURE_NAVBTN_SIZE, "");
      navCloseBtn->callback(FolderWindow::RemoveCallback);
      navCloseBtn->user_data((void *) index);
@@ -70,10 +70,10 @@ void StructureData::CreateGUIElementsDisplay(Fl_Pack *pack) {
      bool isAutoloaded = ConfigParser::fileExists((std::string(USER_AUTOLOAD_PATH) + autoLoadBaseName).c_str());
      autoloadToggleBtn = new AutoloadIndicatorButton(structFileBaseDir + autoLoadBaseName, 
 		                                     autoLoadBaseName, isAutoloaded);
-     autoloadToggleBtn->position(pack->x() + pack->w() - 32, offsetY + 2);
+     autoloadToggleBtn->position(pack->x() + pack->w() - 45, offsetY + 2);
      
-     xmlExportBtn = new XMLExportButton(index);
-     xmlExportBtn->position(pack->x() + pack->w() - 52, offsetY + 5);
+     //xmlExportBtn = new XMLExportButton(index);
+     //xmlExportBtn->position(pack->x() + pack->w() - 52, offsetY + 5);
 
      guiPackingGroup->resizable(mainViewerDisplayBtn);
      guiPackingGroup->end();
