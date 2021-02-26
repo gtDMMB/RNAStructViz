@@ -521,7 +521,7 @@ RNAStructure ** RNAStructure::CreateFromBoltzmannFormatFile(const char *filename
      int sampleNum = 0;
      while(true) {
           if(sampleNum >= BOLTZMANN_FORMAT_MAX_SAMPLES) {
-           TerminalText::PrintInfo("The number of samples in \"%s\" must not exceed %s. Loading first %d samples only.\n", 
+           TerminalText::PrintInfo("The number of samples in \"%s\" must not exceed %d. Loading first %d samples only.\n", 
                            filename, BOLTZMANN_FORMAT_MAX_SAMPLES, BOLTZMANN_FORMAT_MAX_SAMPLES);
            break;
       }  
