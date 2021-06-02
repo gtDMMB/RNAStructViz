@@ -18,7 +18,7 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=c++1z -Wno-c++11-narrowing -I/usr/local/opt/openssl/include
+	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing -I/usr/local/opt/openssl/include
 	LDFLAGS+= -L/usr/local/opt/openssl/lib
 	## fallback values since Mac is broken as a platform w.r.t. its make version:
 	#DEBUG=$(shell ../build-scripts/get-build-config-setting.sh \
@@ -34,7 +34,7 @@ else
 	FLTKCONFIG=$(shell which fltk-config)
 	READLINK=$(shell which readlink)
 	DEBUGGER=$(shell which gdb)
-	CXXFLAGS+= -std=gnu++1z -I/usr/include
+	CXXFLAGS+= -std=c++17 -I/usr/include
 	LDFLAGS+= -Wl,--no-as-needed
 endif
 
