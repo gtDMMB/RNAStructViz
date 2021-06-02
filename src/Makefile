@@ -7,9 +7,9 @@ FALSE=0
 SEDCMD=`which sed`
 
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -m64
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -m64 -Wno-error=unknown-warning
 LD=g++
-LDFLAGS= -g$(DEBUGLEVEL) -lm
+LDFLAGS= -g$(DEBUGLEVEL) -lm -Wno-error=unknown-warning
 
 # OSX-specific locations and utility names:
 TARGET_PLATFORM := $(shell uname -s)
