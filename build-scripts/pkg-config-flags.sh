@@ -1,5 +1,12 @@
 #!/bin/bash
 
+GREP=$(which grep);
+SED=$(which sed);
+if [[ "$(uname -s)" == "Darwin" ]]; then
+     GREP=$(which ggrep);
+     SED=$(which gsed);
+fi
+
 PKGCONFIG=`which pkg-config`
 if [[ "$(uname -s)" == "Darwin" ]]; then 
 	export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/viennarna/lib/pkgconfig";
@@ -32,5 +39,7 @@ elif [[ "$(uname -s)" == "Darwin" ]]; then
 else 
 	PKGOUT+=" -DTARGETOS_GENERIC_UNIX"
 fi
+
+PKGOUT=`echo $PKGOUT | $SED 's/-fno-lto//g' | $SED 's/-Wl,-fno-lto//g'`
 
 echo $PKGOUT
