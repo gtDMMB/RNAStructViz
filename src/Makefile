@@ -76,7 +76,7 @@ ifneq "$(BUILD_WITH_COMPILER)" ""
 	CLANG_EXTRA_CXXFLAGS= -std=c++1z -stdlib=libc++ \
 		-I$(shell ls -d /usr/include | tail -n1)
 	CLANG_EXTRA_LDFLAGS= -std=c++1z -stdlib=libc++ -lm \
-		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/7* | tail -n1) \
+		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/* | tail -n1) \
 		-lgcc_s -lpthread -lrt -lsupc++
 	CXX=$(BUILD_WITH_COMPILER)
 	CXXFLAGS+=$(CLANG_EXTRA_CXXFLAGS)
