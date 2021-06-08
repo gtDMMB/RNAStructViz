@@ -50,7 +50,7 @@ BRANCHID_ARG=BRANCH_TYPE_ID
 
 ifneq "$(TARGET_PLATFORM)" "Darwin"
 	DEBUG=$(call GetBuildConfigOption,${DEBUGGING_ARG})
-	VERBOSE=$(call GetBuildConfigOption, ${VERBOSE_ARG})
+	VERBOSE=$(call GetBuildConfigOption,${VERBOSE_ARG})
 	OPTLEVEL=$(call GetBuildConfigOption,${OPTLEVEL_ARG})
 	DEBUGLEVEL=$(call GetBuildConfigOption,${DEBUGLEVEL_ARG})
 	BRANCHID=$(call GetBuildConfigOption,${BRANCHID_ARG})
