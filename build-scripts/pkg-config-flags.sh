@@ -25,7 +25,13 @@ done
 
 # Conditional library flags for Linux and Mac platform:
 if [[ "$(uname -s)" == "Linux" && "$1" == "--libs" ]]; then
-	LINUX_EXTRA_DIR=$(echo $(ls -d /usr/lib/*-linux-gnu) | tr " " "\n" | head -n 1);
+	if stat --printf='' /usr/lib/*-linux-gnu 2>/dev/null
+     then
+          LINUX_EXTRA_DIR=$(echo $(ls -d /usr/lib/*-linux-gnu) | tr " " "\n" | head -n 1);
+     elif stat --printf='' /usr/lib/gcc/*-linux-gnu 2>/dev/null
+     then
+          LINUX_EXTRA_DIR=$(echo $(ls -d /usr/lib/gcc/*-linux-gnu) | tr " " "\n" | head -n 1);
+     fi
 	if [[ "${LINUX_EXTRA_DIR}" != "" ]]; then
 		PKGOUT+=" -L${LINUX_EXTRA_DIR} -LX11";
 	fi
