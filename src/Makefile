@@ -7,9 +7,9 @@ FALSE=0
 SEDCMD=`which sed`
 
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -m64 -Wno-error=unknown-warning
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -m64
 LD=g++
-LDFLAGS= -g$(DEBUGLEVEL) -lm -Wno-error=unknown-warning
+LDFLAGS= -g$(DEBUGLEVEL) -lm
 
 # OSX-specific locations and utility names:
 TARGET_PLATFORM := $(shell uname -s)
@@ -18,8 +18,8 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing -I/usr/local/opt/openssl/include
-	LDFLAGS+= -L/usr/local/opt/openssl/lib
+	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing - -Wno-error=unknown-warning I/usr/local/opt/openssl/include
+	LDFLAGS+= -Wno-error=unknown-warning -L/usr/local/opt/openssl/lib
 	## fallback values since Mac is broken as a platform w.r.t. its make version:
 	#DEBUG=$(shell ../build-scripts/get-build-config-setting.sh \
 	      $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING)
