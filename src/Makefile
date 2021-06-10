@@ -7,7 +7,7 @@ FALSE=0
 SEDCMD=`which sed`
 
 CXX=g++
-CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL) -march=native -m64
+CXXFLAGS= -g$(DEBUGLEVEL) -O$(OPTLEVEL)
 LD=g++
 LDFLAGS= -g$(DEBUGLEVEL) -lm
 
@@ -18,7 +18,7 @@ ifeq "$(TARGET_PLATFORM)" "Darwin"
 	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing - -Wno-error=unknown-warning I/usr/local/opt/openssl/include
+	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing -Wno-error=unknown-warning -I/usr/local/opt/openssl/include
 	LDFLAGS+= -Wno-error=unknown-warning -L/usr/local/opt/openssl/lib
 	## fallback values since Mac is broken as a platform w.r.t. its make version:
 	#DEBUG=$(shell ../build-scripts/get-build-config-setting.sh \
@@ -36,6 +36,13 @@ else
 	DEBUGGER=$(shell which gdb)
 	CXXFLAGS+= -std=c++17 -I/usr/include
 	LDFLAGS+= -Wl,--no-as-needed
+endif
+
+# Fix issues with builds on non-x86_64 architectures (e.g., some MacOS boxen) caused 
+# by including "-m64" in the default set of build CFLAGS:
+SYSTEM_BUILD_ARCH := $(shell uname -m)
+ifeq "$(TARGET_PLATFORM)" "x86_64"
+	CXXFLAGS += -march=native -m64
 endif
 
 define GetBuildConfigOption =
