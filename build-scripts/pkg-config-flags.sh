@@ -46,6 +46,7 @@ else
 	PKGOUT+=" -DTARGETOS_GENERIC_UNIX"
 fi
 
-PKGOUT=`echo $PKGOUT | $SED 's/-Wl,-fno-lto//g'` | $SED 's/-fno-lto//g'
+PKGOUT=`echo $PKGOUT | $SED 's/-fno-lto -Wl,-fno-lto//g' | $SED 's/-Wl,-fno-lto//g' | $SED 's/-fno-lto//g'`
+#PKGOUT=`echo $PKGOUT | $SED 's/ -fno-lto//g'`
 
 echo $PKGOUT
