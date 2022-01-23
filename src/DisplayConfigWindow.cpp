@@ -164,7 +164,7 @@ char * DisplayConfigWindow::TrimFilePathDisplay(const char *path, int maxlen = C
 }
 
 DisplayConfigWindow::DisplayConfigWindow() : 
-     Fl_Cairo_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT),
+     Fl_Double_Window(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT),
      finished(false), pngNewPathIcon(NULL), imageData(NULL) { 
 
      //Fl::visual(FL_RGB | FL_DEPTH | FL_DOUBLE | FL_MULTISAMPLE | FL_INDEX);
@@ -186,7 +186,7 @@ DisplayConfigWindow::DisplayConfigWindow() :
      size_range(CONFIG_WINDOW_WIDTH, CONFIG_WINDOW_HEIGHT);
      set_modal();
      callback(WindowCloseCallback);
-     set_draw_cb(Draw); 
+     //set_draw_cb(Draw); 
      //Fl::cairo_make_current(this);
 
      ConstructWindow();

@@ -10,6 +10,7 @@
 #include <cairo.h>
 
 #include <FL/Fl_Widget.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Cairo.H>
 #include <FL/Fl_Cairo_Window.H>
 #include <FL/Fl_Button.H>
@@ -36,7 +37,7 @@
 #define CFGWIN_CDIALOG_HEIGHT       (250)
 #define CFGWIN_MAX_FPATH_LENGTH     (256)
 
-class DisplayConfigWindow : public Fl_Cairo_Window { 
+class DisplayConfigWindow : public Fl_Double_Window { 
 
 	public:
 		static bool SetupInitialConfig(); 
