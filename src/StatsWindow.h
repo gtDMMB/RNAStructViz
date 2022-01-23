@@ -7,7 +7,7 @@
 
 #include <cairo.h>
 
-//#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Cairo.H>
 #include <FL/Fl_Cairo_Window.H>
 
@@ -49,7 +49,7 @@ namespace RocBoxPlot {
 
 }
 
-class StatsWindow : public Fl_Cairo_Window
+class StatsWindow : public Fl_Double_Window
 {
 public:
     void Construct(int w, int h, const std::vector<int>& structures);

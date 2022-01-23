@@ -116,6 +116,8 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     cairo_fill(crZoom);
     
     set_draw_cb(Draw);
+    show();
+    wait_for_expose();
 
 }
 
@@ -487,6 +489,7 @@ void DiagramWindow::Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr, bool red
     }
 	
     thisWindow->cursor(DIAGRAMWIN_DEFAULT_CURSOR);
+    thisWindow->show();
 
 }
 

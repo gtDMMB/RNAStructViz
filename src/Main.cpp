@@ -21,6 +21,7 @@
 #include "TerminalPrinting.h"
 #include "OptionParser.h"
 #include "ConfigExterns.h"
+#include "ConfigParser.h"
 #include "MacSystem.h"
 
 #include <signal.h>
@@ -70,7 +71,7 @@ int main(int argc, char **argv) {
     Fl_Tooltip::color(Darker(GUI_WINDOW_BGCOLOR, 0.91f));
     Fl_Tooltip::font(FL_HELVETICA);
     Fl_Tooltip::textcolor(Lighter(GUI_BTEXT_COLOR, 0.75f));
-    Fl_Tooltip::wrap_width(290);
+    Fl_Tooltip::wrap_width();
     //Fl_Tooltip::size(LOCAL_TEXT_SIZE);
     //Fl_Tooltip::margin_height(1);
     //Fl_Tooltip::margin_width(1);
@@ -80,6 +81,10 @@ int main(int argc, char **argv) {
 
     if(DISPLAY_FIRSTRUN_MESSAGE) {
          MainWindow::GetInstance()->DisplayFirstTimeUserInstructions();
+         // Only display it once:
+         DISPLAY_FIRSTRUN_MESSAGE = false;
+         ConfigParser cfgParser(USER_CONFIG_PATH, !DEBUGGING_ON);
+         cfgParser.storeVariables();         
     }
     while(MainWindow::IsRunning()) {
         Fl::wait();

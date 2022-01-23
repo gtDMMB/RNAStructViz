@@ -57,7 +57,6 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
 
     xclass("RNAStructViz");
     Fl::visual(FL_DOUBLE | FL_INDEX | FL_RGB);
-    set_draw_cb(StatsWindow::Draw);
 
     folderIndex = -1;
     referenceIndex = -1;
@@ -808,19 +807,27 @@ void StatsWindow::Construct(int w, int h, const std::vector<int>& structures)
     
     title = (char*)malloc(sizeof(char) * 64);
     SetStructures(structures);
+
+    //set_draw_cb(StatsWindow::Draw);
+    show();
+    wait_for_expose();
+
 }
 
 StatsWindow::StatsWindow(int w, int h, const char *label, 
                          const std::vector<int>& structures) : 
-	Fl_Cairo_Window(w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
+	Fl_Double_Window(w, h), statsFormulasImage(NULL), statsFormulasBox(NULL), 
 	input_window(NULL), rocplot_rotated_text(NULL) {
+    copy_label(label);
     Construct(w, h, structures);
 }
 
 StatsWindow::StatsWindow(int x, int y, int w, int h, const char *label, 
                          const std::vector<int>& structures) : 
-	Fl_Cairo_Window(x, y, w, h, label), statsFormulasImage(NULL), statsFormulasBox(NULL), 
+	Fl_Double_Window(w, h), statsFormulasImage(NULL), statsFormulasBox(NULL), 
 	input_window(NULL) {
+    resize(x, y, w, h);
+    copy_label(label);
     Construct(w, h, structures);
 }
 
@@ -874,6 +881,8 @@ void StatsWindow::Draw(Fl_Cairo_Window *crWin, cairo_t *cr) {
     thisWin->leg4_pack->redraw();
     thisWin->exp_button->redraw();
     thisWin->tab_window->redraw();
+
+    thisWin->show();
 
 }
 

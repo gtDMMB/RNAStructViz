@@ -15,14 +15,21 @@ LDFLAGS= -g$(DEBUGLEVEL) -lm
 TARGET_PLATFORM := $(shell uname -s)
 ifeq "$(TARGET_PLATFORM)" "Darwin"
 	SEDCMD=`which gsed`
-	FLTKCONFIG=/usr/local/opt/fltkwithcairo/bin/fltk-config
+	FLTKCONFIG=$(shell brew --prefix fltkwithcairo)/bin/fltk-config
 	READLINK=$(shell which greadlink)
 	DEBUGGER=$(shell which lldb)
-	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing -Wno-error=unknown-warning -I/usr/local/opt/openssl/include
-	LDFLAGS+= -Wno-error=unknown-warning -L/usr/local/opt/openssl/lib
-	## fallback values since Mac is broken as a platform w.r.t. its make version:
-	#DEBUG=$(shell ../build-scripts/get-build-config-setting.sh \
-	      $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) DEBUGGING)
+	CXXFLAGS+= -std=c++17 -Wno-c++11-narrowing -Wno-error=unknown-warning \
+			-I/usr/local/opt/openssl/include \
+			-I$(shell brew --prefix openssl@1.1)/include \
+			-I$(shell brew --prefix boost)/include
+	LDFLAGS+= -Wno-error=unknown-warning -L/usr/local/opt/openssl/lib \
+			-L$(shell brew --prefix openssl@1.1)/lib \
+			-L$(shell brew --prefix pixman)/lib \
+			-L$(shell brew --prefix libjpeg)/lib \
+			-L$(shell brew --prefix gsl)/lib \
+			-L$(shell brew --prefix mpfr)/lib \
+			-L$(shell brew --prefix gmp)/lib \
+			-L$(shell brew --prefix boost)/lib
 	DEBUG="0"
 	OPTLEVEL=$(shell ../build-scripts/get-build-config-setting.sh \
 		 $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg) OPTLEVEL)
@@ -79,12 +86,15 @@ endif
 # Optional compile with clang compiler:
 BUILD_WITH_COMPILER := $(shell env | grep STRUCTVIZ_COMPILER | sed -e 's/^.*=//')
 ifneq "$(BUILD_WITH_COMPILER)" ""
-	# add necessary CXX/LDFLAGS for clang++:
-	CLANG_EXTRA_CXXFLAGS= -std=c++1z -stdlib=libc++ \
-		-I$(shell ls -d /usr/include | tail -n1)
-	CLANG_EXTRA_LDFLAGS= -std=c++1z -stdlib=libc++ -lm \
-		-L$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/* | tail -n1) \
-		-lgcc_s -lpthread -lrt -lsupc++
+	# Add necessary CXX/LDFLAGS for clang++:
+	CLANG_EXTRA_CXXFLAGS= -std=c++1z -stdlib=libc++ #-I$(shell ls -d /usr/include | tail -n1)
+	LINUX_LIBDIRS=$(shell ls -d /usr/lib/gcc/x86_64-linux-gnu/* | tail -n1)
+        LINUX_LIBINC=
+	ifneq "$(LINUX_LIBDIRS)" ""
+		LINUX_LIBINC=-L$(LINUXLIBDIRS) -lgcc_s -lrt -lsupc++
+	endif
+        CLANG_EXTRA_LDFLAGS= -std=c++1z -stdlib=libc++ -lm \
+				 $(LINUX_LIBINC) -lpthread
 	CXX=$(BUILD_WITH_COMPILER)
 	CXXFLAGS+=$(CLANG_EXTRA_CXXFLAGS)
 	LD=$(BUILD_WITH_COMPILER)
@@ -123,7 +133,7 @@ CXXFLAGS_PKGCONFIG=$(shell ../build-scripts/pkg-config-flags.sh --cflags)
 CXXFLAGS_FLTK=$(shell $(FLTKCONFIG) --use-gl --use-images --use-glut --use-forms --use-cairo --cxxflags)
 CXXFLAGS_DEFINES=$(shell ../build-scripts/generate-build-config-cflags.sh $(shell $(READLINK) -f ../build-scripts/BuildConfig.cfg))
 CXXFLAGS_EXTRA=$(CFLAGS_FLTK_OVERRIDES) $(CXXFLAGS_PKGCONFIG) $(CXXFLAGS_FLTK) \
-	       -DFLTK_HAVE_CAIRO -DFLTKSTATIC -D_LARGEFILE_SOURCE -DBOOST_MPL_LIMIT_LIST_SIZE=10 \
+	       -DFLTK_HAVE_CAIRO -D_LARGEFILE_SOURCE -DBOOST_MPL_LIMIT_LIST_SIZE=10 \
 	       -D_LARGEFILE64_SOURCE -funsigned-char -fwrapv -freciprocal-math \
 	       -ffinite-math-only $(CXXFLAGS_DEFINES)
 
