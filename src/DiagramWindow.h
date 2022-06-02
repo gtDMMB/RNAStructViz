@@ -111,6 +111,11 @@ protected:
     */
     bool computeDrawKeyParams(RNAStructure **sequences, int *numToDraw, int *keyA, int *keyB);
     void drawWidgets(cairo_t *crDraw);
+    static inline void redraw_full(DiagramWindow *thisWin) {
+        thisWin->m_redrawStructures = true;
+        thisWin->drawWidgets(NULL);
+        thisWin->redraw();
+    }
     static void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr, bool drawWidgets);
     static inline void Draw(Fl_Cairo_Window *thisCairoWindow, cairo_t *cr) { DiagramWindow::Draw(thisCairoWindow, cr, true); }
     

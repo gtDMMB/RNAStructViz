@@ -90,6 +90,7 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     size_range(w, h, w, h);
     box(FL_NO_BOX);
     iconize();
+    make_current();
 
     title = (char *) malloc(128 * sizeof(char));
     SetStructures(structures);
@@ -116,8 +117,19 @@ void DiagramWindow::Construct(int w, int h, const std::vector<int> &structures) 
     cairo_fill(crZoom);
     
     set_draw_cb(Draw);
+    redraw_full(this);
     show();
-    wait_for_expose();
+    /* It can take some time from the time show() is called until the 
+     * point when the user should see it on screen. This leads to buggy 
+     * behavior on recent MacOS platforms (>= Big Sur) as seen in issue #105. 
+     * The strategy is to wait until the user sees the window, call show() again, 
+     * and then redraw everything within the window after that happens:
+     */
+    while(!shown() || !visible()) {
+        Fl::wait(0.5);
+    }
+    show();
+    redraw_full(this);
 
 }
 
