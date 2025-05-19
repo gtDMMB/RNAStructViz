@@ -31,19 +31,23 @@
      #ifndef __APPLE__
           #define __APPLE__
      #endif
-     #include <string.h>
-     /* Mac OSX apparently does not support the strchrnul function: */
-     static inline char* strchrnul(const char *s, int ch) {
-          if(s == NULL) {
-               return NULL;
-       }
-          char *strchrResult = (char *) strchr(s, ch);
-          if(strchrResult == NULL) {
-            size_t slen = strnlen(s, 2048);
-               return (char *) (s + slen);
-       }
-          return strchrResult;
-     }        
+     #ifndef strchrnul || !HAVE_STRCHRNUL
+          #include <string.h>
+          /* Mac OSX apparently does not support the strchrnul function: */
+          static inline char* strchrnul(const char *s, int ch) {
+               if(s == NULL) {
+                    return NULL;
+		}
+               char *strchrResult = (char *) strchr(s, ch);
+               if(strchrResult == NULL) {
+                    size_t slen = strnlen(s, 2048);
+                    return (char *) (s + slen);
+               }
+               return strchrResult;
+          }
+     #else
+          extern char *strchrnul(const char *s, int c);
+     #endif
 #endif
 
 #ifdef __LOCAL_NOUSE_THREADS
